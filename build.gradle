@@ -1,4 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'idea'
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir file("webapp/WEB-INF/classes")
+    }
+}
 
 version = '1.0.0'
 sourceCompatibility = 1.8
