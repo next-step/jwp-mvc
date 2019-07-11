@@ -3,9 +3,9 @@ package core.di.factory.example;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import core.annotation.Controller;
+import core.annotation.web.Controller;
 import core.annotation.Inject;
-import core.annotation.RequestMapping;
+import core.annotation.web.RequestMapping;
 import core.mvc.ModelAndView;
 
 @Controller

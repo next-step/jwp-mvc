@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.Maps;
 
-import core.annotation.RequestMethod;
+import core.annotation.web.RequestMethod;
 
 public class AnnotationHandlerMapping {
     private Object[] basePackage;

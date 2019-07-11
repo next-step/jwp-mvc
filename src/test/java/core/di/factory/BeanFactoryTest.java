@@ -1,7 +1,7 @@
 package core.di.factory;
 
 import com.google.common.collect.Sets;
-import core.annotation.Controller;
+import core.annotation.web.Controller;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.di.factory.example.MyQnaService;

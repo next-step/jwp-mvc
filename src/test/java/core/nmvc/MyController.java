@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.annotation.Controller;
-import core.annotation.RequestMapping;
-import core.annotation.RequestMethod;
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 
 @Controller
