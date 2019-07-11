@@ -1,0 +1,27 @@
+apply plugin: 'java'
+
+version = '1.0.0'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'javax.servlet:jstl:1.2'
+    implementation 'javax.servlet:javax.servlet-api:3.1.0'
+    implementation 'com.google.guava:guava:23.0'
+    implementation 'org.apache.commons:commons-lang3:3.6'
+    implementation 'org.apache.commons:commons-dbcp2:2.1.1'
+    implementation 'org.springframework:spring-jdbc:4.3.12.RELEASE'
+    implementation 'org.reflections:reflections:0.9.10'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.1'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:8.5.42'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.5.2'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:8.5.42'
+    runtimeOnly 'com.h2database:h2:1.4.196'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
+    testImplementation 'org.assertj:assertj-core:3.9.0'
+    testImplementation 'org.springframework:spring-test:4.3.12.RELEASE'
+}
