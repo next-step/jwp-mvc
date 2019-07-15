@@ -11,6 +11,8 @@
 	
 	<logger name="next" level="DEBUG" />
 
+	<logger name="study" level="DEBUG" />
+
 	<root level="INFO">
 		<appender-ref ref="STDOUT" />
 	</root>
