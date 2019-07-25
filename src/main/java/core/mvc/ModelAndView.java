@@ -20,6 +20,10 @@ public class ModelAndView {
         return this;
     }
 
+    public Object getObject(String attributeName) {
+        return model.get(attributeName);
+    }
+
     public Map<String, Object> getModel() {
         return Collections.unmodifiableMap(model);
     }
