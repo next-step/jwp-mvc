@@ -1,9 +1,9 @@
 package core.di.factory;
 
 import com.google.common.collect.Sets;
-import core.annotation.web.Controller;
 import core.annotation.Repository;
 import core.annotation.Service;
+import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;

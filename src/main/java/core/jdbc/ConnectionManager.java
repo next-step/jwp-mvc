@@ -1,11 +1,10 @@
 package core.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.sql.DataSource;
-
-import org.apache.commons.dbcp2.BasicDataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class ConnectionManager {
     private static final String DB_DRIVER = "org.h2.Driver";

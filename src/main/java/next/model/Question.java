@@ -20,7 +20,7 @@ public class Question {
     }
 
     public Question(long questionId, String writer, String title, String contents, Date createdDate,
-            int countOfComment) {
+                    int countOfComment) {
         this.questionId = questionId;
         this.writer = writer;
         this.title = title;
