@@ -9,6 +9,8 @@ import java.lang.reflect.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -54,6 +56,20 @@ public class ReflectionTest {
         }
 
         return "";
+    }
+
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        String fieldName= "name";
+        String testName = "태현";
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Field name = clazz.getDeclaredField(fieldName);
+        name.setAccessible(true);
+        Student student = new Student();
+        name.set(student, testName);
+        assertThat(student.getName()).isEqualTo(testName);
     }
 
     @Test
