@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class ReflectionTest {
@@ -21,6 +22,23 @@ public class ReflectionTest {
                 .forEach(it -> logger.debug("constructor : {}", it.getName()));
         Arrays.stream(clazz.getDeclaredMethods())
                 .forEach(it -> logger.debug("method : {}", it.getName()));
+    }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Student student = new Student();
+        Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+        name.set(student, "이름");
+
+        Field age = clazz.getDeclaredField("age");
+        age.setAccessible(true);
+        age.set(student, 5);
+
+        logger.debug("student : {}", student);
     }
 
     @Test
