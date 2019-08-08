@@ -29,7 +29,7 @@ public class ReflectionTest {
                 logger.debug("\t\tparameter: {}", parameterType);
             }
         }
-        for (final Field field : clazz.getFields()) {
+        for (final Field field : clazz.getDeclaredFields()) {
             logger.debug("\tfield: {}", field);
         }
     }
