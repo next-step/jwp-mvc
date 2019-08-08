@@ -1,18 +1,28 @@
 package next.reflection;
 
-import java.lang.reflect.Constructor;
+import com.google.common.collect.Sets;
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    private static final String BASIC_PACKAGE = "core.di.factory.example";
 
     @Test
     public void showClass() {
@@ -91,5 +101,24 @@ public class ReflectionTest {
 
         logger.debug("Student name: " + student.getName());
         logger.debug("Student age: " + student.getAge());
+    }
+
+    @Test
+    public void componentScan() {
+        Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+
+        preInstanticateClazz.forEach(component -> {
+            logger.debug(component.getName());
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation>... annotations) {
+        Reflections reflections = new Reflections(BASIC_PACKAGE);
+        Set<Class<?>> beans = Sets.newHashSet();
+        for (Class<? extends Annotation> annotation : annotations) {
+            beans.addAll(reflections.getTypesAnnotatedWith(annotation));
+        }
+        return beans;
     }
 }
