@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -13,6 +15,23 @@ public class ReflectionTest {
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
+        for (final Constructor constructor : clazz.getConstructors()) {
+            logger.debug("\tconstructor: {}", constructor);
+
+            for (final Class parameterType : constructor.getParameterTypes()) {
+                logger.debug("\t\tparameter: {}", parameterType);
+            }
+        }
+        for (final Method method : clazz.getMethods()) {
+            logger.debug("\tmethod: {}", method);
+
+            for (final Class parameterType : method.getParameterTypes()) {
+                logger.debug("\t\tparameter: {}", parameterType);
+            }
+        }
+        for (final Field field : clazz.getFields()) {
+            logger.debug("\tfield: {}", field);
+        }
     }
 
     @Test
