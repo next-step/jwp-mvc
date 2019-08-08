@@ -3,6 +3,7 @@ package next.reflection;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -33,22 +34,22 @@ public class ReflectionTest {
     private static final String AGE_GETTER_NAME = "getAge";
     private static final String NAME_GETTER_NAME = "getName";
 
+    private static final String BASE_PACKAGE = "core.di.factory.example";
 
+    @DisplayName("showClass : 클래스 필드, 생성자, 메소드 노출")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
-        // 필드
         Arrays.stream(clazz.getDeclaredFields())
                 .forEach(field -> {logger.debug("Field : {}", field);});
-        // 생성자
         Arrays.stream(clazz.getDeclaredConstructors())
                 .forEach(constructor -> {logger.debug("Constructor : {}", constructor);});
-        // 메소드
         Arrays.stream(clazz.getDeclaredMethods())
                 .forEach(method -> {logger.debug("Method : {}", method);});
     }
 
+    @DisplayName("constructor : argument constructor 호출")
     @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
@@ -74,6 +75,7 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("privateFieldAccess : privateField setValue 후 비교")
     @Test
     public void privateFieldAccess() {
         Class<Student> clazz = Student.class;
@@ -107,17 +109,15 @@ public class ReflectionTest {
         }
     }
 
-
+    @DisplayName("componentScan : core.di.factory.example 하위 어노테이션 클래스 노출")
     @Test
     public void componentScan() {
 
-        final String basePackage = "core.di.factory.example";
-
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forPackage(basePackage))
+                .setUrls(ClasspathHelper.forPackage(BASE_PACKAGE))
                 .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner())
-                .filterInputsBy(new FilterBuilder().includePackage(basePackage))
+                .filterInputsBy(new FilterBuilder().includePackage(BASE_PACKAGE))
         );
 
         logger.debug("{}", reflections.getTypesAnnotatedWith(Controller.class));
