@@ -1,6 +1,15 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,10 +105,24 @@ public class ReflectionTest {
             logger.error("{}", e);
             assertThat(e).doesNotThrowAnyException();
         }
-
-
-
     }
 
+
+    @Test
+    public void componentScan() {
+
+        final String basePackage = "core.di.factory.example";
+
+        Reflections reflections = new Reflections(
+                new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forPackage(basePackage))
+                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner())
+                .filterInputsBy(new FilterBuilder().includePackage(basePackage))
+        );
+
+        logger.debug("{}", reflections.getTypesAnnotatedWith(Controller.class));
+        logger.debug("{}", reflections.getTypesAnnotatedWith(Service.class));
+        logger.debug("{}", reflections.getTypesAnnotatedWith(Repository.class));
+    }
 
 }
