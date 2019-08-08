@@ -13,9 +13,17 @@ public class Junit3TestRunner {
         Method[] declaredMethods = clazz.getDeclaredMethods();
 
         for(Method method : declaredMethods) {
-            if (method.getName().startsWith(TEST)) {
-                method.invoke(clazz.newInstance());
-            }
+            invokeMethod(clazz, method);
         }
+    }
+
+    private void invokeMethod(Class<Junit3Test> clazz, Method method) throws Exception {
+        if (isMethodNameStartWithTest(method)) {
+            method.invoke(clazz.newInstance());
+        }
+    }
+
+    private boolean isMethodNameStartWithTest(Method method) {
+        return method.getName().startsWith(TEST);
     }
 }

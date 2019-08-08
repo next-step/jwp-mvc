@@ -10,9 +10,17 @@ public class Junit4TestRunner {
 
         Method[] declaredMethods = clazz.getDeclaredMethods();
         for(Method method : declaredMethods) {
-            if(method.isAnnotationPresent(MyTest.class)) {
-                method.invoke(clazz.newInstance());
-            }
+            invokeMethod(clazz, method);
         }
+    }
+
+    private void invokeMethod(Class<Junit4Test> clazz, Method method) throws Exception {
+        if(isMyTestAnnotationPresent(method)) {
+            method.invoke(clazz.newInstance());
+        }
+    }
+
+    private boolean isMyTestAnnotationPresent(Method method) {
+        return method.isAnnotationPresent(MyTest.class);
     }
 }
