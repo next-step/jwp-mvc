@@ -1,13 +1,21 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -56,5 +64,19 @@ public class ReflectionTest {
                 constructor.newInstance();
             }
         }
+    }
+
+    @Test
+    void di() throws Exception {
+        Reflections reflections = new Reflections("core.di.factory.example", new SubTypesScanner(), new TypeAnnotationsScanner());
+        findAnnotatedClass(reflections, Controller.class);
+        findAnnotatedClass(reflections, Service.class);
+        findAnnotatedClass(reflections, Repository.class);
+    }
+
+    private void findAnnotatedClass(Reflections reflections, Class<? extends Annotation> annotation) {
+        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(annotation);
+        controllers.stream()
+                .forEach(it -> logger.debug(it.getName()));
     }
 }
