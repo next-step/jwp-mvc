@@ -15,9 +15,13 @@ public class Junit3TestRunner {
         Class<Junit3Test> clazz = Junit3Test.class;
         List<Method> methods = Arrays.asList(clazz.getDeclaredMethods());
         for (Method method : methods) {
-            if(decideTestMethod(method)) {
-                method.invoke(clazz.getDeclaredConstructor().newInstance());
-            }
+            invokeMethod(clazz, method);
+        }
+    }
+
+    private void invokeMethod(Class<Junit3Test> clazz, Method method) throws Exception {
+        if(decideTestMethod(method)) {
+            method.invoke(clazz.getDeclaredConstructor().newInstance());
         }
     }
 

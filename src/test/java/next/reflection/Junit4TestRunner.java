@@ -15,10 +15,14 @@ public class Junit4TestRunner {
         List<Method> methodList = Arrays.asList(clazz.getDeclaredMethods());
         for (Method method : methodList) {
             Annotation testAnnotation = method.getAnnotation(MyTest.class);
-            if (Objects.nonNull(testAnnotation)) {
-                method.invoke(clazz.getDeclaredConstructor().newInstance());
-            }
+            newInstanceByAnnotation(clazz, method, testAnnotation);
         }
 
+    }
+
+    private void newInstanceByAnnotation(Class<Junit4Test> clazz, Method method, Annotation testAnnotation) throws Exception {
+        if (Objects.nonNull(testAnnotation)) {
+            method.invoke(clazz.getDeclaredConstructor().newInstance());
+        }
     }
 }
