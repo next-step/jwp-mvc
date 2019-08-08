@@ -47,4 +47,32 @@ public class ReflectionTest {
             }
         }
     }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        final Object object = clazz.getConstructor().newInstance();
+        for (final Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+
+            final String fieldType = field.getType().getSimpleName();
+            if ("String".equals(fieldType)) {
+                field.set(object, "StringValue");
+            }
+            if ("int".equals(fieldType)) {
+                field.set(object, 100);
+            }
+        }
+
+        for (final Method method : clazz.getMethods()) {
+            if (!method.getName().startsWith("get")) {
+                continue;
+            }
+
+            final Object fieldValue = method.invoke(object);
+            logger.debug("{}: {}", method.getName(), fieldValue);
+        }
+    }
 }
