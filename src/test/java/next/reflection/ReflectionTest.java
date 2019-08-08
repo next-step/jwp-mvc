@@ -1,11 +1,18 @@
 package next.reflection;
 
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,6 +76,7 @@ public class ReflectionTest {
         name.setAccessible(true);
         Student student = new Student();
         name.set(student, testName);
+
         assertThat(student.getName()).isEqualTo(testName);
     }
 
@@ -76,13 +84,16 @@ public class ReflectionTest {
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+
+        Date date = new Date();
+        Object[] args = Arrays.array(1, "dave", "title", "content", date, 2);
+        Question question =new Question(1, "dave", "title", "content", date, 2);
+
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
+            if (parameterTypes.length != 5) break; // date 때문에 5개짜리 생성자만 테스트
+            assertThat(constructor.newInstance(args).toString()).isEqualTo(question.toString());
         }
     }
 }
