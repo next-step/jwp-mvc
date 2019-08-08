@@ -23,7 +23,5 @@ public class Junit3TestRunner {
         for(Method method : methods) {
             method.invoke(testInatance);
         }
-
-
     }
 }
