@@ -1,6 +1,12 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,5 +76,15 @@ public class ReflectionTest {
             logger.debug(constructor.newInstance(Arrays.stream(constructor.getParameterTypes())
                     .map(parameterValues::get).toArray()).toString());
         }
+    }
+
+    @Test
+    public void scanAnnotation() {
+        Reflections reflections = new Reflections("core.di.factory.example",
+                new TypeAnnotationsScanner(), new SubTypesScanner());
+
+        logger.debug(reflections.getTypesAnnotatedWith(Controller.class).toString());
+        logger.debug(reflections.getTypesAnnotatedWith(Service.class).toString());
+        logger.debug(reflections.getTypesAnnotatedWith(Repository.class).toString());
     }
 }
