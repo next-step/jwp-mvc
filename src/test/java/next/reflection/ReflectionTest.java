@@ -5,7 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -31,5 +36,24 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Map<String, Object> fieldValue = new HashMap<>();
+
+        fieldValue.put("name", "장소현");
+        fieldValue.put("age", 28);
+
+        Class<Student> clazz = Student.class;
+        Student student = new Student();
+        logger.debug(clazz.getName());
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            field.set(student, fieldValue.get(field.getName()));
+        }
+
+        assertThat(student.getName()).isEqualTo("장소현");
+        assertThat(student.getAge()).isEqualTo(28);
     }
 }
