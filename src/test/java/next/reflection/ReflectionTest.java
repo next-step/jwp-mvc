@@ -1,14 +1,15 @@
 package next.reflection;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -57,15 +58,25 @@ public class ReflectionTest {
         Constructor[] constructors = clazz.getConstructors();
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
+            List<Object> parameters = new ArrayList<>();
+            logger.debug("parameter length : {}", parameterTypes.length);
             for (Class paramType : parameterTypes) {
                 logger.debug("param type : {}", paramType);
+                parameters.add(createParameter(paramType));
             }
+            constructor.newInstance(parameters.toArray());
         }
     }
 
+    private Object createParameter(Class paramType) throws Exception {
+        if(paramType.isPrimitive()) {
+            return 1;
+        }
+        return paramType.newInstance();
+    }
+
     @Test
-    public void privateFieldAccess() throws Exception{
+    public void privateFieldAccess() throws Exception {
         Class<Student> clazz = Student.class;
         Student student = new Student();
 
