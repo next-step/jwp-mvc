@@ -1,11 +1,17 @@
 package next.reflection;
 
+import com.google.common.collect.Sets;
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +19,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -94,6 +101,17 @@ public class ReflectionTest {
             Class[] parameterTypes = constructor.getParameterTypes();
             if (parameterTypes.length != 5) break; // date 때문에 5개짜리 생성자만 테스트
             assertThat(constructor.newInstance(args).toString()).isEqualTo(question.toString());
+        }
+    }
+
+    @Test
+    public void componentScan() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        Class<? extends Annotation>[] annotations = Arrays.array(Controller.class, Service.class, Repository.class);
+        for (Class<? extends Annotation> annotation : annotations) {
+            reflections.getTypesAnnotatedWith(annotation)
+                    .forEach(annotationClass -> logger.debug(annotationClass.getSimpleName()));
         }
     }
 }
