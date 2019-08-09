@@ -31,7 +31,7 @@ public class ComponentScanTest {
         registerBeanFactory(Service.class);
         registerBeanFactory(Repository.class);
 
-        BEAN_FACTORY.stream().forEach(clazz -> logger.debug("bean name : {} ", clazz.getName()));
+        BEAN_FACTORY.stream().forEach(clazz -> logger.debug("Register bean name : {} ", clazz.getName()));
     }
 
     private void registerBeanFactory(Class<? extends Annotation> annotation) {

@@ -4,9 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ReflectionTest {
 
@@ -32,32 +36,43 @@ public class ReflectionTest {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
 
+        String name = "juyoung";
+        int age = 10;
+
+        Student student = new Student();
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
             field.setAccessible(true);
             if (field.getName().equals("name")) {
-                field.set(new Student(), "이름");
-            } else {
-                field.setInt(new Student(), 16);
-                logger.debug("field : {}", field);
+                field.set(student, name);
+            }
+            if (field.getName().equals("age")) {
+                field.set(student, age);
             }
         }
+
+        assertThat(student.getName()).isEqualTo(name);
+        assertThat(student.getAge()).isEqualTo(age);
     }
 
     @Test
     void create_constructors() throws Exception {
         Class<Question> clazz = Question.class;
         Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+
         for (Constructor constructor : declaredConstructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
-            Question question;
-            if (parameterTypes.length > 3) {
-                question = (Question) constructor.newInstance(1, "juyoung", "subject", "content", new Date(), 1);
-            }else{
-                question = (Question) constructor.newInstance("juyoung", "subject", "content");
-            }
+            Question question = newQuestion(parameterTypes.length, constructor);
+
             logger.debug("Question create constructor : {}", question);
         }
+    }
+
+    private Question newQuestion(int countOfParam, Constructor constructor) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        if (countOfParam > 3) {
+            return (Question) constructor.newInstance(1, "juyoung", "subject", "content", new Date(), 1);
+        }
+        return (Question) constructor.newInstance("juyoung", "subject", "content");
     }
 
     @Test
