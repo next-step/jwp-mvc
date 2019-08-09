@@ -12,6 +12,6 @@ public class Junit4TestRunner {
     @DisplayName("Junit4 테스트")
     @Test
     public void run() throws Exception {
-        JunitUtils.findAndRunTestMethod(Junit4Test.class, logger, method -> method.getAnnotation(MyTest.class) != null);
+        ReflectionUtils.findAndRunTestMethod(Junit4Test.class, logger, method -> method.getAnnotation(MyTest.class) != null);
     }
 }

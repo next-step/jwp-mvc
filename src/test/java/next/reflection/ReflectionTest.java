@@ -1,15 +1,25 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static next.reflection.ReflectionUtils.getTestInstance;
+import static next.reflection.ReflectionUtils.setField;
+import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("reflection 테스트")
 public class ReflectionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -23,13 +33,13 @@ public class ReflectionTest {
         studentClass = Student.class;
     }
 
-    @DisplayName("reflection 테스트 : 클래스 ")
+    @DisplayName("클래스 출력")
     @Test
     public void showClass() {
         logger.debug(questionClass.getName());
     }
 
-    @DisplayName("reflection 테스트 : 생성자 ")
+    @DisplayName("생성자 출력")
     @Test
     @SuppressWarnings("rawtypes")
     public void showConstructor() throws Exception {
@@ -43,7 +53,7 @@ public class ReflectionTest {
         }
     }
 
-    @DisplayName("reflection 테스트 : 필드")
+    @DisplayName("필드 출력")
     @Test
     @SuppressWarnings("rawtypes")
     public void field() throws Exception {
@@ -53,7 +63,7 @@ public class ReflectionTest {
         }
     }
 
-    @DisplayName("reflection 테스트 : 메서드 ")
+    @DisplayName("메서드 출력")
     @Test
     @SuppressWarnings("rawtypes")
     public void method() throws Exception {
@@ -67,7 +77,7 @@ public class ReflectionTest {
         }
     }
 
-    @DisplayName("reflection 테스트 : private 필드 접근")
+    @DisplayName("private 필드 접근")
     @Test
     public void privateFieldAccess() throws Exception {
         final String expectedName = "고유식";
@@ -82,15 +92,7 @@ public class ReflectionTest {
 
     }
 
-    private <T> void setField(Class<T> clazz, String fieldName, Object value, T newInstance) throws NoSuchFieldException, IllegalAccessException {
-        Field name = clazz.getDeclaredField(fieldName);
-        if (!name.isAccessible()) {
-            name.setAccessible(true);
-        }
-        name.set(newInstance, value);
-    }
-
-    @DisplayName("reflection 테스트 : 인자 있는 생성자")
+    @DisplayName("인자 있는 생성자")
     @Test
     public void newInstanceWithArguments() throws Exception {
 
@@ -107,30 +109,29 @@ public class ReflectionTest {
 
             logger.debug("생성자 인자 갯수: {}", parameterTypes.length);
             logger.debug("생성자 생성 : {}", instance);
+            assertNotNull(instance);
         }
     }
 
-    private Object getTestInstance(Class parameterType) throws Exception {
-        if (parameterType.isPrimitive()) {
-            return getPrimitiveValue(parameterType);
+    @DisplayName("컴포넌트 스캔 테스트")
+    @Test
+    public void componentScan() throws Exception {
+
+
+        Set<Class<?>> components = scanAnnotations("core.di.factory.example", Controller.class, Service.class, Repository.class);
+        for (Class<?> component : components) {
+            logger.debug("{}", component);
         }
-        return parameterType.newInstance();
+
+        assertFalse(components.isEmpty());
     }
 
-    private Object getPrimitiveValue(Class parameterType) {
-        if (boolean.class == parameterType) {
-            return false;
-        } else if (short.class == parameterType) {
-            return (short) 1;
-        } else if (int.class == parameterType) {
-            return 1;
-        } else if (long.class == parameterType) {
-            return 1L;
-        } else if (float.class == parameterType) {
-            return 1.1f;
-        } else if (double.class == parameterType) {
-            return 1.1;
+    private Set<Class<?>> scanAnnotations(String base, Class<? extends Annotation>... annotations) {
+        Reflections reflections = new Reflections(base);
+        Set<Class<?>> scannedAnnotations = new HashSet<>();
+        for (Class<? extends Annotation> annotation : annotations) {
+            scannedAnnotations.addAll(reflections.getTypesAnnotatedWith(annotation));
         }
-        return 'a';
+        return scannedAnnotations;
     }
 }

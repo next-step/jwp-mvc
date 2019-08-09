@@ -13,6 +13,6 @@ public class Junit3TestRunner {
     @DisplayName("Junit3 테스트")
     @Test
     public void run() throws Exception {
-        JunitUtils.findAndRunTestMethod(Junit3Test.class, logger, method -> method.getName().startsWith(PREFIX_TEST_METHOD));
+        ReflectionUtils.findAndRunTestMethod(Junit3Test.class, logger, method -> method.getName().startsWith(PREFIX_TEST_METHOD));
     }
 }
