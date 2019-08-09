@@ -7,6 +7,7 @@ import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
@@ -38,6 +39,14 @@ public class BeanFactoryTest {
         MyQnaService qnaService = qnaController.getQnaService();
         assertNotNull(qnaService.getUserRepository());
         assertNotNull(qnaService.getQuestionRepository());
+    }
+
+    @DisplayName("요구사항 6 - component scan")
+    @Test
+    @SuppressWarnings("unchecked")
+    void componentScan() {
+        getTypesAnnotatedWith(Controller.class, Service.class, Repository.class)
+                .forEach(System.out::println);
     }
 
     @SuppressWarnings("unchecked")
