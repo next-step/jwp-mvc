@@ -65,8 +65,6 @@ public class ReflectionTest {
                 constructor.newInstance("작성자", "제목", "내용");
             } else if (parameterTypes.length == 6) {
                 constructor.newInstance(1, "작성자", "제목", "내용", new Date(), 5);
-            } else {
-                constructor.newInstance();
             }
         }
     }
