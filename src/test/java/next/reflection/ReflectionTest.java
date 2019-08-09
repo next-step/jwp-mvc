@@ -1,72 +1,65 @@
 package next.reflection;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
-import java.util.stream.Stream;
 
 public class ReflectionTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+    private static Class<Question> targetClass;
 
-    @Test
-    public void showClass() {
-        Class<Question> clazz = Question.class;
-        logger.debug(clazz.getName());
-
-        logger.debug("* field list");
-        Field[] fields = clazz.getFields();
-        for (Field field : fields) {
-            logger.debug(field.getName());
-        }
-
-        logger.debug("* constructor list");
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            logger.debug(constructor.getName());
-        }
+    @BeforeAll
+    public static void init() {
+        targetClass = Question.class;
     }
 
+    @DisplayName("reflection 테스트 : 클래스 ")
+    @Test
+    public void showClass() {
+        logger.debug(targetClass.getName());
+    }
+
+    @DisplayName("reflection 테스트 : 생성자 ")
     @Test
     @SuppressWarnings("rawtypes")
-    public void constructor() throws Exception {
-        Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
+    public void showConstructor() throws Exception {
+        Constructor[] constructors = targetClass.getConstructors();
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
             logger.debug("paramer length : {}", parameterTypes.length);
             for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
+                logger.debug("\t\tparam type : {}", paramType);
             }
         }
     }
 
+    @DisplayName("reflection 테스트 : 필드")
     @Test
     @SuppressWarnings("rawtypes")
     public void field() throws Exception {
-        Class<Question> clazz = Question.class;
-
         logger.debug("* public field list");
-        Field[] publicFields = clazz.getFields();
+        Field[] publicFields = targetClass.getFields();
         for (Field field : publicFields) {
             logger.debug("\t\t{} {}", Modifier.toString(field.getModifiers()), field.getName());
         }
 
         logger.debug("* all field list");
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = targetClass.getDeclaredFields();
         for (Field field : fields) {
             logger.debug("\t\t{} {}", Modifier.toString(field.getModifiers()), field.getName());
         }
     }
 
+    @DisplayName("reflection 테스트 : 메서드 ")
     @Test
     @SuppressWarnings("rawtypes")
     public void method() throws Exception {
-        Class<Question> clazz = Question.class;
-
-        logger.debug("* public field list");
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = targetClass.getDeclaredMethods();
         for (Method method : methods) {
             logger.debug("\t\t{} {}", Modifier.toString(method.getModifiers()), method.getName());
             Parameter[] parameters = method.getParameters();
