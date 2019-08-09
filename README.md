@@ -7,3 +7,13 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+
+----
+# Step 1 자바 reflection
+- [x] 클래스 정보 출력 : Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보 출력
+- [x] test로 시작하는 메소드 실행 : Junit3Runner 클래스 중 test로 시작하는 메소드 실행
+- [x] @Test 애노테이션 메소드 실행 : Junit4TestRunner 클래스 중 @MyTest 어노테이션 메소드 실행
+- [x] private field에 값 할당 : Student의 필드 값을 주입
+- [x] 인자를 가진 생성자의 인스턴스 생성 : Question 인스턴스 생성
+- [x] component scan :  @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스 출력 
