@@ -2,14 +2,20 @@ package next.reflection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +80,20 @@ public class ReflectionTest {
 
   private void printClassInfo(Question question) {
     logger.debug("info : {}", question.toString());
+  }
+
+  @Test
+  public void componentScan() {
+    Reflections reflections = new Reflections("core.di.factory.example");
+
+    Set<Class> findAnnotation = new HashSet<>();
+    findAnnotation.add(Controller.class);
+    findAnnotation.add(Repository.class);
+    findAnnotation.add(Service.class);
+
+    for (Class clazz : findAnnotation) {
+      logger.debug(clazz.getName() + " " + reflections.getTypesAnnotatedWith(clazz).toString());
+    }
   }
 
 }
