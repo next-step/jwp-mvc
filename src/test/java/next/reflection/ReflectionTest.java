@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ReflectionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -42,13 +44,6 @@ public class ReflectionTest {
     @Test
     @SuppressWarnings("rawtypes")
     public void field() throws Exception {
-        logger.debug("* public field list");
-        Field[] publicFields = targetClass.getFields();
-        for (Field field : publicFields) {
-            logger.debug("\t\t{} {}", Modifier.toString(field.getModifiers()), field.getName());
-        }
-
-        logger.debug("* all field list");
         Field[] fields = targetClass.getDeclaredFields();
         for (Field field : fields) {
             logger.debug("\t\t{} {}", Modifier.toString(field.getModifiers()), field.getName());
@@ -67,5 +62,29 @@ public class ReflectionTest {
                 logger.debug("\t\t\t{} {}", Modifier.toString(parameter.getModifiers()), parameter.getType().getName());
             }
         }
+    }
+
+    @DisplayName("reflection 테스트 : private 필드 접근 ")
+    @Test
+    public void privateFieldAccess() throws Exception {
+        final String expectedName = "고유식";
+        final int expectedAge = 32;
+        Class<Student> clazz = Student.class;
+        Student newInstance = clazz.newInstance();
+
+        setField(clazz, "name", expectedName, newInstance);
+        setField(clazz, "age", expectedAge, newInstance);
+
+        assertEquals(expectedName, newInstance.getName());
+        assertEquals(expectedAge, newInstance.getAge());
+
+    }
+
+    private <T> void setField(Class<T> clazz, String fieldName, Object value, T newInstance) throws NoSuchFieldException, IllegalAccessException {
+        Field name = clazz.getDeclaredField(fieldName);
+        if (!name.isAccessible()) {
+            name.setAccessible(true);
+        }
+        name.set(newInstance, value);
     }
 }
