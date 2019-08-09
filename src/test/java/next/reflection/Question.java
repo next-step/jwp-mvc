@@ -1,5 +1,8 @@
 package next.reflection;
 
+import org.aspectj.lang.annotation.RequiredTypes;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import java.util.Date;
 
 public class Question {
@@ -15,11 +18,11 @@ public class Question {
 
     private int countOfComment;
 
-    public Question(String writer, String title, String contents) {
+    public Question(String writer, @Qualifier("test") String title, String contents) {
         this(0, writer, title, contents, new Date(), 0);
     }
 
-    public Question(long questionId, String writer, String title, String contents, Date createdDate,
+    public Question(long questionId, String writer, @Qualifier("test") String title, String contents, Date createdDate,
                     int countOfComment) {
         this.questionId = questionId;
         this.writer = writer;
