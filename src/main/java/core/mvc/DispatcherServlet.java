@@ -1,5 +1,7 @@
-package core.mvc.asis;
+package core.mvc;
 
+import core.mvc.asis.Controller;
+import core.mvc.asis.RequestMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
