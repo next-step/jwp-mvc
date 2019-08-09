@@ -38,6 +38,21 @@ public class ReflectionTest {
         }
     }
 
+    @Test
+    void create_constructors() throws Exception {
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+        for (Constructor constructor : declaredConstructors) {
+            Class[] parameterTypes = constructor.getParameterTypes();
+            Question question;
+            if (parameterTypes.length > 3) {
+                question = (Question) constructor.newInstance(1, "juyoung", "subject", "content", new Date(), 1);
+            }else{
+                question = (Question) constructor.newInstance("juyoung", "subject", "content");
+            }
+            logger.debug("Question create constructor : {}", question);
+        }
+    }
 
     @Test
     @SuppressWarnings("rawtypes")
