@@ -2,10 +2,27 @@ package next.reflection;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
 public class Junit4TestRunner {
     @Test
     public void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
-        // TODO Junit4Test에서 @MyTest 애노테이션이 있는 메소드 실행
+
+        Method[] methods = clazz.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            Annotation[] annotations = methods[i].getAnnotations();
+            if(isAnnotationClass(MyTest.class, annotations)){
+                methods[i].invoke(clazz.newInstance());
+            }
+        }
+    }
+
+    public boolean isAnnotationClass(Class<?> annotationClass, Annotation[] annotations){
+        for (int i = 0; i < annotations.length; i++) {
+            return annotations[i].annotationType().equals(annotationClass);
+        }
+        return false;
     }
 }
