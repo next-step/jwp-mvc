@@ -3,6 +3,9 @@ package next.reflection;
 import java.util.Date;
 
 public class Question {
+
+    public static final String PRIVATE_STATIC_FINAL_STRING = "test";
+
     private long questionId;
 
     private String writer;
