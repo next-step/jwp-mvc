@@ -1,5 +1,8 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,17 +19,34 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String BASE_PACKAGE = "next.controller";
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping annotationHandlerMapping;
+
 
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
+
+        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        annotationHandlerMapping.initialize();
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
+
+        if (handlerExecution != null) {
+            newService(handlerExecution, req, resp);
+            return;
+        }
+
+        oldService(req, resp);
+    }
+
+    protected void oldService(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
@@ -36,6 +56,15 @@ public class DispatcherServlet extends HttpServlet {
             move(viewName, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    private void newService(HandlerExecution handlerExecution, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            ModelAndView modelAndView = handlerExecution.handle(req, resp);
+        } catch (Throwable e) {
+            logger.error("Ner Service Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }

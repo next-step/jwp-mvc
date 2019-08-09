@@ -12,6 +12,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
@@ -26,20 +28,21 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
 public class AnnotationHandlerMapping {
-    private Object[] basePackage;
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
+    private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
-    public void initialize() throws AnnotationHandlerMappingException {
-        for (Object base : basePackage) {
-            Reflections reflections = getBasePackageReflections(base);
-            Set<Class<?>> controllerClasses = getControllerClasses(reflections);
-            Set<HandlerExecution> handlerExecutions = getHandlerExecurions(controllerClasses);
-            putHandlerExecutions(handlerExecutions);
+    public void initialize() {
+        try {
+            basePackageInitialize(basePackage);
+        } catch (AnnotationHandlerMappingException e) {
+            logger.error("{}", e);
+            throw e;
         }
     }
 
@@ -47,6 +50,15 @@ public class AnnotationHandlerMapping {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    private void basePackageInitialize(Object[] bases) {
+        for (Object base : bases) {
+            Reflections reflections = getBasePackageReflections(base);
+            Set<Class<?>> controllerClasses = getControllerClasses(reflections);
+            Set<HandlerExecution> handlerExecutions = getHandlerExecurions(controllerClasses);
+            putHandlerExecutions(handlerExecutions);
+        }
     }
 
     private void putHandlerExecutions(Set<HandlerExecution> handlerExecutions) {
