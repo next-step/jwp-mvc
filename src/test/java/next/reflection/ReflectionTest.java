@@ -70,7 +70,7 @@ public class ReflectionTest {
     }
 
     @Test
-    void di() throws Exception {
+    void componentScanByReflection() throws Exception {
         Reflections reflections = new Reflections("core.di.factory.example", new SubTypesScanner(), new TypeAnnotationsScanner());
         findAnnotatedClass(reflections, Controller.class);
         findAnnotatedClass(reflections, Service.class);
