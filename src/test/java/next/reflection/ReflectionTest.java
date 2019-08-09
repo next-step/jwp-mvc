@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import java.util.Date;
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("요구사항 1 - 클래스 정보 출력")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
@@ -50,6 +52,7 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("요구사항 4 - private field에 값 할당")
     @Test
     public void privateFieldAccess() throws Exception {
         Class<Student> clazz = Student.class;
@@ -71,6 +74,7 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("요구사항 5 - 인자를 가진 생성자의 인스턴스 생성")
     @Test
     void newQuestion() throws Exception {
         Class<Question> clazz = Question.class;
