@@ -13,24 +13,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ReflectionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
-    private static Class<Question> targetClass;
+    private static Class<Question> questionClass;
+    private static Class<Student> studentClass;
+
 
     @BeforeAll
     public static void init() {
-        targetClass = Question.class;
+        questionClass = Question.class;
+        studentClass = Student.class;
     }
 
     @DisplayName("reflection 테스트 : 클래스 ")
     @Test
     public void showClass() {
-        logger.debug(targetClass.getName());
+        logger.debug(questionClass.getName());
     }
 
     @DisplayName("reflection 테스트 : 생성자 ")
     @Test
     @SuppressWarnings("rawtypes")
     public void showConstructor() throws Exception {
-        Constructor[] constructors = targetClass.getConstructors();
+        Constructor[] constructors = questionClass.getConstructors();
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
             logger.debug("paramer length : {}", parameterTypes.length);
@@ -44,7 +47,7 @@ public class ReflectionTest {
     @Test
     @SuppressWarnings("rawtypes")
     public void field() throws Exception {
-        Field[] fields = targetClass.getDeclaredFields();
+        Field[] fields = questionClass.getDeclaredFields();
         for (Field field : fields) {
             logger.debug("\t\t{} {}", Modifier.toString(field.getModifiers()), field.getName());
         }
@@ -54,7 +57,7 @@ public class ReflectionTest {
     @Test
     @SuppressWarnings("rawtypes")
     public void method() throws Exception {
-        Method[] methods = targetClass.getDeclaredMethods();
+        Method[] methods = questionClass.getDeclaredMethods();
         for (Method method : methods) {
             logger.debug("\t\t{} {}", Modifier.toString(method.getModifiers()), method.getName());
             Parameter[] parameters = method.getParameters();
@@ -64,16 +67,15 @@ public class ReflectionTest {
         }
     }
 
-    @DisplayName("reflection 테스트 : private 필드 접근 ")
+    @DisplayName("reflection 테스트 : private 필드 접근")
     @Test
     public void privateFieldAccess() throws Exception {
         final String expectedName = "고유식";
         final int expectedAge = 32;
-        Class<Student> clazz = Student.class;
-        Student newInstance = clazz.newInstance();
+        Student newInstance = studentClass.newInstance();
 
-        setField(clazz, "name", expectedName, newInstance);
-        setField(clazz, "age", expectedAge, newInstance);
+        setField(studentClass, "name", expectedName, newInstance);
+        setField(studentClass, "age", expectedAge, newInstance);
 
         assertEquals(expectedName, newInstance.getName());
         assertEquals(expectedAge, newInstance.getAge());
@@ -86,5 +88,49 @@ public class ReflectionTest {
             name.setAccessible(true);
         }
         name.set(newInstance, value);
+    }
+
+    @DisplayName("reflection 테스트 : 인자 있는 생성자")
+    @Test
+    public void newInstanceWithArguments() throws Exception {
+
+        Constructor[] constructors = questionClass.getConstructors();
+        for (Constructor constructor : constructors) {
+            Class[] parameterTypes = constructor.getParameterTypes();
+            Object[] args = new Object[parameterTypes.length];
+
+            for (int i = 0; i < parameterTypes.length; i++) {
+                args[i] = getTestInstance(parameterTypes[i]);
+            }
+
+            Object instance = constructor.newInstance(args);
+
+            logger.debug("생성자 인자 갯수: {}", parameterTypes.length);
+            logger.debug("생성자 생성 : {}", instance);
+        }
+    }
+
+    private Object getTestInstance(Class parameterType) throws Exception {
+        if (parameterType.isPrimitive()) {
+            return getPrimitiveValue(parameterType);
+        }
+        return parameterType.newInstance();
+    }
+
+    private Object getPrimitiveValue(Class parameterType) {
+        if (boolean.class == parameterType) {
+            return false;
+        } else if (short.class == parameterType) {
+            return (short) 1;
+        } else if (int.class == parameterType) {
+            return 1;
+        } else if (long.class == parameterType) {
+            return 1L;
+        } else if (float.class == parameterType) {
+            return 1.1f;
+        } else if (double.class == parameterType) {
+            return 1.1;
+        }
+        return 'a';
     }
 }
