@@ -15,17 +15,23 @@ public class ReflectionTest {
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
-
         logger.debug("Question name: {}", clazz.getName());
-        Arrays.stream(clazz.getDeclaredFields()).forEach(field -> logger.debug("Field : {}", field));
-        Arrays.stream(clazz.getConstructors()).forEach(constructor -> logger.debug(constructor.toString()));
-        Arrays.stream(clazz.getDeclaredMethods()).forEach(method -> logger.debug("Method : {}", String.valueOf(method)));
+
+        Arrays.stream(clazz.getDeclaredFields())
+                .forEach(field -> logger.debug("Field name : {}", field.getName()));
+
+        Arrays.stream(clazz.getDeclaredMethods())
+                .forEach(constructor -> logger.debug("Constructor name : {}", constructor.toString()));
+
+        Arrays.stream(clazz.getDeclaredMethods())
+                .forEach(method -> logger.debug("Method name : {}", String.valueOf(method)));
     }
 
     @Test
     public void privateFieldAccess() throws IllegalAccessException {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
+
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field field : declaredFields) {
             field.setAccessible(true);
