@@ -2,10 +2,16 @@ package next.reflection;
 
 import org.junit.jupiter.api.Test;
 
-public class Junit4TestRunner {
+import java.util.stream.Stream;
+
+class Junit4TestRunner {
+
     @Test
-    public void run() throws Exception {
-        Class<Junit4Test> clazz = Junit4Test.class;
-        // TODO Junit4Test에서 @MyTest 애노테이션이 있는 메소드 실행
+    void run() {
+        final Class<Junit4Test> clazz = Junit4Test.class;
+
+        Stream.of(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(MyTest.class))
+                .forEach(ExceptionWrapper.wrapper(method -> method.invoke(clazz.newInstance())));
     }
 }
