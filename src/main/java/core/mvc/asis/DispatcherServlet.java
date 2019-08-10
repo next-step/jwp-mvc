@@ -1,5 +1,9 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,28 +20,53 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String BASE_CONTROLLER_PACKAGE = "next.controller";
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         rm = new RequestMapping();
         rm.initMapping();
+
+        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_CONTROLLER_PACKAGE);
+        annotationHandlerMapping.initialize();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
+
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
+            route(controller, req, resp);
+        } catch (Exception e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private void route(Controller controller, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        if(controller == null) {
+            routeAnnotationBaseController(req, resp);
+        } else {
+            routeClassBaseController(req, resp, controller);
+        }
+    }
+
+    private void routeClassBaseController(HttpServletRequest req, HttpServletResponse resp, Controller controller) throws Exception {
+        String viewName = controller.execute(req, resp);
+        move(viewName, req, resp);
+    }
+
+    private void routeAnnotationBaseController(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        HandlerExecution handler = annotationHandlerMapping.getHandler(req);
+        ModelAndView mav = handler.handle(req, resp);
+        View view = mav.getView();
+        view.render(mav.getModel(), req, resp);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
