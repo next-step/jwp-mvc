@@ -60,7 +60,7 @@ public class AnnotationHandlerMapping {
             requestMethods = RequestMethod.values();
         }
 
-        for(RequestMethod requestMethod : requestMethods) {
+        for (RequestMethod requestMethod : requestMethods) {
             handlerExecutions.put(getHandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(clazz.newInstance(), method));
         }
     }
