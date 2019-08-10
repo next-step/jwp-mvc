@@ -1,6 +1,18 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
+import core.di.factory.BeanFactoryTest;
+import core.di.factory.example.JdbcQuestionRepository;
+import core.di.factory.example.JdbcUserRepository;
+import core.di.factory.example.MyQnaService;
+import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -181,5 +194,29 @@ class ReflectionTest {
             assertThat(question.getContents()).isEqualTo("문자열");
             assertThat(question.getCountOfComment()).isEqualTo(0);
         });
+    }
+
+    @Test
+    void componentScan() {
+        final ConfigurationBuilder configurationBuilder = ConfigurationBuilder
+                .build(BeanFactoryTest.class.getPackage().getName())
+                .setScanners(
+                        new SubTypesScanner(),
+//                        new FieldAnnotationsScanner(),
+//                        new MethodAnnotationsScanner(),
+                        new TypeAnnotationsScanner()
+                )
+                .setExecutorService(Executors.newFixedThreadPool(4));
+
+        final Reflections reflections = new Reflections(configurationBuilder);
+
+        assertThat(reflections.getTypesAnnotatedWith(Controller.class))
+                .containsOnly(QnaController.class);
+
+        assertThat(reflections.getTypesAnnotatedWith(Service.class))
+                .containsOnly(MyQnaService.class);
+
+        assertThat(reflections.getTypesAnnotatedWith(Repository.class))
+                .containsOnly(JdbcUserRepository.class, JdbcQuestionRepository.class);
     }
 }
