@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ReflectionTest {
+class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
-    public void showClass() {
+    void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
 
