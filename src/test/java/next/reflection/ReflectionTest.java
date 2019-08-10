@@ -11,6 +11,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -58,19 +60,24 @@ public class ReflectionTest {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
 
+        // given
         final Object object = clazz.getConstructor().newInstance();
         for (final Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             field.set(object, getMockValue(field.getType()));
         }
 
+        // when
         for (final Method method : clazz.getMethods()) {
-            if (!method.getName().startsWith("get")) {
+            if (!method.getName().startsWith("get") || "getClass".equals(method.getName())) {
                 continue;
             }
 
             final Object fieldValue = method.invoke(object);
-            logger.debug("{}: {}", method.getName(), fieldValue);
+            final Object mockValue = getMockValue(fieldValue.getClass());
+
+            // then
+            assertThat(fieldValue).isEqualTo(mockValue);
         }
     }
 
@@ -86,24 +93,26 @@ public class ReflectionTest {
 
             final Object object = constructor.newInstance(parameters);
 
-            logger.debug("{}", object);
+            assertThat(object).isNotNull();
         }
     }
 
     private Object getMockValue(final Class type) {
-        final String fieldType = type.getSimpleName().toLowerCase();
-        if ("string".equals(fieldType)) {
-            return "StringValue";
+        switch (type.getSimpleName().toLowerCase()) {
+            case "string":
+                return "StringValue";
+
+            case "int":
+            case "integer":
+                return 100;
+
+            case "long":
+                return 100_000_000;
+
+            case "date":
+                return new Date();
         }
-        if ("int".equals(fieldType)) {
-            return 100;
-        }
-        if ("long".equals(fieldType)) {
-            return 100_000_000;
-        }
-        if ("date".equals(fieldType)) {
-            return new Date();
-        }
+
 
         return null;
     }
