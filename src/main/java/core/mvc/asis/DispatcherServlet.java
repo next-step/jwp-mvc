@@ -35,42 +35,37 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = requestMapping.findController(requestUri);
 
-        if (controller == null) {
-            execute(req, resp);
-        } else {
-            executeLegacy(req, resp);
+        try {
+            if (controller == null) {
+                execute(req, resp);
+            } else {
+                executeLegacy(req, resp);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
     }
 
-    private void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    private void execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HandlerExecution handler = annotationHandlerMapping.getHandler(req);
 
-        try {
-            ModelAndView modelAndView = handler.handle(req, resp);
-            View view = modelAndView.getView();
-            view.render(modelAndView.getModel(), req, resp);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
+        ModelAndView modelAndView = handler.handle(req, resp);
+        View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), req, resp);
+
     }
 
-    private void executeLegacy(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    private void executeLegacy(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Controller controller = requestMapping.findController(req.getRequestURI());
 
-        try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
+        String viewName = controller.execute(req, resp);
+        move(viewName, req, resp);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
