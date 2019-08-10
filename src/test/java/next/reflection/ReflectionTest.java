@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -50,7 +52,8 @@ public class ReflectionTest {
         name.set(student, "재성");
         age.setInt(student, 10);
 
-        logger.debug("student : {}", student);
+        assertThat(student.getName()).isEqualTo("재성");
+        assertThat(student.getAge()).isEqualTo(10);
     }
 
     @Test
@@ -71,6 +74,9 @@ public class ReflectionTest {
     void constructorWithArgs() throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         Constructor<Question> constructor = Question.class.getConstructor(String.class, String.class, String.class);
         Question question = constructor.newInstance("testWriter", "testTitle", "testContents");
-        logger.debug("new instance : {}", question);
+
+        assertThat(question.getWriter()).isEqualTo("testWriter");
+        assertThat(question.getTitle()).isEqualTo("testTitle");
+        assertThat(question.getContents()).isEqualTo("testContents");
     }
 }
