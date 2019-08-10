@@ -9,8 +9,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ReflectionTest {
@@ -113,6 +115,43 @@ class ReflectionTest {
             for (Class paramType : parameterTypes) {
                 logger.debug("param type : {}", paramType);
             }
+        }
+    }
+
+    @Test
+    void privateFieldAccess() throws IllegalAccessException {
+        Class<Student> clazz = Student.class;
+
+        final Map<StudentFields, Field> fields = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> StudentFields.contains(field.getName()))
+                .peek(field -> field.setAccessible(true))
+                .collect(toMap(field -> StudentFields.valueOf(field.getName().toUpperCase()), field -> field));
+
+        final Student student = new Student();
+        Field name = fields.get(StudentFields.NAME);
+        name.set(student, "박무진");
+
+        Field age = fields.get(StudentFields.AGE);
+        age.set(student, 45);
+
+        assertThat(student.getName()).isEqualTo("박무진");
+        assertThat(student.getAge()).isEqualTo(45);
+    }
+
+    private enum StudentFields {
+        NAME("name"),
+        AGE("age")
+        ;
+
+        private final String name;
+
+        StudentFields(final String name) {
+            this.name = name;
+        }
+
+        public static boolean contains(final String name) {
+            return Arrays.stream(values())
+                         .anyMatch(value -> value.name.equals(name));
         }
     }
 }
