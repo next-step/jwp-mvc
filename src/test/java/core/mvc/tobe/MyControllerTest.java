@@ -18,9 +18,9 @@ class MyControllerTest {
         handlerMapping.initialize();
     }
 
-    @DisplayName("MyController의 /users/findUserId로 요청시 status가 200인지")
+    @DisplayName("method type이 default인 경우 get mapping 처리하는지")
     @Test
-    public void getHandler_get() throws Exception {
+    public void default_request_method_get() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
@@ -29,10 +29,43 @@ class MyControllerTest {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
-    @DisplayName("MyController의 /users로 요청시 status가 200인지")
+    @DisplayName("method type이 default인 경우 put mapping 처리하는지")
     @Test
-    public void getHandler_post() throws Exception {
+    public void default_request_method_put() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("PUT", "/users/findUserId");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.handle(request, response);
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @DisplayName("method type이 default인 경우 post mapping 처리")
+    @Test
+    public void default_request_method_post() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/findUserId");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.handle(request, response);
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @DisplayName("method typd이 post인 경우 post mapping 처리")
+    @Test
+    public void request_method_post() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.handle(request, response);
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @DisplayName("method typd이 get인 경우 get mapping 처리")
+    @Test
+    public void request_method_get() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);

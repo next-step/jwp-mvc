@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+    private static final int DEFAULT_REQUEST_METHOD_COUNT = 1;
 
     private Object[] basePackage;
 
@@ -44,16 +45,28 @@ public class AnnotationHandlerMapping {
     private void generateHandlerExecutions(Class<?> clazz, Set<Method> methods) {
         for (Method method : methods) {
             try {
-                RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                handlerExecutions.put(generateHandlerKey(requestMapping), new HandlerExecution(clazz.newInstance(), method));
+                generate(clazz, method);
             } catch (InstantiationException | IllegalAccessException e) {
                 logger.error(e.getMessage());
             }
         }
     }
 
-    private HandlerKey generateHandlerKey(RequestMapping requestMapping) {
-        return new HandlerKey(requestMapping.value(), requestMapping.method());
+    private void generate(Class<?> clazz, Method method) throws InstantiationException, IllegalAccessException {
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        RequestMethod[] requestMethods = requestMapping.method();
+
+        if (requestMethods.length < DEFAULT_REQUEST_METHOD_COUNT) {
+            requestMethods = RequestMethod.values();
+        }
+
+        for(RequestMethod requestMethod : requestMethods) {
+            handlerExecutions.put(getHandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(clazz.newInstance(), method));
+        }
+    }
+
+    private HandlerKey getHandlerKey(String value, RequestMethod requestMethod) {
+        return new HandlerKey(value, requestMethod);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
