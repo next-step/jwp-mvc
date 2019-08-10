@@ -22,7 +22,7 @@ public class Junit3TestRunner {
 
     private void methodInvoke(Class<Junit3Test> clazz, Method method) {
         try {
-            method.invoke(clazz.newInstance());
+            method.invoke(clazz.getDeclaredConstructor().newInstance());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
