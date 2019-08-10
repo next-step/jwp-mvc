@@ -102,7 +102,7 @@ public class ReflectionTest {
                 .peek(field -> field.setAccessible(true))
                 .collect(Collectors.toMap(field -> field.getName(), field -> field));
 
-        fields.get(argumentsAccessor.getString(0)).setInt(student, argumentsAccessor.getInteger(1));
+        fields.get(argumentsAccessor.getString(0)).set(student, argumentsAccessor.getInteger(1));
         fields.get(argumentsAccessor.getString(2)).set(student, argumentsAccessor.getString(3));
 
         //then
