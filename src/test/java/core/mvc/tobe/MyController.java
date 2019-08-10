@@ -27,7 +27,7 @@ public class MyController {
         return new ModelAndView(new JspView("redirect:/users"));
     }
 
-    @RequestMapping(value="/users/show", method=RequestMethod.GET)
+    @RequestMapping(value = "/users/show", method = RequestMethod.GET)
     public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("users findUserId");
         return new ModelAndView(new JspView("/users/show.jsp"));
