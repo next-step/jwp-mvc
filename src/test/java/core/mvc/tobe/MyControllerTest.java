@@ -2,8 +2,8 @@ package core.mvc.tobe;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -18,58 +18,29 @@ class MyControllerTest {
         handlerMapping.initialize();
     }
 
-    @DisplayName("method type이 default인 경우 get mapping 처리하는지")
-    @Test
-    public void default_request_method_get() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
+    @DisplayName("method type이 default인 경우에 대한 테스트")
+    @ParameterizedTest
+    @CsvSource({"GET, /users/findUserId, 200", "POST, /users/findUserId, 200",
+            "PUT, /users/findUserId, 200", "DELETE, /users/findUserId, 200"})
+    public void request_default_method_test(String method, String uri, int status) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(status, response.getStatus());
     }
 
-    @DisplayName("method type이 default인 경우 put mapping 처리하는지")
-    @Test
-    public void default_request_method_put() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("PUT", "/users/findUserId");
+    @DisplayName("method type이 지정된 경우에 대한 테스트")
+    @ParameterizedTest
+    @CsvSource({"GET, /users/show, 200",
+            "POST, /users, 200"})
+    public void request_method_test(String method, String uri, int status) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-    }
-
-    @DisplayName("method type이 default인 경우 post mapping 처리")
-    @Test
-    public void default_request_method_post() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/findUserId");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
-
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-    }
-
-    @DisplayName("method typd이 post인 경우 post mapping 처리")
-    @Test
-    public void request_method_post() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
-
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-    }
-
-    @DisplayName("method typd이 get인 경우 get mapping 처리")
-    @Test
-    public void request_method_get() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
-
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(status, response.getStatus());
     }
 }
