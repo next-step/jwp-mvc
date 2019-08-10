@@ -1,15 +1,22 @@
 package core.mvc.asis;
 
+import core.mvc.Mapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestMapping {
+public class RequestMapping implements Mapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
+
+    @Override
+    public void initialize() {
+        initMapping();
+    }
 
     void initMapping() {
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
@@ -25,6 +32,11 @@ public class RequestMapping {
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });
+    }
+
+    @Override
+    public Controller getHandler(HttpServletRequest request) {
+        return findController(request.getRequestURI());
     }
 
     public Controller findController(String url) {

@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class RedirectView implements View {
 
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    public static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private final String viewName;
 
