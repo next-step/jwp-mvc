@@ -14,6 +14,6 @@ class Junit3TestRunner {
 
         Stream.of(clazz.getDeclaredMethods())
                 .filter(method -> method.getName().startsWith(TEST))
-                .forEach(ExceptionWrapper.wrapper(method -> method.invoke(clazz.newInstance())));
+                .forEach(ExceptionWrapper.consumerWrapper(method -> method.invoke(clazz.newInstance())));
     }
 }

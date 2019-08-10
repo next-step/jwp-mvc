@@ -12,6 +12,6 @@ class Junit4TestRunner {
 
         Stream.of(clazz.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(MyTest.class))
-                .forEach(ExceptionWrapper.wrapper(method -> method.invoke(clazz.newInstance())));
+                .forEach(ExceptionWrapper.consumerWrapper(method -> method.invoke(clazz.newInstance())));
     }
 }
