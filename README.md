@@ -20,8 +20,8 @@
 
 # Step 2 
 * 요구사항 1 - 애노테이션 기반 MVC 프레임워크
-- [ ] @RequestMapping : controller -> method mapping 으로 변경
-- [ ] @RequestMapping : HTTP 메소드 매핑 추가
+- [x] @RequestMapping : controller -> method mapping 으로 변경
+- [x] @RequestMapping : HTTP 메소드 매핑 추가
 
 - [ ] 어노테이션 기반 컨트롤러 작성 : AnnotationHandlerMappingTest 파일에 Test 패스
 
