@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.NextGenerationDispatcherServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -19,10 +21,16 @@ public class DispatcherServlet extends HttpServlet {
 
     private RequestMapping rm;
 
+    private HttpServlet next;
+
+
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
+
+        next = new NextGenerationDispatcherServlet();
+        next.init();
     }
 
     @Override
@@ -31,6 +39,11 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
+        if (Objects.isNull(controller)) {
+            next.service(req, resp);
+            return;
+        }
+
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
