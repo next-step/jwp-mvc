@@ -1,13 +1,19 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -150,6 +156,24 @@ public class ReflectionTest {
             return (Question)constructor.newInstance(threeArgs);
         }
         return (Question)constructor.newInstance(sixArgs);
+    }
+
+    @DisplayName("core.di.factory.example 패키지에서 @Controller, @Service, @Repository 어노테이션 클래스 목록 출력")
+    @Test
+    public void showAllAnnotatedClassesInPackage() {
+        final Set<Class<?>> classes = getTypesAnnotatedWith("core.di.factory.example", Controller.class, Service.class, Repository.class);
+        logger.debug(classes.toString());
+    }
+
+    private Set<Class<?>> getTypesAnnotatedWith(String packageName, Class<? extends Annotation>... classes) {
+        final Reflections reflections = new Reflections(packageName);
+        final Set<Class<?>> allTypes = new HashSet<>();
+
+        for(Class<? extends Annotation> clazz : classes) {
+            Set<Class<?>> types = reflections.getTypesAnnotatedWith(clazz);
+            allTypes.addAll(types);
+        }
+        return allTypes;
     }
 
     @Test
