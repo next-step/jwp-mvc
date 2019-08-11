@@ -53,7 +53,13 @@ public class AnnotationHandlerMapping {
         HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
         HandlerExecution handleExecution = (request, response) ->
                 (ModelAndView) method.invoke(controller, request, response);
+        loggingMappingInfo(handlerKey, method);
         handlerExecutions.put(handlerKey, handleExecution);
+    }
+
+    private void loggingMappingInfo(HandlerKey handlerKey, Method method) {
+        String methodInfo = String.format("%s.%s", method.getDeclaringClass().getName(), method.getName());
+        logger.info("{}, execution method: {}", handlerKey, methodInfo);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

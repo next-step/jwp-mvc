@@ -1,5 +1,7 @@
 package core.mvc;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,5 +32,13 @@ public class ModelAndView {
 
     public View getView() {
         return view;
+    }
+
+    public String getViewName() {
+        return this.view.getViewName();
+    }
+
+    public void render(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+        view.render(model, httpServletRequest, httpServletResponse);
     }
 }
