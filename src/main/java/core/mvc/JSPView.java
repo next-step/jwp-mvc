@@ -10,6 +10,7 @@ import java.util.Objects;
 
 public class JSPView implements View {
 
+    public static final String REDIRECT_PREFIX = "redirect:";
     private String pageName;
 
     public JSPView(String pageName) {
@@ -18,8 +19,8 @@ public class JSPView implements View {
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (pageName.startsWith("redirect:")) {
-            String page = pageName.substring("redirect:".length() + 1);
+        if (pageName.startsWith(REDIRECT_PREFIX)) {
+            String page = pageName.substring(REDIRECT_PREFIX.length() + 1);
             response.sendRedirect(page);
             return;
         }

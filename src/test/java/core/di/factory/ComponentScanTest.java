@@ -45,7 +45,7 @@ public class ComponentScanTest {
     }
 
     private void registerBeanFactory(Class<? extends Annotation> annotation) {
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(annotation);
-        beanFactory.addAll(controllers);
+        Set<Class<?>> beans = reflections.getTypesAnnotatedWith(annotation);
+        beanFactory.addAll(beans);
     }
 }
