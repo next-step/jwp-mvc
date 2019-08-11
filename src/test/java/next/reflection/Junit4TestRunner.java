@@ -2,10 +2,28 @@ package next.reflection;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Junit4TestRunner {
     @Test
     public void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
-        // TODO Junit4Test에서 @MyTest 애노테이션이 있는 메소드 실행
+        final List<Method> targetMethods = filterMethodsAnnotated(clazz, MyTest.class);
+        Junit4Test junit4Test = clazz.newInstance();
+
+        for(Method method : targetMethods) {
+            method.invoke(junit4Test);
+        }
+    }
+
+    private List<Method> filterMethodsAnnotated(Class<?> clazz, Class<? extends Annotation> annotation) {
+        final Method[] methods = clazz.getDeclaredMethods();
+        return Arrays.stream(methods)
+                .filter(m -> m.isAnnotationPresent(annotation))
+                .collect(Collectors.toList());
     }
 }
