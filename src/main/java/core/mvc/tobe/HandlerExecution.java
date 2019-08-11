@@ -1,14 +1,10 @@
 package core.mvc.tobe;
 
-import core.annotation.web.PathVariable;
-import core.annotation.web.RequestParam;
-import core.mvc.ModelAndView;
 import core.mvc.tobe.support.ArgumentResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -29,6 +25,7 @@ public class HandlerExecution {
         Object[] parameters = new Object[method.getParameterCount()];
         Class<?>[] parameterTypes = method.getParameterTypes();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+
         for (int i = 0; i < parameters.length; i++) {
             MethodParameter methodParameter = new MethodParameter(parameterTypes[i], parameterAnnotations[i]);
             parameters[i] = getParameter(methodParameter, request, response);
