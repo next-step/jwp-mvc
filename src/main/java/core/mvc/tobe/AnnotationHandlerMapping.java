@@ -6,8 +6,6 @@ import core.annotation.web.RequestMethod;
 import core.exception.ExceptionWrapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
@@ -54,8 +52,6 @@ public class AnnotationHandlerMapping {
                 .build(basePackage)
                 .setScanners(
                         new SubTypesScanner(),
-                        new FieldAnnotationsScanner(),
-                        new MethodAnnotationsScanner(),
                         new TypeAnnotationsScanner())
                 .setExecutorService(Executors.newFixedThreadPool(4));
     }

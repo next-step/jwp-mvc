@@ -4,7 +4,6 @@ import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import next.WebServerLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,7 @@ public class DispatcherServlet extends HttpServlet {
         rm = new RequestMapping();
         rm.initMapping();
 
-        annotationHandlerMapping = new AnnotationHandlerMapping(WebServerLauncher.class);
+        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
 
         try {
             annotationHandlerMapping.initialize();
