@@ -25,6 +25,7 @@ public class JspView implements View {
         }
 
         RequestDispatcher rd = request.getRequestDispatcher(viewName);
+        model.forEach(request::setAttribute);
         rd.forward(request, response);
     }
 }
