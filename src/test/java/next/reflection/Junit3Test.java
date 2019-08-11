@@ -12,4 +12,8 @@ public class Junit3Test {
     public void three() throws Exception {
         System.out.println("Running Test3");
     }
+
+    private void test4() {
+        System.out.println("Running Test4");
+    }
 }
