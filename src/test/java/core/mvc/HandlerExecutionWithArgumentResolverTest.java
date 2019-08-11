@@ -37,7 +37,6 @@ public class HandlerExecutionWithArgumentResolverTest {
                 new HttpResponseArgumentResolver(),
                 new RequestParamArgumentResolver()
         );
-
     }
 
     @Test

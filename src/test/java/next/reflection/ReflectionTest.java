@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -56,9 +55,6 @@ public class ReflectionTest {
     @Test
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void constructor() throws Exception {
-        final String VALUE = "what is reflection!";
-        final String QUALIFIER = "test";
-        final Date date = new Date();
         Class<Question> clazz = Question.class;
         Date expectedDate = new Date();
         Question expectedQuestion1 = new Question("writer", "title", "content");
@@ -83,11 +79,6 @@ public class ReflectionTest {
                     results.add(new Holder(constructor.newInstance(expectedArgument), expectedArgument));
                 }
             }
-            Question question = (Question) constructor.newInstance(expectedArguments);
-            assertThat(question.getContents()).isEqualTo(VALUE);
-            assertThat(question.getTitle()).isEqualTo(QUALIFIER);
-            assertThat(question.getWriter()).isEqualTo(VALUE);
-            assertThat(question.getCreatedDate()).isAfterOrEqualsTo(date);
         }
 
         results.stream()
