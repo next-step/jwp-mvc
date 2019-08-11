@@ -15,16 +15,21 @@ import javax.servlet.http.HttpServletResponse;
 public class MyController{
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
+    @RequestMapping(value = "/users")
+    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users list");
+        return new ModelAndView(new JSPView("/users/list.jsp"));
+    }
+
     @RequestMapping("/users/findUserId")
     public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("findUserId");
-        return new ModelAndView(new JSPView("/user/list.jsp"));
+        return new ModelAndView(new JSPView("/user/show.jsp"));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("create");
         return new ModelAndView(new JSPView("redirect:/users"));
-
     }
 }

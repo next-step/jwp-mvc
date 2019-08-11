@@ -20,31 +20,40 @@ public class AnnotationHandlerMapping {
     private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
+    AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
-    public void initialize() throws Exception {
+    void initialize() throws Exception {
         logger.debug("basePackage : {}", basePackage);
-
-        Reflections reflections = new Reflections("core.mvc.tobe");
-
-
+        Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+        initController(controllers);
+    }
+
+    private void initController(Set<Class<?>> controllers) throws InstantiationException, IllegalAccessException {
         for (Class<?> controller : controllers) {
             Object controllerInstance = controller.newInstance();
             Method[] methods = controller.getMethods();
 
-            for (Method method : methods) {
-                if (method.isAnnotationPresent(RequestMapping.class)) {
-                    RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-                    for (RequestMethod requestMethod : annotation.method()) {
-                        HandlerKey handlerKey = new HandlerKey(annotation.value(), requestMethod);
-                        HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, method);
-                        handlerExecutions.put(handlerKey, handlerExecution);
-                    }
-                }
+            initMethod(controllerInstance, methods);
+        }
+    }
+
+    private void initMethod(Object controllerInstance, Method[] methods) {
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(RequestMapping.class)) {
+                RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+                initHandler(controllerInstance, method, annotation);
             }
+        }
+    }
+
+    private void initHandler(Object controllerInstance, Method method, RequestMapping annotation) {
+        for (RequestMethod requestMethod : annotation.method()) {
+            HandlerKey handlerKey = new HandlerKey(annotation.value(), requestMethod);
+            HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, method);
+            handlerExecutions.put(handlerKey, handlerExecution);
         }
     }
 
