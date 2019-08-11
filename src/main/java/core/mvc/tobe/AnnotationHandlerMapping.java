@@ -13,8 +13,12 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnnotationHandlerMapping {
+    private final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -23,16 +27,16 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    public void initialize() throws Exception {
-        Map<Class<?>, Object> scan = controllerScan(this.basePackage);
-        Set<Class<?>> classes = scan.keySet();
+    public void initialize() {
+        Map<Class<?>, Object> controller = controllerScan(this.basePackage);
+        Set<Class<?>> classes = controller.keySet();
 
         for(Class clazz : classes) {
             Set<Method> allMethods = Arrays.stream(clazz.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toSet());
 
-            setHandlerExecutions(clazz, allMethods);
+            setHandlerExecutions(controller.get(clazz), allMethods);
         }
     }
 
@@ -42,15 +46,31 @@ public class AnnotationHandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private HandlerKey createHandlerKey(RequestMapping rm) {
-        return new HandlerKey(rm.value(), rm.method());
+    private Map<Class<?>, Object> controllerScan(Object[] basePackage) {
+        Reflections reflections = new Reflections(basePackage);
+        Set<Class<?>> annotatedClazz = reflections.getTypesAnnotatedWith(Controller.class);
+
+        return setControllerInstances(annotatedClazz);
     }
 
-    private HandlerExecution createHandlerExecution(Class clazz, Method method) {
-        return new HandlerExecution(clazz, method);
+    private Map<Class<?>, Object> setControllerInstances(Set<Class<?>> annotatedClazz) {
+        Map<Class<?>, Object> scanController = Maps.newHashMap();
+        for(Class clazz : annotatedClazz) {
+            setControllerInstance(scanController, clazz);
+        }
+
+        return scanController;
     }
 
-    private void setHandlerExecutions(Class clazz, Set<Method> allMethods) {
+    private void setControllerInstance(Map<Class<?>, Object> scanController, Class clazz) {
+        try {
+            scanController.put(clazz, clazz.newInstance());
+        } catch (InstantiationException | IllegalAccessException e) {
+            logger.debug("controller register fail");
+        }
+    }
+
+    private void setHandlerExecutions(Object clazz, Set<Method> allMethods) {
         for(Method method : allMethods) {
             RequestMapping rm = getAnnotation(method, RequestMapping.class);
             handlerExecutions.put(createHandlerKey(rm), createHandlerExecution(clazz, method));
@@ -61,20 +81,11 @@ public class AnnotationHandlerMapping {
         return method.getAnnotation(annotation);
     }
 
-    private Map<Class<?>, Object> controllerScan(Object[] basePackage) throws Exception {
-        Reflections reflections = new Reflections(basePackage);
-        Set<Class<?>> annotatedClazz = reflections.getTypesAnnotatedWith(Controller.class);
-
-        return scan(annotatedClazz);
+    private HandlerKey createHandlerKey(RequestMapping rm) {
+        return new HandlerKey(rm.value(), rm.method());
     }
 
-    private Map<Class<?>, Object> scan(Set<Class<?>> annotatedClazz) throws Exception {
-        Map<Class<?>, Object> scanController = Maps.newHashMap();
-        for(Class clazz : annotatedClazz) {
-            Object newInstance = clazz.newInstance();
-            scanController.put(clazz, newInstance);
-        }
-
-        return scanController;
+    private HandlerExecution createHandlerExecution(Object clazz, Method method) {
+        return new HandlerExecution(clazz, method);
     }
 }
