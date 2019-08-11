@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-public class JSPView implements View{
+public class JSPView implements View {
 
     private String pageName;
 
@@ -18,8 +18,13 @@ public class JSPView implements View{
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (pageName.startsWith("redirect:")) {
+            String page = pageName.substring("redirect:".length() + 1);
+            response.sendRedirect(page);
+            return;
+        }
         RequestDispatcher requestDispatcher = request.getRequestDispatcher(pageName);
-        requestDispatcher.include(request, response);
+        requestDispatcher.forward(request, response);
     }
 
     @Override
@@ -33,5 +38,12 @@ public class JSPView implements View{
     @Override
     public int hashCode() {
         return Objects.hash(pageName);
+    }
+
+    @Override
+    public String toString() {
+        return "JSPView{" +
+                "pageName='" + pageName + '\'' +
+                '}';
     }
 }

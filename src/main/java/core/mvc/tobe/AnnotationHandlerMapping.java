@@ -20,15 +20,16 @@ public class AnnotationHandlerMapping {
     private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    AnnotationHandlerMapping(Object... basePackage) {
+    public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
-    void initialize() throws Exception {
+    public void initialize() throws Exception {
         logger.debug("basePackage : {}", basePackage);
         Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         initController(controllers);
+        logger.debug("handlerExecutions : {}", handlerExecutions);
     }
 
     private void initController(Set<Class<?>> controllers) throws InstantiationException, IllegalAccessException {

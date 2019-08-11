@@ -45,8 +45,8 @@ public class AnnotationHandlerMappingTest {
         assertThat(handle.getView()).isEqualTo(new JSPView("redirect:/users"));
     }
 
-    private ModelAndView execute(String get, String s) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest(get, s);
+    private ModelAndView execute(String method, String url) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, url);
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         return execution.handle(request, response);
