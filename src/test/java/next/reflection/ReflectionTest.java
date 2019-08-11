@@ -6,12 +6,18 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    public static Question newQuestion() {
+        return new Question("홍길동", "홍길동전", "내용..");
+    }
 
     @Test
     public void showClass() {
@@ -86,6 +92,29 @@ public class ReflectionTest {
         Field nameField = clazz.getDeclaredField(filedName);
         nameField.setAccessible(true);
         return nameField;
+    }
+
+    // Qutions 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
+    @Test
+    public void create_class_no_constructor() throws IllegalAccessException, InstantiationException {
+        Class<Question> clazz = Question.class;
+
+        assertThrows(InstantiationException.class, () -> {
+            clazz.newInstance();
+        });
+    }
+
+    @Test
+    public void create_class() throws Exception {
+        Class<Question> clazz = Question.class;
+
+        Question question = newQuestion();
+        Question otherQuestion = null;
+
+        Constructor constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        otherQuestion = (Question) constructor.newInstance(question.getWriter(), question.getTitle(), question.getContents());
+
+        assertThat(otherQuestion).isEqualTo(question);
     }
 
 }
