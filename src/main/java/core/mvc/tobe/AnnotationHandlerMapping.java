@@ -14,9 +14,13 @@ import org.reflections.util.ConfigurationBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 public class AnnotationHandlerMapping {
     private final Object[] basePackage;
@@ -41,7 +45,7 @@ public class AnnotationHandlerMapping {
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        RequestMethod rm = RequestMethod.valueOfMethod(request.getMethod());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
@@ -58,19 +62,29 @@ public class AnnotationHandlerMapping {
 
     private void put(Stream<Method> methods) {
         methods.forEach(ExceptionWrapper.consumer(method -> {
-            final HandlerKey handlerKey = createHandlerKeyByRequestMapping(method);
+            final Set<HandlerKey> handlerKeys = createHandlerKeyByRequestMapping(method);
             final HandlerExecution handlerExecution = createHandlerExecution(method);
 
-            handlerExecutions.put(handlerKey, handlerExecution);
+            handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey, handlerExecution));
         }));
     }
 
-    private HandlerKey createHandlerKeyByRequestMapping(final Method method) {
+    private Set<HandlerKey> createHandlerKeyByRequestMapping(final Method method) {
         final RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        final RequestMethod requestMethod = annotation.method();
+        final Stream<RequestMethod> requestMethods = getRequestMethods(annotation);
         final String url = annotation.value();
 
-        return new HandlerKey(url, requestMethod);
+        return requestMethods.map(requestMethod -> new HandlerKey(url, requestMethod))
+                .collect(toSet());
+    }
+
+    private Stream<RequestMethod> getRequestMethods(RequestMapping annotation) {
+        Stream<RequestMethod> requestMethods = Arrays.stream(annotation.method());
+        if (requestMethods.count() == 0) {
+            return Arrays.stream(RequestMethod.values());
+        }
+
+        return Arrays.stream(annotation.method());
     }
 
     private HandlerExecution createHandlerExecution(Method method) throws InstantiationException, IllegalAccessException {

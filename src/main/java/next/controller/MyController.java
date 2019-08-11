@@ -17,7 +17,7 @@ public class MyController {
 
     @RequestMapping("/users")
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("users findUserId");
+        logger.debug("users list");
         return new ModelAndView(new JspView("/users/list.jsp"));
     }
 
@@ -29,7 +29,7 @@ public class MyController {
 
     @RequestMapping(value="/users/show", method=RequestMethod.GET)
     public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("users findUserId");
+        logger.debug("users show");
         return new ModelAndView(new JspView("/users/show.jsp"));
     }
 
