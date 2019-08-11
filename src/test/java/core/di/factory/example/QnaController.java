@@ -4,12 +4,17 @@ import core.annotation.Inject;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.mvc.ModelAndView;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class QnaController {
+
+    @Value(value = "name")
+    private String id;
+
     private MyQnaService qnaService;
 
     @Inject
