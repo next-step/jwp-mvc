@@ -1,5 +1,9 @@
 package core.mvc.asis;
 
+import core.mvc.HandleView;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +19,18 @@ import java.io.IOException;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping handlerMapping;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         rm = new RequestMapping();
         rm.initMapping();
+
+        handlerMapping = new AnnotationHandlerMapping("next");
+        handlerMapping.initialize();
     }
 
     @Override
@@ -31,23 +39,49 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
-        try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
+        HandlerExecution execution = handlerMapping.getHandler(req);
+
+        boolean isExecuteController = executeController(req, resp, controller);
+        boolean isExecuteAnnotation = executeAnnotation(req, resp, execution);
+
+        if(!isExecuteController && !isExecuteAnnotation){
+            throw new ServletException("존재하지 않는 페이지 입니다.");
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private boolean executeController(HttpServletRequest req,
+                                   HttpServletResponse resp,
+                                   Controller controller) throws ServletException {
+        if(controller != null){
+            try {
+                String viewName = controller.execute(req, resp);
+                //move(viewName, req, resp);
+                new HandleView(viewName).render(null, req, resp);
+                return true;
+            } catch (Throwable e) {
+                logger.error("Exception : {}", e);
+                throw new ServletException(e.getMessage());
+            }
         }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        return false;
     }
+
+    private boolean executeAnnotation(HttpServletRequest req,
+                                   HttpServletResponse resp,
+                                   HandlerExecution execution) throws ServletException {
+        if(execution != null){
+            try {
+                ModelAndView modelAndView = execution.handle(req, resp);
+                modelAndView.getView().render(null, req, resp);
+                return true;
+            } catch (Throwable e) {
+                logger.error("Exception : {}", e);
+                throw new ServletException(e.getMessage());
+            }
+        }
+
+        return false;
+    }
+
 }
