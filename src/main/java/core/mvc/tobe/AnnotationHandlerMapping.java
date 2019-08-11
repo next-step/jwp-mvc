@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.tobe.support.ArgumentResolver;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -12,8 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,26 +28,37 @@ public class AnnotationHandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private List<ArgumentResolver> argumentResolvers;
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
+    public void setArgumentResolvers(List<ArgumentResolver> argumentResolvers) {
+        this.argumentResolvers = argumentResolvers;
+    }
+
     public void initialize() {
+        logger.info("## Initialized Annotation Handler Mapping");
         Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
 
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> controller : controllers) {
-            for (Method method : controller.getMethods()) {
-                if (method.isAnnotationPresent(RequestMapping.class)) {
-                    RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                    HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-                    HandlerExecution handlerExecution = new HandlerExecution(newInstance(controller), method);
-                    handlerExecutions.put(handlerKey, handlerExecution);
-                }
-            }
+            Object target = newInstance(controller);
+            addHandlerExecution(target, controller.getMethods());
         }
+    }
 
+    private void addHandlerExecution(final Object target, Method[] methods) {
+        Arrays.stream(methods)
+            .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+            .forEach(method -> {
+                RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+                HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
+                HandlerExecution handlerExecution = new HandlerExecution(argumentResolvers, target, method);
+                handlerExecutions.put(handlerKey, handlerExecution);
+                logger.info("Add - method: {}, path: {}, HandlerExecution: {}", requestMapping.method(), requestMapping.value(), method.getName());
+            });
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

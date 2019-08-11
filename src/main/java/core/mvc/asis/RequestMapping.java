@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.DispatcherServlet;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,7 @@ public class RequestMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
-    void initMapping() {
+    public void initMapping() {
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
@@ -31,6 +32,10 @@ public class RequestMapping {
 
     public Controller findController(String url) {
         return mappings.get(url);
+    }
+
+    public boolean containsController(String url) {
+        return mappings.containsKey(url);
     }
 
     void put(String url, Controller controller) {
