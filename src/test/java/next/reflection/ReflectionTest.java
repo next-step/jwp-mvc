@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -34,7 +36,7 @@ public class ReflectionTest {
             logger.debug("param type : {}", paramType);
         }
     }
-    
+
     @Test
     @SuppressWarnings("rawtypes")
     public void method() throws Exception {
@@ -59,4 +61,31 @@ public class ReflectionTest {
             logger.debug("type: " + field.getType());
         }
     }
+
+
+    //자바 Reflection API를 활용해 다음 Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Student student = new Student();
+
+        Field nameField = getAccessibleField(clazz, "name");
+        nameField.set(student, "길동");
+
+        Field ageField = getAccessibleField(clazz, "age");
+        ageField.set(student, 20);
+
+        assertThat(student.getName()).isEqualTo("길동");
+        assertThat(student.getAge()).isEqualTo(20);
+
+    }
+
+    private Field getAccessibleField(Class<Student> clazz, String filedName) throws NoSuchFieldException {
+        Field nameField = clazz.getDeclaredField(filedName);
+        nameField.setAccessible(true);
+        return nameField;
+    }
+
 }
