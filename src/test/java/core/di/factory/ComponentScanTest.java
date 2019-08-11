@@ -3,6 +3,7 @@ package core.di.factory;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
+import core.di.factory.example.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -13,15 +14,18 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ComponentScanTest {
 
     private Reflections reflections;
-    private static final Set<Class> BEAN_FACTORY = new HashSet<>();
+    private Set<Class> beanFactory;
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentScanTest.class);
 
     @BeforeEach
     void setUp() {
+        beanFactory = new HashSet<>();
         reflections = new Reflections("core.di.factory.example");
     }
 
@@ -31,11 +35,17 @@ public class ComponentScanTest {
         registerBeanFactory(Service.class);
         registerBeanFactory(Repository.class);
 
-        BEAN_FACTORY.stream().forEach(clazz -> logger.debug("Register bean name : {} ", clazz.getName()));
+        beanFactory.stream().forEach(clazz -> logger.debug("Register bean name : {} ", clazz.getName()));
+
+        assertThat(beanFactory).containsOnly(
+                QnaController.class,
+                MyQnaService.class,
+                JdbcUserRepository.class,
+                JdbcQuestionRepository.class);
     }
 
     private void registerBeanFactory(Class<? extends Annotation> annotation) {
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(annotation);
-        BEAN_FACTORY.addAll(controllers);
+        beanFactory.addAll(controllers);
     }
 }
