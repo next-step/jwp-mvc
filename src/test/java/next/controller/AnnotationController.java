@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Ignore
-public class AbstractController {
+public class AnnotationController {
 
     public static final String NEXT_CONTROLLER = "next.controller";
     private AnnotationHandlerMapping handlerMapping;

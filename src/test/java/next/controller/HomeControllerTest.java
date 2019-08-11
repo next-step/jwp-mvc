@@ -9,7 +9,7 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HomeControllerTest extends AbstractController{
+class HomeControllerTest extends AnnotationController {
 
     @DisplayName("어노테이션기반으로 homeController 실행")
     @Test

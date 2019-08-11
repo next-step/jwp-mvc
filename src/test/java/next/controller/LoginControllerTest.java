@@ -12,8 +12,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class LoginControllerTest extends AbstractController {
-
+class LoginControllerTest extends AnnotationController {
 
     @DisplayName("로그인에 성공한다")
     @Test
