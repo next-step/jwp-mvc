@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -61,21 +63,11 @@ public class DispatcherServlet extends HttpServlet {
     private void render(HttpServletRequest req, HttpServletResponse resp, Controller controller) throws ServletException {
         try {
             String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            View view = new JspView(viewName);
+            view.render(new HashMap<>(), req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
     }
 }
