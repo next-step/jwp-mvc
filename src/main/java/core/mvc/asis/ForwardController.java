@@ -3,6 +3,7 @@ package core.mvc.asis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Deprecated
 public class ForwardController implements Controller {
     private String forwardUrl;
 

@@ -30,4 +30,4 @@
     - [x] RequestMapping 객체 인자 받아서 HandlerKey 생성
     - [x] HandlerExecution - method 실행로직 추가
     
-- [ ] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+- [x] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
