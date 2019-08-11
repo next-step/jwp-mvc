@@ -1,16 +1,13 @@
 package next.reflection;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -130,6 +127,29 @@ public class ReflectionTest {
         field.setAccessible(true);
         field.set(object, value);
         field.setAccessible(false);
+    }
+
+    @DisplayName("인자를 가진 Question 클래스의 인스턴스 생성")
+    @Test
+    public void createQuestion() throws Exception {
+        final Class<Question> clazz = Question.class;
+
+        final Constructor<?>[] constructors = clazz.getConstructors();
+        for(Constructor<?> constructor : constructors) {
+            Question question = createQuestionInstance(constructor);
+            logger.debug(question.toString());
+        }
+    }
+
+    private Question createQuestionInstance(Constructor<?> constructor) throws Exception {
+        Object[] threeArgs = new Object[]{"진호", "첫번째 질문", "첫번째 질문 내용"};
+        Object[] sixArgs = new Object[]{1, "진호", "두번째 질문", "두번째 질문 내용", new Date(), 0};
+
+        final Class[] parameterTypes = constructor.getParameterTypes();
+        if(parameterTypes.length == 3) {
+            return (Question)constructor.newInstance(threeArgs);
+        }
+        return (Question)constructor.newInstance(sixArgs);
     }
 
     @Test
