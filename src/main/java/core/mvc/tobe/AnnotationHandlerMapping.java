@@ -30,7 +30,8 @@ public class AnnotationHandlerMapping {
         Set<Method> methods = getRequestMappingMethods(controllers.keySet());
         for (Method method : methods) {
             RequestMapping rm = method.getAnnotation(RequestMapping.class);
-            logger.debug("register handlerExecution : url is {}, method is {}", rm.value(), method);
+            logger.debug("register handlerExecution : url is {}, request method : {}, method is {}",
+                    rm.value(), rm.method(), method);
             handlerExecutions.put(createHandlerKey(rm),
                     new HandlerExecution(controllers.get(method.getDeclaringClass()), method));
         }
