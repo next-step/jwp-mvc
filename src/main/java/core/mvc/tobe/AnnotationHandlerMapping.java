@@ -17,6 +17,8 @@ import java.util.stream.Stream;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+    private static final String METHOD_INFO_FORMAT = "%s.%s";
+    private static final String MAPPING_INFO_LOG_FORMAT = "{}, execution method: {}";
 
     private Object[] basePackage;
 
@@ -58,8 +60,8 @@ public class AnnotationHandlerMapping {
     }
 
     private void loggingMappingInfo(HandlerKey handlerKey, Method method) {
-        String methodInfo = String.format("%s.%s", method.getDeclaringClass().getName(), method.getName());
-        logger.info("{}, execution method: {}", handlerKey, methodInfo);
+        String methodInfo = String.format(METHOD_INFO_FORMAT, method.getDeclaringClass().getName(), method.getName());
+        logger.info(MAPPING_INFO_LOG_FORMAT, handlerKey, methodInfo);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

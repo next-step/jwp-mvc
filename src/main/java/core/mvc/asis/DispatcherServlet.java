@@ -20,6 +20,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String ANNOTATION_CONTROLLER_PACKAGE = "next.controller.annotation";
 
     private RequestMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
@@ -28,7 +29,7 @@ public class DispatcherServlet extends HttpServlet {
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller.annotation");
+        annotationHandlerMapping = new AnnotationHandlerMapping(ANNOTATION_CONTROLLER_PACKAGE);
         annotationHandlerMapping.initialize();
     }
 
