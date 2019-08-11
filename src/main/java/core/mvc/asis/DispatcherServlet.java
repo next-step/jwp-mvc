@@ -1,5 +1,8 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +22,18 @@ public class DispatcherServlet extends HttpServlet {
 
     private RequestMapping rm;
 
+    private AnnotationHandlerMapping ahm;
+
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
+        init2();
+    }
+
+    private void init2() {
+        ahm = new AnnotationHandlerMapping("next.controller");
+        ahm.initialize();
     }
 
     @Override
@@ -31,13 +42,26 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
+
         try {
+            if (controller == null) {
+                serviceTobe(req, resp);
+                return;
+            }
+
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    // TODO : 변경중
+    private void serviceTobe(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        HandlerExecution handlerExecution = ahm.getHandler(req);
+        ModelAndView modelAndView = handlerExecution.handle(req, resp);
+        modelAndView.viewRender(req, resp);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)

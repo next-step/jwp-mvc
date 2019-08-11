@@ -7,6 +7,7 @@ import next.model.User;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Deprecated
 public class UpdateFormUserController implements Controller {
 
     @Override
