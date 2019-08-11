@@ -23,7 +23,7 @@
 - [x] @RequestMapping : controller -> method mapping 으로 변경
 - [x] @RequestMapping : HTTP 메소드 매핑 추가
 
-- [ ] 어노테이션 기반 컨트롤러 작성 : AnnotationHandlerMappingTest 파일에 Test 패스
+- [x] 어노테이션 기반 컨트롤러 작성 : AnnotationHandlerMappingTest 파일에 Test 패스
 
 * 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
-- [ ] 기존 코드와 공존하게 점진적 리팩토링 
+- [x] 기존 코드와 공존하게 점진적 리팩토링 
