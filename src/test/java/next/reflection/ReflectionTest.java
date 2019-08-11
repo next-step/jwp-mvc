@@ -1,11 +1,18 @@
 package next.reflection;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -103,6 +110,26 @@ public class ReflectionTest {
 
     private String fromModifier(int modifier) {
         return modifier == 0 ? "" : Modifier.toString(modifier);
+    }
+
+    @DisplayName("private 이름과 나이 필드에 값을 할당")
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        final Student student = clazz.newInstance();
+
+        setPrivateField(student, "name", "진호");
+        setPrivateField(student, "age", 36);
+
+        assertThat(student.getName()).isEqualTo("진호");
+        assertThat(student.getAge()).isEqualTo(36);
+    }
+
+    private void setPrivateField(Object object, String fieldName, Object value) throws Exception {
+        Field field = object.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(object, value);
+        field.setAccessible(false);
     }
 
     @Test
