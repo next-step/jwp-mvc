@@ -1,6 +1,14 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +16,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -115,6 +127,32 @@ public class ReflectionTest {
         otherQuestion = (Question) constructor.newInstance(question.getWriter(), question.getTitle(), question.getContents());
 
         assertThat(otherQuestion).isEqualTo(question);
+    }
+
+
+    // code.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력하라.
+    @Test
+    public void componentScan() {
+        Reflections reflections = new Reflections(
+                "core.di.factory.example",
+                new TypeAnnotationsScanner(),
+                new SubTypesScanner());
+
+        Set<Class> findClasses = getTypesAnnotatedWith(reflections, Controller.class, Service.class, Repository.class);
+
+        for (Class clazz : findClasses) {
+            logger.debug(clazz.getName());
+        }
+    }
+
+    private Set<Class> getTypesAnnotatedWith(Reflections reflections, Class... annotations) {
+        Set<Class> findAnnotatedTypes = new HashSet<>();
+
+        for (Class annotation : annotations) {
+            findAnnotatedTypes.addAll(reflections.getTypesAnnotatedWith(annotation));
+        }
+
+        return findAnnotatedTypes;
     }
 
 }
