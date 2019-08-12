@@ -17,12 +17,14 @@ public class MyController {
     @RequestMapping("/users/findUserId")
     public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("findUserId");
-        return null;
+        final ModelAndView mv = new ModelAndView();
+        mv.addObject("findUserId", "findUserId");
+        return mv;
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("save");
-        return null;
+        return new ModelAndView();
     }
 }
