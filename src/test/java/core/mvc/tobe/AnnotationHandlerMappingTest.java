@@ -21,4 +21,5 @@ public class AnnotationHandlerMappingTest {
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
     }
+
 }
