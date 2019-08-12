@@ -3,7 +3,9 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.exceptions.AnnotationHandlerMappingException;
+import core.exceptions.HandlerMappingException;
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndViewHandler;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping<ModelAndViewHandler> {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private Object[] basePackage;
@@ -31,13 +33,14 @@ public class AnnotationHandlerMapping {
             Map<Class<?>, Object> instantiateControllers = scanner.getInstantiateControllers();
             Set<Method> requestMappingMethods = getAllRequestMappingMethod(instantiateControllers.keySet());
             setHandlerExecutions(instantiateControllers, requestMappingMethods);
-        } catch (AnnotationHandlerMappingException e) {
+        } catch (HandlerMappingException e) {
             logger.error("{}", e);
             throw e;
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    @Override
+    public ModelAndViewHandler getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
@@ -62,7 +65,7 @@ public class AnnotationHandlerMapping {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
 
         if (requestMapping == null) {
-            throw new AnnotationHandlerMappingException("getHandlerKey fail by : " + RequestMapping.class);
+            throw new HandlerMappingException("getHandlerKey fail by : " + RequestMapping.class);
         }
 
         return Optional.ofNullable(requestMapping.method())

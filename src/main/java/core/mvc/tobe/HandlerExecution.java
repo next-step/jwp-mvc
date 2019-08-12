@@ -1,12 +1,13 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
+import core.mvc.ModelAndViewHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class HandlerExecution {
+public class HandlerExecution implements ModelAndViewHandler {
     private final Object instance;
     private final Method method;
 
@@ -19,6 +20,7 @@ public class HandlerExecution {
         return new HandlerExecution(instance, method);
     }
 
+    @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return (ModelAndView) this.method.invoke(this.instance, request, response);
     }
