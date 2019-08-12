@@ -5,8 +5,11 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.reflections.Reflections;
 
@@ -21,48 +24,69 @@ public class AnnotationHandlerMapping {
   }
 
   public void initialize() {
-    try {
-      handlerExecutions = getControllers(basePackage);
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
+    initHandlerExecutions(basePackage);
+  }
+
+  private void initHandlerExecutions(Object[] basePackages) {
+    for (Object basePackage : basePackages) {
+      initHandlerExecutions(basePackage);
     }
   }
 
-  private Map<HandlerKey, HandlerExecution> getControllers(Object[] basePackages)
-      throws IllegalAccessException, InstantiationException {
-    Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-    for (Object basePackage : basePackages) {
-      Reflections reflections = new Reflections(basePackage);
+  private void initHandlerExecutions(Object basePackage) {
+    Set<Class<?>> handlers = getHandlers(basePackage);
 
-      Set<Class<?>> typesAnnotatedWith = reflections.getTypesAnnotatedWith(Controller.class);
-
-      for (Class clazz : typesAnnotatedWith) {
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-        for (Method method : declaredMethods) {
-          if (method.isAnnotationPresent(RequestMapping.class)) {
-            RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-            RequestMethod[] method1 = annotation.method();
-            if (method1.length == 0) {
-              RequestMethod[] methods = RequestMethod.values();
-              for (RequestMethod requestMethod : methods) {
-                String value = annotation.value();
-                HandlerKey handlerKey = new HandlerKey(value, requestMethod);
-                handlerExecutions.put(handlerKey, new HandlerExecution(clazz, method));
-              }
-              continue;
-            }
-            for (RequestMethod requestMethod : method1) {
-              String value = annotation.value();
-              HandlerKey handlerKey = new HandlerKey(value, requestMethod);
-              handlerExecutions.put(handlerKey, new HandlerExecution(clazz, method));
-            }
-          }
-        }
-      }
+    for (Class handler : handlers) {
+      makeHandlerExecutionsAndFill(handler, getHandlerExecutionMethods(handler));
     }
-    return handlerExecutions;
+  }
+
+  private Set<Class<?>> getHandlers(Object basePackage) {
+    return getAnnotationTypeClass(basePackage, Controller.class);
+  }
+
+  private List<Method> getHandlerExecutionMethods(Class handlers) {
+    return Arrays.stream(handlers.getDeclaredMethods())
+        .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+        .collect(Collectors.toList());
+  }
+
+  private void makeHandlerExecutionsAndFill(Class handler, List<Method> executionMethods) {
+    for (Method method : executionMethods) {
+      RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+
+      RequestMethod[] requestMethods = getRequestMethods(requestMapping.method());
+      HandlerExecution handlerExecution = new HandlerExecution(handler, method);
+      HandlerKey[] handlerKey = makeHandlerKey(requestMethods, requestMapping.value());
+      
+      fillHandlerExecutions(handlerExecution, handlerKey);
+    }
+  }
+
+  private void fillHandlerExecutions(HandlerExecution handlerExecution, HandlerKey[] handlerKey) {
+    for (HandlerKey key : handlerKey) {
+      handlerExecutions.put(key, handlerExecution);
+    }
+  }
+
+  private HandlerKey[] makeHandlerKey(RequestMethod[] requestMethods, String url) {
+    HandlerKey[] handlerKeys = new HandlerKey[requestMethods.length];
+    for (int i = 0; i < requestMethods.length; i++) {
+      handlerKeys[i] = new HandlerKey(url, requestMethods[i]);
+    }
+    return handlerKeys;
+  }
+
+  private RequestMethod[] getRequestMethods(RequestMethod[] methods) {
+    if (methods.length > 0) {
+      return methods;
+    }
+    return RequestMethod.values();
+  }
+
+  private Set<Class<?>> getAnnotationTypeClass(Object basePackage, Class clazz) {
+    Reflections reflections = new Reflections(basePackage);
+    return reflections.getTypesAnnotatedWith(clazz);
   }
 
   public HandlerExecution getHandler(HttpServletRequest request) {
