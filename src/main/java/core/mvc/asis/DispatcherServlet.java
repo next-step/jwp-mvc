@@ -65,7 +65,7 @@ public class DispatcherServlet extends HttpServlet {
             ModelAndView modelAndView = handlerExecution.handle(req, resp);
             viewRender(modelAndView, req, resp);
         } catch (Throwable e) {
-            logger.error("Ner Service Exception : {}", e);
+            logger.error("New Service Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
