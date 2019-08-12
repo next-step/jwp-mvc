@@ -10,14 +10,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-class CreateUserControllerTest {
-
-    @DisplayName("CreateUserController 테스트")
+class LogoutControllerTest {
+    @DisplayName("LogoutController 테스트 - legacy")
     @Test
-    public void user_create_controller_test() throws ServletException, IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/create");
+    public void logout_test() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/logout");
         MockHttpServletResponse response = new MockHttpServletResponse();
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.init();

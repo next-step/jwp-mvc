@@ -1,18 +1,21 @@
 package next.controller;
 
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
-import core.mvc.asis.Controller;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-public class LoginController implements Controller {
-    @Override
+@Controller
+public class LoginController {
+    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");
