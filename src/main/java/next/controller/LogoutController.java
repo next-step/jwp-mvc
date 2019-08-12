@@ -1,7 +1,7 @@
 package next.controller;
 
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +14,6 @@ public class LogoutController implements Controller {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
 
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("redirect:/"));
     }
 }

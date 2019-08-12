@@ -1,8 +1,8 @@
 package next.controller;
 
 import core.db.DataBase;
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
 import next.model.User;
 import org.slf4j.Logger;
@@ -26,6 +26,6 @@ public class UpdateUserController implements Controller {
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
 
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("redirect:/"));
     }
 }

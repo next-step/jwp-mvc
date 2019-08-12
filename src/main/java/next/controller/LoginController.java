@@ -3,6 +3,7 @@ package next.controller;
 import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
 import next.model.User;
 
@@ -26,7 +27,7 @@ public class LoginController implements Controller {
             HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
 
-            return new ModelAndView(new JspView("redirect:/"));
+            return new ModelAndView(new RedirectView("redirect:/"));
         } else {
             req.setAttribute("loginFailed", true);
 
