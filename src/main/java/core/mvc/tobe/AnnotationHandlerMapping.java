@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -73,16 +74,28 @@ public class AnnotationHandlerMapping {
     private void setHandlerExecutions(Object clazz, Set<Method> allMethods) {
         for(Method method : allMethods) {
             RequestMapping rm = getAnnotation(method, RequestMapping.class);
-            handlerExecutions.put(createHandlerKey(rm), createHandlerExecution(clazz, method));
+            Set<RequestMethod> requestMethods = setRequestMappingMethod(rm);
+
+            requestMethods.forEach(requestMethod ->
+                handlerExecutions.put(createHandlerKey(rm.value(), requestMethod), createHandlerExecution(clazz, method)));
         }
+    }
+
+    private Set<RequestMethod> setRequestMappingMethod(RequestMapping rm) {
+        RequestMethod[] method = rm.method();
+        if(method.length == 0) {
+            return Sets.newHashSet(RequestMethod.values());
+        }
+
+        return Sets.newHashSet(method);
     }
 
     private <T extends Annotation> T getAnnotation(Method method, Class<T> annotation) {
         return method.getAnnotation(annotation);
     }
 
-    private HandlerKey createHandlerKey(RequestMapping rm) {
-        return new HandlerKey(rm.value(), rm.method());
+    private HandlerKey createHandlerKey(String value, RequestMethod method) {
+        return new HandlerKey(value, method);
     }
 
     private HandlerExecution createHandlerExecution(Object clazz, Method method) {
