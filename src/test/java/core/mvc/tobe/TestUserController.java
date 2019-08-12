@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.annotation.web.Controller;
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestUserController {
+
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
