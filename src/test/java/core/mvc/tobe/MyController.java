@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +18,7 @@ public class MyController {
   @RequestMapping("/users")
   public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
     logger.debug("users findUserId");
-    return new ModelAndView(new JspView("/users/list.jsp"));
+    return new ModelAndView(new JspView("/users/list"));
   }
 
   @RequestMapping(value = "/users/show", method = RequestMethod.GET)

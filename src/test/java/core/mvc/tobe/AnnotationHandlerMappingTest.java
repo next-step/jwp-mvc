@@ -15,14 +15,14 @@ public class AnnotationHandlerMappingTest {
   @BeforeEach
   public void setup() {
     handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-    handlerMapping.initialize();
+    handlerMapping.initMapping();
   }
 
   @Test
   public void getHandler() throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
     MockHttpServletResponse response = new MockHttpServletResponse();
-    HandlerExecution execution = handlerMapping.getHandler(request);
+    HandlerExecution execution = handlerMapping.findController(request);
     execution.handle(request, response);
   }
 
@@ -31,7 +31,7 @@ public class AnnotationHandlerMappingTest {
   public void GET_Method_getHandler() throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
     MockHttpServletResponse response = new MockHttpServletResponse();
-    HandlerExecution execution = handlerMapping.getHandler(request);
+    HandlerExecution execution = handlerMapping.findController(request);
     execution.handle(request, response);
   }
 
@@ -40,7 +40,7 @@ public class AnnotationHandlerMappingTest {
   public void POST_Method_getHandler() throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/create");
     MockHttpServletResponse response = new MockHttpServletResponse();
-    HandlerExecution execution = handlerMapping.getHandler(request);
+    HandlerExecution execution = handlerMapping.findController(request);
     execution.handle(request, response);
   }
 
@@ -50,7 +50,7 @@ public class AnnotationHandlerMappingTest {
   public void NO_Method_Mapping_getHandler(String method) throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest(method, "/users");
     MockHttpServletResponse response = new MockHttpServletResponse();
-    HandlerExecution execution = handlerMapping.getHandler(request);
+    HandlerExecution execution = handlerMapping.findController(request);
     execution.handle(request, response);
 
   }
