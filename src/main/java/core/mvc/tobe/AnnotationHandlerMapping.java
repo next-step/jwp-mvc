@@ -32,7 +32,7 @@ public class AnnotationHandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-    private static List<ArgumentResolver> argumentResolvers;
+    private List<ArgumentResolver> argumentResolvers;
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;

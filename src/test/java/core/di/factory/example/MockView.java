@@ -1,6 +1,6 @@
 package core.di.factory.example;
 
-import core.mvc.View;
+import core.mvc.tobe.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;

@@ -7,7 +7,6 @@ import core.mvc.tobe.support.ArgumentResolver;
 import core.mvc.tobe.support.HttpRequestArgumentResolver;
 import core.mvc.tobe.support.HttpResponseArgumentResolver;
 import core.mvc.tobe.support.RequestParamArgumentResolver;
-import next.WebServerLauncher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -44,8 +43,8 @@ public class HandlerExecutionWithArgumentResolverTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("id", "jun");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        MockExecutor target = new MockExecutor();
-        Method[] methods = MockExecutor.class.getMethods();
+        MockController target = new MockController();
+        Method[] methods = MockController.class.getMethods();
 
         for (Method method : methods) {
             if (method.isAnnotationPresent(RequestMapping.class)) {
@@ -56,7 +55,7 @@ public class HandlerExecutionWithArgumentResolverTest {
         }
     }
 
-    public static class MockExecutor {
+    public static class MockController {
 
         @RequestMapping
         public ModelAndView request(HttpServletRequest request) {

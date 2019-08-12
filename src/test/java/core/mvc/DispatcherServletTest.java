@@ -1,10 +1,5 @@
 package core.mvc;
 
-import core.di.factory.example.MockView;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.AnnotationHandlerMappingAdapter;
-import core.mvc.tobe.Environment;
-import core.mvc.tobe.HandlerAdapterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +51,6 @@ class DispatcherServletTest {
         HttpServletResponse response = new MockHttpServletResponse();
         dispatcherServlet.service(request, response);
         assertThat(request.getAttribute("mock")).isEqualTo("ok");
-
     }
 
 

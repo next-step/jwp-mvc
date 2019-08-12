@@ -7,7 +7,7 @@ public class ForwardController implements Controller {
     private String forwardUrl;
 
     public ForwardController(String forwardUrl) {
-        this.forwardUrl = forwardUrl;
+        this.forwardUrl = "forward:" + forwardUrl;
         if (forwardUrl == null) {
             throw new NullPointerException("forwardUrl is null. 이동할 URL을 입력하세요.");
         }

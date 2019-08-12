@@ -1,15 +1,22 @@
 package core.mvc.tobe;
 
+import core.mvc.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class AnnotationHandlerMappingAdapter implements HandlerAdapter {
 
     private AnnotationHandlerMapping annotationHandlerMapping;
+    private ModelAndViewHandler strategyModelAndViewHandler = new ViewNameModelAndViewHandler();
 
     public AnnotationHandlerMappingAdapter(AnnotationHandlerMapping annotationHandlerMapping) {
         this.annotationHandlerMapping = annotationHandlerMapping;
         annotationHandlerMapping.initialize();
+    }
+
+    public void setStrategyModelAndViewHandler(ModelAndViewHandler strategyModelAndViewHandler) {
+        this.strategyModelAndViewHandler = strategyModelAndViewHandler;
     }
 
     @Override
@@ -18,9 +25,14 @@ public class AnnotationHandlerMappingAdapter implements HandlerAdapter {
     }
 
     @Override
-    public void handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HandlerExecution handler = annotationHandlerMapping.getHandler(req);
         Object result = handler.handle(req, resp);
-        ResultValueHandler.execute(result, req, resp);
+
+        if (result instanceof ModelAndView) {
+            return (ModelAndView) result;
+        }
+
+        return strategyModelAndViewHandler.handle(result);
     }
 }

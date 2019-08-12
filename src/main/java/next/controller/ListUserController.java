@@ -14,6 +14,6 @@ public class ListUserController implements Controller {
         }
 
         req.setAttribute("users", DataBase.findAll());
-        return "/user/list.jsp";
+        return "forward:/user/list.jsp";
     }
 }
