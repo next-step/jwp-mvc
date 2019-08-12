@@ -20,8 +20,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 public class AnnotationHandlerMapping {
@@ -54,15 +56,14 @@ public class AnnotationHandlerMapping {
             Reflections reflections = getBasePackageReflections(base);
             Set<Class<?>> controllerClasses = getControllerClasses(reflections);
             Set<HandlerExecution> handlerExecutions = getHandlerExecurions(controllerClasses);
-            putHandlerExecutions(handlerExecutions);
+            Map<HandlerKey, HandlerExecution> keyHandlerExecutions = getKeyHandlerExecutions(handlerExecutions);
+            this.handlerExecutions.putAll(keyHandlerExecutions);
         }
     }
 
-    private void putHandlerExecutions(Set<HandlerExecution> handlerExecutions) {
-        for (HandlerExecution handlerExecution : handlerExecutions) {
-            HandlerKey handlerKey = getHandlerKey(handlerExecution);
-            this.handlerExecutions.put(handlerKey, handlerExecution);
-        }
+    private Map<HandlerKey, HandlerExecution> getKeyHandlerExecutions(Set<HandlerExecution> handlerExecutions) {
+        return handlerExecutions.stream()
+                .collect(toMap(this::getHandlerKey, Function.identity(), (v1, v2) -> v1));
     }
 
     private HandlerKey getHandlerKey(HandlerExecution handlerExecution) {
