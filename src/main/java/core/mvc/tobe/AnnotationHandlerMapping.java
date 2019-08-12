@@ -30,7 +30,8 @@ public class AnnotationHandlerMapping {
         Set<Class<?>> controllers = controllerScanner.getControllers();
 
         for (Class<?> controller : controllers) {
-            generateHandlerExecutions(controller, getRequestMappingAnnotatedMethods(controller));
+            Set<Method> methods = getRequestMappingAnnotatedMethods(controller);
+            generateHandlerExecutions(controller, methods);
         }
     }
 
@@ -60,8 +61,9 @@ public class AnnotationHandlerMapping {
             requestMethods = RequestMethod.values();
         }
 
+        Object controller = clazz.newInstance();
         for (RequestMethod requestMethod : requestMethods) {
-            handlerExecutions.put(getHandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(clazz.newInstance(), method));
+            handlerExecutions.put(getHandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(controller, method));
         }
     }
 
