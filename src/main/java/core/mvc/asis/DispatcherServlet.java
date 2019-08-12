@@ -63,10 +63,23 @@ public class DispatcherServlet extends HttpServlet {
     private void newService(HandlerExecution handlerExecution, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             ModelAndView modelAndView = handlerExecution.handle(req, resp);
+            viewRender(modelAndView, req, resp);
         } catch (Throwable e) {
             logger.error("Ner Service Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+    
+    private void viewRender(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    	 if(modelAndView == null) {
+         	return;
+         }
+         
+         if(modelAndView.getView() == null) {
+         	return;
+         }
+         
+         modelAndView.getView().render(modelAndView.getModel(), req, resp);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
