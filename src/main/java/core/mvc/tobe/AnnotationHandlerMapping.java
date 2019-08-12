@@ -56,7 +56,7 @@ public class AnnotationHandlerMapping {
         for (Object base : bases) {
             Reflections reflections = getBasePackageReflections(base);
             Set<Class<?>> controllerClasses = getControllerClasses(reflections);
-            Set<HandlerExecution> handlerExecutions = getHandlerExecurions(controllerClasses);
+            Set<HandlerExecution> handlerExecutions = getHandlerExecutions(controllerClasses);
             putHandlerExecutions(handlerExecutions);
         }
     }
@@ -86,16 +86,16 @@ public class AnnotationHandlerMapping {
         return new HandlerKey(requestMapping.value(), requestMapping.method());
     }
 
-    private Set<HandlerExecution> getHandlerExecurions(Set<Class<?>> controllerClasses) {
+    private Set<HandlerExecution> getHandlerExecutions(Set<Class<?>> controllerClasses) {
 
         return Optional.ofNullable(controllerClasses)
                 .orElse(emptySet())
                 .stream()
-                .flatMap(ctrl -> getHandlerExecurions(ctrl).stream())
+                .flatMap(ctrl -> getHandlerExecutions(ctrl).stream())
                 .collect(toSet());
     }
 
-    private Set<HandlerExecution> getHandlerExecurions(Class<?> controllerClasses) {
+    private Set<HandlerExecution> getHandlerExecutions(Class<?> controllerClasses) {
         Object invokeInstance = getControllerNew(controllerClasses);
 
         return getRequestMappingMethod(controllerClasses)
