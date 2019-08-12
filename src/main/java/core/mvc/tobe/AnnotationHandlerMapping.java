@@ -82,11 +82,11 @@ public class AnnotationHandlerMapping {
         return Optional.ofNullable(controllerClasses)
                 .orElse(emptySet())
                 .stream()
-                .flatMap(ctrl -> getHandlerExecurions(ctrl).stream())
+                .flatMap(ctrl -> getHandlerExecutions(ctrl).stream())
                 .collect(toSet());
     }
 
-    private Set<HandlerExecution> getHandlerExecurions(Class<?> controllerClasses) {
+    private Set<HandlerExecution> getHandlerExecutions(Class<?> controllerClasses) {
         Object invokeInstance = getControllerNew(controllerClasses);
 
         return getRequestMappingMethod(controllerClasses)
