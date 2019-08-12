@@ -14,15 +14,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandler implements RequestHandler {
-    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandler.class);
+public class AnnotationHandlerMapping implements RequestHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private static final int DEFAULT_REQUEST_METHOD_COUNT = 1;
 
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandler(Object... basePackage) {
+    public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 

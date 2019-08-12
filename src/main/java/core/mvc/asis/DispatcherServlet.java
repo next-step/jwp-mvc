@@ -3,7 +3,7 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.RequestHandler;
 import core.mvc.View;
-import core.mvc.tobe.AnnotationHandler;
+import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class DispatcherServlet extends HttpServlet {
         RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
 
-        AnnotationHandler annotationHandlerMapping = new AnnotationHandler(BASE_PACKAGE);
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
 
         requestHandlers = new ArrayList<>();

@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-public class AnnotationHandlerMappingTest {
-    private AnnotationHandler handlerMapping;
+public class AnnotationHandlerMappingMappingTest {
+    private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandler("core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         handlerMapping.initialize();
     }
 
