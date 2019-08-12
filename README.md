@@ -16,3 +16,8 @@
 - 애노테이션 함수들을 호출하는 로직을 추가하였습니다
 6. AnnotationHandlerMapping 어노태이션 검색 추가
 7. DispatcherServlet 레거시 controller 와 애노테이션 controller 둘다 쓰기위해 로직을 변경 하였습니다.
+
+###새로 추가한 작업 $step3:
+1. HandlerMapping 인터 페이스 추가
+- 기존 컨트롤러, 어노테이션 컨트롤러를 DispatcherServlet에 분리 시켰습니다
+2. 기존 컨트롤러 execute 리턴값을 modelAndView로 변환
