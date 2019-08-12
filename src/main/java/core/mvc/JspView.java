@@ -5,12 +5,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-public class ResultView implements View {
+public class JspView implements View {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private String urlPath;
 
-    public ResultView(String urlPath) {
+    public JspView(String urlPath) {
         this.urlPath = urlPath;
     }
 
