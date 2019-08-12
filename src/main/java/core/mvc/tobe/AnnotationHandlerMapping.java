@@ -7,6 +7,7 @@ import core.exceptions.AnnotationHandlerMappingException;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -66,6 +67,7 @@ public class AnnotationHandlerMapping {
 
         return Optional.ofNullable(requestMapping.method())
                 .map(Arrays::asList)
+                .filter(list -> !CollectionUtils.isEmpty(list))
                 .map(Collection::stream)
                 .orElse(Arrays.stream(RequestMethod.values()))
                 .map(requestMappingMethod -> new HandlerKey(requestMapping.value(), requestMappingMethod))
