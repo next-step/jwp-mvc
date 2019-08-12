@@ -1,10 +1,10 @@
 package next.reflection;
 
-import com.google.common.collect.Sets;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
 import org.assertj.core.util.Arrays;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -13,13 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,7 +71,7 @@ public class ReflectionTest {
 
     @Test
     public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
-        String fieldName= "name";
+        String fieldName = "name";
         String testName = "태현";
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
@@ -93,25 +90,55 @@ public class ReflectionTest {
         Class<Question> clazz = Question.class;
         Constructor[] constructors = clazz.getDeclaredConstructors();
 
-        Date date = new Date();
-        Object[] args = Arrays.array(1, "dave", "title", "content", date, 2);
-        Question question =new Question(1, "dave", "title", "content", date, 2);
+        Map<Integer, Object[]> actualValuesMap = getActual();
+        List<Question> expectedValues = getExpected();
 
         for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            if (parameterTypes.length != 5) break; // date 때문에 5개짜리 생성자만 테스트
-            assertThat(constructor.newInstance(args).toString()).isEqualTo(question.toString());
+            Object actual = newInstance(actualValuesMap, constructor);
+            assertThat(actual).isIn(expectedValues);
         }
+    }
+
+    private Object newInstance(Map<Integer, Object[]> actualValuesMap, Constructor constructor) throws Exception {
+        int parameterCount = constructor.getParameterCount();
+        Object[] actualValues = actualValuesMap.get(parameterCount);
+
+        return constructor.newInstance(actualValues);
+    }
+
+    private List<Question> getExpected() {
+        Question questionByThreeArgument = new Question("writer", "title", "content");
+        Question questionBySixArgument = new Question(1, "writer", "title", "content", new Date(), 2);
+
+        return Lists.newArrayList(questionByThreeArgument, questionBySixArgument);
+    }
+
+    private Map<Integer, Object[]> getActual() {
+        Object[] threeArguments = Arrays.array("writer", "title", "content");
+        Object[] sixArguments = Arrays.array(1, "writer", "title", "content", new Date(), 2);
+
+        Map<Integer, Object[]> actualMap = new HashMap<>();
+        actualMap.put(threeArguments.length, threeArguments);
+        actualMap.put(sixArguments.length, sixArguments);
+
+        return actualMap;
     }
 
     @Test
     public void componentScan() {
         Reflections reflections = new Reflections("core.di.factory.example");
-
+        Map<Class<? extends Annotation>, List<String>> componentNamesMap = new HashMap<>();
+        componentNamesMap.put(Controller.class, Lists.newArrayList("QnaController"));
+        componentNamesMap.put(Service.class, Lists.newArrayList("MyQnaService"));
+        componentNamesMap.put(Repository.class, Lists.newArrayList("JdbcQuestionRepository", "JdbcUserRepository"));
         Class<? extends Annotation>[] annotations = Arrays.array(Controller.class, Service.class, Repository.class);
+
         for (Class<? extends Annotation> annotation : annotations) {
             reflections.getTypesAnnotatedWith(annotation)
-                    .forEach(annotationClass -> logger.debug(annotationClass.getSimpleName()));
+                    .forEach(annotationClass -> {
+                        List<String> componentNames = componentNamesMap.get(annotation);
+                        assertThat(annotationClass.getSimpleName()).isIn(componentNames);
+                    });
         }
     }
 }
