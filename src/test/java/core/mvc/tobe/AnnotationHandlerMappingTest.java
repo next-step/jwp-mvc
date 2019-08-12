@@ -6,11 +6,11 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 public class AnnotationHandlerMappingTest {
-    private AnnotationHandlerMapping handlerMapping;
+    private AnnotationHandler handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new AnnotationHandler("core.mvc.tobe");
         handlerMapping.initialize();
     }
 

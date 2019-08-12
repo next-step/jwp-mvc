@@ -10,11 +10,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MyControllerTest {
-    private AnnotationHandlerMapping handlerMapping;
+    private AnnotationHandler handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new AnnotationHandler("core.mvc.tobe");
         handlerMapping.initialize();
     }
 

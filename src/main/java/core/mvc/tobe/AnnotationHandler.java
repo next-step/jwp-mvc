@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,15 +14,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
-    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+public class AnnotationHandler implements RequestHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandler.class);
     private static final int DEFAULT_REQUEST_METHOD_COUNT = 1;
 
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
+    public AnnotationHandler(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
@@ -71,6 +72,7 @@ public class AnnotationHandlerMapping {
         return new HandlerKey(value, requestMethod);
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
