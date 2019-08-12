@@ -20,7 +20,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) this.invokeMethod.invoke(this.invokeInstance, new Object[]{request, response});
+        return (ModelAndView) this.invokeMethod.invoke(this.invokeInstance, request, response);
     }
 
     public Object getInvokeInstance() {
