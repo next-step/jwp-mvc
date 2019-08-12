@@ -1,21 +1,22 @@
 package core.mvc.tobe;
 
+import next.WebServerLauncher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-public class AnnotationHandlerMappingTest {
+class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
-    public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+    void setup() throws ClassNotFoundException {
+        handlerMapping = new AnnotationHandlerMapping(WebServerLauncher.class);
         handlerMapping.initialize();
     }
 
     @Test
-    public void getHandler() throws Exception {
+    void getHandler() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
