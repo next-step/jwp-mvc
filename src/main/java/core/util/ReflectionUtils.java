@@ -12,13 +12,7 @@ public class ReflectionUtils {
 
     public static <T> T newInstance(Class<T> clazz, Object... args) {
 
-        Constructor constructor = null;
-
-        for (Constructor candidate : clazz.getConstructors()) {
-            if (candidate.getParameterCount() == args.length) {
-                constructor = candidate;
-            }
-        }
+        Constructor constructor = getConstructorByArgs(clazz, args);
 
         if (constructor == null) {
             throw new IllegalArgumentException(clazz.getSimpleName() + " doesn't have args size constructor");
@@ -35,6 +29,32 @@ public class ReflectionUtils {
         }
 
         throw new RuntimeException(clazz.getSimpleName() + " instantiation failed");
+    }
+
+    public static Constructor getConstructorByArgs(Class clazz, Object... args) {
+        for (Constructor candidate : clazz.getConstructors()) {
+            if (isMatched(candidate, args)) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean isMatched(Constructor constructor, Object... args) {
+
+        if (constructor.getParameterCount() != args.length) {
+            return false;
+        }
+
+        final Class[] parameterTypes = constructor.getParameterTypes();
+        for (int i = 0; i < args.length; i++) {
+            if (parameterTypes[i] != args[i].getClass()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

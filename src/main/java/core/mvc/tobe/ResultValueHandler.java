@@ -3,18 +3,15 @@ package core.mvc.tobe;
 import core.mvc.ModelAndView;
 import core.mvc.View;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.Map;
 
 public enum ResultValueHandler {
 
-    MODEL_AND_VIEW {
-        @Override
-        public boolean support(Object result) {
-            return result instanceof ModelAndView;
-        }
-
+    MODEL_AND_VIEW(ModelAndView.class) {
         @Override
         public void handle(Object result, HttpServletRequest request, HttpServletResponse response) throws Exception {
             ModelAndView mav = (ModelAndView) result;
@@ -23,12 +20,7 @@ public enum ResultValueHandler {
         }
     },
 
-    STRING {
-        @Override
-        public boolean support(Object result) {
-            return result instanceof String;
-        }
-
+    STRING(String.class) {
         @Override
         public void handle(Object result, HttpServletRequest request, HttpServletResponse response) throws Exception {
             String viewName = (String) result;
@@ -37,15 +29,28 @@ public enum ResultValueHandler {
         }
     };
 
-    public static void execute(Object result, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        for (ResultValueHandler handler : values()) {
-            if (handler.support(result)) {
-                handler.handle(result, request, response);
-            }
+    ResultValueHandler(Class<?> clazz) {
+        this.clazz = clazz;
+    }
+
+    private static Map<Class<?>, ResultValueHandler> resultValueHandlers = new HashMap<>();
+    
+    static {
+        for (ResultValueHandler handler : ResultValueHandler.values()) {
+            resultValueHandlers.put(handler.getClazz(), handler);
         }
     }
 
-    public abstract boolean support(Object result);
+    public static void execute(Object result, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        resultValueHandlers.get(result.getClass())
+                .handle(result, req, resp);
+    }
+
+    public Class<?> getClazz() {
+        return clazz;
+    }
+
+    private Class<?> clazz;
 
     public abstract void handle(Object result, HttpServletRequest request, HttpServletResponse response) throws Exception;
 

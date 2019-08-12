@@ -7,13 +7,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HandlerExecution {
 
     private List<ArgumentResolver> argumentResolver;
     private Object target;
     private Method method;
-
+    private static final Map<Method, MethodParameter[]> methodParameterCache = new ConcurrentHashMap<>();
 
     public HandlerExecution(List<ArgumentResolver> argumentResolvers, Object target, Method method) {
         this.argumentResolver = argumentResolvers;
@@ -22,19 +24,36 @@ public class HandlerExecution {
     }
 
     public Object handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Object[] parameters = new Object[method.getParameterCount()];
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        for (int i = 0; i < parameters.length; i++) {
-            MethodParameter methodParameter = new MethodParameter(parameterTypes[i], parameterAnnotations[i]);
-            parameters[i] = getParameter(methodParameter, request, response);
+        MethodParameter[] methodParameters = getMethodParameters();
+        Object[] arguments = new Object[methodParameters.length];
+
+        for (int i = 0; i < methodParameters.length; i++) {
+            arguments[i] = getArguments(methodParameters[i], request, response);
         }
 
-        return method.invoke(target, parameters);
+        return method.invoke(target, arguments);
     }
 
-    private Object getParameter(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
+    private MethodParameter[] getMethodParameters() {
+        MethodParameter[] methodParameters = methodParameterCache.get(method);
+
+        if (methodParameters == null) {
+            methodParameters = new MethodParameter[method.getParameterCount()];
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+
+            for (int i = 0; i < methodParameters.length; i++) {
+                methodParameters[i] = new MethodParameter(parameterTypes[i], parameterAnnotations[i]);
+            }
+
+            methodParameterCache.put(method, methodParameters);
+        }
+
+        return methodParameters;
+    }
+
+    private Object getArguments(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
 
         for (ArgumentResolver resolver : argumentResolver) {
             if (resolver.supports(methodParameter)) {

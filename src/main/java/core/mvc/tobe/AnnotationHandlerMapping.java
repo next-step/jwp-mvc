@@ -5,6 +5,9 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.tobe.support.ArgumentResolver;
+import core.mvc.tobe.support.HttpRequestArgumentResolver;
+import core.mvc.tobe.support.HttpResponseArgumentResolver;
+import core.mvc.tobe.support.RequestParamArgumentResolver;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -20,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static core.util.ReflectionUtils.newInstance;
+import static java.util.Arrays.asList;
 
 public class AnnotationHandlerMapping {
 
@@ -28,14 +32,19 @@ public class AnnotationHandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-    private List<ArgumentResolver> argumentResolvers;
+    private static List<ArgumentResolver> argumentResolvers;
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
+        argumentResolvers = createArgumentResolvers();
     }
 
-    public void setArgumentResolvers(List<ArgumentResolver> argumentResolvers) {
-        this.argumentResolvers = argumentResolvers;
+    private List<ArgumentResolver> createArgumentResolvers() {
+        return asList(
+                new HttpRequestArgumentResolver(),
+                new HttpResponseArgumentResolver(),
+                new RequestParamArgumentResolver()
+        );
     }
 
     public void initialize() {
@@ -59,6 +68,10 @@ public class AnnotationHandlerMapping {
                 handlerExecutions.put(handlerKey, handlerExecution);
                 logger.info("Add - method: {}, path: {}, HandlerExecution: {}", requestMapping.method(), requestMapping.value(), method.getName());
             });
+    }
+
+    public boolean hasHandler(HttpServletRequest request) {
+        return getHandler(request) != null;
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

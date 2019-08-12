@@ -22,11 +22,6 @@ class AnnotationHandlerAdapterTest {
     @BeforeEach
     void setup() {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.setArgumentResolvers(asList(
-                new HttpRequestArgumentResolver(),
-                new HttpResponseArgumentResolver(),
-                new RequestParamArgumentResolver()
-        ));
         handlerMapping.initialize();
     }
 

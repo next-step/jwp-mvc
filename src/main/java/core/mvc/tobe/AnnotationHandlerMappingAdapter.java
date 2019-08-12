@@ -14,7 +14,7 @@ public class AnnotationHandlerMappingAdapter implements HandlerAdapter {
 
     @Override
     public boolean supports(HttpServletRequest req) {
-        return annotationHandlerMapping.getHandler(req) != null;
+        return annotationHandlerMapping.hasHandler(req);
     }
 
     @Override

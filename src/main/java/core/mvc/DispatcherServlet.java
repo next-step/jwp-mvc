@@ -22,7 +22,9 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        HandlerAdapterFactory adapterFactory = new HandlerAdapterFactory(new Environment());
+        Environment environment = new Environment();
+        getServletContext().setAttribute(Environment.class.getName(), environment);
+        HandlerAdapterFactory adapterFactory = new HandlerAdapterFactory(environment);
         this.handlerAdapters = adapterFactory.getHandlerAdapters();
     }
 
@@ -34,7 +36,7 @@ public class DispatcherServlet extends HttpServlet {
             doService(req, resp);
         } catch (Throwable e) {
             logger.error("## Exception: {}", e.getMessage());
-            throw new ServletException();
+            throw new ServletException(e);
         }
     }
 
@@ -42,11 +44,9 @@ public class DispatcherServlet extends HttpServlet {
         for (HandlerAdapter handlerAdapter : handlerAdapters) {
             if (handlerAdapter.supports(req)) {
                 handlerAdapter.handle(req, resp);
+                return;
             }
         }
     }
 
-    public void setHandlerAdapters(List<HandlerAdapter> handlerAdapters) {
-        this.handlerAdapters = handlerAdapters;
-    }
 }
