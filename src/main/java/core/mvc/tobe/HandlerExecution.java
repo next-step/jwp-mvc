@@ -7,27 +7,27 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
-    private final Object invokeInstance;
-    private final Method invokeMethod;
+    private final Object instance;
+    private final Method method;
 
-    private HandlerExecution(Object invokeInstance, Method invokeMethod) {
-        this.invokeInstance = invokeInstance;
-        this.invokeMethod = invokeMethod;
+    private HandlerExecution(Object instance, Method method) {
+        this.instance = instance;
+        this.method = method;
     }
 
-    public static HandlerExecution of(Object invokeInstance, Method invokeMethod) {
-        return new HandlerExecution(invokeInstance, invokeMethod);
+    public static HandlerExecution of(Object instance, Method method) {
+        return new HandlerExecution(instance, method);
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) this.invokeMethod.invoke(this.invokeInstance, request, response);
+        return (ModelAndView) this.method.invoke(this.instance, request, response);
     }
 
-    public Object getInvokeInstance() {
-        return invokeInstance;
+    public Object getInstance() {
+        return instance;
     }
 
-    public Method getInvokeMethod() {
-        return invokeMethod;
+    public Method getMethod() {
+        return method;
     }
 }
