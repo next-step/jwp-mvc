@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package next.controller;
 
 import core.annotation.web.RequestMethod;
 import core.mvc.asis.DispatcherServlet;
