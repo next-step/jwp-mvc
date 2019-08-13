@@ -71,9 +71,13 @@ public class ReflectionTest {
         for (Method method : methods) {
             logger.debug("\t\t{} {}", Modifier.toString(method.getModifiers()), method.getName());
             Parameter[] parameters = method.getParameters();
-            for (Parameter parameter : parameters) {
-                logger.debug("\t\t\t{} {}", Modifier.toString(parameter.getModifiers()), parameter.getType().getName());
-            }
+            printParameters(parameters);
+        }
+    }
+
+    private void printParameters(Parameter[] parameters) {
+        for (Parameter parameter : parameters) {
+            logger.debug("\t\t\t{} {}", Modifier.toString(parameter.getModifiers()), parameter.getType().getName());
         }
     }
 
