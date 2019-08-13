@@ -21,4 +21,3 @@
 1. HandlerMapping 인터 페이스 추가
 - 기존 컨트롤러, 어노테이션 컨트롤러를 DispatcherServlet에 분리 시켰습니다
 2. 기존 컨트롤러 execute 리턴값을 modelAndView로 변환
-

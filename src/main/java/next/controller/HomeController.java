@@ -3,7 +3,6 @@ package next.controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
-import core.mvc.asis.Controller;
 import core.mvc.asis.DispatcherServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
