@@ -17,6 +17,10 @@ public class ModelAndView {
         this.view = view;
     }
 
+    public void render(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+        view.render(model, httpServletRequest, httpServletResponse);
+    }
+
     public ModelAndView addObject(String attributeName, Object attributeValue) {
         model.put(attributeName, attributeValue);
         return this;
@@ -36,9 +40,5 @@ public class ModelAndView {
 
     public String getViewName() {
         return this.view.getViewName();
-    }
-
-    public void render(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
-        view.render(model, httpServletRequest, httpServletResponse);
     }
 }
