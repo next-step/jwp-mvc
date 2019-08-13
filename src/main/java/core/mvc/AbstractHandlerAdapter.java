@@ -4,10 +4,10 @@ public abstract class AbstractHandlerAdapter implements HandlerAdapter{
 
     private Class<?> clazz;
 
-    public AbstractHandlerAdapter(Class<?> clazz) {
+    AbstractHandlerAdapter(Class<?> clazz) {
         this.clazz = clazz;
-
     }
+
     @Override
     public boolean supports(Object handler) {
         assert handler!= null;
