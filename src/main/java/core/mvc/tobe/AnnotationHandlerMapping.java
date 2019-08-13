@@ -12,13 +12,14 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private static final String METHOD_INFO_FORMAT = "%s.%s";
     private static final String MAPPING_INFO_LOG_FORMAT = "{}, execution method: {}";
+    private final Class<? extends RequestMapping> requestMappingClass = RequestMapping.class;
 
     private Object[] basePackage;
 
@@ -30,33 +31,50 @@ public class AnnotationHandlerMapping {
 
     public void initialize() {
         Reflections reflections = new Reflections(basePackage);
-        reflections.getTypesAnnotatedWith(Controller.class)
-                .forEach(this::findRequestMappingMethods);
-
-    }
-
-    private void findRequestMappingMethods(Class<?> aClass) {
-        try {
-            Method[] methods = aClass.getDeclaredMethods();
-            Object instance = aClass.getDeclaredConstructor().newInstance();
-            Stream.of(methods).forEach(method -> addHandlerExecutions(instance, method));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        for (Class<?> aClass : reflections.getTypesAnnotatedWith(Controller.class)) {
+            findRequestMappingMethods(aClass);
         }
     }
 
+    private void findRequestMappingMethods(Class<?> aClass) {
+        Optional<Object> instanceOptional = getInstance(aClass);
+        if (!instanceOptional.isPresent()) {
+            return;
+        }
+
+        Object instance = instanceOptional.get();
+        for (Method method : aClass.getDeclaredMethods()) {
+            addHandlerExecutions(instance, method);
+        }
+    }
+
+    private Optional<Object> getInstance(Class<?> aClass) {
+        try {
+            return Optional.of(aClass.getDeclaredConstructor().newInstance());
+        } catch (ReflectiveOperationException e) {
+            logger.error(e.getMessage());
+        }
+
+        return Optional.empty();
+    }
+
     private void addHandlerExecutions(Object controller, Method method) {
-        Class<? extends RequestMapping> requestMappingClass = RequestMapping.class;
         if (!method.isAnnotationPresent(requestMappingClass)) {
             return;
         }
 
-        RequestMapping requestMapping = method.getAnnotation(requestMappingClass);
-        HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-        HandlerExecution handleExecution = (request, response) ->
-                (ModelAndView) method.invoke(controller, request, response);
+        HandlerKey handlerKey = getHandlerKey(method);
+        handlerExecutions.put(handlerKey, getHandlerExecution(controller, method));
         loggingMappingInfo(handlerKey, method);
-        handlerExecutions.put(handlerKey, handleExecution);
+    }
+
+    private HandlerExecution getHandlerExecution(Object controller, Method method) {
+        return (request, response) -> (ModelAndView) method.invoke(controller, request, response);
+    }
+
+    private HandlerKey getHandlerKey(Method method) {
+        RequestMapping requestMapping = method.getAnnotation(requestMappingClass);
+        return new HandlerKey(requestMapping.value(), requestMapping.method());
     }
 
     private void loggingMappingInfo(HandlerKey handlerKey, Method method) {
