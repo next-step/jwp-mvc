@@ -1,16 +1,12 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
-import core.mvc.tobe.support.HttpRequestArgumentResolver;
-import core.mvc.tobe.support.HttpResponseArgumentResolver;
-import core.mvc.tobe.support.RequestParamArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ControllerScannerTest {
@@ -19,11 +15,7 @@ public class ControllerScannerTest {
 
     @BeforeEach
     void setUp() {
-        scanner = new ControllerScanner(asList(
-                new HttpRequestArgumentResolver(),
-                new HttpResponseArgumentResolver(),
-                new RequestParamArgumentResolver()
-        ));
+        scanner = new ControllerScanner();
     }
 
     @DisplayName("Controller Scan With ArgumentResolver")

@@ -26,15 +26,7 @@ public class AnnotationHandlerMapping {
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
-        controllerScanner = new ControllerScanner(createArgumentResolvers());
-    }
-
-    private List<ArgumentResolver> createArgumentResolvers() {
-        return asList(
-                new HttpRequestArgumentResolver(),
-                new HttpResponseArgumentResolver(),
-                new RequestParamArgumentResolver()
-        );
+        controllerScanner = new ControllerScanner();
     }
 
     public void setArgumentResolvers(List<ArgumentResolver> argumentResolvers) {

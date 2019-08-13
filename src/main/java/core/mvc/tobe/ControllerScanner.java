@@ -3,6 +3,9 @@ package core.mvc.tobe;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.mvc.tobe.support.ArgumentResolver;
+import core.mvc.tobe.support.HttpRequestArgumentResolver;
+import core.mvc.tobe.support.HttpResponseArgumentResolver;
+import core.mvc.tobe.support.RequestParamArgumentResolver;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -14,16 +17,17 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static core.util.ReflectionUtils.newInstance;
+import static java.util.Arrays.asList;
 
 public class ControllerScanner {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerScanner.class);
 
-    private List<ArgumentResolver> argumentResolvers;
-
-    public ControllerScanner(List<ArgumentResolver> argumentResolvers) {
-        this.argumentResolvers = argumentResolvers;
-    }
+    private static List<ArgumentResolver> argumentResolvers = asList(
+                new HttpRequestArgumentResolver(),
+                new HttpResponseArgumentResolver(),
+                new RequestParamArgumentResolver()
+        );
 
     public Map<HandlerKey, HandlerExecution> scan(Object... basePackage) {
         Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
@@ -37,7 +41,6 @@ public class ControllerScanner {
 
         return handlers;
     }
-
 
     private void addHandlerExecution(Map<HandlerKey, HandlerExecution> handlers, final Object target, Method[] methods) {
         Arrays.stream(methods)
