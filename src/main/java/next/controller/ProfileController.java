@@ -1,8 +1,6 @@
 package next.controller;
 
 import core.db.DataBase;
-import core.mvc.JspView;
-import core.mvc.ModelAndView;
 import core.mvc.asis.Controller;
 import next.model.User;
 
@@ -11,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ProfileController implements Controller {
     @Override
-    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (user == null) {
@@ -19,6 +17,6 @@ public class ProfileController implements Controller {
         }
         req.setAttribute("user", user);
 
-        return new ModelAndView(new JspView("/user/profile.jsp"));
+        return "/user/profile.jsp";
     }
 }
