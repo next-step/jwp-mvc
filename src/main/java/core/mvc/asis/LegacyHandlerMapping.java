@@ -9,15 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.mvc.HandlerMapping;
-import next.controller.UpdateUserController;
 
 public class LegacyHandlerMapping implements HandlerMapping<Controller> {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/users/update", new UpdateUserController());
-
+        
         logger.info("Initialized Request Mapping!");
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
