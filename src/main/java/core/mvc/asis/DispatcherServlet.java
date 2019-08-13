@@ -1,10 +1,7 @@
 package core.mvc.asis;
 
-import core.mvc.ModelAndView;
-import core.mvc.RequestHandler;
-import core.mvc.View;
+import core.mvc.*;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +21,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final String BASE_PACKAGE = "next";
 
     private List<RequestHandler> requestHandlers;
+    private List<HandlerAdapter> adapters;
 
     @Override
     public void init() throws ServletException {
@@ -36,12 +34,15 @@ public class DispatcherServlet extends HttpServlet {
         requestHandlers = new ArrayList<>();
         requestHandlers.add(requestMapping);
         requestHandlers.add(annotationHandlerMapping);
+
+        adapters = new ArrayList<>();
+        adapters.add(new LegacyHandler());
+        adapters.add(new AnnotationHandler());
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
         try {
             ModelAndView modelAndView = handle(req, resp);
@@ -55,11 +56,12 @@ public class DispatcherServlet extends HttpServlet {
     private ModelAndView handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Object handler = getRequestHandler(req);
 
-        if (handler instanceof Controller) {
-            return ((Controller) handler).execute(req, resp);
-        } else {
-            return ((HandlerExecution) handler).handle(req, resp);
+        for (HandlerAdapter adapter : adapters) {
+            if (adapter.supports(handler)) {
+                return adapter.handle(req, resp, handler);
+            }
         }
+        return null;
     }
 
     private Object getRequestHandler(HttpServletRequest req) {
