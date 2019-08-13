@@ -11,16 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class MappingRegistryTest {
+class HandlerMappingRegistryTest {
 
     private MockHttpServletRequest request;
-    private MockMapping mockMapping;
+    private MockHandlerMapping mockMapping;
     private MyController controller = new MyController();
 
     @BeforeEach
     void setup() {
         request = new MockHttpServletRequest();
-        mockMapping = new MockMapping(controller);
+        mockMapping = new MockHandlerMapping(controller);
     }
 
     @DisplayName("입력받은 Mapping 을 초기화 한다.")
@@ -40,19 +40,19 @@ class MappingRegistryTest {
 
     @Test
     void getHandler_Handler가_없으면_에러() throws Exception {
-        mockMapping = new MockMapping(null);
+        mockMapping = new MockHandlerMapping(null);
         MappingRegistry registry = new MappingRegistry(mockMapping);
 
         assertThatThrownBy(() -> registry.getHandler(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    private static class MockMapping implements Mapping {
+    private static class MockHandlerMapping implements HandlerMapping {
 
         private boolean initialize = false;
         private final Object handler;
 
-        private MockMapping(Object handler) {
+        private MockHandlerMapping(Object handler) {
             this.handler = handler;
         }
 
