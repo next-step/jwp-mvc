@@ -2,7 +2,9 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Lists;
 import core.annotation.web.RequestMethod;
+import core.mvc.View;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,23 +28,26 @@ public class AnnotationHandlerMappingTest {
     }
 
     @Test
+    @DisplayName("/users/findUserId api에서 리턴되는 jsp 파일을 확인한다")
     public void getHandler() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
+        String givenRequestUrl = "/users/findUserId";
+        String expectedViewName = "/users/show.jsp";
+
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", givenRequestUrl);
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        View view = execution.handle(request, response).getView();
+
+        assertThat(view.getViewName()).isEqualTo(expectedViewName);
     }
 
     @Test
+    @DisplayName("core.mvc.tobe package 중 Controller annotation이 붙은 method가 올바로 등록되었는지 확인한다.")
     void initialize() {
-        List<HandlerKey> handlerKeys = getExpected();
+        List<HandlerKey> expectedKeys = getExpected();
         Set<HandlerKey> actualKeys = handlerMapping.getHandlerKeys();
 
-        assertThat(actualKeys).isNotEmpty();
-        for (HandlerKey handlerKey : actualKeys) {
-            logger.debug("actual handler key : {}", handlerKey);
-            assertThat(handlerKey).isIn(handlerKeys);
-        }
+        assertThat(actualKeys).containsAll(expectedKeys);
     }
 
     private List<HandlerKey> getExpected() {
@@ -54,6 +59,7 @@ public class AnnotationHandlerMappingTest {
     }
 
     @Test
+    @DisplayName("handlerMapping에 맵핑된 키값 중 POST /users 가 있는지 확인한다.")
     void isHandlerKeyPresent() {
         assertThat(handlerMapping.isHandlerKeyPresent("/users", RequestMethod.POST)).isTrue();
     }
