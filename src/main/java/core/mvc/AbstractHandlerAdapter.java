@@ -1,7 +1,6 @@
 package core.mvc;
 
 public abstract class AbstractHandlerAdapter implements HandlerAdapter{
-
     private Class<?> clazz;
 
     AbstractHandlerAdapter(Class<?> clazz) {
@@ -11,6 +10,7 @@ public abstract class AbstractHandlerAdapter implements HandlerAdapter{
     @Override
     public boolean supports(Object handler) {
         assert handler!= null;
-        return clazz.isAssignableFrom(handler.getClass());
+
+        return clazz.isInstance(handler);
     }
 }
