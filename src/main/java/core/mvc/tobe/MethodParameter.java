@@ -19,4 +19,12 @@ public class MethodParameter {
     public Annotation[] getAnnotations() {
         return annotations;
     }
+
+    public boolean isString() {
+        return type == String.class;
+    }
+
+    public boolean isInteger() {
+        return type == Integer.class || type == int.class;
+    }
 }

@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.mock;
 
 import core.mvc.tobe.view.View;
 import org.springframework.mock.web.MockHttpServletResponse;

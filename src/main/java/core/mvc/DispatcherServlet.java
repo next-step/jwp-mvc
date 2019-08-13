@@ -9,6 +9,7 @@ import core.mvc.tobe.view.ViewResolverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,9 +27,15 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() {
         Environment environment = new Environment();
-        getServletContext().setAttribute(Environment.class.getName(), environment);
+        setEnvironmentInContext(environment);
         this.handlerAdapterManager = new HandlerAdapterManager(environment);
         this.viewResolverManager = new ViewResolverManager();
+    }
+
+    private void setEnvironmentInContext(Environment environment) {
+        if (getServletConfig() != null) {
+            getServletContext().setAttribute(Environment.class.getName(), environment);
+        }
     }
 
     @Override
@@ -44,7 +51,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void doService(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        HandlerAdapter handler = handlerAdapterManager.getHandler(req, resp);
+        HandlerAdapter handler = handlerAdapterManager.getHandler(req);
         ModelAndView mav = handler.handle(req, resp);
         View view = viewResolverManager.resolveView(mav.getViewName());
         view.render(mav.getModel(), req, resp);

@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class HandlerAdapterManager {
         return handlerAdapters;
     }
 
-    public HandlerAdapter getHandler(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    public HandlerAdapter getHandler(HttpServletRequest req) throws ServletException {
         for (HandlerAdapter handlerAdapter : handlerAdapters) {
             if (handlerAdapter.supports(req)) {
                 return handlerAdapter;

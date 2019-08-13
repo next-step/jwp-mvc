@@ -1,6 +1,5 @@
 package core.mvc.tobe.view;
 
-import core.mvc.tobe.AnnotationHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +9,7 @@ import java.util.Map;
 
 public class RedirectView implements View {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedirectView.class);
 
     private String viewName;
 

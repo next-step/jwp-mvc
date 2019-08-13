@@ -49,7 +49,7 @@ public class ReflectionUtils {
 
         final Class[] parameterTypes = constructor.getParameterTypes();
         for (int i = 0; i < args.length; i++) {
-            if (parameterTypes[i] != args[i].getClass()) {
+            if (parameterTypes[i] != args[i].getClass()) { // todo handle primitive type
                 return false;
             }
         }

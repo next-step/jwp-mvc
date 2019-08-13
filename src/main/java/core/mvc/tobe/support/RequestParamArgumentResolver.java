@@ -25,8 +25,10 @@ public class RequestParamArgumentResolver implements ArgumentResolver{
 
         Object arg = request.getParameter(requestParam.value());
 
-        if (methodParameter.getType() == String.class) {
+        if (methodParameter.isString()) {
             return arg;
+        } else if (methodParameter.isInteger()) {
+            return Integer.valueOf(arg.toString());
         }
 
         throw new MethodArgumentTypeNotSupportedException(methodParameter.getType(), arg);

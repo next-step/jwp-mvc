@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.mvc.ModelAndView;
 import core.mvc.tobe.support.ArgumentResolver;
 import core.mvc.tobe.support.HttpRequestArgumentResolver;
 import core.mvc.tobe.support.HttpResponseArgumentResolver;
@@ -13,6 +14,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AnnotationHandlerAdapterTest {
     private AnnotationHandlerMapping handlerMapping;
@@ -21,16 +23,20 @@ class AnnotationHandlerAdapterTest {
 
     @BeforeEach
     void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping("next.mock");
         handlerMapping.initialize();
     }
 
     @DisplayName("AnnotationHandlerAdapter request mapping test")
     @Test
     void getHandler() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/mock/users");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        final Object result = execution.handle(request, response);
+        ModelAndView mav = (ModelAndView) result;
+        assertThat(mav.getViewName()).isEqualTo("forward:users.jsp");
+        assertThat(request.getAttribute("mock")).isEqualTo("users");
+
     }
 }

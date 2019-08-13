@@ -31,9 +31,9 @@ class DispatcherServletTest {
     @DisplayName("dispatcher servlet service process")
     @ParameterizedTest(name = "call {0} -> result: {2}")
     @MethodSource("sampleReqResp")
-    public void dispatcherServlet(HttpServletRequest request, HttpServletResponse response, String expexted) throws ServletException {
+    public void dispatcherServlet(HttpServletRequest request, HttpServletResponse response, String expected) throws ServletException {
         dispatcherServlet.service(request, response);
-        assertThat(request.getAttribute("mock")).isEqualTo(expexted);
+        assertThat(request.getAttribute("mock")).isEqualTo(expected);
     }
 
     private static Stream<Arguments> sampleReqResp() {
