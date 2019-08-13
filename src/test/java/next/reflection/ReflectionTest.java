@@ -43,16 +43,21 @@ public class ReflectionTest {
     Class<Student> clazz = Student.class;
 
     Student student = new Student();
-    Field nameField = clazz.getDeclaredField("name");
-    nameField.setAccessible(true);
+    Field nameField = getAccessibleField(clazz, "name");
     nameField.set(student, "changjun");
 
-    Field ageField = clazz.getDeclaredField("age");
-    ageField.setAccessible(true);
+    Field ageField = getAccessibleField(clazz, "age");
     ageField.set(student, 31);
 
     assertThat(student.getName()).isEqualTo("changjun");
     assertThat(student.getAge()).isEqualTo(31);
+  }
+
+  private Field getAccessibleField(Class<Student> clazz, String fieldName)
+      throws NoSuchFieldException {
+    Field ageField = clazz.getDeclaredField(fieldName);
+    ageField.setAccessible(true);
+    return ageField;
   }
 
   @Test
