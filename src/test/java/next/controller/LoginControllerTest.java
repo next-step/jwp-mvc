@@ -20,9 +20,6 @@ public class LoginControllerTest {
 	private static final String HTTP_METHOD = "GET";
 	private static final String REQUEST_URI_CREATE = "/users/create";
 	private static final String REQUEST_URI_LOGIN = "/users/login";
-
-
-
 	private static final String TEST_NAME = "circlee";
 	private static final String TEST_EMAIL = "circlee7@gmail.com";
 	private static final String USER_ID = "userId";

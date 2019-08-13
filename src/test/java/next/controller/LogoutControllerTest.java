@@ -23,10 +23,6 @@ public class LogoutControllerTest {
 	private static final String REQUEST_URI_LOGOUT = "/users/logout";
 	private static final String TEST_NAME = "circlee";
 	private static final String TEST_EMAIL = "circlee7@gmail.com";
-	private static final String USER_ID = "userId";
-	private static final String PASSWORD = "password";
-	private static final String NAME = "name";
-	private static final String EMAIL = "email";
 
 	private DispatcherServlet dispatcherServlet;
 
@@ -35,7 +31,6 @@ public class LogoutControllerTest {
 		dispatcherServlet = new DispatcherServlet();
 		dispatcherServlet.init();
 	}
-
 
 	@DisplayName("변경된 Login 컨트롤러 테스트 : 로그인 세션 존재")
 	@Test
