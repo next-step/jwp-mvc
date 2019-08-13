@@ -16,7 +16,7 @@ public class HandlerKey {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("HandlerKey {url=[");
+        StringBuilder sb = new StringBuilder("{url=[");
         sb.append(String.join(", ", url));
         sb.append("], requestMethod=[");
         sb.append(Arrays.stream(requestMethod).map(Enum::name).collect(Collectors.joining(", ")));

@@ -29,7 +29,6 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-
         Set<Class<?>> controllers = ComponentScanner.scan(basePackages, Controller.class);
         for (Class controller : controllers) {
             Object bean = null;
@@ -52,6 +51,7 @@ public class AnnotationHandlerMapping {
             Arrays.stream(urls).forEach(url -> urlMappings.put(url, handlerKey));
 
             handlerExecutions.put(handlerKey, new HandlerExecution(bean, method));
+            logger.info("key: {}, handler: {}", handlerKey, handlerExecutions.get(handlerKey));
         }
     }
 
