@@ -18,7 +18,6 @@ public class LegacyHandlerMapping implements HandlerMapping<Controller> {
     private Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
 
