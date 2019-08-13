@@ -8,6 +8,7 @@ import core.mvc.tobe.view.ViewResolver;
 import core.mvc.tobe.view.ViewResolverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -26,10 +27,14 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         Environment environment = new Environment();
         setEnvironmentInContext(environment);
         this.handlerAdapterManager = new HandlerAdapterManager(environment);
         this.viewResolverManager = new ViewResolverManager();
+        stopWatch.stop();
+        logger.info("dispatcherServlet initialize time: [" + stopWatch.getLastTaskTimeMillis() + "] millis");
     }
 
     private void setEnvironmentInContext(Environment environment) {

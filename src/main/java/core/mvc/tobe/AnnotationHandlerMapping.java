@@ -30,13 +30,13 @@ public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private Object[] basePackage;
+    private ControllerScanner controllerScanner;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-    private List<ArgumentResolver> argumentResolvers;
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
-        argumentResolvers = createArgumentResolvers();
+        controllerScanner = new ControllerScanner(createArgumentResolvers());
     }
 
     private List<ArgumentResolver> createArgumentResolvers() {
@@ -49,25 +49,7 @@ public class AnnotationHandlerMapping {
 
     public void initialize() {
         logger.info("## Initialized Annotation Handler Mapping");
-        Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
-
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-        for (Class<?> controller : controllers) {
-            Object target = newInstance(controller);
-            addHandlerExecution(target, controller.getMethods());
-        }
-    }
-
-    private void addHandlerExecution(final Object target, Method[] methods) {
-        Arrays.stream(methods)
-            .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-            .forEach(method -> {
-                RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-                HandlerExecution handlerExecution = new HandlerExecution(argumentResolvers, target, method);
-                handlerExecutions.put(handlerKey, handlerExecution);
-                logger.info("Add - method: {}, path: {}, HandlerExecution: {}", requestMapping.method(), requestMapping.value(), method.getName());
-            });
+        handlerExecutions.putAll(controllerScanner.scan(basePackage));
     }
 
     public boolean hasHandler(HttpServletRequest request) {

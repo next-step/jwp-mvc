@@ -38,6 +38,6 @@ public class HandlerAdapterManager {
             }
         }
 
-        throw new ServletException("No Adapter for processing servlet");
+        throw new ServletException("[" + req.getMethod() + " " + req.getRequestURI() + "] No Adapter for processing servlet");
     }
 }
