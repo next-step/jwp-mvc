@@ -28,7 +28,7 @@ public class UserController {
         return new ModelAndView(new JspView("/user/list.jsp"));
     }
 
-    @RequestMapping(value="/users", method=RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
                 request.getParameter("email"));
