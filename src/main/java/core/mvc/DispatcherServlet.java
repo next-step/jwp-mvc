@@ -1,29 +1,43 @@
 package core.mvc;
 
-import core.mvc.tobe.Environment;
 import core.mvc.tobe.HandlerAdapter;
-import core.mvc.tobe.HandlerAdapterFactory;
+import core.mvc.tobe.HandlerAdapterManager;
+import core.mvc.tobe.view.View;
+import core.mvc.tobe.view.ViewResolverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private List<HandlerAdapter> handlerAdapters;
+    private HandlerAdapterManager handlerAdapterManager;
+    private ViewResolverManager viewResolverManager;
 
     @Override
     public void init() {
-        HandlerAdapterFactory adapterFactory = new HandlerAdapterFactory(new Environment());
-        this.handlerAdapters = adapterFactory.getHandlerAdapters();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        Environment environment = new Environment();
+        setEnvironmentInContext(environment);
+        this.handlerAdapterManager = new HandlerAdapterManager(environment);
+        this.viewResolverManager = new ViewResolverManager();
+        stopWatch.stop();
+        logger.info("dispatcherServlet initialize time: [" + stopWatch.getLastTaskTimeMillis() + "] millis");
+    }
+
+    private void setEnvironmentInContext(Environment environment) {
+        if (getServletConfig() != null) {
+            getServletContext().setAttribute(Environment.class.getName(), environment);
+        }
     }
 
     @Override
@@ -34,19 +48,15 @@ public class DispatcherServlet extends HttpServlet {
             doService(req, resp);
         } catch (Throwable e) {
             logger.error("## Exception: {}", e.getMessage());
-            throw new ServletException();
+            throw new ServletException(e);
         }
     }
 
     private void doService(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        for (HandlerAdapter handlerAdapter : handlerAdapters) {
-            if (handlerAdapter.supports(req)) {
-                handlerAdapter.handle(req, resp);
-            }
-        }
+        HandlerAdapter handler = handlerAdapterManager.getHandler(req);
+        ModelAndView mav = handler.handle(req, resp);
+        View view = viewResolverManager.resolveView(mav.getViewName());
+        view.render(mav.getModel(), req, resp);
     }
 
-    public void setHandlerAdapters(List<HandlerAdapter> handlerAdapters) {
-        this.handlerAdapters = handlerAdapters;
-    }
 }
