@@ -23,7 +23,7 @@ public class ControllerScanner {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerScanner.class);
 
-    private static List<ArgumentResolver> argumentResolvers = asList(
+    private static final List<ArgumentResolver> argumentResolvers = asList(
                 new HttpRequestArgumentResolver(),
                 new HttpResponseArgumentResolver(),
                 new RequestParamArgumentResolver()
