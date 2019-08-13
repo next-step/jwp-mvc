@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.mvc.HandlerMapping;
-import next.controller.ListUserController;
 import next.controller.LoginController;
 import next.controller.LogoutController;
 import next.controller.ProfileController;
@@ -23,7 +22,6 @@ public class LegacyHandlerMapping implements HandlerMapping<Controller> {
     void initMapping() {
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
-        mappings.put("/users", new ListUserController());
         mappings.put("/users/login", new LoginController());
         mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
