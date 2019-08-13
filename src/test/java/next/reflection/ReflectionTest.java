@@ -117,7 +117,6 @@ public class ReflectionTest {
     @Test
     public void componentScan() throws Exception {
 
-
         Set<Class<?>> components = scanAnnotations("core.di.factory.example", Controller.class, Service.class, Repository.class);
         for (Class<?> component : components) {
             logger.debug("{}", component);
