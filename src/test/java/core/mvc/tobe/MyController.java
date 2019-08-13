@@ -12,12 +12,17 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class MyController {
-    private static final Logger logger = LoggerFactory.getLogger(MyController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MyController.class);
+	
+	public static final String ATTRIBUTE_USER_ID_NAME = "userId";
+	public static final String ATTRIBUTE_USER_ID_VALUE = "circlee";
 
     @RequestMapping("/users/findUserId")
     public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("findUserId");
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(ATTRIBUTE_USER_ID_NAME, ATTRIBUTE_USER_ID_VALUE);
+        return modelAndView;
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
