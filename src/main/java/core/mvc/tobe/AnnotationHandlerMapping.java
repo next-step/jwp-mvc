@@ -1,23 +1,29 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Maps;
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
-import core.exceptions.HandlerMappingException;
-import core.mvc.HandlerMapping;
-import core.mvc.ModelAndViewHandler;
+import static java.util.stream.Collectors.toSet;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.*;
+import com.google.common.collect.Maps;
 
-import static java.util.stream.Collectors.toSet;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
+import core.exceptions.HandlerMappingException;
+import core.mvc.HandlerMapping;
 
-public class AnnotationHandlerMapping implements HandlerMapping<ModelAndViewHandler> {
+public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution> {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private Object[] basePackage;
@@ -38,12 +44,21 @@ public class AnnotationHandlerMapping implements HandlerMapping<ModelAndViewHand
             throw e;
         }
     }
+    
+    @Override
+	public boolean support(HttpServletRequest request) {
+		return handlerExecutions.containsKey(createHandlerKey(request));
+	}
 
     @Override
-    public ModelAndViewHandler getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        return handlerExecutions.get(createHandlerKey(request));
+    }
+    
+    private HandlerKey createHandlerKey(HttpServletRequest request) {
+    	String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        return new HandlerKey(requestUri, rm);
     }
 
     private void setHandlerExecutions(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {

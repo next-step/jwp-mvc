@@ -1,16 +1,23 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerMapping;
-import core.mvc.ModelAndViewHandler;
-import next.controller.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LegacyHandlerMapping implements HandlerMapping<ModelAndViewHandler> {
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import core.mvc.HandlerMapping;
+import next.controller.CreateUserController;
+import next.controller.ListUserController;
+import next.controller.LoginController;
+import next.controller.LogoutController;
+import next.controller.ProfileController;
+import next.controller.UpdateFormUserController;
+import next.controller.UpdateUserController;
+
+public class LegacyHandlerMapping implements HandlerMapping<Controller> {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
@@ -38,9 +45,15 @@ public class LegacyHandlerMapping implements HandlerMapping<ModelAndViewHandler>
     void put(String url, Controller controller) {
         mappings.put(url, controller);
     }
+    
+    @Override
+	public boolean support(HttpServletRequest request) {
+		String requestUri = request.getRequestURI();
+		return mappings.containsKey(requestUri);
+	}
 
     @Override
-    public ModelAndViewHandler getHandler(HttpServletRequest request) {
+    public Controller getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
