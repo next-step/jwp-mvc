@@ -5,12 +5,10 @@ import core.mvc.tobe.HandlerExecution;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class AnnotationHandler implements HandlerAdapter {
-    @Override
-    public boolean supports(Object handler) {
-        assert handler != null;
+public class AnnotationHandler extends AbstractHandlerAdapter {
 
-        return HandlerExecution.class.isAssignableFrom(handler.getClass());
+    public AnnotationHandler(Class<?> clazz) {
+        super(clazz);
     }
 
     @Override

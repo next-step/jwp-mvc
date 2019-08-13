@@ -1,6 +1,7 @@
 package core.mvc;
 
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -18,7 +19,7 @@ class HandlerAdapterTest {
         mapping.initialize();
 
         HttpServletRequest request = new MockHttpServletRequest("GET", "/");;
-        HandlerAdapter adapter = new AnnotationHandler();
+        HandlerAdapter adapter = new AnnotationHandler(HandlerExecution.class);
         Object handler = mapping.getHandler(request);
 
         assertTrue(adapter.supports(handler));

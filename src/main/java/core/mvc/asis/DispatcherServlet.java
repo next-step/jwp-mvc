@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.*;
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,8 @@ public class DispatcherServlet extends HttpServlet {
         requestHandlers.add(annotationHandlerMapping);
 
         adapters = new ArrayList<>();
-        adapters.add(new LegacyHandler());
-        adapters.add(new AnnotationHandler());
+        adapters.add(new LegacyHandler(Controller.class));
+        adapters.add(new AnnotationHandler(HandlerExecution.class));
     }
 
     @Override
@@ -55,13 +56,12 @@ public class DispatcherServlet extends HttpServlet {
 
     private ModelAndView handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Object handler = getRequestHandler(req);
+        HandlerAdapter handlerAdapter = adapters.stream()
+                .filter(adapter -> adapter.supports(handler))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not Supported Handler"));
 
-        for (HandlerAdapter adapter : adapters) {
-            if (adapter.supports(handler)) {
-                return adapter.handle(req, resp, handler);
-            }
-        }
-        return null;
+        return handlerAdapter.handle(req, resp, handler);
     }
 
     private Object getRequestHandler(HttpServletRequest req) {

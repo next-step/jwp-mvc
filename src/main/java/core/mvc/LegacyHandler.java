@@ -5,14 +5,11 @@ import core.mvc.asis.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class LegacyHandler implements HandlerAdapter {
+public class LegacyHandler extends AbstractHandlerAdapter {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    @Override
-    public boolean supports(Object handler) {
-        assert handler != null;
-
-        return Controller.class.isAssignableFrom(handler.getClass());
+    public LegacyHandler(Class<?> clazz) {
+        super(clazz);
     }
 
     @Override
