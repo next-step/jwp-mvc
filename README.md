@@ -21,3 +21,13 @@
 1. HandlerMapping 인터 페이스 추가
 - 기존 컨트롤러, 어노테이션 컨트롤러를 DispatcherServlet에 분리 시켰습니다
 2. 기존 컨트롤러 execute 리턴값을 modelAndView로 변환
+
+###새로 추가한 작업 $step3-1:
+1. Controller 인터페이스 String 으로 수정
+2. AnnotationCotroller 인터페이스 추가
+3. BasicHandlerMapping 구조 수정
+- 기존 핸들러를 가지고 있는 상테에서 받는 것으로 수정
+- init 함수를 제거 addMapping 으로 추가와 동시에 init
+- find 함수로 컨트롤러를 리턴
+4. DispatcherServlet
+- BasicHandlerMapping 에 컨트롤러 추가

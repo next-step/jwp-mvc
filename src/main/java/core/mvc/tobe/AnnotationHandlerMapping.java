@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.ModelAndView;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -36,10 +38,16 @@ public class AnnotationHandlerMapping implements HandlerMapping{
     }
 
     @Override
-    public core.mvc.asis.Controller findController(HttpServletRequest request) {
+    public ModelAndView findAndExecute(HttpServletRequest request, HttpServletResponse resp) throws Exception {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        HandlerKey handlerKey = new HandlerKey(requestUri, rm);
+
+        if(handlerExecutions.containsKey(handlerKey)){
+            return handlerExecutions.get(new HandlerKey(requestUri, rm)).execute(request, resp);
+        }
+
+        return null;
     }
 
     private void findControllerAnnotation(){

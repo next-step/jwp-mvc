@@ -1,42 +1,38 @@
 package core.mvc.tobe;
 
-import core.mvc.asis.Controller;
-import core.mvc.asis.RequestMapping;
+import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class BasicHandlerMapping implements HandlerMapping{
+public class BasicHandlerMapping {
 
-    private List<HandlerMapping> mappingList;
+    private List<HandlerMapping> handlerMappings;
 
-    public BasicHandlerMapping(String basePackage){
-        mappingList = new ArrayList<>();
-        HandlerMapping controllerMapping = new RequestMapping();
-        HandlerMapping annotationMapping = new AnnotationHandlerMapping(basePackage);
 
-        mappingList.add(controllerMapping);
-        mappingList.add(annotationMapping);
+    public BasicHandlerMapping(){
+        handlerMappings = new ArrayList<>();
     }
 
-    @Override
-    public void initMapping() {
-        mappingList.stream().forEach(handlerMapping -> {
-            handlerMapping.initMapping();
-        });
+    public void addMapping(HandlerMapping handlerMapping){
+        handlerMappings.add(handlerMapping);
+        handlerMapping.initMapping();
     }
 
-    @Override
-    public Controller findController(HttpServletRequest req){
-        for(HandlerMapping mapping : mappingList){
-            Controller returnObject = mapping.findController(req);
-            if(returnObject != null){
-                return returnObject;
-            }
-
-        }
-
-        return null;
+    public ModelAndView find(HttpServletRequest req, HttpServletResponse resp){
+        return handlerMappings.stream()
+                .map(handlerMapping -> {
+                    try{
+                        return handlerMapping.findAndExecute(req, resp);
+                    }catch (Exception e){
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 }

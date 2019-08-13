@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.BasicHandlerMapping;
 
 import org.slf4j.Logger;
@@ -20,8 +21,10 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        handlerMapping = new BasicHandlerMapping("next");
-        handlerMapping.initMapping();
+        handlerMapping = new BasicHandlerMapping();
+
+        handlerMapping.addMapping(new RequestMapping());
+        handlerMapping.addMapping(new AnnotationHandlerMapping("next"));
     }
 
     @Override
@@ -29,26 +32,17 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller handler = handlerMapping.findController(req);
-        if(!executeController(req, resp, handler)){
-            throw new ServletException("존재하지 않는 페이지 입니다.");
-        }
-    }
+        try {
+            ModelAndView modelAndView = handlerMapping.find(req, resp);
+            modelAndView.getView().render(null, req, resp);
 
-    private boolean executeController(HttpServletRequest req,
-                                   HttpServletResponse resp,
-                                   Controller controller) throws ServletException {
-        if(controller != null){
-            try {
-                ModelAndView modelAndView = controller.execute(req, resp);
-                modelAndView.getView().render(null, req, resp);
-                return true;
-            } catch (Throwable e) {
-                logger.error("Exception : {}", e);
-                throw new ServletException(e.getMessage());
+            if(modelAndView == null){
+                throw new ServletException("존재하지 않는 페이지 입니다.");
             }
+        }catch (Throwable e){
+            logger.error("Exception : {}", e);
+            throw new ServletException(e.getMessage());
         }
-
-        return false;
     }
+
 }

@@ -1,11 +1,13 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
 import core.mvc.tobe.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +31,12 @@ public class RequestMapping implements HandlerMapping {
     }
 
     @Override
-    public Controller findController(HttpServletRequest req) {
-        return mappings.get(req.getRequestURI());
+    public ModelAndView findAndExecute(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+        if(mappings.containsKey(req.getRequestURI())){
+            return new ModelAndView(mappings.get(req.getRequestURI()).execute(req, resp));
+        }
+
+        return null;
     }
 
     void put(String url, Controller controller) {

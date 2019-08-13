@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class HandlerExecution implements Controller {
+public class HandlerExecution implements AnnotationController {
     private static final Logger logger = LoggerFactory.getLogger(HandlerExecution.class);
 
     Class<?> clazz;
