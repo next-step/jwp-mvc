@@ -28,8 +28,6 @@ public class LegacyView implements View {
         }
 
         RequestDispatcher rd = request.getRequestDispatcher(viewName);
-        System.out.println(rd);
-        System.out.println(viewName);
         rd.forward(request, response);
     }
 }

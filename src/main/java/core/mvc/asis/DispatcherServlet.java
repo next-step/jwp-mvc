@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -51,22 +52,18 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object getHandler(HttpServletRequest request) throws ServletException {
-        for (HandlerMapping handlerMapping : this.handlerMappings) {
-            Object handler = handlerMapping.getHandler(request);
-            if (handler != null) {
-                return handler;
-            }
-        }
-        throw new ServletException("not found handler");
+        return handlerMappings.stream()
+                .map(mapping -> mapping.getHandler(request))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new ServletException("Mapped handler Not found"));
     }
 
     private HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
-        for (HandlerAdapter handlerAdapter : this.handlerAdapters) {
-            if (handlerAdapter.supports(handler)) {
-                return handlerAdapter;
-            }
-        }
-        throw new ServletException("not found handler adapter");
+        return handlerAdapters.stream()
+                .filter(adapter -> adapter.supports(handler))
+                .findFirst()
+                .orElseThrow(() -> new ServletException("Handler adapter not found"));
     }
 
     private void initHandlerMappings() {
