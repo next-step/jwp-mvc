@@ -1,23 +1,21 @@
 package core.mvc.tobe;
 
+import core.annotation.web.Controller;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import java.util.Map;
 
 class ControllerScannerTest {
-    private static final Logger logger = LoggerFactory.getLogger(ControllerScannerTest.class);
-
     @DisplayName("@Controller 클래스 읽어오는지 테스트")
     @Test
     public void test() {
         ControllerScanner controllerScanner = new ControllerScanner("core.mvc.tobe");
-        Set<Class<?>> controllers = controllerScanner.getControllers();
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
 
-        controllers
-                .forEach(clazz -> logger.debug("class : {}", clazz.getName()));
+        for (Class<?> controller : controllers.keySet()) {
+            Assertions.assertTrue(controller.isAnnotationPresent(Controller.class));
+        }
     }
-
 }

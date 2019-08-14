@@ -3,18 +3,17 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import core.mvc.RequestHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
-    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+public class AnnotationHandlerMapping implements RequestHandler {
     private static final int DEFAULT_REQUEST_METHOD_COUNT = 1;
 
     private Object[] basePackage;
@@ -27,32 +26,29 @@ public class AnnotationHandlerMapping {
 
     public void initialize() {
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
-        Set<Class<?>> controllers = controllerScanner.getControllers();
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
 
-        for (Class<?> controller : controllers) {
-            generateHandlerExecutions(controller, getRequestMappingAnnotatedMethods(controller));
-        }
+        Set<Method> methods = getMethods(controllers);
+        methods.forEach(method -> generateHandlerExecutions(controllers, method));
     }
 
-    private Set<Method> getRequestMappingAnnotatedMethods(Class<?> clazz) {
-        Method[] methods = clazz.getDeclaredMethods();
+    private Set<Method> getMethods(Map<Class<?>, Object> controllers) {
+        Set<Method> annotatedMethods = new HashSet<>();
+        for (Class<?> clazz : controllers.keySet()) {
+            Method[] methods = clazz.getDeclaredMethods();
+            annotatedMethods.addAll(getAnnotatedMethods(methods));
+        }
 
+        return annotatedMethods;
+    }
+
+    private Set<Method> getAnnotatedMethods(Method[] methods) {
         return Arrays.stream(methods)
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toSet());
     }
 
-    private void generateHandlerExecutions(Class<?> clazz, Set<Method> methods) {
-        for (Method method : methods) {
-            try {
-                generate(clazz, method);
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.error(e.getMessage());
-            }
-        }
-    }
-
-    private void generate(Class<?> clazz, Method method) throws InstantiationException, IllegalAccessException {
+    private void generateHandlerExecutions(Map<Class<?>, Object> controllers, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         RequestMethod[] requestMethods = requestMapping.method();
 
@@ -61,7 +57,10 @@ public class AnnotationHandlerMapping {
         }
 
         for (RequestMethod requestMethod : requestMethods) {
-            handlerExecutions.put(getHandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(clazz.newInstance(), method));
+            HandlerKey handlerKey = getHandlerKey(requestMapping.value(), requestMethod);
+            Object controller = controllers.get(method.getDeclaringClass());
+
+            handlerExecutions.put(handlerKey, new HandlerExecution(controller, method));
         }
     }
 
@@ -69,6 +68,7 @@ public class AnnotationHandlerMapping {
         return new HandlerKey(value, requestMethod);
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
