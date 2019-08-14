@@ -2,6 +2,7 @@ package next.reflection;
 
 import org.slf4j.Logger;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,27 +39,31 @@ public class ReflectionUtils {
         name.set(newInstance, value);
     }
 
-    public static Object getTestInstance(Class parameterType) throws Exception {
+    public static Object getTestInstance(Class<?> parameterType) throws Exception {
         if (parameterType.isPrimitive()) {
-            return getPrimitiveValue(parameterType);
+            return getDefaultValue(parameterType);
         }
         return parameterType.newInstance();
     }
 
+    private static <T> T getDefaultValue(Class<T> clazz) {
+        return (T) Array.get(Array.newInstance(clazz, 1), 0);
+    }
+
     private static Object getPrimitiveValue(Class parameterType) {
         if (boolean.class == parameterType) {
-            return false;
+            return Boolean.TRUE;
         } else if (short.class == parameterType) {
-            return (short) 1;
+            return Short.MIN_VALUE;
         } else if (int.class == parameterType) {
-            return 1;
+            return Integer.MIN_VALUE;
         } else if (long.class == parameterType) {
-            return 1L;
+            return Long.MIN_VALUE;
         } else if (float.class == parameterType) {
-            return 1.1f;
+            return Float.MIN_VALUE;
         } else if (double.class == parameterType) {
-            return 1.1;
+            return Double.MIN_VALUE;
         }
-        return 'a';
+        return Character.MIN_VALUE;
     }
 }

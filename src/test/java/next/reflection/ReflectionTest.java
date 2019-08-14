@@ -71,9 +71,13 @@ public class ReflectionTest {
         for (Method method : methods) {
             logger.debug("\t\t{} {}", Modifier.toString(method.getModifiers()), method.getName());
             Parameter[] parameters = method.getParameters();
-            for (Parameter parameter : parameters) {
-                logger.debug("\t\t\t{} {}", Modifier.toString(parameter.getModifiers()), parameter.getType().getName());
-            }
+            printParameters(parameters);
+        }
+    }
+
+    private void printParameters(Parameter[] parameters) {
+        for (Parameter parameter : parameters) {
+            logger.debug("\t\t\t{} {}", Modifier.toString(parameter.getModifiers()), parameter.getType().getName());
         }
     }
 
@@ -116,7 +120,6 @@ public class ReflectionTest {
     @DisplayName("컴포넌트 스캔 테스트")
     @Test
     public void componentScan() throws Exception {
-
 
         Set<Class<?>> components = scanAnnotations("core.di.factory.example", Controller.class, Service.class, Repository.class);
         for (Class<?> component : components) {
