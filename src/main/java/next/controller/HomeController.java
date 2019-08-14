@@ -2,7 +2,7 @@ package next.controller;
 
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.asis.Controller;
+import core.mvc.ModelAndView;
 import core.mvc.asis.DispatcherServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,8 @@ public class HomeController {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     @RequestMapping("/")
-    public String indexMainPage(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        logger.debug("!!!!!!!!!!~~~~~~~~~!!!!!!!!!!");
+    public ModelAndView indexMainPage(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         req.setAttribute("users", DataBase.findAll());
-        return "home.jsp";
+        return new ModelAndView("home.jsp");
     }
 }
