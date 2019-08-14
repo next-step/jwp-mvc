@@ -1,7 +1,6 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.Mapping;
@@ -9,10 +8,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import org.reflections.Reflections;
 
 public class AnnotationHandlerMapping implements Mapping {
 
@@ -35,15 +32,13 @@ public class AnnotationHandlerMapping implements Mapping {
   }
 
   private void initHandlerExecution(Object basePackage) {
-    Set<Class<?>> handlers = getHandlers(basePackage);
-
-    for (Class handler : handlers) {
-      makeHandlerExecutionsAndFill(handler, getHandlerExecutionMethods(handler));
-    }
-  }
-
-  private Set<Class<?>> getHandlers(Object basePackage) {
-    return getAnnotationTypeClass(basePackage, Controller.class);
+    ControllerScanner controllerScanner = new ControllerScanner(basePackage.toString());
+    Map<Class, Object> controllers = controllerScanner.getControllers();
+    controllers.keySet().stream()
+        .forEach(controller ->
+            makeHandlerExecutionsAndFill(controllers.get(controller),
+                getHandlerExecutionMethods(controller))
+        );
   }
 
   private List<Method> getHandlerExecutionMethods(Class handlers) {
@@ -52,7 +47,7 @@ public class AnnotationHandlerMapping implements Mapping {
         .collect(Collectors.toList());
   }
 
-  private void makeHandlerExecutionsAndFill(Class handler, List<Method> executionMethods) {
+  private void makeHandlerExecutionsAndFill(Object handler, List<Method> executionMethods) {
     for (Method method : executionMethods) {
       RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
 
@@ -83,11 +78,6 @@ public class AnnotationHandlerMapping implements Mapping {
       return methods;
     }
     return RequestMethod.values();
-  }
-
-  private Set<Class<?>> getAnnotationTypeClass(Object basePackage, Class clazz) {
-    Reflections reflections = new Reflections(basePackage);
-    return reflections.getTypesAnnotatedWith(clazz);
   }
 
   public HandlerExecution findController(HttpServletRequest request) {
