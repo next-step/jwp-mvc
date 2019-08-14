@@ -13,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -53,10 +54,20 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void doService(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        HandlerAdapter handler = handlerAdapterManager.getHandler(req);
+        HandlerAdapter handler = handlerAdapterManager.getHandler(req, resp);
+
+        if (handler == null) {
+            notFoundHandler(req, resp);
+        }
+
         ModelAndView mav = handler.handle(req, resp);
         View view = viewResolverManager.resolveView(mav.getViewName());
         view.render(mav.getModel(), req, resp);
+    }
+
+    private void notFoundHandler(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        logger.error("no matching handler: {}", req.getRequestURI());
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
 }
