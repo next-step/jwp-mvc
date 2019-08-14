@@ -1,6 +1,7 @@
 package core.mvc.tobe.support;
 
 import core.annotation.web.RequestParam;
+import core.exception.MethodArgumentTypeNotSupportedException;
 import core.mvc.tobe.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +23,15 @@ public class RequestParamArgumentResolver implements ArgumentResolver{
                 .map(ann -> (RequestParam) ann)
                 .orElseThrow(IllegalArgumentException::new);
 
-        if (methodParameter.getType() == String.class) {
-            return request.getParameter(requestParam.value());
+        Object arg = request.getParameter(requestParam.value());
+
+        if (methodParameter.isString()) {
+            return arg;
+        } else if (methodParameter.isInteger()) {
+            return Integer.valueOf(arg.toString());
         }
 
-        return new Object();
+        throw new MethodArgumentTypeNotSupportedException(methodParameter.getType(), arg);
     }
 
 }
