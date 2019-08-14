@@ -6,17 +6,15 @@ import core.mvc.tobe.view.View;
 import core.mvc.tobe.view.ViewResolverManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StopWatch;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
-public class DispatcherServlet extends HttpServlet {
+public class DispatcherServlet extends FrameworkServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
@@ -24,21 +22,9 @@ public class DispatcherServlet extends HttpServlet {
     private ViewResolverManager viewResolverManager;
 
     @Override
-    public void init() {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        this.handlerAdapterFactory = new HandlerAdapterFactory(getEnvironment());
-        this.viewResolverManager = new ViewResolverManager();
-        stopWatch.stop();
-        logger.info("dispatcherServlet initialize time: [" + stopWatch.getLastTaskTimeMillis() + "] millis");
-    }
-
-    private Environment getEnvironment() {
-        if (getServletConfig() != null) {
-            return (Environment) getServletContext().getAttribute(Environment.class.getName());
-        }
-
-        return new Environment();
+    protected void initStrategies(ApplicationContext context) {
+        handlerAdapterFactory = context.getHandlerAdapterFactory();
+        viewResolverManager = context.getViewResolverManager();
     }
 
     @Override
@@ -58,6 +44,7 @@ public class DispatcherServlet extends HttpServlet {
 
         if (handler == null) {
             notFoundHandler(req, resp);
+            return;
         }
 
         ModelAndView mav = handler.handle(req, resp);

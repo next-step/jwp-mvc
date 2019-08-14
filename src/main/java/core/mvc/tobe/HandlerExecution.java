@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.tobe.support.ArgumentResolver;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +15,12 @@ public class HandlerExecution {
 
     private static final Map<Method, MethodParameter[]> methodParameterCache = new ConcurrentHashMap<>();
     private List<ArgumentResolver> argumentResolver;
+    private ParameterNameDiscoverer parameterNameDiscoverer;
     private Object target;
     private Method method;
 
-    public HandlerExecution(List<ArgumentResolver> argumentResolvers, Object target, Method method) {
+    public HandlerExecution(ParameterNameDiscoverer parameterNameDiscoverer, List<ArgumentResolver> argumentResolvers, Object target, Method method) {
+        this.parameterNameDiscoverer = parameterNameDiscoverer;
         this.argumentResolver = argumentResolvers;
         this.target = target;
         this.method = method;
@@ -36,6 +39,7 @@ public class HandlerExecution {
 
     private MethodParameter[] getMethodParameters() {
         MethodParameter[] methodParameters = methodParameterCache.get(method);
+        String[] parameterNames = parameterNameDiscoverer.getParameterNames(method);
 
         if (methodParameters == null) {
             methodParameters = new MethodParameter[method.getParameterCount()];
@@ -43,7 +47,7 @@ public class HandlerExecution {
             Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
             for (int i = 0; i < methodParameters.length; i++) {
-                methodParameters[i] = new MethodParameter(parameterTypes[i], parameterAnnotations[i]);
+                methodParameters[i] = new MethodParameter(method, parameterTypes[i], parameterAnnotations[i], parameterNames[i]);
             }
 
             methodParameterCache.put(method, methodParameters);
@@ -59,7 +63,7 @@ public class HandlerExecution {
             }
         }
 
-        return new Object();
+        throw new IllegalStateException("No suitable resolver for argument: " + methodParameter.getType());
     }
 
 

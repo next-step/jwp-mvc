@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 public class HandlerAdapterFactory {
 
     private List<HandlerAdapter> handlerAdapters;
@@ -22,15 +24,10 @@ public class HandlerAdapterFactory {
 
     private List<HandlerAdapter> createDefaultHandlerAdapters(Environment environment) {
         String basePackage = environment.getProperty("component.basepackage");
-        List<HandlerAdapter> handlerAdapters = new ArrayList<>();
-
-        if (StringUtils.isNotEmpty(basePackage)) {
-            handlerAdapters.add(new AnnotationHandlerMappingAdapter(new AnnotationHandlerMapping(basePackage)));
-        }
-
-        handlerAdapters.add(new RequestMappingHandlerAdapter(new RequestMapping()));
-
-        return handlerAdapters;
+        return asList(
+                new AnnotationHandlerMappingAdapter(basePackage),
+                new RequestMappingHandlerAdapter(new RequestMapping())
+        );
     }
 
     public HandlerAdapter getHandler(HttpServletRequest request, HttpServletResponse response) throws ServletException {
@@ -41,5 +38,9 @@ public class HandlerAdapterFactory {
         }
 
         return null;
+    }
+
+    public void destroy() {
+        handlerAdapters.clear();
     }
 }

@@ -30,4 +30,8 @@ public class ViewResolverManager {
                 new EmptyUrlForwardViewResolver()
         );
     }
+
+    public void destory() {
+        viewResolvers.clear();
+    }
 }

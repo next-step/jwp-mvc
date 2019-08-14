@@ -2,16 +2,15 @@ package core.mvc.tobe;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
-import core.mvc.tobe.support.ArgumentResolver;
-import core.mvc.tobe.support.HttpRequestArgumentResolver;
-import core.mvc.tobe.support.HttpResponseArgumentResolver;
-import core.mvc.tobe.support.RequestParamArgumentResolver;
+import core.mvc.tobe.support.*;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -26,8 +25,12 @@ public class ControllerScanner {
     private static final List<ArgumentResolver> argumentResolvers = asList(
                 new HttpRequestArgumentResolver(),
                 new HttpResponseArgumentResolver(),
-                new RequestParamArgumentResolver()
+                new RequestParamArgumentResolver(),
+                new PathVariableArgumentResolver(),
+                new ModelArgumentResolver()
         );
+
+    private static final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     public Map<HandlerKey, HandlerExecution> scan(Object... basePackage) {
         Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner(), new MethodAnnotationsScanner());
@@ -48,7 +51,7 @@ public class ControllerScanner {
                 .forEach(method -> {
                     RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
                     HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-                    HandlerExecution handlerExecution = new HandlerExecution(argumentResolvers, target, method);
+                    HandlerExecution handlerExecution = new HandlerExecution(nameDiscoverer, argumentResolvers, target, method);
                     handlers.put(handlerKey, handlerExecution);
                     logger.info("Add - method: {}, path: {}, HandlerExecution: {}", requestMapping.method(), requestMapping.value(), method.getName());
                 });

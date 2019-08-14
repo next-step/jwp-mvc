@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -29,6 +31,7 @@ public class HandlerExecutionWithArgumentResolverTest {
     private static final Logger logger = LoggerFactory.getLogger(HandlerExecutionWithArgumentResolverTest.class);
 
     private List<ArgumentResolver> argumentResolvers;
+    private ParameterNameDiscoverer nameDiscoverer;
 
     @BeforeEach
     void setUp() {
@@ -37,6 +40,7 @@ public class HandlerExecutionWithArgumentResolverTest {
                 new HttpResponseArgumentResolver(),
                 new RequestParamArgumentResolver()
         );
+        this.nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
     }
 
     @Test
@@ -50,7 +54,7 @@ public class HandlerExecutionWithArgumentResolverTest {
         for (Method method : methods) {
             if (method.isAnnotationPresent(RequestMapping.class)) {
                 logger.info("test {} method", method.getName());
-                HandlerExecution handlerExecution = new HandlerExecution(argumentResolvers, target, method);
+                HandlerExecution handlerExecution = new HandlerExecution(nameDiscoverer, argumentResolvers, target, method);
                 handlerExecution.handle(request, response);
             }
         }

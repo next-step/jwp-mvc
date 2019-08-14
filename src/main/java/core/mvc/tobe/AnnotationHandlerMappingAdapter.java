@@ -10,8 +10,8 @@ public class AnnotationHandlerMappingAdapter implements HandlerAdapter {
     private AnnotationHandlerMapping annotationHandlerMapping;
     private ModelAndViewHandler strategyModelAndViewHandler = new ViewNameModelAndViewHandler();
 
-    public AnnotationHandlerMappingAdapter(AnnotationHandlerMapping annotationHandlerMapping) {
-        this.annotationHandlerMapping = annotationHandlerMapping;
+    public AnnotationHandlerMappingAdapter(String basePackage) {
+        this.annotationHandlerMapping = new AnnotationHandlerMapping(basePackage);
         annotationHandlerMapping.initialize();
     }
 

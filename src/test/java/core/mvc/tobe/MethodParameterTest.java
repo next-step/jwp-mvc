@@ -11,9 +11,9 @@ public class MethodParameterTest {
 
     @Test
     void methodParameter() {
-        MethodParameter stringMp = new MethodParameter(String.class, new Annotation[]{new MockRequestParam()});
-        MethodParameter integerMp = new MethodParameter(Integer.class, new Annotation[]{new MockRequestParam()});
-        MethodParameter intMp = new MethodParameter(int.class, new Annotation[]{new MockRequestParam()});
+        MethodParameter stringMp = new MethodParameter(null, String.class, new Annotation[]{new MockRequestParam()}, "");
+        MethodParameter integerMp = new MethodParameter(null, Integer.class, new Annotation[]{new MockRequestParam()}, "");
+        MethodParameter intMp = new MethodParameter(null, int.class, new Annotation[]{new MockRequestParam()}, "");
 
         assertTrue(stringMp.isString());
         assertTrue(integerMp.isInteger());
