@@ -26,7 +26,8 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        ModelAndView modelAndView = execution.handle(request, response);
+        assertThat(modelAndView.getViewName()).isEqualTo("/users/show.jsp");
     }
 
     @DisplayName("GET 요청과 /users 패스를 가진 요청 처리")
@@ -35,7 +36,8 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        ModelAndView modelAndView = execution.handle(request, response);
+        assertThat(modelAndView.getViewName()).isEqualTo("/users/list.jsp");
     }
 
     @DisplayName("POST 요청과 /users 패스를 가진 요청 처리")
@@ -44,6 +46,9 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        ModelAndView modelAndView = execution.handle(request, response);
+        assertThat(modelAndView.getViewName()).isEqualTo("redirect:/users");
+
+
     }
 }

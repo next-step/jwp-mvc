@@ -5,6 +5,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,18 +19,18 @@ public class MyController {
     @RequestMapping("/users")
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("users findUserId");
-        return new ModelAndView(new JspView("/users/list.jsp"));
+        return new ModelAndView("/users/list.jsp");
     }
 
     @RequestMapping("/users/show")
     public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("users show");
-        return new ModelAndView(new JspView("/users/show.jsp"));
+        return new ModelAndView("/users/show.jsp");
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("users create");
-        return new ModelAndView(new JspView("redirect:/users"));
+        return new ModelAndView("redirect:/users");
     }
 }

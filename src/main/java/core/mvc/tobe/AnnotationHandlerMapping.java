@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private Object[] basePackage;
@@ -34,7 +34,7 @@ public class AnnotationHandlerMapping {
 
     public void initialize() {
         for (Class<?> controller : controllerScanner.getAnnotatedControllers()) {
-            for (Method method : ReflectionUtils.getAllMethods(controller)) {
+            for (Method method : ReflectionUtils.getAllMethods(controller, RequestMapping.class)) {
                 RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
                 handlerExecutions.put(createHandlerKey(requestMapping), HandlerExecution.of(controller, method));
                 logger.debug("Add RequestMapping - {} {}.{}", requestMapping.method(), controller.getName(), method.getName());

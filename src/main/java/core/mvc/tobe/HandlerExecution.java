@@ -36,10 +36,6 @@ public class HandlerExecution {
             throw new UnsupportedOperationException();
         }
 
-        if (!Arrays.asList(method.getParameterTypes()).containsAll(Arrays.asList(HttpServletRequest.class, HttpServletResponse.class))) {
-            throw new UnsupportedOperationException();
-        }
-
         return new HandlerExecution(clazz, method);
     }
 }
