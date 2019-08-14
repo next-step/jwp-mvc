@@ -36,8 +36,7 @@ public class DispatcherServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException {
-    String requestUri = req.getRequestURI();
-    logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+    logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
     Object controller = findController(req);
 
