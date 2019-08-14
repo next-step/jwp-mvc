@@ -1,5 +1,8 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +21,22 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping ahm;
 
     @Override
     public void init() throws ServletException {
+        initRequestMapping();
+        initAnnotationHandlerMapping();
+    }
+
+    private void initRequestMapping() {
         rm = new RequestMapping();
         rm.initMapping();
+    }
+
+    private void initAnnotationHandlerMapping() {
+        ahm = new AnnotationHandlerMapping("next.controller");
+        ahm.initialize();
     }
 
     @Override
@@ -30,14 +44,25 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
         try {
+            HandlerExecution handlerExecution = ahm.getHandler(req);
+            if (handlerExecution != null) {
+                executeWithAnnotation(req, resp, handlerExecution);
+                return;
+            }
+
+            Controller controller = rm.findController(requestUri);
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private void executeWithAnnotation(HttpServletRequest req, HttpServletResponse resp, HandlerExecution handlerExecution) throws Exception {
+        ModelAndView modelAndView = handlerExecution.handle(req, resp);
+        modelAndView.viewRender(req, resp);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)

@@ -11,6 +11,8 @@
 ## step1 - Java Reflection 실습
 - [자바 Reflect API](https://docs.oracle.com/javase/8/docs/api/java/lang/reflect)
 - [Custom Annotation](https://advenoh.tistory.com/21)
+- [ComponetScan참고](https://www.baeldung.com/reflections-library)
+
 
 - [x] 요구사항 1 - 클래스 정보 출력
     - [x]  모든 필드, 생성자, 메소드에 대한 정보를 출력
@@ -19,3 +21,13 @@
 - [x] 요구사항 4 - private field에 값 할당
 - [x] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
 - [x] 요구사항 6 - component scan
+
+## step2 - @MVC 구현
+
+- [x] 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+    - [x] @Controller Class Scan
+    - [x] @RequestMapping Method Scan
+    - [x] RequestMapping 객체 인자 받아서 HandlerKey 생성
+    - [x] HandlerExecution - method 실행로직 추가
+    
+- [x] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합

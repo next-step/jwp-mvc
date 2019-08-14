@@ -12,7 +12,10 @@ public class Junit3TestRunner {
     public void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
         Stream.of(clazz.getDeclaredMethods())
-                .filter(method -> method.getName().startsWith("test"))
+                .filter(method -> {
+                    String methodName = method.getName();
+                    return methodName.startsWith("test");
+                })
                 .forEach(method -> {
                     try {
                         method.invoke(clazz.newInstance());
