@@ -1,9 +1,13 @@
 package core.mvc.tobe;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import java.util.stream.Stream;
 
 public class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
@@ -14,11 +18,20 @@ public class AnnotationHandlerMappingTest {
         handlerMapping.initialize();
     }
 
-    @Test
-    public void getHandler() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
+    @ParameterizedTest(name = "method : {0}, url {1}")
+    @MethodSource("getRequestMapping")
+    public void getHandler(String method, String url) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, url);
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
+    }
+
+
+    private static Stream<Arguments> getRequestMapping() {
+        return Stream.of(
+                Arguments.of("GET", "/users/findUserId"),
+                Arguments.of("POST", "/users")
+        );
     }
 }
