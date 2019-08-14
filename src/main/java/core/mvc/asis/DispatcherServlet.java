@@ -5,7 +5,8 @@ import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,15 +23,16 @@ public class DispatcherServlet extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
   private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-  private Mapping[] mappings = new Mapping[2];
+
+  private List<Mapping> mappings = new ArrayList<>();
 
   @Override
-  public void init() throws ServletException {
-    mappings[0] = new RequestMapping();
-    mappings[0].initMapping();
+  public void init() {
+    mappings.add(new RequestMapping());
+    mappings.add(new AnnotationHandlerMapping("next.controller"));
 
-    mappings[1] = new AnnotationHandlerMapping("next.controller");
-    mappings[1].initMapping();
+    mappings.stream()
+        .forEach(mapping -> mapping.initMapping());
   }
 
   @Override
@@ -71,7 +73,7 @@ public class DispatcherServlet extends HttpServlet {
   }
 
   private Object findController(HttpServletRequest req) {
-    return Arrays.stream(mappings)
+    return mappings.stream()
         .map(mapping -> mapping.findController(req))
         .filter(controller -> controller != null)
         .findFirst()
