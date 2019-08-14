@@ -28,7 +28,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final String BASE_PACKAGE = "next.controller";
 
     private List<HandlerMapping<?>> handlerMappings = new ArrayList<>();
-    private List<HandlerAdapter<?>> handlerAdapters = new ArrayList<>();
+    private List<HandlerAdapter> handlerAdapters = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
@@ -49,7 +49,7 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
         	Object handler = getMatchedHandler(req, resp);
-            HandlerAdapter<?> handlerAdapter = getMatchedHandlerAdapter(handler);
+            HandlerAdapter handlerAdapter = getMatchedHandlerAdapter(handler);
             ModelAndView modelAndView = handlerAdapter.handle(req, resp, handler);
             viewRender(modelAndView, req, resp);
         } catch (Throwable e) {
@@ -66,7 +66,7 @@ public class DispatcherServlet extends HttpServlet {
                 .orElseThrow(() -> new HandlerMappingException("not found handler mapping"));
     }
     
-    private HandlerAdapter<?> getMatchedHandlerAdapter(Object handler) {
+    private HandlerAdapter getMatchedHandlerAdapter(Object handler) {
     	return handlerAdapters.stream()
                 .filter(handlerAdapter -> handlerAdapter.supports(handler))
                 .findFirst()

@@ -3,10 +3,9 @@ package core.mvc;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import core.mvc.asis.Controller;
 import core.mvc.tobe.HandlerExecution;
 
-public class ExecutionHandlerAdapter extends HandlerAdapter<HandlerExecution>{
+public class ExecutionHandlerAdapter extends AbstractHandlerAdapter<HandlerExecution>{
 	
 	public ExecutionHandlerAdapter() {
 		super(HandlerExecution.class);

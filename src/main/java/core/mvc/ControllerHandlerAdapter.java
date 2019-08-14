@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import core.mvc.asis.Controller;
 
-public class ControllerHandlerAdapter extends HandlerAdapter<Controller>{
+public class ControllerHandlerAdapter extends AbstractHandlerAdapter<Controller>{
 	
 	public ControllerHandlerAdapter() {
 		super(Controller.class);

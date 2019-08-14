@@ -12,8 +12,8 @@ import core.mvc.HandlerAdapter;
 
 public class HandlerAdapterTest {
 
-	private static final HandlerAdapter<?> CONTROLLER_ADAPTER = new ControllerHandlerAdapter();
-	private static final HandlerAdapter<?> EXECUTION_ADAPTER = new ExecutionHandlerAdapter();
+	private static final HandlerAdapter CONTROLLER_ADAPTER = new ControllerHandlerAdapter();
+	private static final HandlerAdapter EXECUTION_ADAPTER = new ExecutionHandlerAdapter();
 	private static final String HTTP_METHOD = "GET";
 	private static final String REQUEST_URI = "/users/findUserId";
 	private static final String BASE_PACKAGE = "core.mvc.tobe";
