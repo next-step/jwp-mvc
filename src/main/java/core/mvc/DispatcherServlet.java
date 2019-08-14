@@ -1,7 +1,7 @@
 package core.mvc;
 
 import core.mvc.tobe.HandlerAdapter;
-import core.mvc.tobe.HandlerAdapterManager;
+import core.mvc.tobe.HandlerAdapterFactory;
 import core.mvc.tobe.view.View;
 import core.mvc.tobe.view.ViewResolverManager;
 import org.slf4j.Logger;
@@ -20,25 +20,25 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private HandlerAdapterManager handlerAdapterManager;
+    private HandlerAdapterFactory handlerAdapterFactory;
     private ViewResolverManager viewResolverManager;
 
     @Override
     public void init() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Environment environment = new Environment();
-        setEnvironmentInContext(environment);
-        this.handlerAdapterManager = new HandlerAdapterManager(environment);
+        this.handlerAdapterFactory = new HandlerAdapterFactory(getEnvironment());
         this.viewResolverManager = new ViewResolverManager();
         stopWatch.stop();
         logger.info("dispatcherServlet initialize time: [" + stopWatch.getLastTaskTimeMillis() + "] millis");
     }
 
-    private void setEnvironmentInContext(Environment environment) {
+    private Environment getEnvironment() {
         if (getServletConfig() != null) {
-            getServletContext().setAttribute(Environment.class.getName(), environment);
+            return (Environment) getServletContext().getAttribute(Environment.class.getName());
         }
+
+        return new Environment();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void doService(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        HandlerAdapter handler = handlerAdapterManager.getHandler(req, resp);
+        HandlerAdapter handler = handlerAdapterFactory.getHandler(req, resp);
 
         if (handler == null) {
             notFoundHandler(req, resp);

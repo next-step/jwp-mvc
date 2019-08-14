@@ -12,10 +12,14 @@ public class Environment {
     public Properties config;
 
     public Environment() {
+        this(RESOURCE_NAME);
+    }
+
+    public Environment(String resourceName) {
         try {
-            config = PropertiesLoaderUtils.loadAllProperties(RESOURCE_NAME);
+            config = PropertiesLoaderUtils.loadAllProperties(resourceName);
         } catch (IOException e) {
-            throw new IllegalArgumentException(RESOURCE_NAME + " config invalid");
+            throw new IllegalArgumentException(resourceName + " config invalid");
         }
     }
 

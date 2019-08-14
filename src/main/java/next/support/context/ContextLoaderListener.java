@@ -1,6 +1,7 @@
 package next.support.context;
 
 import core.jdbc.ConnectionManager;
+import core.mvc.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -21,6 +22,7 @@ public class ContextLoaderListener implements ServletContextListener {
         populator.addScript(new ClassPathResource("jwp.sql"));
         DatabasePopulatorUtils.execute(populator, ConnectionManager.getDataSource());
 
+        sce.getServletContext().setAttribute(Environment.class.getName(), new Environment());
         logger.info("Completed Load ServletContext!");
     }
 

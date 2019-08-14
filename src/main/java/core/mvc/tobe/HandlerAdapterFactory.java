@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HandlerAdapterManager {
+public class HandlerAdapterFactory {
 
     private List<HandlerAdapter> handlerAdapters;
 
-    public HandlerAdapterManager(Environment environment) {
+    public HandlerAdapterFactory(Environment environment) {
         this.handlerAdapters = createDefaultHandlerAdapters(environment);
     }
 
