@@ -13,6 +13,8 @@ import java.util.Map;
 
 public class AnnotationHandlerMapping {
 
+    private static final int DEFAULT_MAPPING_METHOD_LENGTH = 0;
+
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
     private final Object[] basePackage;
 
@@ -47,12 +49,21 @@ public class AnnotationHandlerMapping {
                             final Method method) {
         final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
 
-        Arrays.stream(requestMapping.method())
+        Arrays.stream(extractMethods(requestMapping))
                 .forEach(requestMethod -> {
                     final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMethod);
                     final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
 
                     handlerExecutions.put(handlerKey, handlerExecution);
                 });
+    }
+
+    private RequestMethod[] extractMethods(final RequestMapping requestMapping) {
+        final RequestMethod[] methods = requestMapping.method();
+        if (methods.length == DEFAULT_MAPPING_METHOD_LENGTH) {
+            return RequestMethod.values();
+        }
+
+        return methods;
     }
 }

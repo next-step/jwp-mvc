@@ -3,8 +3,8 @@ package core.mvc.tobe;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.ViewFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public class MyController {
                                    final HttpServletResponse response) {
         logger.debug("findUserId");
 
-        return new ModelAndView(new JspView("/users/show.jsp"));
+        return new ModelAndView(ViewFactory.create("/users/show.jsp"));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
@@ -28,6 +28,6 @@ public class MyController {
                              final HttpServletResponse response) {
         logger.debug("save");
 
-        return new ModelAndView(new JspView("redirect:/users"));
+        return new ModelAndView(ViewFactory.create("redirect:/users"));
     }
 }

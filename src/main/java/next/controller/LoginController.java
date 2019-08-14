@@ -4,8 +4,8 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.ViewFactory;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +34,12 @@ public class LoginController {
             final HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
 
-            return new ModelAndView(new JspView("redirect:/"));
+            return new ModelAndView(ViewFactory.create("redirect:/"));
         };
     }
 
     private ModelAndView failHandle() {
-        final ModelAndView mvn = new ModelAndView(new JspView("/user/login.jsp"));
+        final ModelAndView mvn = new ModelAndView(ViewFactory.create("/user/login.jsp"));
         mvn.addObject("loginFailed", true);
         return mvn;
     }

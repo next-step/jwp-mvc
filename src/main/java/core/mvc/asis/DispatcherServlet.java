@@ -1,66 +1,56 @@
 package core.mvc.asis;
 
-import core.mvc.tobe.NextGenerationDispatcherServlet;
+import core.mvc.HandlerMapper;
+import core.mvc.HandlerNotFoundException;
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.NextGenerationHandlerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Objects;
+import java.util.List;
+import java.util.function.Function;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
-
-    private HttpServlet next;
-
+    private List<HandlerMapper> handlerMappers;
 
     @Override
-    public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
-
-        next = new NextGenerationDispatcherServlet();
-        next.init();
+    public void init() {
+        handlerMappers = List.of(new LegacyHandlerMapperAdapter(), new NextGenerationHandlerMapper());
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+    protected void service(final HttpServletRequest request,
+                           final HttpServletResponse response) throws ServletException {
+        logger.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
 
-        Controller controller = rm.findController(requestUri);
-        if (Objects.isNull(controller)) {
-            next.service(req, resp);
-            return;
-        }
+        final ModelAndView mav = handlerMappers.stream()
+                .filter(handlerMapper -> handlerMapper.isSupport(request))
+                .findFirst()
+                .map(handle(request, response))
+                .orElseThrow(HandlerNotFoundException::new);
 
+        final View view = mav.getView();
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
+            view.render(mav.getModel(), request, response);
+        } catch (final Throwable e) {
+            logger.error("Exception ", e);
+            throw new ServletException(e);
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+    private Function<HandlerMapper, ModelAndView> handle(final HttpServletRequest request,
+                                                         final HttpServletResponse response) {
+        return handlerMapper -> handlerMapper.mapping(request, response);
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,10 +36,6 @@ class LoginControllerTest {
         // when
         dispatcherServlet.service(request, response);
         final String forwardUrl = response.getForwardedUrl();
-
-        System.out.println(response.getHeaderNames());
-        System.out.println(response.getIncludedUrls());
-        System.out.println(Arrays.toString(response.getCookies()));
 
         // then
         assertThat(forwardUrl).isEqualTo("/user/login.jsp");
