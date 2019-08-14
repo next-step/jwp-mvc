@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
-public class MyController {
-    private static final Logger logger = LoggerFactory.getLogger(MyController.class);
+public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = {"/usersNew", "/userList"}, method = {RequestMethod.GET, RequestMethod.PATCH})
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
