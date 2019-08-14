@@ -5,6 +5,7 @@ import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import java.io.IOException;
+import java.util.Arrays;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -53,11 +54,10 @@ public class DispatcherServlet extends HttpServlet {
       HandlerExecution handlerExecution) {
     try {
       ModelAndView modelAndView = handlerExecution.handle(req, resp);
-      modelAndView.getView().render(modelAndView.getModel(), req, resp);
+      modelAndView.render(modelAndView.getModel(), req, resp);
     } catch (Exception e) {
       logger.error("Exception : {}", e);
     }
-    return;
   }
 
   private void controllerExecute(HttpServletRequest req, HttpServletResponse resp,
@@ -69,17 +69,14 @@ public class DispatcherServlet extends HttpServlet {
       logger.error("Exception : {}", e);
       throw new ServletException(e.getMessage());
     }
-    return;
   }
 
   private Object findController(HttpServletRequest req) {
-    for (Mapping mapping : mappings) {
-      Object controller = mapping.findController(req);
-      if (controller != null) {
-        return controller;
-      }
-    }
-    throw new RuntimeException("요청에 대한 Controller 가 없습니다.");
+    return Arrays.stream(mappings)
+        .map(mapping -> mapping.findController(req))
+        .filter(controller -> controller != null)
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException("요청에 대한 Controller 가 없습니다."));
   }
 
   private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)

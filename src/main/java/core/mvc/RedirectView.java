@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public class RedirectView implements View {
 
-  private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
   private String path;
 
   public RedirectView(String path) {
@@ -16,6 +15,6 @@ public class RedirectView implements View {
   @Override
   public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
       throws Exception {
-    response.sendRedirect(path.substring(DEFAULT_REDIRECT_PREFIX.length()));
+    response.sendRedirect(path);
   }
 }
