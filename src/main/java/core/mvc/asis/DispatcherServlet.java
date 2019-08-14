@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import com.google.common.collect.Lists;
 import core.mvc.HandlerAdapter;
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
@@ -19,22 +20,17 @@ import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private RequestMapping rm;
-    private AnnotationHandlerMapping handlerMappings;
+    private List<HandlerMapping> handlerMappings = Lists.newArrayList();
     private List<HandlerAdapter> handlerAdapters = Lists.newArrayList();
 
     @Override
     public void init() {
-        rm = new RequestMapping();
-        rm.initMapping();
-
-        handlerMappings = new AnnotationHandlerMapping("next.controller");
-        handlerMappings.initialize();
-
-        setHandlerAdapters();
+        initHandlerMappings();
+        initHandlerAdapters();
     }
 
     @Override
@@ -55,19 +51,13 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object getHandler(HttpServletRequest request) throws ServletException {
-        Object handler = handlerMappings.getHandler(request);
-
-        if (handler == null) {
-            // legacy handler
-            String requestUri = request.getRequestURI();
-            logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
-            handler = rm.findController(requestUri);
+        for (HandlerMapping handlerMapping : this.handlerMappings) {
+            Object handler = handlerMapping.getHandler(request);
+            if (handler != null) {
+                return handler;
+            }
         }
-
-        if (handler == null) {
-            throw new ServletException("not found handler");
-        }
-        return handler;
+        throw new ServletException("not found handler");
     }
 
     private HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
@@ -79,7 +69,15 @@ public class DispatcherServlet extends HttpServlet {
         throw new ServletException("not found handler adapter");
     }
 
-    private void setHandlerAdapters() {
+    private void initHandlerMappings() {
+        handlerMappings.add(new RequestMapping());
+        handlerMappings.add(new AnnotationHandlerMapping("next.controller"));
+
+        // initialize
+        handlerMappings.forEach(HandlerMapping::initialize);
+    }
+
+    private void initHandlerAdapters() {
         handlerAdapters.add(new LegacyHandlerAdapter());
         handlerAdapters.add(new RequestMappingHandlerAdapter());
     }
