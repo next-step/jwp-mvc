@@ -30,11 +30,11 @@ public class AnnotationHandlerMapping implements Mapping {
 
   private void initHandlerExecutions(Object[] basePackages) {
     for (Object basePackage : basePackages) {
-      initHandlerExecutions(basePackage);
+      initHandlerExecution(basePackage);
     }
   }
 
-  private void initHandlerExecutions(Object basePackage) {
+  private void initHandlerExecution(Object basePackage) {
     Set<Class<?>> handlers = getHandlers(basePackage);
 
     for (Class handler : handlers) {
