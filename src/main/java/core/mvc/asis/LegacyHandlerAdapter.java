@@ -16,6 +16,7 @@ public class LegacyHandlerAdapter implements Handler {
 
     public LegacyHandlerAdapter(LegacyHandlerMapping handlerMapping) {
         this.handlerMapping = handlerMapping;
+        handlerMapping.initMapping();
     }
 
     @Override
@@ -31,6 +32,11 @@ public class LegacyHandlerAdapter implements Handler {
         } catch (Exception e) {
             throw new HandlerException(e);
         }
+    }
+
+    @Override
+    public boolean isSupport(HttpServletRequest req) {
+        return getHandler(req) != null;
     }
 
     private Controller getHandler(HttpServletRequest request) {

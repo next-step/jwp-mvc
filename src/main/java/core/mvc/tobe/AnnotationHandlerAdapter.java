@@ -18,6 +18,7 @@ public class AnnotationHandlerAdapter implements Handler {
 
     public AnnotationHandlerAdapter(AnnotationHandlerMapping annotationHandlerMapping) {
         this.annotationHandlerMapping = annotationHandlerMapping;
+        annotationHandlerMapping.initialize();
     }
 
     @Override
@@ -37,6 +38,11 @@ public class AnnotationHandlerAdapter implements Handler {
         } catch (InvocationTargetException e) {
             throw new HandlerException(e);
         }
+    }
+
+    @Override
+    public boolean isSupport(HttpServletRequest req) {
+        return getHandler(req) != null;
     }
 
     private HandlerExecution getHandler(HttpServletRequest request) {

@@ -5,4 +5,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface Handler {
     ModelAndView handle(HttpServletRequest request, HttpServletResponse response);
+
+    boolean isSupport(HttpServletRequest req);
 }
