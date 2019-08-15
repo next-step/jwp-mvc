@@ -1,25 +1,22 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
-import org.reflections.Reflections;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private static final String METHOD_INFO_FORMAT = "%s.%s";
     private static final String MAPPING_INFO_LOG_FORMAT = "{}, execution method: {}";
-    private final Class<? extends RequestMapping> requestMappingClass = RequestMapping.class;
 
     private Object[] basePackage;
 
@@ -30,50 +27,34 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        for (Class<?> aClass : reflections.getTypesAnnotatedWith(Controller.class)) {
-            findRequestMappingMethods(aClass);
+        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
+        initHandlerExecution(controllerScanner.getInstantiateControllerMap());
+    }
+
+    private void initHandlerExecution(Map<Class<?>, Object> instantiateControllerMap) {
+        for (Class<?> aClass : instantiateControllerMap.keySet()) {
+            Object controller = instantiateControllerMap.get(aClass);
+            addExecutionOfController(controller, aClass);
         }
     }
 
-    private void findRequestMappingMethods(Class<?> aClass) {
-        Optional<Object> instanceOptional = getInstance(aClass);
-        if (!instanceOptional.isPresent()) {
-            return;
+    private void addExecutionOfController(Object controller, Class<?> aClass) {
+        Class<RequestMapping> requestMappingClass = RequestMapping.class;
+        Set<Method> methods = ReflectionUtils.getAllMethods(aClass, ReflectionUtils.withAnnotation(requestMappingClass));
+
+        for (Method method : methods) {
+            HandlerKey handlerKey = createHandlerKey(method.getAnnotation(requestMappingClass));
+            HandlerExecution handlerExecution = getHandlerExecution(controller, method);
+            handlerExecutions.put(handlerKey, handlerExecution);
+            loggingMappingInfo(handlerKey, method);
         }
-
-        Object instance = instanceOptional.get();
-        for (Method method : aClass.getDeclaredMethods()) {
-            addHandlerExecutions(instance, method);
-        }
-    }
-
-    private Optional<Object> getInstance(Class<?> aClass) {
-        try {
-            return Optional.of(aClass.getDeclaredConstructor().newInstance());
-        } catch (ReflectiveOperationException e) {
-            logger.error(e.getMessage());
-        }
-
-        return Optional.empty();
-    }
-
-    private void addHandlerExecutions(Object controller, Method method) {
-        if (!method.isAnnotationPresent(requestMappingClass)) {
-            return;
-        }
-
-        HandlerKey handlerKey = getHandlerKey(method);
-        handlerExecutions.put(handlerKey, getHandlerExecution(controller, method));
-        loggingMappingInfo(handlerKey, method);
     }
 
     private HandlerExecution getHandlerExecution(Object controller, Method method) {
         return (request, response) -> (ModelAndView) method.invoke(controller, request, response);
     }
 
-    private HandlerKey getHandlerKey(Method method) {
-        RequestMapping requestMapping = method.getAnnotation(requestMappingClass);
+    private HandlerKey createHandlerKey(RequestMapping requestMapping) {
         return new HandlerKey(requestMapping.value(), requestMapping.method());
     }
 
