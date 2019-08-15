@@ -1,13 +1,8 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +15,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private Object[] basePackage;
 
+    private ControllerScanner controllerScanner;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
@@ -28,13 +24,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage
-                , new TypeAnnotationsScanner()
-                , new MethodAnnotationsScanner()
-                , new SubTypesScanner());
-
-        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(Controller.class);
-        initializeHandlerExecutions(annotatedClasses);
+        controllerScanner = ControllerScanner.of(basePackage);
+        initializeHandlerExecutions(controllerScanner.getClasses());
     }
 
     private void initializeHandlerExecutions(Set<Class<?>> annotatedClasses) {
@@ -58,11 +49,10 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         try {
             RequestMapping requestMapping = method.getAnnotation(annotationType);
             HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-            handlerExecutions.put(handlerKey, new HandlerExecution(annotatedClass.newInstance(), method));
+            handlerExecutions.put(handlerKey, new HandlerExecution(controllerScanner.getInstance(annotatedClass), method));
 
             logger.debug("Path : [{}], Controller : [{}]", requestMapping.value(), method.getDeclaringClass());
-
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

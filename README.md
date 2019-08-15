@@ -41,8 +41,10 @@
         - [x] servletHanderAdapter 구현.
         - 프레임워크가 늘어날 경우 handlerAdapter 를 wrapping 하는 1급 컬랙션 추가 및 기능구현 필요 
         
-- [ ] 요구사항 1 힌트
-    - [ ] 구조 리팩토링
+- [x] 요구사항 1 힌트
+    - [x] 힌트1 - ControllerScanner 클래스 추가
+    - [x] 힌트 2 - AnnotationHandlerMapping 클래스 추가  // step2에서 구현완료
+    - [x] 힌트 3 - 요청에 대한 Controller 반환 // step2에서 구현완료
 
 - [x] 요구사항 2
     - [x] 힌트 1 - HandlerMapping 추가
