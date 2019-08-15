@@ -37,15 +37,14 @@
 - [ ] step2 피드백 반영
     - [x] annotationHandlerMapping 로 옮긴 요청 RequestMapping에서 제거 ( 중복제거 )
     
-    - [ ] 보류 //handlerAdapter 구현 / `if/else` 없이 다양한 프레임워크 기술 통합 가능한 구조로 변경
-        - [ ] LegacyHandlerAdapter 구현 (support check기준 : ReequestMapping.findController)
-        - [ ] AnnotationHandlerApdapter 구현 (support check기준 : handlerKey 존재확인) 
-        
+    - [x] handlerAdapter 구현 / `if/else` 없이 다양한 프레임워크 기술 통합 가능한 구조로 변경
+        - [x] servletHanderAdapter 구현.
+        - 프레임워크가 늘어날 경우 handlerAdapter 를 wrapping 하는 1급 컬랙션 추가 및 기능구현 필요 
         
 - [ ] 요구사항 1 힌트
     - [ ] 구조 리팩토링
 
-- [ ] 요구사항 2
+- [x] 요구사항 2
     - [x] 힌트 1 - HandlerMapping 추가
         - [x] RequestMapping 이름변경, HandlerMapping 인터페이스 상속, method수정 (initialize, getHandler) 
         - [x] AnnotationHandlerMapping, HandlerMapping 인터페이스 상속
@@ -55,7 +54,9 @@
         - [x] handlerMappingList 초기화
         - [x] handlerMappingList에서 필요한 handler 찾아서 사용
         
-    - [ ] 힌트 3 - Controller 실행
+    - [x] 힌트 3 - Controller 실행
         - [x] handler 인스턴스 타입에 따른 executeMethod 분리
-        - [ ] handler와 관련된 기능 별도 class로 분리 / HandlerAdapter 적용해보기
+        - [x] handler와 관련된 기능 별도 class로 분리 / HandlerAdapter 적용해보기
+        - [x] handlerMappingList -> 1급 컬랙션으로 wrapping
+        - [x] servletHandlerAdapter 구현, dispatcherServlet 기능 정리
         

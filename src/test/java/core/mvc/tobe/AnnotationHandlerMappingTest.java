@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import javax.servlet.http.HttpServletRequest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class AnnotationHandlerMappingTest {
     private static Logger logger = LoggerFactory.getLogger(AnnotationHandlerMappingTest.class);
     private AnnotationHandlerMapping handlerMapping;
@@ -34,5 +38,14 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
+    }
+
+    @Test
+    void support() {
+        //given
+        HttpServletRequest req = new MockHttpServletRequest("POST", "/users/login");
+
+        //when, then
+        assertThat(handlerMapping.support(req)).isTrue();
     }
 }
