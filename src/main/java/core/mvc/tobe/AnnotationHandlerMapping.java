@@ -5,6 +5,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
+import org.reflections.scanners.AbstractScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
@@ -18,35 +19,48 @@ import java.util.Map;
 public class AnnotationHandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+    private static final AbstractScanner[] SCANNERS = { new SubTypesScanner(), new TypeAnnotationsScanner() };
 
-    private Object[] basePackage;
+    private Object[] basePackages;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
+    public AnnotationHandlerMapping(Object... basePackages) {
+        this.basePackages = basePackages;
     }
 
     public void initialize() {
-        Arrays.stream(basePackage)
-                .peek(it -> logger.info("Scan package [{}]", it))
-                .map(it -> new Reflections(it, new SubTypesScanner(), new TypeAnnotationsScanner()))
+        Arrays.stream(basePackages)
+                .peek(basePackage -> logger.info("Scan package [{}]", basePackage))
+                .map(it -> new Reflections(it, SCANNERS))
                 .flatMap(it -> it.getTypesAnnotatedWith(Controller.class).stream())
-                .flatMap(it -> Arrays.stream(it.getMethods()))
+                .flatMap(controllerClass -> Arrays.stream(controllerClass.getMethods()))
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(method -> createHandlerExecution(method));
+                .forEach(method -> parseRequestMapping(method));
     }
 
-    private void createHandlerExecution(Method method) {
-        Class<?> controllerClass = method.getDeclaringClass();
+    private void parseRequestMapping(Method method) {
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        String url = requestMapping.value();
+        Arrays.stream(parseRequestMethods(requestMapping))
+                .map(requestMethod -> new HandlerKey(url, requestMethod))
+                .forEach(handlerKey -> createHandlerExecution(handlerKey, method));
+    }
+
+    private RequestMethod[] parseRequestMethods(RequestMapping requestMapping) {
+        RequestMethod[] methods = requestMapping.method();
+        if (methods.length == 0) {
+            return RequestMethod.values();
+        }
+        return methods;
+    }
+
+    private void createHandlerExecution(HandlerKey handlerKey, Method method) {
         try {
-            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-            String url = requestMapping.value();
-            RequestMethod requestMethod = requestMapping.method();
-            logger.info("Request mapping : {} [value = {}, method = {}]", controllerClass.getSimpleName(), url, requestMethod);
-            handlerExecutions.put(new HandlerKey(url, requestMethod), new HandlerExecution(method));
+            handlerExecutions.put(handlerKey, new HandlerExecution(method));
+            logger.info("Request Mapping : {}[{}]", method.getDeclaringClass().getSimpleName(), handlerKey);
         } catch (Exception e) {
             logger.error("Failed to create HandlerExecution. class : {}, method : {}",
-                    controllerClass.getSimpleName(), method.getName(), e);
+                    method.getDeclaringClass().getSimpleName(), method.getName(), e);
         }
     }
 
