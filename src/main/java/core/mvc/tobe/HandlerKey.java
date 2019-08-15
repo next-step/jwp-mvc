@@ -17,7 +17,7 @@ public class HandlerKey {
 
     public static Set<HandlerKey> createWithAnyRequestMethod(String url) {
         return Arrays.stream(RequestMethod.values())
-                .filter(m -> !m.equals(RequestMethod.ALL))
+                .filter(m -> !m.equals(RequestMethod.DEFAULT))
                 .map(m -> new HandlerKey(url, m))
                 .collect(Collectors.toSet());
     }

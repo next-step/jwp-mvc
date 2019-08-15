@@ -49,13 +49,13 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         final ModelAndView modelAndView = execution.handle(request, response);
-        Assertions.assertThat(modelAndView.getObject("findUserId")).isEqualTo("findUserId");
+        Assertions.assertThat(modelAndView.getClass()).isEqualTo(ModelAndView.class);
     }
 
     @DisplayName("요청에 대한 핸들러를 찾을 수 없을 때 Null 리턴")
     @Test
     public void shouldNull_When_NotFound() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/show");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         Assertions.assertThat(execution).isNull();

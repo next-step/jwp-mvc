@@ -1,7 +1,6 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
@@ -26,46 +25,36 @@ public class AnnotationHandlerMapping {
     }
 
     private Map<HandlerKey, HandlerExecution> mapToHandlerExecutions(Object controller) {
-        final Set<Method> actionMethods = findActionMethods(controller.getClass());
+        final Class<?> controllerClass = controller.getClass();
+        final Set<Method> actionMethods = filterActionMethods(controllerClass.getMethods());
         Map<HandlerKey, HandlerExecution> handlerMap = Maps.newHashMap();
         actionMethods.forEach(method -> {
-            final Map<HandlerKey, HandlerExecution> handlers = createHandlerExecutions(controller, method);
-            handlerMap.putAll(handlers);
+            final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
+            final HandlerKey handlerKey = createHandlerKey(method.getAnnotation(RequestMapping.class));
+            handlerMap.put(handlerKey, handlerExecution);
         });
         return handlerMap;
     }
 
-    private Map<HandlerKey, HandlerExecution> createHandlerExecutions(Object controller, Method method) {
-        final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
-        final Set<HandlerKey> handlerKeys = createHandlerKeys(method);
-        final Map<HandlerKey, HandlerExecution> handlers = Maps.newHashMap();
-        for(HandlerKey handlerKey : handlerKeys) {
-            handlers.put(handlerKey, handlerExecution);
-        }
-        return handlers;
-    }
-
-    private Set<Method> findActionMethods(Class<?> controllerClass) {
-        return Arrays.stream(controllerClass.getMethods())
+    private Set<Method> filterActionMethods(Method[] methods) {
+        return Arrays.stream(methods)
                 .filter(m -> m.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toSet());
     }
 
-    private Set<HandlerKey> createHandlerKeys(Method actionMethod) {
-        final RequestMapping annotation = actionMethod.getAnnotation(RequestMapping.class);
+    private HandlerKey createHandlerKey(RequestMapping annotation) {
         final String requestUri = annotation.value();
         final RequestMethod requestMethod = annotation.method();
-
-        if(RequestMethod.ALL == requestMethod) {
-            return HandlerKey.createWithAnyRequestMethod(requestUri);
-        }
-        final HandlerKey key = new HandlerKey(requestUri, requestMethod);
-        return Sets.newHashSet(key);
+        return new HandlerKey(requestUri, requestMethod);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         final String requestUri = request.getRequestURI();
         final RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        final HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, rm));
+        if(handlerExecution != null) {
+            return handlerExecution;
+        }
+        return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.DEFAULT));
     }
 }
