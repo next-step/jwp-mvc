@@ -80,7 +80,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void initHandlerMappings() {
-        handlerMappings.add(new RequestMapping().initialize());
+        handlerMappings.add(new LegacyHandlerMapping().initialize());
         handlerMappings.add(new AnnotationHandlerMapping("next.controller").initialize());
     }
 

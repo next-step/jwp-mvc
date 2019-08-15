@@ -1,7 +1,6 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author : yusik
@@ -32,15 +30,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public HandlerMapping initialize() {
-        Set<Class<?>> controllers = ComponentScanner.scan(basePackages, Controller.class);
-        for (Class controller : controllers) {
-            Object bean = null;
-            try {
-                bean = controller.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.debug("can't create bean: {}", controller.getTypeName());
-            }
-            registerHandler(bean, controller.getDeclaredMethods());
+        Map<Class<?>, Object> beans = ComponentScanner.getControllers(basePackages);
+        for (Class controller : beans.keySet()) {
+            registerHandler(beans.get(controller), controller.getDeclaredMethods());
         }
 
         return this;
