@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private static final String METHOD_INFO_FORMAT = "%s.%s";
     private static final String MAPPING_INFO_LOG_FORMAT = "{}, execution method: {}";
@@ -63,17 +63,18 @@ public class AnnotationHandlerMapping {
         logger.info(MAPPING_INFO_LOG_FORMAT, handlerKey, methodInfo);
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
-    }
-
     public Set<HandlerKey> getHandlerKeys() {
         return this.handlerExecutions.keySet();
     }
 
     public boolean isHandlerKeyPresent(String url, RequestMethod method) {
         return this.handlerExecutions.containsKey(new HandlerKey(url, method));
+    }
+
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
     }
 }
