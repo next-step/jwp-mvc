@@ -4,6 +4,8 @@ import core.util.ReflectionUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReflectionUtilsTest {
 
@@ -16,6 +18,22 @@ public class ReflectionUtilsTest {
         assertThat(speedCar.runNameSpeed()).isEqualTo("jun 80");
         assertThat(specialCar.runNameGear()).isEqualTo("jun special");
         assertThat(superCar.runPower()).isEqualTo("super");
+    }
+
+    @Test
+    void convertStringValue() {
+        assertThat(ReflectionUtils.convertStringValue("word", String.class)).isEqualTo("word");
+        assertThat(ReflectionUtils.convertStringValue("12", Integer.class)).isEqualTo(12);
+        assertThat(ReflectionUtils.convertStringValue("5000", Long.class)).isEqualTo(5000L);
+        assertThat(ReflectionUtils.convertStringValue("1.1", Float.class)).isEqualTo(1.1F);
+        assertThat(ReflectionUtils.convertStringValue("5.5", Double.class)).isEqualTo(5.5D);
+    }
+
+    @Test
+    void hasFieldMethod() {
+        assertTrue(ReflectionUtils.hasFieldMethod(Car.class, "setName", String.class));
+        assertFalse(ReflectionUtils.hasFieldMethod(Car.class, "setName1", String.class));
+        assertFalse(ReflectionUtils.hasFieldMethod(Car.class, "setName", Integer.class));
     }
 
     public static class Car {
@@ -40,6 +58,14 @@ public class ReflectionUtilsTest {
 
         public Car(String power) {
             this.power = power;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setSpeed(Integer speed) {
+            this.speed = speed;
         }
 
         public String runNameSpeed() {

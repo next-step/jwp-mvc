@@ -24,7 +24,7 @@ class DispatcherServletTest {
     @BeforeEach
     void setUp() {
         Environment.RESOURCE_NAME = "config-test.properties";
-        dispatcherServlet = new DispatcherServlet();
+        dispatcherServlet = new StubDispatcherServlet();
         dispatcherServlet.init();
     }
 

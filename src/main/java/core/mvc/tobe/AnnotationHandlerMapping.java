@@ -2,18 +2,11 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMethod;
-import core.mvc.tobe.support.ArgumentResolver;
-import core.mvc.tobe.support.HttpRequestArgumentResolver;
-import core.mvc.tobe.support.HttpResponseArgumentResolver;
-import core.mvc.tobe.support.RequestParamArgumentResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
 
 public class AnnotationHandlerMapping {
 
@@ -29,9 +22,6 @@ public class AnnotationHandlerMapping {
         controllerScanner = new ControllerScanner();
     }
 
-    public void setArgumentResolvers(List<ArgumentResolver> argumentResolvers) {
-    }
-
     public void initialize() {
         logger.info("## Initialized Annotation Handler Mapping");
         handlerExecutions.putAll(controllerScanner.scan(basePackage));
@@ -44,6 +34,16 @@ public class AnnotationHandlerMapping {
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        return getHandlerInternal(new HandlerKey(requestUri, rm));
+    }
+
+    private HandlerExecution getHandlerInternal(HandlerKey requestHandlerKey) {
+        for (HandlerKey handlerKey : handlerExecutions.keySet()) {
+            if (handlerKey.isMatch(requestHandlerKey)) {
+                return handlerExecutions.get(handlerKey);
+            }
+        }
+
+        return null;
     }
 }

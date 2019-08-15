@@ -1,10 +1,10 @@
 package core.mvc.tobe.mock;
 
-import core.annotation.web.RequestParam;
+import core.annotation.web.PathVariable;
 
 import java.lang.annotation.Annotation;
 
-public class MockRequestParam implements RequestParam {
+public class MockPathVariable implements PathVariable {
     @Override
     public String value() {
         return "value";
@@ -22,6 +22,6 @@ public class MockRequestParam implements RequestParam {
 
     @Override
     public Class<? extends Annotation> annotationType() {
-        return RequestParam.class;
+        return PathVariable.class;
     }
 }
