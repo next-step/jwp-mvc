@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
-
     @DisplayName("Question 클래스 이름 출력")
     @Test
     public void showClassName() {

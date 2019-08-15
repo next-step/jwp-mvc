@@ -1,17 +1,14 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
+import com.google.common.collect.Sets;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
     private final Object[] basePackage;
@@ -23,46 +20,47 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        final Set<Class<?>> controllerClasses = findControllers();
-        controllerClasses.forEach(controllerClass -> {
-            final Stream<Method> actionMethods = findMethods(controllerClass);
-            addHandlerExecutions(controllerClass, actionMethods);
-        });
+        final Set<Object> controllers = ControllerCollector.collect(basePackage);
+        controllers.stream().map(this::mapToHandlerExecutions)
+                .forEach(handlerExecutions::putAll);
     }
 
-    private Set<Class<?>> findControllers() {
-        final Reflections reflections = new Reflections(this.basePackage);
-        return reflections.getTypesAnnotatedWith(Controller.class);
-    }
-
-    private Stream<Method> findMethods(Class<?> controllerClass) {
-        return Arrays.stream(controllerClass.getMethods())
-                .filter(m -> m.isAnnotationPresent(RequestMapping.class));
-    }
-
-    private void addHandlerExecutions(Class<?> controllerClass, Stream<Method> actionMethods) {
+    private Map<HandlerKey, HandlerExecution> mapToHandlerExecutions(Object controller) {
+        final Set<Method> actionMethods = findActionMethods(controller.getClass());
+        Map<HandlerKey, HandlerExecution> handlerMap = Maps.newHashMap();
         actionMethods.forEach(method -> {
-            final RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-            final String annotatedRequestUri = annotation.value();
-            final HandlerExecution handlerExecution = new HandlerExecution(controllerClass, method);
-
-            final RequestMethod annotatedRequestMethod = annotation.method();
-            addHandlerExecution(annotatedRequestUri, handlerExecution, annotatedRequestMethod);
+            final Map<HandlerKey, HandlerExecution> handlers = createHandlerExecutions(controller, method);
+            handlerMap.putAll(handlers);
         });
+        return handlerMap;
     }
 
-    private void addHandlerExecution(String annotatedRequestUri, HandlerExecution handlerExecution, RequestMethod annotatedRequestMethod) {
-        if(RequestMethod.ALL != annotatedRequestMethod) {
-            final HandlerKey key = new HandlerKey(annotatedRequestUri, annotatedRequestMethod);
-            handlerExecutions.put(key, handlerExecution);
-            return;
+    private Map<HandlerKey, HandlerExecution> createHandlerExecutions(Object controller, Method method) {
+        final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
+        final Set<HandlerKey> handlerKeys = createHandlerKeys(method);
+        final Map<HandlerKey, HandlerExecution> handlers = Maps.newHashMap();
+        for(HandlerKey handlerKey : handlerKeys) {
+            handlers.put(handlerKey, handlerExecution);
         }
+        return handlers;
+    }
 
-        final RequestMethod[] requestMethods = RequestMethod.values();
-        Arrays.stream(requestMethods).forEach(m -> {
-            final HandlerKey handlerKey = new HandlerKey(annotatedRequestUri, m);
-            handlerExecutions.put(handlerKey, handlerExecution);
-        });
+    private Set<Method> findActionMethods(Class<?> controllerClass) {
+        return Arrays.stream(controllerClass.getMethods())
+                .filter(m -> m.isAnnotationPresent(RequestMapping.class))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<HandlerKey> createHandlerKeys(Method actionMethod) {
+        final RequestMapping annotation = actionMethod.getAnnotation(RequestMapping.class);
+        final String requestUri = annotation.value();
+        final RequestMethod requestMethod = annotation.method();
+
+        if(RequestMethod.ALL == requestMethod) {
+            return HandlerKey.createWithAnyRequestMethod(requestUri);
+        }
+        final HandlerKey key = new HandlerKey(requestUri, requestMethod);
+        return Sets.newHashSet(key);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
