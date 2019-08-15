@@ -46,9 +46,16 @@
     - [ ] 구조 리팩토링
 
 - [ ] 요구사항 2
-    - [ ] 힌트 1 - HandlerMapping 추가
+    - [x] 힌트 1 - HandlerMapping 추가
         - [x] RequestMapping 이름변경, HandlerMapping 인터페이스 상속, method수정 (initialize, getHandler) 
-        - [ ] AnnotationHandlerMapping, HandlerMapping 인터페이스 상속
+        - [x] AnnotationHandlerMapping, HandlerMapping 인터페이스 상속
           
-    - [ ] 힌트 2 - HandlerMapping 초기화
+    - [x] 힌트 2 - HandlerMapping 초기화
+        - [x] dispatcherServlet에 handlerMapping list 추가
+        - [x] handlerMappingList 초기화
+        - [x] handlerMappingList에서 필요한 handler 찾아서 사용
+        
     - [ ] 힌트 3 - Controller 실행
+        - [x] handler 인스턴스 타입에 따른 executeMethod 분리
+        - [ ] handler와 관련된 기능 별도 class로 분리 / HandlerAdapter 적용해보기
+        

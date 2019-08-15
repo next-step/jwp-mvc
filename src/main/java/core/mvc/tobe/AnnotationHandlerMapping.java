@@ -68,9 +68,16 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
+    public HandlerExecution getHandler(HttpServletRequest req) {
+        String requestUri = req.getRequestURI();
+        RequestMethod rm = RequestMethod.valueOf(req.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    @Override
+    public boolean support(HttpServletRequest req) {
+        String requestUri = req.getRequestURI();
+        RequestMethod rm = RequestMethod.valueOf(req.getMethod().toUpperCase());
+        return handlerExecutions.containsKey(new HandlerKey(requestUri, rm));
     }
 }

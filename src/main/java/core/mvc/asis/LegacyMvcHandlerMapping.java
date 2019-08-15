@@ -32,6 +32,11 @@ public class LegacyMvcHandlerMapping implements HandlerMapping {
         return mappings.get(req.getRequestURI());
     }
 
+    @Override
+    public boolean support(HttpServletRequest req) {
+        return mappings.containsKey(req.getRequestURI());
+    }
+
     void put(String url, Controller controller) {
         mappings.put(url, controller);
     }

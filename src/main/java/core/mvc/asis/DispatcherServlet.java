@@ -3,6 +3,7 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -20,23 +23,25 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private LegacyMvcHandlerMapping lmhm;
-    private AnnotationHandlerMapping ahm;
+    private List<HandlerMapping> handlerMappings;
 
     @Override
     public void init() throws ServletException {
-        initLegacyMvcHandlerMapping();
-        initAnnotationHandlerMapping();
+        handlerMappings = new ArrayList<>();
+        handlerMappings.add(initLegacyMvcHandlerMapping());
+        handlerMappings.add(initAnnotationHandlerMapping());
     }
 
-    private void initLegacyMvcHandlerMapping() {
-        lmhm = new LegacyMvcHandlerMapping();
+    private LegacyMvcHandlerMapping initLegacyMvcHandlerMapping() {
+        LegacyMvcHandlerMapping lmhm = new LegacyMvcHandlerMapping();
         lmhm.initialize();
+        return lmhm;
     }
 
-    private void initAnnotationHandlerMapping() {
-        ahm = new AnnotationHandlerMapping("next.controller");
+    private AnnotationHandlerMapping initAnnotationHandlerMapping() {
+        AnnotationHandlerMapping ahm = new AnnotationHandlerMapping("next.controller");
         ahm.initialize();
+        return ahm;
     }
 
     @Override
@@ -45,19 +50,37 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            HandlerExecution handlerExecution = ahm.getHandler(req);
-            if (handlerExecution != null) {
-                executeWithAnnotation(req, resp, handlerExecution);
-                return;
-            }
-
-            Controller controller = lmhm.getHandler(req);
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            execute(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private void execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Object handler = getHandler(req);
+
+        if (handler instanceof Controller) {
+            executeWithLegacyController(req, resp, (Controller) handler);
+            return;
+        }
+
+        if (handler instanceof HandlerExecution) {
+            executeWithAnnotation(req, resp, (HandlerExecution) handler);
+        }
+    }
+
+    private Object getHandler(HttpServletRequest req) throws Exception {
+        return handlerMappings.stream()
+                .filter(handlerMapping -> handlerMapping.support(req))
+                .map(handlerMapping -> handlerMapping.getHandler(req))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("미등록URL : " + req.getRequestURI()));
+    }
+
+    private void executeWithLegacyController(HttpServletRequest req, HttpServletResponse resp, Controller controller) throws Exception {
+        String viewName = controller.execute(req, resp);
+        move(viewName, req, resp);
     }
 
     private void executeWithAnnotation(HttpServletRequest req, HttpServletResponse resp, HandlerExecution handlerExecution) throws Exception {
