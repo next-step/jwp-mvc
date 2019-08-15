@@ -31,12 +31,8 @@ public class AnnotationHandlerAdapter implements Handler {
 
         try {
             return handler.handle(request, response);
-        } catch (IllegalAccessException e) {
-            throw new HandlerException(e);
-        } catch (InstantiationException e) {
-            throw new HandlerException(e);
-        } catch (InvocationTargetException e) {
-            throw new HandlerException(e);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            throw new HandlerException("Failed to invoke method", e);
         }
     }
 
