@@ -31,3 +31,24 @@
     - [x] HandlerExecution - method 실행로직 추가
     
 - [x] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+
+## step3 - 3단계 - @MVC 구현(힌트)
+
+- [ ] step2 피드백 반영
+    - [x] annotationHandlerMapping 로 옮긴 요청 RequestMapping에서 제거 ( 중복제거 )
+    
+    - [ ] 보류 //handlerAdapter 구현 / `if/else` 없이 다양한 프레임워크 기술 통합 가능한 구조로 변경
+        - [ ] LegacyHandlerAdapter 구현 (support check기준 : ReequestMapping.findController)
+        - [ ] AnnotationHandlerApdapter 구현 (support check기준 : handlerKey 존재확인) 
+        
+        
+- [ ] 요구사항 1 힌트
+    - [ ] 구조 리팩토링
+
+- [ ] 요구사항 2
+    - [ ] 힌트 1 - HandlerMapping 추가
+        - [x] RequestMapping 이름변경, HandlerMapping 인터페이스 상속, method수정 (initialize, getHandler) 
+        - [ ] AnnotationHandlerMapping, HandlerMapping 인터페이스 상속
+          
+    - [ ] 힌트 2 - HandlerMapping 초기화
+    - [ ] 힌트 3 - Controller 실행

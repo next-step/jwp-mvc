@@ -20,18 +20,18 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private LegacyMvcHandlerMapping lmhm;
     private AnnotationHandlerMapping ahm;
 
     @Override
     public void init() throws ServletException {
-        initRequestMapping();
+        initLegacyMvcHandlerMapping();
         initAnnotationHandlerMapping();
     }
 
-    private void initRequestMapping() {
-        rm = new RequestMapping();
-        rm.initMapping();
+    private void initLegacyMvcHandlerMapping() {
+        lmhm = new LegacyMvcHandlerMapping();
+        lmhm.initialize();
     }
 
     private void initAnnotationHandlerMapping() {
@@ -51,7 +51,7 @@ public class DispatcherServlet extends HttpServlet {
                 return;
             }
 
-            Controller controller = rm.findController(requestUri);
+            Controller controller = (Controller) lmhm.getHandler(req);
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
         } catch (Throwable e) {

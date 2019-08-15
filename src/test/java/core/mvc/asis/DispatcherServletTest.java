@@ -26,15 +26,21 @@ class DispatcherServletTest {
 
     @DisplayName("Legacy MVC 테스트")
     @ParameterizedTest
-    @CsvSource({"GET,/", "GET,/users/form", "GET,/users/loginForm"})
-    void requestMappingTest(String method, String requestURI) throws Exception {
+    @CsvSource({"GET,/"
+            , "GET,/users/form"
+            , "GET,/users/loginForm"})
+    void legacyMvcHandlerMappingTest(String method, String requestURI) throws Exception {
         request = new MockHttpServletRequest(method, requestURI);
         dispatcher.service(request, response);
     }
 
     @DisplayName("@MVC 테스트")
     @ParameterizedTest
-    @CsvSource({"POST,/users", "POST,/users/create", "POST,/users/login", "GET,/users/logout", "POST,/users/profile"})
+    @CsvSource({"GET,/users"
+            , "POST,/users/create"
+            , "POST,/users/login"
+            , "GET,/users/logout"
+            , "GET,/users/profile"})
     void annotationHandlerMappingTest(String method, String requestURI) throws Exception {
         request = new MockHttpServletRequest(method, requestURI);
         dispatcher.service(request, response);
