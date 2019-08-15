@@ -1,10 +1,9 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
+import core.mvc.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,25 +12,23 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
-    private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-    private Reflections reflections;
+    private ControllerScanner controllerScanner;
 
     public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
-        this.reflections = new Reflections(this.basePackage);
+        this.controllerScanner = new ControllerScanner(basePackage);
+        initialize();
     }
 
-    public void initialize() {
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+    private void initialize() {
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
 
-        controllers.forEach(controller -> {
+        controllers.forEach((controller, controllerInstance) -> {
             Method[] methods = getMethodsWithAnnotation(controller, RequestMapping.class);
             Arrays.stream(methods)
                     .forEach(method -> registerMapping(controller, method));
@@ -65,6 +62,7 @@ public class AnnotationHandlerMapping {
         return requestMethods;
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
@@ -81,4 +79,5 @@ public class AnnotationHandlerMapping {
                 .filter(method -> method.isAnnotationPresent(annotation))
                 .toArray(Method[]::new);
     }
+
 }
