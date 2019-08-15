@@ -5,8 +5,5 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public interface View {
-
-    String DEFAULT_REDIRECT_PREFIX = "redirect:";
-
     void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception;
 }

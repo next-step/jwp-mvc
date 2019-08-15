@@ -50,20 +50,4 @@ public class ReflectionUtils {
         return (T) Array.get(Array.newInstance(clazz, 1), 0);
     }
 
-    private static Object getPrimitiveValue(Class parameterType) {
-        if (boolean.class == parameterType) {
-            return Boolean.TRUE;
-        } else if (short.class == parameterType) {
-            return Short.MIN_VALUE;
-        } else if (int.class == parameterType) {
-            return Integer.MIN_VALUE;
-        } else if (long.class == parameterType) {
-            return Long.MIN_VALUE;
-        } else if (float.class == parameterType) {
-            return Float.MIN_VALUE;
-        } else if (double.class == parameterType) {
-            return Double.MIN_VALUE;
-        }
-        return Character.MIN_VALUE;
-    }
 }
