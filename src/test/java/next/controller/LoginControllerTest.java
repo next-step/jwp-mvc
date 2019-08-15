@@ -10,13 +10,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import static next.controller.AnnotationController.execute;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class LoginControllerTest extends AnnotationController {
+class LoginControllerTest {
 
     @DisplayName("로그인에 성공한다")
     @Test
-    void login_success() throws Exception {
+    void login_success() {
         // given
         String userId = "admin";
         String password = "password";
@@ -39,7 +40,7 @@ class LoginControllerTest extends AnnotationController {
     @ParameterizedTest
     @CsvSource({"'nonUser','password",
                 "'admin','wrongPassword'"})
-    void login_fail(String userId, String password) throws Exception {
+    void login_fail(String userId, String password) {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/login");
         request.addParameter("userId", userId);

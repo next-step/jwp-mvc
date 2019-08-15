@@ -1,7 +1,9 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandleException;
 import core.mvc.tobe.HandlerMapping;
 import core.mvc.tobe.NotFoundServletException;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -29,25 +32,35 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        mappingHandlers.stream()
-                .forEach(HandlerMapping::initialize);
+        mappingHandlers.forEach(HandlerMapping::initialize);
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        ModelAndView handle = mappingHandlers.stream()
-                .filter(handlerMapping -> handlerMapping.isExistHandler(req))
+        ModelAndView modelAndView = mappingHandlers.stream()
+                .filter(handlerMapping -> handlerMapping.isExists(req))
                 .findFirst()
-                .map(handlerMapping -> handlerMapping.handle(req, resp))
+                .map(serve(req, resp))
                 .orElseThrow(NotFoundServletException::new);
 
         try {
-            handle.getView().render(handle.getModel(), req, resp);
+            View view = modelAndView.getView();
+            view.render(modelAndView.getModel(), req, resp);
         } catch (Exception e) {
-            logger.error("Exception : {}", e);
+            logger.error("View render exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private Function<HandlerMapping, ModelAndView> serve(HttpServletRequest req, HttpServletResponse resp) {
+        return handlerMapping -> {
+            try {
+                return handlerMapping.handle(req, resp);
+            } catch (Exception e) {
+                throw new HandleException(e);
+            }
+        };
     }
 }

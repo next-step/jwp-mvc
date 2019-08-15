@@ -3,7 +3,6 @@ package core.mvc.asis;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
-import core.mvc.tobe.HandleException;
 import core.mvc.tobe.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,25 +19,20 @@ public class LegacyMappingAdapter implements HandlerMapping {
     }
 
     @Override
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
-        Controller controller = requestMapping.findController(request.getRequestURI());
-
-        String viewName;
-        try {
-            viewName = controller.execute(request, response);
-        } catch (Exception e) {
-            throw new HandleException(e);
-        }
-
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            viewName = viewName.substring(DEFAULT_REDIRECT_PREFIX.length());
-            return new ModelAndView(new RedirectView(viewName));
-        }
-        return new ModelAndView(new JspView(viewName));
+    public boolean isExists(HttpServletRequest request) {
+        return null != requestMapping.findController(request.getRequestURI());
     }
 
     @Override
-    public boolean isExistHandler(HttpServletRequest request) {
-        return null != requestMapping.findController(request.getRequestURI());
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Controller controller = requestMapping.findController(request.getRequestURI());
+
+        String viewName = controller.execute(request, response);
+
+        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
+            String redirectViewName = viewName.substring(DEFAULT_REDIRECT_PREFIX.length());
+            return new ModelAndView(new RedirectView(redirectViewName));
+        }
+        return new ModelAndView(new JspView(viewName));
     }
 }

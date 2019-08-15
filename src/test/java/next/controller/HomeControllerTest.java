@@ -7,13 +7,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
+import static next.controller.AnnotationController.execute;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HomeControllerTest extends AnnotationController {
+class HomeControllerTest {
 
-    @DisplayName("어노테이션기반으로 homeController 실행")
+    @DisplayName("메인페이지 접속 시 유저 리스트를 가져오는데 성공한다")
     @Test
-    void home() throws Exception {
+    void home() {
         ModelAndView modelAndView = execute("GET", "/");
 
         Collection<User> users = (Collection<User>) modelAndView.getObject("users");

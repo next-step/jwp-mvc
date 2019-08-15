@@ -5,6 +5,6 @@ public class HandleException extends IllegalStateException {
     private static final String ERROR_MESSAGE = "handler가 정상적으로 실행되지 않았습니다.";
 
     public HandleException(Throwable cause) {
-        super(String.format(ERROR_MESSAGE, cause));
+        super(ERROR_MESSAGE, cause);
     }
 }

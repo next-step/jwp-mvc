@@ -31,9 +31,10 @@ class AnnotationHandlerMappingTest {
     void handle_isExistRequest_isNotNull(String method, String url) {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         // when
-        ModelAndView handler = handlerMapping.handle(request, new MockHttpServletResponse());
+        ModelAndView handler = handlerMapping.handle(request, response);
 
         // then
         assertThat(handler).isNotNull();
@@ -48,10 +49,11 @@ class AnnotationHandlerMappingTest {
     void handle_isNotExistRequest_exception(String method, String url) {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         // when && exception
         assertThatExceptionOfType(NotFoundServletException.class)
-                .isThrownBy(() -> handlerMapping.handle(request, new MockHttpServletResponse()));
+                .isThrownBy(() -> handlerMapping.handle(request, response));
     }
 
     @DisplayName("매핑되는 핸들러가 있는지 확인한다")
@@ -65,7 +67,7 @@ class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
 
         // when
-        boolean existHandler = handlerMapping.isExistHandler(request);
+        boolean existHandler = handlerMapping.isExists(request);
 
         // then
         assertThat(existHandler).isEqualTo(result);

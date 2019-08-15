@@ -9,7 +9,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Ignore
 public class AnnotationController {
 
     private static final AnnotationHandlerMapping handlerMapping;
@@ -23,15 +22,15 @@ public class AnnotationController {
         }
     }
 
-    protected ModelAndView execute(HttpServletRequest request) {
+    public static ModelAndView execute(HttpServletRequest request) {
         return handlerMapping.handle(request, new MockHttpServletResponse());
     }
 
-    protected ModelAndView execute(HttpServletRequest request, HttpServletResponse response) {
+    public static ModelAndView execute(HttpServletRequest request, HttpServletResponse response) {
         return handlerMapping.handle(request,response);
     }
 
-    protected ModelAndView execute(String method, String url) {
+    public static ModelAndView execute(String method, String url) {
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
         return handlerMapping.handle(request, new MockHttpServletResponse());
     }
