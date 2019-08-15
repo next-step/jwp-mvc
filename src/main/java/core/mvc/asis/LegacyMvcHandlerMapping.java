@@ -28,7 +28,7 @@ public class LegacyMvcHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public Object getHandler(HttpServletRequest req) {
+    public Controller getHandler(HttpServletRequest req) {
         return mappings.get(req.getRequestURI());
     }
 

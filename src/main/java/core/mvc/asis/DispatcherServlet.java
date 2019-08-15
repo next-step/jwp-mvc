@@ -51,7 +51,7 @@ public class DispatcherServlet extends HttpServlet {
                 return;
             }
 
-            Controller controller = (Controller) lmhm.getHandler(req);
+            Controller controller = lmhm.getHandler(req);
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
         } catch (Throwable e) {
