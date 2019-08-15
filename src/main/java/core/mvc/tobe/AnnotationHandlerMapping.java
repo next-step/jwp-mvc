@@ -31,7 +31,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public void initialize() {
+    public HandlerMapping initialize() {
         Set<Class<?>> controllers = ComponentScanner.scan(basePackages, Controller.class);
         for (Class controller : controllers) {
             Object bean = null;
@@ -42,6 +42,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
             }
             registerHandler(bean, controller.getDeclaredMethods());
         }
+
+        return this;
     }
 
     private void registerHandler(Object bean, Method[] methods) {

@@ -15,7 +15,7 @@ public class RequestMapping implements HandlerMapping {
     private Map<String, Controller> mappings = new HashMap<>();
 
     @Override
-    public void initialize() {
+    public HandlerMapping initialize() {
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
@@ -28,6 +28,7 @@ public class RequestMapping implements HandlerMapping {
         mappings.put("/users/update", new UpdateUserController());
 
         mappings.keySet().forEach(path -> logger.info("mapping url : {}, handler : {}", path, mappings.get(path).getClass()));
+        return this;
     }
 
     @Override

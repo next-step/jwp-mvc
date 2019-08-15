@@ -22,6 +22,6 @@ public class LegacyHandlerAdapter implements HandlerAdapter {
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         String viewName = ((Controller) handler).execute(request, response);
-        return new ModelAndView(new LegacyView(viewName));
+        return new ModelAndView(viewName);
     }
 }

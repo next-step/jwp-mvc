@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
+    private String viewName;
     private View view;
     private Map<String, Object> model = new HashMap<String, Object>();
 
@@ -13,6 +14,10 @@ public class ModelAndView {
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public ModelAndView(String viewName) {
+        this.viewName = viewName;
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
@@ -30,5 +35,9 @@ public class ModelAndView {
 
     public View getView() {
         return view;
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 }
