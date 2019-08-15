@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private Object[] basePackage;
 
@@ -26,6 +26,7 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
         Reflections reflections = new Reflections(basePackage
                 , new TypeAnnotationsScanner()
@@ -63,9 +64,10 @@ public class AnnotationHandlerMapping {
 
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
-        };
+        }
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
