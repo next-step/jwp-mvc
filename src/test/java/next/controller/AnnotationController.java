@@ -2,9 +2,7 @@ package next.controller;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import jdk.nashorn.internal.ir.annotations.Ignore;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -14,29 +12,28 @@ import javax.servlet.http.HttpServletResponse;
 @Ignore
 public class AnnotationController {
 
-    public static final String NEXT_CONTROLLER = "next.controller";
-    private AnnotationHandlerMapping handlerMapping;
+    private static final AnnotationHandlerMapping handlerMapping;
 
-    @BeforeEach
-    public void setup() throws Exception {
-        handlerMapping = new AnnotationHandlerMapping(NEXT_CONTROLLER);
-        handlerMapping.initialize();
+    static {
+        handlerMapping = AnnotationHandlerMapping.of();
+        try {
+            handlerMapping.initialize();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    protected ModelAndView execute(HttpServletRequest request) throws Exception {
-        return execute(request, new MockHttpServletResponse());
+    protected ModelAndView execute(HttpServletRequest request) {
+        return handlerMapping.handle(request, new MockHttpServletResponse());
     }
 
-    protected ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        return execution.handle(request, response);
+    protected ModelAndView execute(HttpServletRequest request, HttpServletResponse response) {
+        return handlerMapping.handle(request,response);
     }
 
-    protected ModelAndView execute(String method, String url) throws Exception {
+    protected ModelAndView execute(String method, String url) {
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        return execution.handle(request, response);
+        return handlerMapping.handle(request, new MockHttpServletResponse());
     }
 }
 

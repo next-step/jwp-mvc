@@ -1,6 +1,6 @@
 package next.controller;
 
-import core.mvc.JSPView;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +51,6 @@ class LoginControllerTest extends AnnotationController {
 
         // then
         assertThat(isNotLogin).isTrue();
-        assertThat(result.getView()).isEqualTo(new JSPView("/user/login.jsp"));
+        assertThat(result.getView()).isEqualTo(new JspView("/user/login.jsp"));
     }
 }

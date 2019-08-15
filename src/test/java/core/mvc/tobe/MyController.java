@@ -3,7 +3,7 @@ package core.mvc.tobe;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.JSPView;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,18 +18,18 @@ public class MyController{
     @RequestMapping(value = "/users")
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("users list");
-        return new ModelAndView(new JSPView("/users/list.jsp"));
+        return new ModelAndView(new JspView("/users/list.jsp"));
     }
 
     @RequestMapping("/users/findUserId")
     public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("findUserId");
-        return new ModelAndView(new JSPView("/user/show.jsp"));
+        return new ModelAndView(new JspView("/user/show.jsp"));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("create");
-        return new ModelAndView(new JSPView("redirect:/users"));
+        return new ModelAndView(new JspView("redirect:/users"));
     }
 }
