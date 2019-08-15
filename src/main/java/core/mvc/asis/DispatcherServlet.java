@@ -26,7 +26,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        handlerAdapters = new HandlerAdapters("next.controller");
+        String basePackages = (String) getServletContext().getAttribute("basePackages");
+        handlerAdapters = new HandlerAdapters(basePackages);
         viewResolvers = new ViewResolvers();
     }
 

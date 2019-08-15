@@ -21,7 +21,13 @@ public class ContextLoaderListener implements ServletContextListener {
         populator.addScript(new ClassPathResource("jwp.sql"));
         DatabasePopulatorUtils.execute(populator, ConnectionManager.getDataSource());
 
+        setGlobalAttributes(sce);
+
         logger.info("Completed Load ServletContext!");
+    }
+
+    private void setGlobalAttributes(ServletContextEvent sce) {
+        sce.getServletContext().setAttribute("basePackages", "next.controller");
     }
 
     @Override
