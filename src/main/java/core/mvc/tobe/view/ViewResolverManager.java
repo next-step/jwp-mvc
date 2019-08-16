@@ -27,6 +27,7 @@ public class ViewResolverManager {
     private List<ViewResolver> createViewResolvers() {
         return asList(
                 new UrlBasedViewResolver(),
+                new HandlebarsViewResolver(),
                 new EmptyUrlForwardViewResolver()
         );
     }
