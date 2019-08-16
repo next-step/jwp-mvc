@@ -1,88 +1,81 @@
 package core.mvc.asis;
 
 import core.annotation.web.RequestMethod;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.ModelAndViewWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-    private static final String ANNOTATION_CONTROLLER_PACKAGE = "next.controller.annotation";
+    private static final String ANNOTATION_CONTROLLER_PACKAGE = "next.controller";
 
-    private RequestMapping rm;
+    private LegacyHandlerMapping legacyHandlerMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
-    public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+    public void init() {
+        legacyHandlerMapping = new LegacyHandlerMapping();
+        legacyHandlerMapping.initMapping();
         annotationHandlerMapping = new AnnotationHandlerMapping(ANNOTATION_CONTROLLER_PACKAGE);
         annotationHandlerMapping.initialize();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        String requestUri = request.getRequestURI();
+        logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        if (annotationHandlerMapping.isHandlerKeyPresent(req.getRequestURI(), RequestMethod.valueOf(req.getMethod()))) {
-            serviceAnnotationMapping(req, resp);
-            return;
-        }
-
-        Controller controller = rm.findController(requestUri);
+        Object handler = getHandler(request);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            move(handler, request, response);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void serviceAnnotationMapping(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
-        try {
-            ModelAndView modelAndView = handlerExecution.handle(req, resp);
-            move(modelAndView, req, resp);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private Object getHandler(HttpServletRequest request) {
+        if (annotationHandlerMapping.isHandlerKeyPresent(request.getRequestURI(), RequestMethod.valueOf(request.getMethod()))) {
+            return annotationHandlerMapping.getHandler(request);
         }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        return legacyHandlerMapping.getHandler(request);
     }
 
-    private void move(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp)
-            throws Exception {
+    private void move(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ModelAndView modelAndView = getModelAndView(handler, request, response);
         String viewName = modelAndView.getViewName();
+
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+            response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;
         }
 
-        modelAndView.render(req, resp);
+        modelAndView.render(request, response);
+    }
+
+    private ModelAndView getModelAndView(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution) handler).handle(request, response);
+        }
+
+        return wrapControllerInModelAndView((Controller) handler, request, response);
+    }
+
+    private ModelAndView wrapControllerInModelAndView(Controller handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return ModelAndViewWrapper.wrap(handler.execute(request, response), JspView.class);
     }
 }

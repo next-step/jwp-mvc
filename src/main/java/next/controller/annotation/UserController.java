@@ -17,8 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final String USER_REQUEST = "/users";
 
-    @RequestMapping("/users")
+    @RequestMapping(USER_REQUEST)
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
         if (!UserSessionUtils.isLogined(request.getSession())) {
             return new ModelAndView(new JspView("redirect:/users/loginForm"));
@@ -28,7 +29,7 @@ public class UserController {
         return new ModelAndView(new JspView("/user/list.jsp"));
     }
 
-    @RequestMapping(value="/users", method=RequestMethod.POST)
+    @RequestMapping(value = USER_REQUEST, method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
                 request.getParameter("email"));
