@@ -16,10 +16,10 @@ public class ListUserController {
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         ModelAndView modelAndView;
         if (!UserSessionUtils.isLogined(req.getSession())) {
-            return new ModelAndView(new JspView("redirect:/users/loginForm"));
+            return new ModelAndView("redirect:/users/loginForm");
         }
 
-        modelAndView = new ModelAndView(new JspView("/user/list.jsp"));
+        modelAndView = new ModelAndView("/user/list.jsp");
         modelAndView.addObject("users", DataBase.findAll());
         return modelAndView;
     }

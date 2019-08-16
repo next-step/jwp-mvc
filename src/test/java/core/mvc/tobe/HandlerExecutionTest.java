@@ -12,12 +12,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class HandlerExecutionTest {
-    private Class<TestHandlerController> clazz;
-
-    @BeforeEach
-    void setUp() {
-        clazz = TestHandlerController.class;
-    }
+    private Class<TestHandlerController> clazz = TestHandlerController.class;
 
     @DisplayName("생성 확인")
     @Test
@@ -43,7 +38,6 @@ class HandlerExecutionTest {
             HandlerExecution.of(clazz, method);
         });
     }
-
 
     @DisplayName("Parameter Type이 다른 경우 실패 확인")
     @Test

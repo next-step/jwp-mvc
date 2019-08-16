@@ -25,6 +25,6 @@ public class CreateUserController {
 
         DataBase.addUser(user);
 
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView("redirect:/");
     }
 }
