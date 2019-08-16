@@ -16,12 +16,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserControllerTest {
 
-    private UserController userController;
+    private UserController userController = new UserController();
 
     @BeforeEach
     void setUp() {
         DataBase.deleteAll();
-        userController = new UserController();
     }
 
     @DisplayName("로그인 유저 /users 요청시 유저 리스트 반환")
