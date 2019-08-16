@@ -14,10 +14,12 @@ public class ViewResolverCombineTest {
 
         final View redirectView = viewResolverManager.resolveView("redirect:redirect-result.jsp");
         final View forwardView = viewResolverManager.resolveView("forward:forward-result.jsp");
+        final View handlebarsView = viewResolverManager.resolveView("handlebars.hbs");
         final View defaultForwardView = viewResolverManager.resolveView("forward-result.jsp");
 
         assertThat(redirectView).isExactlyInstanceOf(RedirectView.class);
         assertThat(forwardView).isExactlyInstanceOf(ForwardView.class);
+        assertThat(handlebarsView).isExactlyInstanceOf(HandlebarsView.class);
         assertThat(defaultForwardView).isExactlyInstanceOf(ForwardView.class);
     }
 
