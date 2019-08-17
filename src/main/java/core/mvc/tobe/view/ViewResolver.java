@@ -6,6 +6,8 @@ public interface ViewResolver {
 
     String DEFAULT_FORWARD_PREFIX = "forward:";
 
+    String HANDLE_BARS_EXTENSION = "hbs";
+
     View resolveViewName(String viewName);
 
 }

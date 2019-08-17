@@ -20,4 +20,10 @@ public class ListUserController {
         req.setAttribute("users", DataBase.findAll());
         return new ModelAndView("forward:/user/list.jsp");
     }
+
+    @RequestMapping("/users/handlebars")
+    public ModelAndView usersByHandlebars(HttpServletRequest request) {
+        return new ModelAndView("/user/handlebars-list.hbs")
+                .addObject("users", DataBase.findAll());
+    }
 }
