@@ -8,14 +8,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.mvc.DispatcherServlet.DEFAULT_PACKAGE;
 
 public class AnnotationController {
 
     private static final AnnotationHandlerMapping handlerMapping;
 
     static {
-        handlerMapping = new AnnotationHandlerMapping(DEFAULT_PACKAGE);
+        handlerMapping = new AnnotationHandlerMapping("next.controller");
         handlerMapping.initialize();
     }
 

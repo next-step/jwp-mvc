@@ -1,10 +1,7 @@
 package core.mvc;
 
 import core.mvc.asis.LegacyMappingAdapter;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandleException;
-import core.mvc.tobe.HandlerMapping;
-import core.mvc.tobe.NotFoundServletException;
+import core.mvc.tobe.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,20 +15,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import static core.mvc.tobe.Environment.ANNOTATION_PACKAGE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    public static final String DEFAULT_PACKAGE = "next.controller";
+
+    private static final List<HandlerMapping> mappingHandlers;
+    private static final Environment environment = Environment.ofDefault();
 
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private static final List<HandlerMapping> mappingHandlers;
-
     static {
-        mappingHandlers = Arrays.asList(new LegacyMappingAdapter(), new AnnotationHandlerMapping(DEFAULT_PACKAGE));
+        String annotationPackage = environment.getProperty(ANNOTATION_PACKAGE);
+        mappingHandlers = Arrays.asList(new LegacyMappingAdapter(), new AnnotationHandlerMapping(annotationPackage));
     }
 
     @Override

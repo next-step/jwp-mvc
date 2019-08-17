@@ -4,9 +4,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
-import core.mvc.tobe.view.JspView;
 import core.mvc.ModelAndView;
-import core.mvc.tobe.view.RedirectView;
 import core.mvc.tobe.view.ViewGenerator;
 import next.model.User;
 
@@ -31,6 +29,6 @@ public class LoginController {
 
         HttpSession session = req.getSession();
         session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-        return new ModelAndView(ViewGenerator.of("/"));
+        return new ModelAndView(ViewGenerator.of("redirect:/"));
     }
 }

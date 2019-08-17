@@ -67,8 +67,4 @@ class AnnotationHandlerMappingTest {
         // then
         assertThat(handlerMapping.supports(request)).isEqualTo(result);
     }
-
-    @Test
-    void createHandler() {
-    }
 }
