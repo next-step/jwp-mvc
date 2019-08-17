@@ -7,6 +7,7 @@ import core.mvc.tobe.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 public class LegacyMappingAdapter implements HandlerMapping {
 
@@ -19,8 +20,8 @@ public class LegacyMappingAdapter implements HandlerMapping {
     }
 
     @Override
-    public boolean isExists(HttpServletRequest request) {
-        return null != requestMapping.findController(request.getRequestURI());
+    public boolean supports(HttpServletRequest request) {
+        return Objects.nonNull(requestMapping.findController(request.getRequestURI()));
     }
 
     @Override

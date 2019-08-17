@@ -13,15 +13,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 
 class AnnotationHandlerMappingTest {
 
+    private static final String DEFAULT_PACKAGE = "core.mvc.tobe";
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
     void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping(DEFAULT_PACKAGE);
         handlerMapping.initialize();
     }
 
-    @DisplayName("매핑되는 핸들러가 있을 경우 성공한다")
+    @DisplayName(DEFAULT_PACKAGE + "매핑되는 핸들러가 있을 경우 성공한다")
     @ParameterizedTest
     @CsvSource({
             "'GET', '/users'",
@@ -67,7 +68,7 @@ class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
 
         // when
-        boolean existHandler = handlerMapping.isExists(request);
+        boolean existHandler = handlerMapping.supports(request);
 
         // then
         assertThat(existHandler).isEqualTo(result);

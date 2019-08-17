@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
@@ -32,7 +33,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
         controllers.entrySet()
                 .forEach(this::initMethod);
-        logger.debug("handlerExecutions : {}", handlerExecutions);
     }
 
     private void initMethod(Map.Entry<Class<?>, Object> controller) {
@@ -49,17 +49,21 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         for (RequestMethod requestMethod : annotation.method()) {
             HandlerKey handlerKey = new HandlerKey(annotation.value(), requestMethod);
             HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, method);
+
+            logger.debug("handlerExecution : handlerKey {} : handlerExecution {}.{}",
+                    handlerKey, method.getDeclaringClass(), method.getName());
+
             handlerExecutions.put(handlerKey, handlerExecution);
         }
     }
 
     @Override
-    public boolean isExists(HttpServletRequest request) {
-        return null != getHandler(request);
+    public boolean supports(HttpServletRequest request) {
+        return Objects.nonNull(getHandler(request));
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
-        if (!isExists(request)) {
+        if (!supports(request)) {
             throw new NotFoundServletException();
         }
         HandlerExecution handler = getHandler(request);

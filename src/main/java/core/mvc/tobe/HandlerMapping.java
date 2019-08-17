@@ -9,7 +9,7 @@ public interface HandlerMapping {
 
     void initialize();
 
-    boolean isExists(HttpServletRequest request);
+    boolean supports(HttpServletRequest request);
 
     ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }
