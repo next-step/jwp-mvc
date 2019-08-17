@@ -31,3 +31,34 @@
     - [x] HandlerExecution - method 실행로직 추가
     
 - [x] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+
+## step3 - 3단계 - @MVC 구현(힌트)
+
+- [ ] step2 피드백 반영
+    - [x] annotationHandlerMapping 로 옮긴 요청 RequestMapping에서 제거 ( 중복제거 )
+    
+    - [x] handlerAdapter 구현 / `if/else` 없이 다양한 프레임워크 기술 통합 가능한 구조로 변경
+        - [x] servletHanderAdapter 구현.
+        - 프레임워크가 늘어날 경우 handlerAdapter 를 wrapping 하는 1급 컬랙션 추가 및 기능구현 필요 
+        
+- [x] 요구사항 1 힌트
+    - [x] 힌트1 - ControllerScanner 클래스 추가
+    - [x] 힌트 2 - AnnotationHandlerMapping 클래스 추가  // step2에서 구현완료
+    - [x] 힌트 3 - 요청에 대한 Controller 반환 // step2에서 구현완료
+
+- [x] 요구사항 2
+    - [x] 힌트 1 - HandlerMapping 추가
+        - [x] RequestMapping 이름변경, HandlerMapping 인터페이스 상속, method수정 (initialize, getHandler) 
+        - [x] AnnotationHandlerMapping, HandlerMapping 인터페이스 상속
+          
+    - [x] 힌트 2 - HandlerMapping 초기화
+        - [x] dispatcherServlet에 handlerMapping list 추가
+        - [x] handlerMappingList 초기화
+        - [x] handlerMappingList에서 필요한 handler 찾아서 사용
+        
+    - [x] 힌트 3 - Controller 실행
+        - [x] handler 인스턴스 타입에 따른 executeMethod 분리
+        - [x] handler와 관련된 기능 별도 class로 분리 / HandlerAdapter 적용해보기
+        - [x] handlerMappingList -> 1급 컬랙션으로 wrapping
+        - [x] servletHandlerAdapter 구현, dispatcherServlet 기능 정리
+        

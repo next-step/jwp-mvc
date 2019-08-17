@@ -1,13 +1,8 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,24 +11,21 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private Object[] basePackage;
 
+    private ControllerScanner controllerScanner;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage
-                , new TypeAnnotationsScanner()
-                , new MethodAnnotationsScanner()
-                , new SubTypesScanner());
-
-        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(Controller.class);
-        initializeHandlerExecutions(annotatedClasses);
+        controllerScanner = ControllerScanner.of(basePackage);
+        initializeHandlerExecutions(controllerScanner.getClasses());
     }
 
     private void initializeHandlerExecutions(Set<Class<?>> annotatedClasses) {
@@ -57,18 +49,25 @@ public class AnnotationHandlerMapping {
         try {
             RequestMapping requestMapping = method.getAnnotation(annotationType);
             HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-            handlerExecutions.put(handlerKey, new HandlerExecution(annotatedClass.newInstance(), method));
+            handlerExecutions.put(handlerKey, new HandlerExecution(controllerScanner.getInstance(annotatedClass), method));
 
             logger.debug("Path : [{}], Controller : [{}]", requestMapping.value(), method.getDeclaringClass());
-
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        };
+        }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest req) {
+        String requestUri = req.getRequestURI();
+        RequestMethod rm = RequestMethod.valueOf(req.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    @Override
+    public boolean support(HttpServletRequest req) {
+        String requestUri = req.getRequestURI();
+        RequestMethod rm = RequestMethod.valueOf(req.getMethod().toUpperCase());
+        return handlerExecutions.containsKey(new HandlerKey(requestUri, rm));
     }
 }
