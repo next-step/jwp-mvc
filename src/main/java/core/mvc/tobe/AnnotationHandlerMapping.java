@@ -16,25 +16,19 @@ import java.util.Set;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
 
-    private static final String DEFAULT_PACKAGE = "next.controller";
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    AnnotationHandlerMapping(Object... basePackage) {
+    public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
-    }
-
-    public static AnnotationHandlerMapping of() {
-        return new AnnotationHandlerMapping(DEFAULT_PACKAGE);
     }
 
     public void initialize() {
         logger.debug("basePackage : {}", basePackage);
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
         Map<Class<?>, Object> controllers = controllerScanner.getControllers();
-
 
         controllers.entrySet()
                 .forEach(this::initMethod);

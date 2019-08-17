@@ -9,17 +9,15 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static core.mvc.asis.DispatcherServlet.DEFAULT_PACKAGE;
+
 public class AnnotationController {
 
     private static final AnnotationHandlerMapping handlerMapping;
 
     static {
-        handlerMapping = AnnotationHandlerMapping.of();
-        try {
-            handlerMapping.initialize();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        handlerMapping = new AnnotationHandlerMapping(DEFAULT_PACKAGE);
+        handlerMapping.initialize();
     }
 
     public static ModelAndView execute(HttpServletRequest request) {
@@ -27,7 +25,7 @@ public class AnnotationController {
     }
 
     public static ModelAndView execute(HttpServletRequest request, HttpServletResponse response) {
-        return handlerMapping.handle(request,response);
+        return handlerMapping.handle(request, response);
     }
 
     public static ModelAndView execute(String method, String url) {

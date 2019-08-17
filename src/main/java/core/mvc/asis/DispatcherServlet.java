@@ -24,12 +24,14 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    public static final String DEFAULT_PACKAGE = "next.controller";
+
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private static final List<HandlerMapping> mappingHandlers;
 
     static {
-        mappingHandlers = Arrays.asList(new LegacyMappingAdapter(), AnnotationHandlerMapping.of());
+        mappingHandlers = Arrays.asList(new LegacyMappingAdapter(), new AnnotationHandlerMapping(DEFAULT_PACKAGE));
     }
 
     @Override
