@@ -1,64 +1,70 @@
 package core.mvc.tobe;
 
-import core.mvc.JSPView;
 import core.mvc.ModelAndView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.Map;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-public class AnnotationHandlerMappingTest {
+class AnnotationHandlerMappingTest {
+
+    private static final String DEFAULT_PACKAGE = "core.mvc.tobe";
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
-    public void setup() throws Exception {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+    void setup() {
+        handlerMapping = new AnnotationHandlerMapping(DEFAULT_PACKAGE);
         handlerMapping.initialize();
     }
 
-    @DisplayName("RequestMethod가 존재하지 않을 시 모든 메소드에 매핑된다")
-    @Test
-    public void getHandler_Default() throws Exception {
-        ModelAndView handle = execute("GET", "/users/findUserId");
-
-        assertThat(handle.getView()).isEqualTo(new JSPView("/user/show.jsp"));
-    }
-
-    @DisplayName("RequestMethod GET 요청에 매핑을 성공한다")
-    @Test
-    public void getHandler_GET() throws Exception {
-        ModelAndView handle = execute("GET", "/users");
-
-        assertThat(handle.getView()).isEqualTo(new JSPView("/users/list.jsp"));
-    }
-
-    @DisplayName("RequestMethod POST 요청에 매핑을 성공한다")
-    @Test
-    public void getHandler_POST() throws Exception {
-        ModelAndView handle = execute("POST", "/users");
-
-        assertThat(handle.getView()).isEqualTo(new JSPView("redirect:/users"));
-    }
-
-    private ModelAndView execute(String method, String url) throws Exception {
+    @DisplayName(DEFAULT_PACKAGE + " 중 controller 어노테이션 클래스에 해당되며 매핑되는 핸들러가 있을 경우 성공한다")
+    @ParameterizedTest
+    @CsvSource({
+            "'GET', '/users'",
+            "'POST', '/users'",
+            "'GET', '/users/findUserId'",
+    })
+    void handle_isExistRequest_isNotNull(String method, String url) {
+        // given
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        return execution.handle(request, response);
+
+        // when
+        ModelAndView handler = handlerMapping.handle(request, response);
+
+        // then
+        assertThat(handler).isNotNull();
     }
 
-    @DisplayName("매핑되는 핸들러가 없을 경우 null을 반환한다")
+    @DisplayName(DEFAULT_PACKAGE + "controller 어노테이션의 객체에 매핑되는 핸들러가 없을 경우 exception")
     @Test
-    public void getHandler_Exception() {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/none");
+    void handle_isNotExistRequest_exception() {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        // when && exception
+        assertThatExceptionOfType(NotFoundServletException.class)
+                .isThrownBy(() -> handlerMapping.handle(request, response));
+    }
 
-        assertThat(execution).isNull();
+    @DisplayName(DEFAULT_PACKAGE + "에 매핑되는 핸들러가 있는지 확인한다")
+    @ParameterizedTest
+    @CsvSource({
+            "'GET', '/users/findUserId', 'true'",
+            "'GET', '/users/1', 'false'",
+    })
+    void isExistHandler(String method, String url, boolean result) {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest(method, url);
+
+        // then
+        assertThat(handlerMapping.supports(request)).isEqualTo(result);
     }
 }

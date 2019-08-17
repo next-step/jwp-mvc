@@ -1,6 +1,6 @@
 package next.controller;
 
-import core.mvc.JSPView;
+import core.mvc.tobe.view.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.DisplayName;
@@ -10,13 +10,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import static next.controller.AnnotationController.execute;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class LoginControllerTest extends AnnotationController {
+class LoginControllerTest {
 
     @DisplayName("로그인에 성공한다")
     @Test
-    void login_success() throws Exception {
+    void login_success() {
         // given
         String userId = "admin";
         String password = "password";
@@ -39,7 +40,7 @@ class LoginControllerTest extends AnnotationController {
     @ParameterizedTest
     @CsvSource({"'nonUser','password",
                 "'admin','wrongPassword'"})
-    void login_fail(String userId, String password) throws Exception {
+    void login_fail(String userId, String password) {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/login");
         request.addParameter("userId", userId);
@@ -51,6 +52,6 @@ class LoginControllerTest extends AnnotationController {
 
         // then
         assertThat(isNotLogin).isTrue();
-        assertThat(result.getView()).isEqualTo(new JSPView("/user/login.jsp"));
+        assertThat(result.getView()).isEqualTo(new JspView("/user/login.jsp"));
     }
 }

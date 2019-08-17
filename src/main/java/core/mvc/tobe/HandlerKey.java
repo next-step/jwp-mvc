@@ -2,21 +2,14 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
 
-public class HandlerKey {
+class HandlerKey {
+
     private String url;
     private RequestMethod requestMethod;
 
-    public HandlerKey(String url, RequestMethod requestMethod) {
+    HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
-    }
-
-    @Override
-    public String toString() {
-        return "HandlerKey{" +
-                "url='" + url + '\'' +
-                ", requestMethod=" + requestMethod +
-                '}';
     }
 
     @Override
@@ -45,5 +38,13 @@ public class HandlerKey {
         } else if (!url.equals(other.url))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "HandlerKey{" +
+                "url='" + url + '\'' +
+                ", requestMethod=" + requestMethod +
+                '}';
     }
 }
