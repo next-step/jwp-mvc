@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
 
@@ -49,7 +51,10 @@ public class DispatcherServlet extends HttpServlet {
             View view = modelAndView.getView();
             view.render(modelAndView.getModel(), req, resp);
         } catch (Exception e) {
-            logger.error("View render exception : {}", e);
+            logger.error("View render exception", e);
+            if (e instanceof NotFoundServletException) {
+                resp.setStatus(SC_NOT_FOUND);
+            }
             throw new ServletException(e.getMessage());
         }
     }
