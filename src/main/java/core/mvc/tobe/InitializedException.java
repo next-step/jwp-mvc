@@ -1,8 +1,8 @@
 package core.mvc.tobe;
 
-public class InitializedException extends IllegalStateException {
+class InitializedException extends IllegalStateException {
 
-    public InitializedException(Throwable cause) {
+    InitializedException(Throwable cause) {
         super(cause);
     }
 }
