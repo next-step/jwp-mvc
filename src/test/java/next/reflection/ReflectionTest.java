@@ -159,13 +159,7 @@ public class ReflectionTest {
     @MethodSource("questionConstructorParams")
     public void createQuestion(List<Object> valueList, String name, String title, String contents, int countOfComment) throws Exception {
         final Class<Question> clazz = Question.class;
-        Object[] paramValues = valueList.toArray();
-        final Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        final Constructor<?> constructor = Arrays.stream(constructors)
-                .filter(c -> isAssignable(c.getParameterTypes(), paramValues))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
-        final Question question = (Question) constructor.newInstance(paramValues);
+        final Question question = getQuestion(valueList, clazz);
 
         assertAll("인자 목록을 이용하여 Question 클래스의 인스턴스를 생성",
                 () -> assertThat(question.getWriter()).isEqualTo(name),
@@ -249,6 +243,17 @@ public class ReflectionTest {
             allTypes.addAll(types);
         }
         return allTypes;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getQuestion(List<Object> valueList, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        Object[] paramValues = valueList.toArray();
+        final Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        final Constructor<?> constructor = Arrays.stream(constructors)
+                .filter(c -> isAssignable(c.getParameterTypes(), paramValues))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+        return (T)constructor.newInstance(paramValues);
     }
 
     private static boolean isAssignable(Class<?>[] parameterTypes, Object[] values) {
