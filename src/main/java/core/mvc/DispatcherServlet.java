@@ -1,7 +1,6 @@
-package core.mvc.asis;
+package core.mvc;
 
-import core.mvc.ModelAndView;
-import core.mvc.View;
+import core.mvc.asis.LegacyMappingAdapter;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandleException;
 import core.mvc.tobe.HandlerMapping;

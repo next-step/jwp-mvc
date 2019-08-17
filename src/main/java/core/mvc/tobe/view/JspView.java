@@ -1,4 +1,6 @@
-package core.mvc;
+package core.mvc.tobe.view;
+
+import core.mvc.View;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

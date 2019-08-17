@@ -2,14 +2,13 @@ package next.controller;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.mvc.asis.DispatcherServlet.DEFAULT_PACKAGE;
+import static core.mvc.DispatcherServlet.DEFAULT_PACKAGE;
 
 public class AnnotationController {
 

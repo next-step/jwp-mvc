@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.mvc.ModelAndView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -22,7 +23,7 @@ class AnnotationHandlerMappingTest {
         handlerMapping.initialize();
     }
 
-    @DisplayName(DEFAULT_PACKAGE + "매핑되는 핸들러가 있을 경우 성공한다")
+    @DisplayName(DEFAULT_PACKAGE + " 중 controller 어노테이션 클래스에 해당되며 매핑되는 핸들러가 있을 경우 성공한다")
     @ParameterizedTest
     @CsvSource({
             "'GET', '/users'",
@@ -41,15 +42,11 @@ class AnnotationHandlerMappingTest {
         assertThat(handler).isNotNull();
     }
 
-    @DisplayName("매핑되는 핸들러가 없을 경우 exception")
-    @ParameterizedTest
-    @CsvSource({
-            "'GET', '/none'",
-            "'POST', '/none'",
-    })
-    void handle_isNotExistRequest_exception(String method, String url) {
+    @DisplayName(DEFAULT_PACKAGE + "controller 어노테이션의 객체에 매핑되는 핸들러가 없을 경우 exception")
+    @Test
+    void handle_isNotExistRequest_exception() {
         // given
-        MockHttpServletRequest request = new MockHttpServletRequest(method, url);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/1");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         // when && exception
@@ -57,20 +54,21 @@ class AnnotationHandlerMappingTest {
                 .isThrownBy(() -> handlerMapping.handle(request, response));
     }
 
-    @DisplayName("매핑되는 핸들러가 있는지 확인한다")
+    @DisplayName(DEFAULT_PACKAGE + "에 매핑되는 핸들러가 있는지 확인한다")
     @ParameterizedTest
     @CsvSource({
-            "'GET', '/users', 'true'",
-            "'GET', '/none', 'false'",
+            "'GET', '/users/findUserId', 'true'",
+            "'GET', '/users/1', 'false'",
     })
     void isExistHandler(String method, String url, boolean result) {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest(method, url);
 
-        // when
-        boolean existHandler = handlerMapping.supports(request);
-
         // then
-        assertThat(existHandler).isEqualTo(result);
+        assertThat(handlerMapping.supports(request)).isEqualTo(result);
+    }
+
+    @Test
+    void createHandler() {
     }
 }

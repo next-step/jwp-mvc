@@ -1,6 +1,6 @@
 package next.controller;
 
-import core.mvc.JspView;
+import core.mvc.tobe.view.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.DisplayName;
