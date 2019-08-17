@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc;
 
 import core.annotation.Configuration;
 import org.slf4j.Logger;
@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 @Configuration
-public class Environment {
+class Environment {
 
     static final String DEFAULT_ENV_RESOURCE = "application.properties";
-    public static final String ANNOTATION_PACKAGE = "annotation.package";
+    static final String ANNOTATION_PACKAGE = "annotation.package";
 
     private static final Logger logger = LoggerFactory.getLogger(Environment.class);
 
@@ -22,7 +22,7 @@ public class Environment {
         this.properties = properties;
     }
 
-    public static Environment ofDefault() {
+    static Environment ofDefault() {
         return of(DEFAULT_ENV_RESOURCE);
     }
 
@@ -36,7 +36,7 @@ public class Environment {
         }
     }
 
-    public String getProperty(String key) {
+    String getProperty(String key) {
         return properties.getProperty(key);
     }
 }

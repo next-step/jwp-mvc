@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static core.mvc.tobe.Environment.ANNOTATION_PACKAGE;
+import static core.mvc.Environment.ANNOTATION_PACKAGE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)

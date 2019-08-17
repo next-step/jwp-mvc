@@ -1,10 +1,10 @@
-package core.mvc.tobe;
+package core.mvc;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static core.mvc.tobe.Environment.DEFAULT_ENV_RESOURCE;
+import static core.mvc.Environment.DEFAULT_ENV_RESOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EnvironmentTest {
