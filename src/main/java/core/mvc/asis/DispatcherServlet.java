@@ -2,81 +2,70 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.View;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.*;
+import core.utils.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-    private static final String BASE_CONTROLLER_PACKAGE = "next.controller";
+    private static final String BASE_PACKAGE = "next";
 
-    private RequestMapping rm;
-    private AnnotationHandlerMapping annotationHandlerMapping;
-
-    @Override
-    public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
-
-        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_CONTROLLER_PACKAGE);
-        annotationHandlerMapping.initialize();
-    }
+    private List<HandlerMapping> handlerMappings = ListUtils.newArrayList(
+            new RequestMapping(),
+            new AnnotationHandlerMapping(BASE_PACKAGE)
+    );
+    private List<HandlerAdapter> handlerAdapters = ListUtils.newArrayList(
+            new ControllerHandlerAdapter(),
+            new DefaultHandlerAdapter()
+    );
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
-
-        Controller controller = rm.findController(requestUri);
-        if (controller != null) {
-            handleController(controller, req, resp);
-            return;
-        }
-        handleHandlerExecution(req, resp);
+    public void init() {
+        handlerMappings.forEach(HandlerMapping::initialize);
     }
 
-    private void handleController(Controller controller, HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
-    }
-
-    private void handleHandlerExecution(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        try {
-            HandlerExecution handler = annotationHandlerMapping.getHandler(req);
-            ModelAndView modelAndView = handler.handle(req, resp);
-            View view = modelAndView.getView();
-            view.render(modelAndView.getModel(), req, resp);
+            Object handler = findHandler(req);
+            ModelAndView modelAndView = executeHandler(handler, req, resp);
+            render(modelAndView, req, resp);
         } catch (Exception e) {
-            logger.error("Exception : {}", e);
+            logger.error("Failed to handle request", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private ModelAndView executeHandler(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        HandlerAdapter handlerAdapter = handlerAdapters.stream()
+                .filter(adapter -> adapter.canHandle(handler))
+                .findFirst()
+                .orElseThrow(() -> new ServletException("Not found adapter to handle"));
+        return handlerAdapter.handle(handler, req, resp);
+    }
+
+    private Object findHandler(HttpServletRequest req) throws ServletException {
+        return handlerMappings.stream()
+                    .map(handlerMapping -> handlerMapping.getHandler(req))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElseThrow(() -> new ServletException("Not found resource"));
+    }
+
+    private void render(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), req, resp);
     }
 }

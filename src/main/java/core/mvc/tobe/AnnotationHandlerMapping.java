@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private static final AbstractScanner[] SCANNERS = { new SubTypesScanner(), new TypeAnnotationsScanner() };
@@ -28,6 +28,7 @@ public class AnnotationHandlerMapping {
         this.basePackages = basePackages;
     }
 
+    @Override
     public void initialize() {
         Arrays.stream(basePackages)
                 .peek(basePackage -> logger.info("Scan package [{}]", basePackage))
@@ -35,7 +36,7 @@ public class AnnotationHandlerMapping {
                 .flatMap(it -> it.getTypesAnnotatedWith(Controller.class).stream())
                 .flatMap(controllerClass -> Arrays.stream(controllerClass.getMethods()))
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(method -> parseRequestMapping(method));
+                .forEach(this::parseRequestMapping);
     }
 
     private void parseRequestMapping(Method method) {
@@ -64,6 +65,7 @@ public class AnnotationHandlerMapping {
         }
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
