@@ -2,7 +2,6 @@ package next.reflection;
 
 import com.google.common.collect.Maps;
 
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

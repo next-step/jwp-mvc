@@ -68,10 +68,34 @@ public class ReflectionTest {
 
     private static Stream questionConstructorParams() {
         return Stream.of(
-                Arguments.of(Arrays.asList("진호", "첫번째 질문", "첫번째 질문 내용"), "진호", "첫번째 질문", "첫번째 질문 내용", 0),
-                Arguments.of(Arrays.asList(2, "진호", "두번째 질문", "두번째 질문 내용", new Date(), 1), "진호", "두번째 질문", "두번째 질문 내용", 1),
-                Arguments.of(Arrays.asList(3L, "진호", "세번째 질문", "세번째 질문 내용", new Date(), 2), "진호", "세번째 질문", "세번째 질문 내용", 2)
+                Arguments.of(
+                        Arrays.asList("진호", "첫번째 질문", "첫번째 질문 내용"),
+                        "진호",
+                        "첫번째 질문",
+                        "첫번째 질문 내용",
+                        0),
+                Arguments.of(
+                        Arrays.asList(2, "진호", "두번째 질문", "두번째 질문 내용", new Date(), 1),
+                        "진호",
+                        "두번째 질문",
+                        "두번째 질문 내용",
+                        1),
+                Arguments.of(
+                        Arrays.asList(3L, "진호", "세번째 질문", "세번째 질문 내용", new Date(), 2),
+                        "진호",
+                        "세번째 질문",
+                        "세번째 질문 내용",
+                        2)
         );
+    }
+
+    private static boolean isAssignable(Class<?>[] parameterTypes, Object[] values) {
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (!AssignableParameterHelper.isAssignable(parameterTypes[i], values[i].getClass())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @DisplayName("Question 클래스의 이름 확인")
@@ -105,7 +129,8 @@ public class ReflectionTest {
     @DisplayName("Question 클래스의 생성자 확인")
     @ParameterizedTest(name = "name: {0}, modifier: {1}, paramCount: {2}, paramTypes: {3}")
     @MethodSource("constructorProvider")
-    public void showConstructor(String name, int modifier, int paramCount, Class<?>[] paramTypes) throws NoSuchMethodException {
+    public void showConstructor(String name, int modifier, int paramCount, Class<?>[] paramTypes)
+            throws NoSuchMethodException {
         Class<Question> clazz = Question.class;
         final Constructor<Question> constructor = clazz.getDeclaredConstructor(paramTypes);
         assertAll("생성자의 이름, 접근제한자, 인수 개수와 타입 검증",
@@ -128,7 +153,8 @@ public class ReflectionTest {
     @DisplayName("Question 클래스의 메서드 확인")
     @ParameterizedTest(name = "name: {0}, modifier: {1}, returnType: {2}, paramCount: {3}, paramTypes: {4}")
     @MethodSource("methodProvider")
-    void showMethod(String name, int modifier, Class<?> returnType, int paramCount, Class<?>[] paramTypes) throws NoSuchMethodException {
+    void showMethod(String name, int modifier, Class<?> returnType, int paramCount, Class<?>[] paramTypes)
+            throws NoSuchMethodException {
         Class<Question> clazz = Question.class;
         final Method method = clazz.getMethod(name, paramTypes);
         assertAll("생성자의 이름, 접근제한자, 인수 개수와 타입 검증",
@@ -157,7 +183,8 @@ public class ReflectionTest {
     @DisplayName("인자를 가진 Question 클래스의 인스턴스 생성")
     @ParameterizedTest()
     @MethodSource("questionConstructorParams")
-    public void createQuestion(List<Object> valueList, String name, String title, String contents, int countOfComment) throws Exception {
+    public void createQuestion(List<Object> valueList, String name, String title, String contents, int countOfComment)
+            throws Exception {
         final Class<Question> clazz = Question.class;
         final Question question = getQuestion(valueList, clazz);
 
@@ -172,8 +199,16 @@ public class ReflectionTest {
     @DisplayName("core.di.factory.example 패키지에서 @Controller, @Service, @Repository 어노테이션 클래스 목록 출력")
     @Test
     public void showAllAnnotatedClassesInPackage() {
-        final Set<Class<?>> classes = getTypesAnnotatedWith("core.di.factory.example", Controller.class, Service.class, Repository.class);
-        assertThat(classes).containsExactlyInAnyOrder(MyQnaService.class, JdbcQuestionRepository.class, QnaController.class, JdbcUserRepository.class);
+        final Set<Class<?>> classes = getTypesAnnotatedWith(
+                "core.di.factory.example",
+                Controller.class,
+                Service.class,
+                Repository.class);
+        assertThat(classes).containsExactlyInAnyOrder(
+                MyQnaService.class,
+                JdbcQuestionRepository.class,
+                QnaController.class,
+                JdbcUserRepository.class);
     }
 
     private void logConstructors(Constructor<?>[] constructors) {
@@ -246,22 +281,14 @@ public class ReflectionTest {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T getQuestion(List<Object> valueList, Class<T> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    private <T> T getQuestion(List<Object> valueList, Class<T> clazz)
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object[] paramValues = valueList.toArray();
         final Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         final Constructor<?> constructor = Arrays.stream(constructors)
                 .filter(c -> isAssignable(c.getParameterTypes(), paramValues))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
-        return (T)constructor.newInstance(paramValues);
-    }
-
-    private static boolean isAssignable(Class<?>[] parameterTypes, Object[] values) {
-        for (int i = 0; i < parameterTypes.length; i++) {
-            if (!AssignableParameterHelper.isAssignable(parameterTypes[i], values[i].getClass())) {
-                return false;
-            }
-        }
-        return true;
+        return (T) constructor.newInstance(paramValues);
     }
 }
