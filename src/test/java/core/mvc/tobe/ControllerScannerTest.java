@@ -26,6 +26,6 @@ class ControllerScannerTest {
 
         // then
         assertThat(controllers).hasSize(1);
-        assertThat(controllers.keySet()).contains(MyController.class);
+        assertThat(controllers.keySet()).containsOnly(MyController.class);
     }
 }
