@@ -1,5 +1,6 @@
 package core.mvc;
 
+import core.mvc.view.JspView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

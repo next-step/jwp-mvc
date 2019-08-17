@@ -1,8 +1,8 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerExecutor;
-import core.mvc.MappingRegistry;
-import core.mvc.MappingRegistryFactory;
+import core.mvc.handler.HandlerExecutor;
+import core.mvc.mapping.MappingRegistry;
+import core.mvc.mapping.MappingRegistryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
