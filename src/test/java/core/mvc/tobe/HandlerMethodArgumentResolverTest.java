@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,10 +22,12 @@ public class HandlerMethodArgumentResolverTest {
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
     private final Class testUserControllerClass = TestUserController.class;
     private MockHttpServletRequest request;
+    private MockHttpServletResponse response;
 
     @BeforeEach
     void setup() {
         request = new MockHttpServletRequest();
+        response = new MockHttpServletResponse();
     }
 
     @Test
@@ -66,7 +69,7 @@ public class HandlerMethodArgumentResolverTest {
 
         Method method = getMethod("create_javabean", testUserControllerClass.getDeclaredMethods());
 
-        Object[] results = HandlerMethodArgumentResolver.resolve(method, request);
+        Object[] results = HandlerMethodArgumentResolver.resolve(method, request, response);
 
         assertThat(results).hasSize(1);
         assertThat(results[0]).isInstanceOf(TestUser.class);
@@ -86,7 +89,7 @@ public class HandlerMethodArgumentResolverTest {
 
         Method method = getMethod("show_pathvariable", testUserControllerClass.getDeclaredMethods());
 
-        Object[] results = HandlerMethodArgumentResolver.resolve(method, request);
+        Object[] results = HandlerMethodArgumentResolver.resolve(method, request, response);
         assertThat(results).hasSize(1);
         assertThat(results[0]).isEqualTo(id);
     }
@@ -102,9 +105,20 @@ public class HandlerMethodArgumentResolverTest {
 
         Method method = getMethod("create_int_long", testUserControllerClass.getDeclaredMethods());
 
-        Object[] results = HandlerMethodArgumentResolver.resolve(method, request);
+        Object[] results = HandlerMethodArgumentResolver.resolve(method, request, response);
         assertThat(results).hasSize(2);
         assertThat(results[0]).isEqualTo(id);
         assertThat(results[1]).isEqualTo(age);
+    }
+
+    @DisplayName("파라미터가 HttpServletRequest, HttpServletResponse")
+    @Test
+    void request_response() throws Exception {
+        Method method = getMethod("request_response", testUserControllerClass.getDeclaredMethods());
+
+        Object[] results = HandlerMethodArgumentResolver.resolve(method, request, response);
+        assertThat(results).hasSize(2);
+        assertThat(results[0]).isSameAs(request);
+        assertThat(results[1]).isSameAs(response);
     }
 }
