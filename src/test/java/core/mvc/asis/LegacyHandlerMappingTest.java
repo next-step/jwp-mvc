@@ -10,13 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LegacyMvcHandlerMappingTest {
+class LegacyHandlerMappingTest {
 
-    private LegacyMvcHandlerMapping legacyMvcHandlerMapping;
+    private LegacyHandlerMapping legacyHandlerMapping;
 
     @BeforeEach
     void setUp() {
-        legacyMvcHandlerMapping = new LegacyMvcHandlerMapping();
+        legacyHandlerMapping = new LegacyHandlerMapping();
     }
 
     @DisplayName("HandlerMapping 테스트")
@@ -29,10 +29,10 @@ class LegacyMvcHandlerMappingTest {
     void getHandler(String method, String requestUri) {
         //given
         HttpServletRequest req = new MockHttpServletRequest(method, requestUri);
-        legacyMvcHandlerMapping.initialize();
+        legacyHandlerMapping.initialize();
 
         //when
-        Object handler = legacyMvcHandlerMapping.getHandler(req);
+        Object handler = legacyHandlerMapping.getHandler(req);
 
         //then
         assertThat(handler instanceof Controller).isTrue();

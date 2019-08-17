@@ -1,8 +1,7 @@
 package core.mvc.asis;
 
-import core.mvc.tobe.HandlerAdapter;
+import core.mvc.tobe.HandlerAdapters;
 import core.mvc.tobe.HandlerMappings;
-import core.mvc.tobe.ServletHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +18,12 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private HandlerMappings handlerMappings;
-    private HandlerAdapter handlerAdapter;
+    private HandlerAdapters handlerAdapters;
 
     @Override
     public void init() throws ServletException {
         handlerMappings = HandlerMappings.of();
-        handlerAdapter = ServletHandlerAdapter.of(handlerMappings);
+        handlerAdapters = HandlerAdapters.of();
     }
 
     @Override
@@ -41,9 +40,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (handlerAdapter.support(req)) {
-            Object handler = handlerMappings.getHandler(req);
-            handlerAdapter.handle(req, resp, handler);
-        }
+        Object handler = handlerMappings.getHandler(req);
+        handlerAdapters.handle(req, resp, handler);
     }
 }

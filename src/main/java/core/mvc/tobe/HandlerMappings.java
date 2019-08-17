@@ -1,10 +1,11 @@
 package core.mvc.tobe;
 
-import core.mvc.asis.LegacyMvcHandlerMapping;
+import core.mvc.asis.LegacyHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class HandlerMappings {
     private List<HandlerMapping> handlerMappings;
@@ -14,14 +15,14 @@ public class HandlerMappings {
     }
 
     public static HandlerMappings of() {
-        return new HandlerMappings(initLegacyMvcHandlerMapping()
+        return new HandlerMappings(initLegacyHandlerMapping()
                 , initAnnotationHandlerMapping());
     }
 
-    private static LegacyMvcHandlerMapping initLegacyMvcHandlerMapping() {
-        LegacyMvcHandlerMapping lmhm = new LegacyMvcHandlerMapping();
-        lmhm.initialize();
-        return lmhm;
+    private static LegacyHandlerMapping initLegacyHandlerMapping() {
+        LegacyHandlerMapping lhm = new LegacyHandlerMapping();
+        lhm.initialize();
+        return lhm;
     }
 
     private static AnnotationHandlerMapping initAnnotationHandlerMapping() {
@@ -30,16 +31,11 @@ public class HandlerMappings {
         return ahm;
     }
 
-    public boolean support(HttpServletRequest req) {
-        return handlerMappings.stream()
-                .anyMatch(handlerMapping -> handlerMapping.support(req));
-    }
-
     public Object getHandler(HttpServletRequest req) {
         return handlerMappings.stream()
                 .filter(handlerMapping -> handlerMapping.support(req))
                 .map(handlerMapping -> handlerMapping.getHandler(req))
                 .findFirst()
-                .orElseThrow(() -> new IllegalAccessError("비정상 접근입니다."));
+                .orElseThrow(NoSuchElementException::new);
     }
 }

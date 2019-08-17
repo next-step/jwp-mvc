@@ -28,6 +28,6 @@ class HandlerMappingsTest {
         HttpServletRequest req = new MockHttpServletRequest(method, requestUri);
 
         //when & then
-        assertThat(handlerMappings.support(req)).isTrue();
+        assertThat(handlerMappings.getHandler(req)).isNotNull();
     }
 }
