@@ -1,6 +1,4 @@
-package core.mvc.tobe;
-
-import core.mvc.ModelAndView;
+package core.mvc;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -2,7 +2,7 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
 
-public class HandlerKey {
+class HandlerKey {
 
     private String url;
     private RequestMethod requestMethod;

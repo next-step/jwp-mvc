@@ -1,7 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.HandlerMapping;
+import core.mvc.HandlerMapping;
 import core.mvc.tobe.view.ViewGenerator;
 
 import javax.servlet.http.HttpServletRequest;
