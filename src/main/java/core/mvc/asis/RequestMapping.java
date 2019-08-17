@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
+import next.controller.LoginController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,9 @@ public class RequestMapping implements HandlerMapping {
 
     void initialize() {
         logger.info("Initialized Request Mapping!");
+
+        mappings.put("/users/login", new LoginController());
+
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });

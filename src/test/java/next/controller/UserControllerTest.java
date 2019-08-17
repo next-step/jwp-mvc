@@ -59,32 +59,6 @@ class UserControllerTest {
         assertThat(view.getViewName()).isEqualTo("/user/login");
     }
 
-    @DisplayName("로그인 성공")
-    @Test
-    void login() {
-
-        DataBase.addUser(new User("testUser", "1234", "testUser", "test@abc.com"));
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("userId", "testUser");
-        request.setParameter("password", "1234");
-        ModelAndView mav = userController.doLogin(request, new MockHttpServletResponse());
-
-        View view = mav.getView();
-        assertThat(view.getViewName()).isEqualTo("redirect:/");
-    }
-
-    @DisplayName("로그인 실패")
-    @Test
-    void loginFailed() {
-        ModelAndView mav = userController.doLogin(new MockHttpServletRequest(), new MockHttpServletResponse());
-
-        View view = mav.getView();
-        Object loginFailed = mav.getObject("loginFailed");
-        assertThat(view.getViewName()).isEqualTo("/user/login");
-        assertThat(loginFailed).isEqualTo(true);
-    }
-
     @DisplayName("회원 가입")
     @Test
     void register() {

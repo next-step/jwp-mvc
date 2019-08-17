@@ -44,33 +44,6 @@ public class UserController {
         return new ModelAndView(new JspView("/user/login"));
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView doLogin(HttpServletRequest req, HttpServletResponse resp) {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
-        User user = DataBase.findUserById(userId);
-
-        ModelAndView mav = new ModelAndView();
-
-        if (user == null) {
-            mav.addView(new JspView("/user/login"));
-            mav.addObject("loginFailed", true);
-            return mav;
-        }
-
-        if (user.matchPassword(password)) {
-            HttpSession session = req.getSession();
-            session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            mav.addView(new RedirectView("redirect:/"));
-            return mav;
-        }
-
-        mav.addView(new JspView("/user/login"));
-        mav.addObject("loginFailed", true);
-        return mav;
-
-    }
-
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) {
         HttpSession session = req.getSession();
