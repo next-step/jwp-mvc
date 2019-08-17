@@ -17,11 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MyControllerTest {
 
     private AnnotationHandlerMapping handlerMapping;
-
     @BeforeEach
     void setUp() {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
     }
 
     @DisplayName("url과 method별 요청시 반환되는 view name 확인")

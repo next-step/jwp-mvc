@@ -21,6 +21,10 @@ public class DataBase {
         return users.get(userId);
     }
 
+    public static void deleteAll() {
+        users.clear();
+    }
+
     public static Collection<User> findAll() {
         return users.values();
     }
