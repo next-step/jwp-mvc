@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -40,23 +41,21 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
-
-        ModelAndView modelAndView = mappingHandlers.stream()
-                .filter(handlerMapping -> handlerMapping.isExists(req))
-                .findFirst()
-                .map(serve(req, resp))
-                .orElseThrow(NotFoundServletException::new);
-
         try {
+            ModelAndView modelAndView = mappingHandlers.stream()
+                    .filter(handlerMapping -> handlerMapping.supports(req))
+                    .findFirst()
+                    .map(serve(req, resp))
+                    .orElseThrow(NotFoundServletException::new);
+
             View view = modelAndView.getView();
             view.render(modelAndView.getModel(), req, resp);
+        } catch (NotFoundServletException e) {
+            resp.sendError(SC_NOT_FOUND);
         } catch (Exception e) {
             logger.error("View render exception", e);
-            if (e instanceof NotFoundServletException) {
-                resp.setStatus(SC_NOT_FOUND);
-            }
             throw new ServletException(e.getMessage());
         }
     }
