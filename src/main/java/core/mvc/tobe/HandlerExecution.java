@@ -1,6 +1,5 @@
 package core.mvc.tobe;
 
-import com.sun.xml.internal.ws.handler.HandlerException;
 import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,16 +12,16 @@ public class HandlerExecution {
     private Object controller;
     private Method method;
 
-    public HandlerExecution(Object controller, Method method) {
+    HandlerExecution(Object controller, Method method) {
         this.controller = controller;
         this.method = method;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
+    ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
         try {
             return (ModelAndView) method.invoke(controller, request, response);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new HandlerException(e);
+            throw new HandleException(e);
         }
     }
 
