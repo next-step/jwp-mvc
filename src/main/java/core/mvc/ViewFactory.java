@@ -8,9 +8,9 @@ public final class ViewFactory {
 
     public static View create(final String viewName) {
         if (viewName.startsWith(REDIRECT_PREFIX)) {
-            return new RedirectView(viewName.substring(REDIRECT_PREFIX.length()));
+            return RedirectView.of(viewName.substring(REDIRECT_PREFIX.length()));
         }
 
-        return new JspView(viewName);
+        return JspView.of(viewName);
     }
 }
