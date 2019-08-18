@@ -72,6 +72,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .toArray(HandlerKey[]::new);
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         final String requestUri = request.getRequestURI();
         final RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());

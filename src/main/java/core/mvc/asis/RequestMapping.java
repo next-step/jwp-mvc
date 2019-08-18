@@ -1,7 +1,10 @@
 package core.mvc.asis;
 
 import core.mvc.tobe.HandlerMapping;
-import next.controller.*;
+import next.controller.HomeController;
+import next.controller.LogoutController;
+import next.controller.UpdateFormUserController;
+import next.controller.UpdateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +21,6 @@ public class RequestMapping implements HandlerMapping {
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
-        mappings.put("/users/login", new LoginController());
-        mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
@@ -32,11 +33,7 @@ public class RequestMapping implements HandlerMapping {
 
     @Override
     public Controller getHandler(HttpServletRequest request) {
-        return this.findController(request.getRequestURI());
-    }
-
-    public Controller findController(String url) {
-        return mappings.get(url);
+        return mappings.get(request.getRequestURI());
     }
 
     void put(String url, Controller controller) {

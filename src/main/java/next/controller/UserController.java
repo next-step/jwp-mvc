@@ -23,20 +23,34 @@ public class UserController {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return new ModelAndView(new JspView("redirect:/users/loginForm"));
         }
-        req.setAttribute("users", DataBase.findAll());
 
         final ModelAndView modelAndView = new ModelAndView(new JspView("/user/list.jsp"));
         modelAndView.addObject("users", DataBase.findAll());
         return modelAndView;
     }
 
-    @RequestMapping(value="/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
+        User user = new User(
+                req.getParameter("userId"),
+                req.getParameter("password"),
+                req.getParameter("name"),
                 req.getParameter("email"));
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
         return new ModelAndView(new JspView("redirect:/"));
+    }
+
+    @RequestMapping("/users/profile")
+    public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        String userId = req.getParameter("userId");
+        User user = DataBase.findUserById(userId);
+        if (user == null) {
+            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+        }
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/profile.jsp"));
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 }

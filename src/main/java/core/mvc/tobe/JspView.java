@@ -10,12 +10,16 @@ import java.util.Map;
 public class JspView implements View {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private final String viewName;
+
     public JspView(String viewName) {
         this.viewName = viewName;
     }
 
     @Override
-    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        this.bindModel(model, request);
+
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
             response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;
@@ -23,5 +27,11 @@ public class JspView implements View {
 
         RequestDispatcher rd = request.getRequestDispatcher(viewName);
         rd.forward(request, response);
+    }
+
+    private void bindModel(Map<String, ?> model, HttpServletRequest request) {
+        for (Map.Entry<String, ?> keyValue : model.entrySet()) {
+            request.setAttribute(keyValue.getKey(), keyValue.getValue());
+        }
     }
 }
