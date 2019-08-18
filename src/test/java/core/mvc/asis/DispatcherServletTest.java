@@ -27,6 +27,8 @@ class DispatcherServletTest {
         dispatcherServlet.service(request, response);
 
         assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getForwardedUrl()).isNotBlank();
+        assertThat(response.getRedirectedUrl()).isNull();
     }
 
     @Test
@@ -38,5 +40,7 @@ class DispatcherServletTest {
         dispatcherServlet.service(request, response);
 
         assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getForwardedUrl()).isNotBlank();
+        assertThat(response.getRedirectedUrl()).isNull();
     }
 }
