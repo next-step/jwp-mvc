@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.mapping;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.server.PathContainer;

@@ -1,9 +1,11 @@
-package core.mvc.tobe;
+package core.mvc.mapping;
 
 public class TestUser {
     private String userId;
     private String password;
     private int age;
+
+    private TestUser() {}
 
     public TestUser(String userId, String password, int age) {
         this.userId = userId;

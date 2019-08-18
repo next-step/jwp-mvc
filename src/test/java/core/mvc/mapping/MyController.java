@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.mapping;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;

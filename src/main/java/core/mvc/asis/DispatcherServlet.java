@@ -1,8 +1,8 @@
 package core.mvc.asis;
 
-import core.mvc.MappingHandlerAdapter;
-import core.mvc.MappingRegistry;
-import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.handler.HandlerExecutor;
+import core.mvc.mapping.MappingRegistry;
+import core.mvc.mapping.MappingRegistryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,15 +18,12 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private MappingHandlerAdapter mappingHandlerAdapter;
+    private HandlerExecutor handlerExecutor;
 
     @Override
     public void init() throws ServletException {
-        MappingRegistry registry = new MappingRegistry(
-                new AnnotationHandlerMapping(""), new RequestMapping()
-        );
-
-        mappingHandlerAdapter = new MappingHandlerAdapter(registry);
+        MappingRegistry registry = MappingRegistryFactory.create("next.controller");
+        handlerExecutor = new HandlerExecutor(registry);
     }
 
     @Override
@@ -35,7 +32,7 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            mappingHandlerAdapter.handle(req, resp);
+            handlerExecutor.execute(req, resp);
         } catch (Throwable e) {
             logger.error("Exception!!!", e);
             throw new ServletException(e.getMessage());

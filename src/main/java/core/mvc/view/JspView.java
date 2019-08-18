@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
