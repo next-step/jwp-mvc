@@ -1,5 +1,6 @@
 package core.mvc.mapping;
 
+import core.annotation.web.Controller;
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Controller
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 

@@ -2,7 +2,6 @@ package core.mvc.mapping;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
 import core.mvc.handler.HandlerExecution;
 import core.mvc.handler.HandlerMapping;
 import org.reflections.ReflectionUtils;
@@ -16,6 +15,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private HandlerExecutionRegistry handlerExecutionRegistry = new HandlerExecutionRegistry();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -31,18 +31,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private void putHandlerExecutions(Class<?> controllerClass, Object instance) {
         Set<Method> methods = ReflectionUtils.getAllMethods(controllerClass, ReflectionUtils.withAnnotation(RequestMapping.class));
-        methods.forEach(method -> handlerExecutions.put(createHandlerKey(method), new HandlerExecution(instance, method)));
-    }
-
-    private HandlerKey createHandlerKey(Method method) {
-        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        return new HandlerKey(requestMapping.value(), requestMapping.method());
+        methods.forEach(method -> handlerExecutionRegistry.add(instance, method));
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        return handlerExecutionRegistry.getHandlerExecution(request);
     }
 }
