@@ -20,6 +20,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String NEXT_CONTROLLER_PACKAGE = "next.controller";
 
     private RequestMapping rm;
     private AnnotationHandlerMapping handlerMapping;
@@ -29,7 +30,7 @@ public class DispatcherServlet extends HttpServlet {
         rm = new RequestMapping();
         rm.initMapping();
 
-        handlerMapping = new AnnotationHandlerMapping("next.controller");
+        handlerMapping = new AnnotationHandlerMapping(NEXT_CONTROLLER_PACKAGE);
         handlerMapping.initialize();
     }
 
@@ -40,7 +41,7 @@ public class DispatcherServlet extends HttpServlet {
 
         final HandlerExecution handlerExecution = handlerMapping.getHandler(req);
         try {
-            if(handlerExecution == null) {
+            if (handlerExecution == null) {
                 Controller controller = rm.findController(requestUri);
                 String viewName = controller.execute(req, resp);
                 move(viewName, req, resp);
