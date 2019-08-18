@@ -6,7 +6,9 @@ import core.annotation.web.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
@@ -19,7 +21,7 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        final Set<Object> controllers = ControllerCollector.collect(basePackage);
+        final Set<Object> controllers = ControllerScanner.scan(basePackage);
         controllers.stream().map(this::mapToHandlerExecutions)
                 .forEach(handlerExecutions::putAll);
     }
@@ -52,7 +54,7 @@ public class AnnotationHandlerMapping {
         final String requestUri = request.getRequestURI();
         final RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         final HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, rm));
-        if(handlerExecution != null) {
+        if (handlerExecution != null) {
             return handlerExecution;
         }
         return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.DEFAULT));

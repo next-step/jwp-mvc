@@ -186,7 +186,7 @@ public class ReflectionTest {
     public void createQuestion(List<Object> valueList, String name, String title, String contents, int countOfComment)
             throws Exception {
         final Class<Question> clazz = Question.class;
-        final Question question = getQuestion(valueList, clazz);
+        final Question question = createInstance(clazz, valueList);
 
         assertAll("인자 목록을 이용하여 Question 클래스의 인스턴스를 생성",
                 () -> assertThat(question.getWriter()).isEqualTo(name),
@@ -281,7 +281,7 @@ public class ReflectionTest {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T getQuestion(List<Object> valueList, Class<T> clazz)
+    private <T> T createInstance(Class<T> clazz, List<Object> valueList)
             throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object[] paramValues = valueList.toArray();
         final Constructor<?>[] constructors = clazz.getDeclaredConstructors();
