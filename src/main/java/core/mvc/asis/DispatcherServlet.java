@@ -6,6 +6,9 @@ import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.ExceptionConsumerSupplier;
 import core.mvc.tobe.ExceptionFunctionSupplier;
 import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.argumentresolver.MethodArgumentHandler;
+import core.mvc.tobe.argumentresolver.NumberArgumentResolver;
+import core.mvc.tobe.argumentresolver.UserArgumentResolver;
 import core.mvc.tobe.handleradapter.ControllerHandlerAdapter;
 import core.mvc.tobe.handleradapter.HandlerAdapter;
 import core.mvc.tobe.handleradapter.HandlerExecutionHandlerAdapter;
@@ -31,11 +34,18 @@ public class DispatcherServlet extends HttpServlet {
 
     private List<HandlerMapping> handlerMappings = Lists.newArrayList();
     private List<HandlerAdapter> handlerAdapters = Lists.newArrayList();
+    private MethodArgumentHandler methodArgumentHandler = new MethodArgumentHandler();
 
     @Override
     public void init() {
         handlerMappingsInit();
         handlerAdaptersInit();
+        methodArgumentHandlerInit();
+    }
+
+    private void methodArgumentHandlerInit() {
+        methodArgumentHandler.add(new NumberArgumentResolver());
+        methodArgumentHandler.add(new UserArgumentResolver());
     }
 
     private void handlerAdaptersInit() {

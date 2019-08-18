@@ -1,15 +1,19 @@
 package core.mvc.tobe;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import core.mvc.tobe.argumentresolver.NumberArgumentResolver;
+import core.mvc.tobe.argumentresolver.HandlerMethodArgumentResolver;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,8 +23,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private static final String MAPPING_INFO_LOG_FORMAT = "{}, execution method: {}";
 
     private Object[] basePackage;
-
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers = Lists.newArrayList();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -29,6 +33,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public void initialize() {
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
         initHandlerExecution(controllerScanner.getInstantiateControllerMap());
+        handlerMethodArgumentResolvers.add(new NumberArgumentResolver());
     }
 
     private void initHandlerExecution(Map<Class<?>, Object> instantiateControllerMap) {
@@ -51,7 +56,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private HandlerExecution getHandlerExecution(Object controller, Method method) {
-        return (request, response) -> (ModelAndView) method.invoke(controller, request, response);
+        return (request, response) -> {
+            return (ModelAndView) method.invoke(controller, request, response);
+        };
     }
 
     private HandlerKey createHandlerKey(RequestMapping requestMapping) {
