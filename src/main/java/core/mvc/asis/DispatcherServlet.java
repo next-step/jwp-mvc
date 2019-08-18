@@ -1,70 +1,61 @@
 package core.mvc.asis;
 
+import com.google.common.collect.Sets;
 import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerAdapter;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerAdapters;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final String NEXT_CONTROLLER_PACKAGE = "next.controller";
 
-    private RequestMapping rm;
-    private AnnotationHandlerMapping handlerMapping;
+    private HandlerMappings handlerMappings;
+    private HandlerAdapters handlerAdapters;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        handlerMappings = new HandlerMappings(Sets.newHashSet(
+                new RequestMapping(),
+                new AnnotationHandlerMapping(NEXT_CONTROLLER_PACKAGE)
+        ));
 
-        handlerMapping = new AnnotationHandlerMapping(NEXT_CONTROLLER_PACKAGE);
-        handlerMapping.initialize();
+        handlerAdapters = new HandlerAdapters(Sets.newHashSet(
+                new ControllerHandlerAdapter(),
+                new AnnotationHandlerAdapter()
+        ));
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String requestUri = request.getRequestURI();
+        logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        final HandlerExecution handlerExecution = handlerMapping.getHandler(req);
         try {
-            if (handlerExecution == null) {
-                Controller controller = rm.findController(requestUri);
-                String viewName = controller.execute(req, resp);
-                move(viewName, req, resp);
-                return;
-            }
-            final ModelAndView modelAndView = handlerExecution.handle(req, resp);
-            final Map<String, Object> model = modelAndView.getModel();
-            modelAndView.getView().render(model, req, resp);
-
+            final Object handler = handlerMappings.get(request);
+            final ModelAndView modelAndView = handlerAdapters.execute(handler, request, response);
+            render(modelAndView, request, response);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+    private void render(ModelAndView modelAndView, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        final View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), request, response);
     }
 }
