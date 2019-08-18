@@ -6,26 +6,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
-public class JspView implements View {
+public class RedirectView implements View {
 
     private static final Map<String, View> CACHE = new WeakHashMap<>();
 
     private final String viewName;
 
-    private JspView(final String viewName) {
+    private RedirectView(final String viewName) {
         this.viewName = viewName;
     }
 
     static View of(final String viewName) {
-        return CACHE.computeIfAbsent(viewName, JspView::new);
+        return CACHE.computeIfAbsent(viewName, RedirectView::new);
     }
 
     @Override
     public void render(final Map<String, ?> model,
                        final HttpServletRequest request,
                        final HttpServletResponse response) throws Exception {
-        request.getRequestDispatcher(viewName)
-                .forward(request, response);
+        response.sendRedirect(viewName);
     }
 
     @Override
@@ -33,11 +32,11 @@ public class JspView implements View {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof JspView)) {
+        if (!(o instanceof RedirectView)) {
             return false;
         }
 
-        final JspView that = (JspView) o;
+        final RedirectView that = (RedirectView) o;
         return Objects.equals(viewName, that.viewName);
     }
 
