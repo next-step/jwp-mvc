@@ -9,13 +9,16 @@ import java.lang.reflect.Method;
 public class HandlerExecution {
     private Object instance;
     private Method method;
+    private HandlerMethodArgumentResolver argumentResolver;
 
     public HandlerExecution(Object instance, Method method) {
         this.instance = instance;
         this.method = method;
+        this.argumentResolver = new HandlerMethodArgumentResolver();
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(instance, request, response);
+        Object[] arguments = argumentResolver.getMethodArguments(request, method);
+        return (ModelAndView) method.invoke(instance, arguments);
     }
 }

@@ -8,18 +8,19 @@ import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class ListUserController {
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (!UserSessionUtils.isLogined(req.getSession())) {
+    public ModelAndView execute(HttpSession session) throws Exception {
+        if (!UserSessionUtils.isLogined(session)) {
             return new ModelAndView(new RedirectView("redirect:/users/loginForm"));
         }
-        req.setAttribute("users", DataBase.findAll());
 
-        return new ModelAndView(new JspView("/user/list.jsp"));
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/list.jsp"));
+        modelAndView.addObject("users", DataBase.findAll());
+
+        return modelAndView;
     }
 }
