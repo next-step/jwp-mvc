@@ -11,16 +11,8 @@ public class ModelAndView {
     public ModelAndView() {
     }
 
-    public ModelAndView(String viewName) {
-        this(View.parse(viewName));
-    }
-
     public ModelAndView(View view) {
         addView(view);
-    }
-
-    public ModelAndView addView(String viewName) {
-        return addView(View.parse(viewName));
     }
 
     public ModelAndView addView(View view) {

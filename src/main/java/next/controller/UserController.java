@@ -4,7 +4,9 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +21,12 @@ public class UserController {
 
     @RequestMapping("/users")
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView modelAndView = new ModelAndView();
         if (!UserSessionUtils.isLogined(request.getSession())) {
-            return new ModelAndView("redirect:/users/loginForm");
+            return new ModelAndView(new RedirectView("redirect:/users/loginForm"));
         }
 
-        modelAndView.addView("/user/list.jsp");
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addView(new JspView("/user/list.jsp"));
         modelAndView.addObject("users", DataBase.findAll());
         return modelAndView;
     }
@@ -39,6 +41,6 @@ public class UserController {
         );
         DataBase.addUser(user);
 
-        return new ModelAndView("redirect:/users");
+        return new ModelAndView(new RedirectView("redirect:/users"));
     }
 }
