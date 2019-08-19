@@ -1,12 +1,16 @@
 package core.mvc;
 
+import core.annotation.web.PathVariable;
+
+import java.lang.reflect.Parameter;
+
 public class MethodParameter {
     private String name;
-    private Class<?> type;
+    private Parameter parameter;
 
-    public MethodParameter(String name, Class<?> type) {
+    public MethodParameter(String name, Parameter parameter) {
         this.name = name;
-        this.type = type;
+        this.parameter = parameter;
     }
 
     public String getName() {
@@ -14,6 +18,10 @@ public class MethodParameter {
     }
 
     public Class<?> getType() {
-        return type;
+        return this.parameter.getType();
+    }
+
+    public boolean isPathVariable() {
+        return this.parameter.isAnnotationPresent(PathVariable.class);
     }
 }

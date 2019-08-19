@@ -1,5 +1,6 @@
 package next.controller;
 
+import com.sun.tools.internal.xjc.model.Model;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -19,7 +20,8 @@ public class LoginController {
         if (user == null) {
             ModelAndView modelAndView = new ModelAndView(new JspView("/user/login.jsp"));
             modelAndView.addObject("loginFailed", true);
-            return new ModelAndView(new JspView("/user/login.jsp"));
+
+            return modelAndView;
         }
 
         if (user.matchPassword(password)) {
@@ -27,8 +29,10 @@ public class LoginController {
 
             return new ModelAndView(new RedirectView("redirect:/"));
         } else {
-            //req.setAttribute("loginFailed", true);
-            return new ModelAndView(new JspView("/user/login.jsp")).addObject("loginFailed", true);
+            ModelAndView modelAndView = new ModelAndView(new JspView("/user/login.jsp"));
+            modelAndView.addObject("loginFailed", true);
+
+            return modelAndView;
         }
     }
 }
