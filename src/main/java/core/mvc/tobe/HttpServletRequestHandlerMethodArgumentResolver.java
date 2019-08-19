@@ -7,7 +7,7 @@ public class HttpServletRequestHandlerMethodArgumentResolver implements HandlerM
 
     @Override
     public boolean supportsParameter(final MethodParameters parameter, final HttpRequestParameters requestParameters) {
-        return parameter.contains(HttpServletRequest.class);
+        return parameter.isParameterTypePresent(HttpServletRequest.class);
     }
 
     @Override

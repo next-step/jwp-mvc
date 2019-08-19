@@ -57,4 +57,13 @@ class AnnotationHandlerMappingTest {
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
     }
+
+    @Test
+    void pathVariable() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.handle(request, response);
+    }
 }

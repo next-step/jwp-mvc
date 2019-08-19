@@ -13,10 +13,10 @@ public class CommandHandlerMethodArgumentResolver implements HandlerMethodArgume
     public boolean supportsParameter(final MethodParameters methodParameters, final HttpRequestParameters requestParameters) {
         return methodParameters.stream()
                 .anyMatch(entry -> {
-                    final Class<?> commandParameter = entry.getValue().getType();
-                    return !commandParameter.isPrimitive() &&
-                            !commandParameter.equals(String.class) &&
-                            !methodParameters.contains(HttpServletRequest.class);
+                    final Class<?> commandParameterType = entry.getValue().getType();
+                    return !commandParameterType.isPrimitive() &&
+                            !commandParameterType.equals(String.class) &&
+                            !methodParameters.isParameterTypePresent(HttpServletRequest.class);
                 });
     }
 
@@ -34,6 +34,15 @@ public class CommandHandlerMethodArgumentResolver implements HandlerMethodArgume
                 .toArray();
     }
 
+    private Stream<?> newInstanceFromConstructor(final Class<?> commandParameter, final HttpRequestParameters requestParameters) {
+        return Arrays.stream(commandParameter.getDeclaredConstructors())
+                .map(ExceptionWrapper.function(constructor -> {
+                    final MethodParameters constructorParameter = new MethodParameters(constructor);
+                    final Object[] parameters = getParameters(constructorParameter, requestParameters);
+                    return constructor.newInstance(parameters);
+                }));
+    }
+
     private Object[] getParameters(final MethodParameters methodParameters, final HttpRequestParameters requestParameters) {
         return methodParameters.stream()
                 .filter(entry -> requestParameters.containsKey(entry.getKey()))
@@ -45,11 +54,4 @@ public class CommandHandlerMethodArgumentResolver implements HandlerMethodArgume
                 .toArray();
     }
 
-    private Stream<?> newInstanceFromConstructor(final Class<?> commandParameter, final HttpRequestParameters requestParameters) {
-        return Arrays.stream(commandParameter.getDeclaredConstructors())
-                .map(ExceptionWrapper.function(constructor -> {
-                    final MethodParameters constructorParameter = new MethodParameters(constructor);
-                    return constructor.newInstance(getParameters(constructorParameter, requestParameters));
-                }));
-    }
 }

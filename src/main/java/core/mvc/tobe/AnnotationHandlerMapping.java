@@ -5,12 +5,14 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.exception.AlreadyExistsException;
 import core.exception.ExceptionWrapper;
+import core.exception.NotFoundException;
 import core.mvc.HandlerMapping;
 import org.apache.commons.lang3.ArrayUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -46,8 +48,18 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
+
         RequestMethod rm = RequestMethod.valueOfMethod(request.getMethod());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+
+        final HandlerKey handlerKey = handlerExecutions.keySet().stream()
+                .filter(key -> {
+                    final PathPattern pathPattern = PathPatternUtils.parse(key.getUrl());
+                    return pathPattern.matches(PathPatternUtils.toPathContainer(requestUri));
+                })
+                .findFirst()
+                .orElseThrow(NotFoundException::new);
+
+        return handlerExecutions.get(new HandlerKey(handlerKey.getUrl(), rm));
     }
 
     private ConfigurationBuilder configurationBuilder(final Object... basePackage) {

@@ -15,6 +15,7 @@ public class HandlerExecution {
 
     static {
         argumentResolvers.add(new HttpServletRequestHandlerMethodArgumentResolver());
+        argumentResolvers.add(new AnnotationHandlerMethodArgumentResolver());
         argumentResolvers.add(new ParameterMapHandlerMethodArgumentResolver());
         argumentResolvers.add(new CommandHandlerMethodArgumentResolver());
     }
