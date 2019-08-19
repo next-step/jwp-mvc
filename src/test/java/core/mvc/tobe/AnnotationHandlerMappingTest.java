@@ -20,7 +20,9 @@ public class AnnotationHandlerMappingTest {
     private static Stream requestProvider() {
         return Stream.of(
                 Arguments.of("/users/findUserId", "GET"),
-                Arguments.of("/users", "POST")
+                Arguments.of("/users", "POST"),
+                Arguments.of("/users", "GET"),
+                Arguments.of("/users", "PUT")
         );
     }
 
@@ -41,7 +43,7 @@ public class AnnotationHandlerMappingTest {
         Assertions.assertThat(modelAndView.getClass()).isEqualTo(ModelAndView.class);
     }
 
-    @DisplayName("@RequestMapping 에 RequestMethod 를 설정하지 않으면 모든 메서드 설정")
+    @DisplayName("@RequestMapping RequestMethod 없이 RequestURI 만 설정하면 모든 메서드를 설정")
     @ParameterizedTest(name = "RequestMethod: {0}")
     @ValueSource(strings = {"GET", "POST", "PUT", "DELETE", "OPTIONS"})
     public void shouldMappedAllMethod_When_NotSetAnnotation(String method) throws Exception {
