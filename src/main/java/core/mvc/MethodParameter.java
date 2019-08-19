@@ -40,12 +40,12 @@ public class MethodParameter {
     }
 
     public boolean isPathVariable() {
-        return Arrays.asList(annotations)
-                .contains(PathVariable.class);
+        return Arrays.stream(annotations)
+                .anyMatch(annotation -> annotation.annotationType() == PathVariable.class);
     }
 
     public boolean isAnnotationNotExist() {
-        return annotations.length == 0;
+        return annotations == null || annotations.length == 0;
     }
 
     public boolean isPrimitiveType() {

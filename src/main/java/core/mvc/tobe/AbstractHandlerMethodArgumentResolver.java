@@ -25,6 +25,6 @@ public abstract class AbstractHandlerMethodArgumentResolver implements HandlerMe
             return value;
         }
 
-        throw new Exception("Type TypeMismatch");
+        throw new Exception("TypeMismatch");
     }
 }
