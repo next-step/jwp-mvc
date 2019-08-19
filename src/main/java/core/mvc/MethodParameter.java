@@ -18,10 +18,14 @@ public class MethodParameter {
     }
 
     public Class<?> getType() {
-        return this.parameter.getType();
+        return parameter.getType();
     }
 
     public boolean isPathVariable() {
-        return this.parameter.isAnnotationPresent(PathVariable.class);
+        return parameter.isAnnotationPresent(PathVariable.class);
+    }
+
+    public boolean isAnnotationNotExist() {
+        return parameter.getAnnotations().length == 0;
     }
 }
