@@ -19,7 +19,19 @@ public class JspView implements View {
       throws Exception {
 
     model.forEach(request::setAttribute);
-    RequestDispatcher rd = request.getRequestDispatcher(path + JSP_VIEW_POSTFIX);
+
+    RequestDispatcher rd = request.getRequestDispatcher(getPath());
     rd.forward(request, response);
+  }
+
+  private String getPath() {
+    if (hasJspPostFix()) {
+      return path;
+    }
+    return path + JSP_VIEW_POSTFIX;
+  }
+
+  private boolean hasJspPostFix() {
+    return path.indexOf(JSP_VIEW_POSTFIX) > -1;
   }
 }

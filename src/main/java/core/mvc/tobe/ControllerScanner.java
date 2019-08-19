@@ -1,9 +1,10 @@
 package core.mvc.tobe;
 
+import static java.util.stream.Collectors.toMap;
+
 import core.annotation.web.Controller;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,6 @@ public class ControllerScanner {
 
   private static final Class<Controller> CONTROLLER = Controller.class;
   private String basePackage;
-
 
   public ControllerScanner(String basePackage) {
     this.basePackage = basePackage;
@@ -29,16 +29,17 @@ public class ControllerScanner {
 
   private Map<Class, Object> instantiateControllers(Set<Class<?>> typesAnnotatedWith) {
     return typesAnnotatedWith.stream()
-        .collect(Collectors.toMap(clazz -> clazz, clazz -> {
-          try {
-            return clazz.newInstance();
-          } catch (InstantiationException e) {
-            logger.error("error {}", e.getMessage());
-          } catch (IllegalAccessException e) {
-            logger.error("error {}", e.getMessage());
-          }
-          return null;
-        }));
+        .collect(
+            toMap(clazz -> clazz, clazz -> getNewInstance(clazz)));
+  }
+
+  private Object getNewInstance(Class<?> clazz) {
+    try {
+      return clazz.newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      logger.error("error {}", e.getMessage());
+    }
+    return null;
   }
 
 }

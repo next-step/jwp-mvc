@@ -1,14 +1,12 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerAdaptor;
 import core.mvc.Mapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +19,10 @@ public class DispatcherServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
   private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-  private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
 
   private List<Mapping> mappings = new ArrayList<>();
+  private List<HandlerAdaptor> handlerAdaptors;
 
   @Override
   public void init() {
@@ -33,43 +31,30 @@ public class DispatcherServlet extends HttpServlet {
 
     mappings.stream()
         .forEach(mapping -> mapping.initMapping());
+
+    handlerAdaptors = Arrays.asList(new ControllerAdaptor(), new HandlerExecutionAdaptor());
   }
 
   @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException {
+  protected void service(HttpServletRequest req, HttpServletResponse resp) {
     logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-    Object controller = findController(req);
+    Object handler = findController(req);
+    HandlerAdaptor adaptor = findAdaptor(handler);
 
-    if (controller instanceof Controller) {
-      controllerExecute(req, resp, (Controller) controller);
-      return;
-    } else if (controller instanceof HandlerExecution) {
-      annotationControllerExecute(req, resp, (HandlerExecution) controller);
-      return;
-    }
-  }
-
-  private void annotationControllerExecute(HttpServletRequest req, HttpServletResponse resp,
-      HandlerExecution handlerExecution) {
     try {
-      ModelAndView modelAndView = handlerExecution.handle(req, resp);
+      ModelAndView modelAndView = adaptor.handle(handler, req, resp);
       modelAndView.render(modelAndView.getModel(), req, resp);
     } catch (Exception e) {
       logger.error("Exception : {}", e);
     }
   }
 
-  private void controllerExecute(HttpServletRequest req, HttpServletResponse resp,
-      Controller controller) throws ServletException {
-    try {
-      String viewName = controller.execute(req, resp);
-      move(viewName, req, resp);
-    } catch (Throwable e) {
-      logger.error("Exception : {}", e);
-      throw new ServletException(e.getMessage());
-    }
+  private HandlerAdaptor findAdaptor(Object handler) {
+    return handlerAdaptors.stream()
+        .filter(adaptor -> adaptor.isCanHandle(handler))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException("Controller를 수행할 Adaptor가 없습니다."));
   }
 
   private Object findController(HttpServletRequest req) {
@@ -78,16 +63,5 @@ public class DispatcherServlet extends HttpServlet {
         .filter(controller -> controller != null)
         .findFirst()
         .orElseThrow(() -> new RuntimeException("요청에 대한 Controller 가 없습니다."));
-  }
-
-  private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
-    if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-      resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-      return;
-    }
-
-    RequestDispatcher rd = req.getRequestDispatcher(viewName);
-    rd.forward(req, resp);
   }
 }
