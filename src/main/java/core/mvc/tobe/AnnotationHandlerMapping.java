@@ -1,19 +1,18 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import core.mvc.tobe.argumentresolver.HttpServletObjectArgumentResolver;
+import core.mvc.tobe.argumentresolver.MethodArgumentHandler;
 import core.mvc.tobe.argumentresolver.NumberArgumentResolver;
-import core.mvc.tobe.argumentresolver.HandlerMethodArgumentResolver;
+import core.mvc.tobe.argumentresolver.UserArgumentResolver;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,8 +22,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private static final String MAPPING_INFO_LOG_FORMAT = "{}, execution method: {}";
 
     private Object[] basePackage;
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-    private List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers = Lists.newArrayList();
+    private HandlerExecutionsManager handlerExecutionsManager = new HandlerExecutionsManager();
+    private MethodArgumentHandler methodArgumentHandler = new MethodArgumentHandler();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -33,7 +32,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public void initialize() {
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
         initHandlerExecution(controllerScanner.getInstantiateControllerMap());
-        handlerMethodArgumentResolvers.add(new NumberArgumentResolver());
+        methodArgumentHandlerInit();
+    }
+
+    private void methodArgumentHandlerInit() {
+        methodArgumentHandler.add(new NumberArgumentResolver());
+        methodArgumentHandler.add(new UserArgumentResolver());
+        methodArgumentHandler.add(new HttpServletObjectArgumentResolver());
     }
 
     private void initHandlerExecution(Map<Class<?>, Object> instantiateControllerMap) {
@@ -50,14 +55,15 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         for (Method method : methods) {
             HandlerKey handlerKey = createHandlerKey(method.getAnnotation(requestMappingClass));
             HandlerExecution handlerExecution = getHandlerExecution(controller, method);
-            handlerExecutions.put(handlerKey, handlerExecution);
+            handlerExecutionsManager.put(handlerKey, handlerExecution);
             loggingMappingInfo(handlerKey, method);
         }
     }
 
     private HandlerExecution getHandlerExecution(Object controller, Method method) {
         return (request, response) -> {
-            return (ModelAndView) method.invoke(controller, request, response);
+            Object[] values = methodArgumentHandler.getValues(method, request, response);
+            return (ModelAndView) method.invoke(controller, values);
         };
     }
 
@@ -71,17 +77,17 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public Set<HandlerKey> getHandlerKeys() {
-        return this.handlerExecutions.keySet();
+        return this.handlerExecutionsManager.keySet();
     }
 
     public boolean isHandlerKeyPresent(String url, RequestMethod method) {
-        return this.handlerExecutions.containsKey(new HandlerKey(url, method));
+        return this.handlerExecutionsManager.containsKey(new HandlerKey(url, method));
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
+        return handlerExecutionsManager.get(new HandlerKey(requestUri, requestMethod));
     }
 }

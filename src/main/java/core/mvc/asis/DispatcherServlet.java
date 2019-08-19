@@ -34,18 +34,11 @@ public class DispatcherServlet extends HttpServlet {
 
     private List<HandlerMapping> handlerMappings = Lists.newArrayList();
     private List<HandlerAdapter> handlerAdapters = Lists.newArrayList();
-    private MethodArgumentHandler methodArgumentHandler = new MethodArgumentHandler();
 
     @Override
     public void init() {
         handlerMappingsInit();
         handlerAdaptersInit();
-        methodArgumentHandlerInit();
-    }
-
-    private void methodArgumentHandlerInit() {
-        methodArgumentHandler.add(new NumberArgumentResolver());
-        methodArgumentHandler.add(new UserArgumentResolver());
     }
 
     private void handlerAdaptersInit() {

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,12 +42,13 @@ public class HandlerMethodArgumentResolverTest {
     @DisplayName("String 파라미터를 파싱 하는지 확인한다.")
     void name() throws IllegalAccessException, InstantiationException, InvocationTargetException {
         MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
         request.addParameter(USER_ID_PARAMETER_NAME, TEST_USER_ID);
         request.addParameter(USER_PASSWORD_PARAMETER_NAME, TEST_USER_PASSWORD);
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
 
-        Object[] values = methodArgumentHandler.getValues(method, request);
+        Object[] values = methodArgumentHandler.getValues(method, request, response);
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject(USER_ID_PARAMETER_NAME)).isEqualTo(TEST_USER_ID);
         assertThat(mav.getObject(USER_PASSWORD_PARAMETER_NAME)).isEqualTo(TEST_USER_PASSWORD);
@@ -60,12 +62,13 @@ public class HandlerMethodArgumentResolverTest {
         String name = TEST_USER_NAME;
         String email = TEST_USER_EMAIL;
 
+        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest request = getMockHttpServletRequest(userId, password, name, email);
         User user = new User(userId, password, name, email);
         Class clazz = TestUserController.class;
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
 
-        Object[] values = methodArgumentHandler.getValues(method, request);
+        Object[] values = methodArgumentHandler.getValues(method, request, response);
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("testUser")).isEqualTo(user);
 
@@ -85,6 +88,7 @@ public class HandlerMethodArgumentResolverTest {
     void primitiveArgumentMapping() throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Integer id = 1;
         int age = 10;
+        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("id", String.valueOf(id));
         request.addParameter("age", String.valueOf(age));
@@ -92,11 +96,26 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
 
-        Object[] values = methodArgumentHandler.getValues(method, request);
+        Object[] values = methodArgumentHandler.getValues(method, request, response);
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("id")).isEqualTo(id);
         assertThat(mav.getObject("age")).isEqualTo(age);
 
+    }
+
+    @Test
+    @DisplayName("PathVariable 파라미터를 파싱 하는지 확인한다.")
+    void pathVariableMapping() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/users/1");
+
+        Class clazz = TestUserController.class;
+        Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
+
+        Object[] values = methodArgumentHandler.getValues(method, request, response);
+        ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        assertThat(mav.getObject("id")).isEqualTo(1L);
     }
 
     private Method getMethod(String name, Method[] methods) {

@@ -50,7 +50,8 @@ public class DispatcherServletTest {
         String getMethod = HttpMethod.GET.name();
         return Stream.of(
                 Arguments.of(getMethod, "/", "home.jsp"),
-                Arguments.of(getMethod, "/users", "/users/loginForm")
+                Arguments.of(getMethod, "/users", "/users/loginForm"),
+                Arguments.of(getMethod, "/users/admin", "/user/profile.jsp")
         );
     }
 }
