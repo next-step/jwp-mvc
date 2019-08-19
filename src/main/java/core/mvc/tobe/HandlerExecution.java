@@ -42,8 +42,9 @@ public class HandlerExecution {
 
     private List<HandlerMethodArgumentResolver> initializeArgumentResolvers() {
         List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
-        resolvers.add(new RequestParameterArgumentResolver());
+        resolvers.add(new ServletRequestArgumentResolver());
         resolvers.add(new PathVariableArgumentResolver(method));
+        resolvers.add(new ParameterArgumentResolver());
 
         return resolvers;
     }
