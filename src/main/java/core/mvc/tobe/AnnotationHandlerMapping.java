@@ -3,13 +3,13 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import org.reflections.ReflectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
@@ -28,9 +28,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void mapToHandlerExecutions(Object controller) {
         final Class<?> controllerClass = controller.getClass();
-        final Set<Method> actionMethods = getActionMethods(controllerClass.getMethods());
+        final Set<Method> actionMethods = ReflectionUtils.getAllMethods(
+                controllerClass,
+                ReflectionUtils.withAnnotation((RequestMapping.class)));
         for (Method method : actionMethods) {
             appendHandlerExecutions(controller, method);
         }
@@ -56,12 +59,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private boolean isFallbackMethod(RequestMapping requestMapping) {
         return requestMapping.method().length == 0;
-    }
-
-    private Set<Method> getActionMethods(Method[] methods) {
-        return Arrays.stream(methods)
-                .filter(m -> m.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toSet());
     }
 
     private HandlerKey[] createHandlerKeys(RequestMapping requestMapping, boolean isFallbackMapping) {
