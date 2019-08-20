@@ -1,9 +1,7 @@
-package next.controller;
+package core.mvc.asis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import core.annotation.web.RequestMethod;
-import core.mvc.asis.DispatcherServlet;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-class HomeControllerTest {
+class DispatcherServletTest {
 
     private HttpServlet dispatcherServlet;
     private MockHttpServletRequest request;
@@ -23,12 +21,15 @@ class HomeControllerTest {
         dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.init();
 
-        request = new MockHttpServletRequest("GET", "/");
+        request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
     }
 
     @Test
     void home() throws ServletException, IOException {
+        request.setMethod("GET");
+        request.setRequestURI("/");
+
         dispatcherServlet.service(request, response);
         String forwardedUrl = response.getForwardedUrl();
 

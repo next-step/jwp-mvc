@@ -6,7 +6,7 @@ import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.JspView;
+import core.mvc.JspView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
