@@ -12,11 +12,15 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
-    public boolean isUrlMatch(String targetUrl) {
+    public boolean isHandlerKeyMatch(String targetUrl, RequestMethod method) {
+        return isUrlMatch(targetUrl) && isMethodMatch(method);
+    }
+
+    private boolean isUrlMatch(String targetUrl) {
         return PathPatternMatcher.isUrlMatch(url, targetUrl);
     }
 
-    public boolean isMethodMatch(RequestMethod method) {
+    private boolean isMethodMatch(RequestMethod method) {
         return this.requestMethod == method;
     }
 

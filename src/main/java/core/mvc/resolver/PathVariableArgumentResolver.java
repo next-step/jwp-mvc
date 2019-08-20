@@ -1,21 +1,19 @@
 package core.mvc.resolver;
 
-import core.annotation.web.RequestMapping;
 import core.mvc.MethodParameter;
-import core.mvc.utils.PathPatternMatcher;
+import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import static core.mvc.utils.PathPatternMatcher.toPathContainer;
 
 public class PathVariableArgumentResolver extends AbstractHandlerMethodArgumentResolver {
-    private Method method;
+    private PathPattern pattern;
 
-    public PathVariableArgumentResolver(Method method) {
-        this.method = method;
+    public PathVariableArgumentResolver(PathPattern pattern) {
+        this.pattern = pattern;
     }
 
     @Override
@@ -25,8 +23,7 @@ public class PathVariableArgumentResolver extends AbstractHandlerMethodArgumentR
 
     @Override
     public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        Map<String, String> pathVariables = PathPatternMatcher.parse(annotation.value())
+        Map<String, String> pathVariables = pattern
                 .matchAndExtract(toPathContainer(request.getRequestURI())).getUriVariables();
 
         return getArgument(parameter, pathVariables.get(parameter.getName()));

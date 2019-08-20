@@ -1,10 +1,13 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestMapping;
 import core.mvc.MethodParameter;
 import core.mvc.ModelAndView;
 import core.mvc.resolver.*;
+import core.mvc.utils.PathPatternMatcher;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,13 +45,11 @@ public class HandlerExecution {
     }
 
     private List<HandlerMethodArgumentResolver> initializeArgumentResolvers() {
-        List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
-        resolvers.add(new ServletRequestArgumentResolver());
-        resolvers.add(new ServletResponseArgumentResolver());
-        resolvers.add(new SessionArgumentResolver());
-        resolvers.add(new PathVariableArgumentResolver(method));
-        resolvers.add(new JavaDataTypeArgumentResolver());
-        resolvers.add(new ParameterArgumentResolver());
+        List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>(ResolverGenerator.getResolvers());
+
+        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+        PathPattern pattern = PathPatternMatcher.parse(annotation.value());
+        resolvers.add(new PathVariableArgumentResolver(pattern));
 
         return resolvers;
     }
