@@ -46,8 +46,9 @@ public class DispatcherServlet extends HttpServlet {
       ModelAndView modelAndView = adaptor.handle(handler, req, resp);
       modelAndView.render(modelAndView.getModel(), req, resp);
     } catch (Exception e) {
-      logger.error("Exception : {}", e);
+      logger.error("error : {}", e.getMessage());
     }
+    
   }
 
   private HandlerAdaptor findAdaptor(Object handler) {

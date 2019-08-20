@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UpdateFormUserController implements Controller {
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {

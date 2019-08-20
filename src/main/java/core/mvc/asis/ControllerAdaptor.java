@@ -18,8 +18,7 @@ public class ControllerAdaptor implements HandlerAdaptor {
   }
 
   @Override
-  public ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp)
-      throws Exception {
+  public ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) {
     controller = (Controller) handler;
     String viewName = controller.execute(req, resp);
     return move(viewName);
