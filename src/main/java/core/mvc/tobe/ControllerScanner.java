@@ -14,14 +14,14 @@ public class ControllerScanner {
   private static final Logger logger = LoggerFactory.getLogger(ControllerScanner.class);
 
   private static final Class<Controller> CONTROLLER = Controller.class;
-  private String basePackage;
+  private Object[] basePackages;
 
-  public ControllerScanner(String basePackage) {
-    this.basePackage = basePackage;
+  public ControllerScanner(Object[] basePackages) {
+    this.basePackages = basePackages;
   }
 
   public Map<Class, Object> getControllers() {
-    Reflections reflections = new Reflections(basePackage);
+    Reflections reflections = new Reflections(basePackages);
     Set<Class<?>> typesAnnotatedWith = reflections.getTypesAnnotatedWith(CONTROLLER);
 
     return instantiateControllers(typesAnnotatedWith);

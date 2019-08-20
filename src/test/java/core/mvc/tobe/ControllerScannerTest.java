@@ -13,9 +13,12 @@ class ControllerScannerTest {
   @DisplayName("@Controller 를 찾는다")
   void scanControllers() {
     String basePackage = "next.controller";
-    ControllerScanner controllerScanner = new ControllerScanner(basePackage);
+    String basePackage1 = "core.mvc.tobe";
+    Object [] basePackages ={basePackage,basePackage1};
+
+    ControllerScanner controllerScanner = new ControllerScanner(basePackages);
 
     Map<Class, Object> controllers = controllerScanner.getControllers();
-    assertThat(controllers).containsEntry(UserController.class, new UserController());
+    assertThat(controllers).containsOnlyKeys(UserController.class, MyController.class);
   }
 }

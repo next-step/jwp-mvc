@@ -26,13 +26,7 @@ public class AnnotationHandlerMapping implements Mapping {
   }
 
   private void initHandlerExecutions(Object[] basePackages) {
-    for (Object basePackage : basePackages) {
-      initHandlerExecution(basePackage);
-    }
-  }
-
-  private void initHandlerExecution(Object basePackage) {
-    ControllerScanner controllerScanner = new ControllerScanner(basePackage.toString());
+    ControllerScanner controllerScanner = new ControllerScanner(basePackages);
     Map<Class, Object> controllers = controllerScanner.getControllers();
     controllers.keySet().stream()
         .forEach(controller ->
