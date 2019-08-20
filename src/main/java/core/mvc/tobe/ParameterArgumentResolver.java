@@ -6,6 +6,7 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ParameterArgumentResolver extends AbstractHandlerMethodArgumentReso
     }
 
     @Override
-    public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request) throws Exception {
+    public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws Exception {
         if (parameter.getType().equals(HttpSession.class)) {
             return request.getSession();
         }

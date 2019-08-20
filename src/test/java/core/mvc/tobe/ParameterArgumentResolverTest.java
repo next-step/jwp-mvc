@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
 import javax.servlet.http.HttpSession;
@@ -21,6 +22,7 @@ class ParameterArgumentResolverTest {
 
     private ParameterArgumentResolver resolver;
     private MockHttpServletRequest request;
+    private MockHttpServletResponse response;
 
     @BeforeEach
     void setup() {
@@ -40,7 +42,7 @@ class ParameterArgumentResolverTest {
         request.addParameter("name", "Summer");
 
         MethodParameter parameter = new MethodParameter("name", String.class);
-        String argument = (String) resolver.getMethodArgument(parameter, request);
+        String argument = (String) resolver.getMethodArgument(parameter, request, response);
 
         assertEquals("Summer", argument);
     }
@@ -51,7 +53,7 @@ class ParameterArgumentResolverTest {
         request.addParameter("age", "28");
 
         MethodParameter parameter = new MethodParameter("age", int.class);
-        int argument = (int) resolver.getMethodArgument(parameter, request);
+        int argument = (int) resolver.getMethodArgument(parameter, request, response);
 
         assertEquals(28, argument);
     }
@@ -62,7 +64,7 @@ class ParameterArgumentResolverTest {
         request.addParameter("age", "28");
 
         MethodParameter parameter = new MethodParameter("age", Integer.class);
-        Integer argument = (Integer) resolver.getMethodArgument(parameter, request);
+        Integer argument = (Integer) resolver.getMethodArgument(parameter, request, response);
 
         assertEquals(28, argument);
     }
@@ -73,7 +75,7 @@ class ParameterArgumentResolverTest {
         MockHttpSession session = new MockHttpSession();
         request.setSession(session);
         MethodParameter parameter = new MethodParameter("session", HttpSession.class);
-        HttpSession argument = (HttpSession) resolver.getMethodArgument(parameter, request);
+        HttpSession argument = (HttpSession) resolver.getMethodArgument(parameter, request, response);
 
         assertEquals(session.getId(), argument.getId());
     }
@@ -87,7 +89,7 @@ class ParameterArgumentResolverTest {
         request.addParameter("age", String.valueOf(testUser.getAge()));
 
         MethodParameter parameter = new MethodParameter("testUser", TestUser.class);
-        TestUser argument = (TestUser) resolver.getMethodArgument(parameter, request);
+        TestUser argument = (TestUser) resolver.getMethodArgument(parameter, request, response);
 
         assertEquals(testUser.getUserId(), argument.getUserId());
         assertEquals(testUser.getPassword(), argument.getPassword());

@@ -5,6 +5,7 @@ import core.mvc.MethodParameter;
 import core.mvc.utils.PathPatternMatcher;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class PathVariableArgumentResolver extends AbstractHandlerMethodArgumentR
     }
 
     @Override
-    public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request) throws Exception {
+    public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws Exception {
         RequestMapping annotation = method.getAnnotation(RequestMapping.class);
         Map<String, String> pathVariables = PathPatternMatcher.parse(annotation.value())
                 .matchAndExtract(toPathContainer(request.getRequestURI())).getUriVariables();

@@ -43,6 +43,7 @@ public class HandlerExecution {
     private List<HandlerMethodArgumentResolver> initializeArgumentResolvers() {
         List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
         resolvers.add(new ServletRequestArgumentResolver());
+        resolvers.add(new ServletResponseArgumentResolver());
         resolvers.add(new PathVariableArgumentResolver(method));
         resolvers.add(new ParameterArgumentResolver());
 
@@ -54,7 +55,7 @@ public class HandlerExecution {
         for (int i = 0; i < this.methodParameters.size(); i++) {
             MethodParameter methodParameter = methodParameters.get(i);
 
-            Object argument = getResolver(methodParameter).getMethodArgument(methodParameter, request);
+            Object argument = getResolver(methodParameter).getMethodArgument(methodParameter, request, response);
             arguments[i] = argument;
         }
 

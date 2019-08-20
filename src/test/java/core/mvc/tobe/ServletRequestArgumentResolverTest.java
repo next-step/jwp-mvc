@@ -4,6 +4,7 @@ import core.mvc.MethodParameter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,8 +32,9 @@ class ServletRequestArgumentResolverTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("name", "Summer");
 
+        MockHttpServletResponse response = new MockHttpServletResponse();
         MethodParameter parameter = new MethodParameter("request", HttpServletRequest.class);
-        HttpServletRequest argument = (HttpServletRequest) resolver.getMethodArgument(parameter, request);
+        HttpServletRequest argument = (HttpServletRequest) resolver.getMethodArgument(parameter, request, response);
 
         assertEquals("Summer", argument.getParameter("name"));
     }
