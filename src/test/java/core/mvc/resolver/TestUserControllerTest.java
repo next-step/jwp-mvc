@@ -1,6 +1,8 @@
-package core.mvc.tobe;
+package core.mvc.resolver;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +15,7 @@ class TestUserControllerTest {
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping("core.mvc.resolver");
         handlerMapping.initialize();
     }
 

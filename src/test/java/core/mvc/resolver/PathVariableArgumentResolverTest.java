@@ -1,14 +1,15 @@
-package core.mvc.tobe;
+package core.mvc.resolver;
 
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.MethodParameter;
-import core.mvc.resolver.PathVariableArgumentResolver;
+import core.mvc.utils.PathPatternMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.util.pattern.PathPattern;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -31,8 +32,11 @@ class PathVariableArgumentResolverTest {
                 method = m;
         }
 
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        PathPattern pathPattern = PathPatternMatcher.parse(requestMapping.value());
+
         Parameter param = method.getParameters()[0];
-        resolver = new PathVariableArgumentResolver(method);
+        resolver = new PathVariableArgumentResolver(pathPattern);
         methodParameter = new MethodParameter("id", param);
     }
 

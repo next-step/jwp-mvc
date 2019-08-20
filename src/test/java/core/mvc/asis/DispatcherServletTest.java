@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,11 @@ class DispatcherServletTest {
     @Test
     public void user_create_controller_test() throws ServletException, IOException {
         request = new MockHttpServletRequest("POST", "/users/create");
-
+        User user = new User("admin", "password", "자바지기", "admin@slipp.net");
+        request.addParameter("userId", user.getUserId());
+        request.addParameter("password", user.getPassword());
+        request.addParameter("name", user.getName());
+        request.addParameter("email", user.getEmail());
         dispatcherServlet.service(request, response);
 
         assertEquals("/", response.getRedirectedUrl());

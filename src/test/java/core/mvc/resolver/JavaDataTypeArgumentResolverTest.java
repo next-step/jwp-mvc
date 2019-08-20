@@ -1,8 +1,6 @@
-package core.mvc.tobe;
+package core.mvc.resolver;
 
 import core.mvc.MethodParameter;
-import core.mvc.resolver.ParameterArgumentResolver;
-import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,25 +8,23 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
 
-import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class ParameterArgumentResolverTest {
+class JavaDataTypeArgumentResolverTest {
 
-    private ParameterArgumentResolver resolver;
+    private JavaDataTypeArgumentResolver resolver;
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
 
     @BeforeEach
     void setup() {
-        resolver = new ParameterArgumentResolver();
+        resolver = new JavaDataTypeArgumentResolver();
         request = new MockHttpServletRequest();
+        response = new MockHttpServletResponse();
     }
 
     @ParameterizedTest
@@ -70,33 +66,6 @@ class ParameterArgumentResolverTest {
         assertEquals(28, argument);
     }
 
-    @DisplayName("Type이 HttpSession인 경우")
-    @Test
-    void get_argument_session() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        request.setSession(session);
-        MethodParameter parameter = new MethodParameter("session", HttpSession.class);
-        HttpSession argument = (HttpSession) resolver.getMethodArgument(parameter, request, response);
-
-        assertEquals(session.getId(), argument.getId());
-    }
-
-    @DisplayName("Type이 java bean인 경우")
-    @Test
-    void get_argument_java_bean() throws Exception {
-        TestUser testUser = new TestUser("Summer", "pw", 28);
-        request.addParameter("userId", testUser.getUserId());
-        request.addParameter("password", testUser.getPassword());
-        request.addParameter("age", String.valueOf(testUser.getAge()));
-
-        MethodParameter parameter = new MethodParameter("testUser", TestUser.class);
-        TestUser argument = (TestUser) resolver.getMethodArgument(parameter, request, response);
-
-        assertEquals(testUser.getUserId(), argument.getUserId());
-        assertEquals(testUser.getPassword(), argument.getPassword());
-        assertEquals(testUser.getAge(), argument.getAge());
-    }
-
     private static List<MethodParameter> supportingType() {
         return Arrays.asList(
                 new MethodParameter("int", int.class),
@@ -107,10 +76,7 @@ class ParameterArgumentResolverTest {
                 new MethodParameter("boolean", boolean.class),
                 new MethodParameter("Boolean", Boolean.class),
                 new MethodParameter("byte", byte.class),
-                new MethodParameter("Byte", Byte.class),
-                new MethodParameter("session", HttpSession.class),
-                new MethodParameter("testUser", TestUser.class),
-                new MethodParameter("user", User.class)
-                );
+                new MethodParameter("Byte", Byte.class)
+        );
     }
 }
