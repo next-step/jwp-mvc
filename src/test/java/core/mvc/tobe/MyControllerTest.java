@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
-import core.mvc.JspView;
-import core.mvc.ModelAndView;
+import core.mvc.view.JspView;
+import core.mvc.view.ModelAndView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MyControllerTest {
 
-    private AnnotationHandlerMapping handlerMapping;
+    private RequestMappingHandlerMapping handlerMapping;
     @BeforeEach
     void setUp() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new RequestMappingHandlerMapping("core.mvc.tobe.MyController");
     }
 
     @DisplayName("url과 method별 요청시 반환되는 view name 확인")

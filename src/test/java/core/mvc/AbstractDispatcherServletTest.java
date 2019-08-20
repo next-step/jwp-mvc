@@ -1,4 +1,4 @@
-package core.mvc.asis;
+package core.mvc;
 
 import core.annotation.web.RequestMethod;
 import next.model.User;
