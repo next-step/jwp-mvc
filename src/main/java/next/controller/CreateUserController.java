@@ -15,8 +15,7 @@ public class CreateUserController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView execute(String userId, String password, String name, String email) {
-        User user = new User(userId, password, name, email);
+    public ModelAndView execute(User user) {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
