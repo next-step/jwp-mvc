@@ -13,11 +13,11 @@ public class MethodParameter {
     private Annotation[] annotations;
 
     private static final List<Class<?>> PRIMITIVE_TYPE;
-    private static final List<Class<?>> REFERENCE_TYPE;
+    private static final List<Class<?>> WRAPPER_TYPE;
 
     static {
         PRIMITIVE_TYPE = Arrays.asList(int.class, long.class, byte.class, boolean.class);
-        REFERENCE_TYPE = Arrays.asList(Integer.class, Long.class, Byte.class, Boolean.class);
+        WRAPPER_TYPE = Arrays.asList(Integer.class, Long.class, Byte.class, Boolean.class);
     }
 
     public MethodParameter(String name, Class<?> type) {
@@ -52,8 +52,8 @@ public class MethodParameter {
         return PRIMITIVE_TYPE.contains(type);
     }
 
-    public boolean isReferenceType() {
-        return REFERENCE_TYPE.contains(type);
+    public boolean isWrapperType() {
+        return WRAPPER_TYPE.contains(type);
     }
 
     public boolean isString() {

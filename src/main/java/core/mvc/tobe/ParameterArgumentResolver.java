@@ -34,7 +34,7 @@ public class ParameterArgumentResolver extends AbstractHandlerMethodArgumentReso
             return request.getSession();
         }
 
-        if (parameter.isPrimitiveType() || parameter.isString() || parameter.isReferenceType()) {
+        if (parameter.isPrimitiveType() || parameter.isString() || parameter.isWrapperType()) {
             return getArgument(parameter, request.getParameter(parameter.getName()));
         }
 
