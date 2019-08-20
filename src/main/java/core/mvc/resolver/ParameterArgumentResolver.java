@@ -7,7 +7,6 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +29,6 @@ public class ParameterArgumentResolver extends AbstractHandlerMethodArgumentReso
 
     @Override
     public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (parameter.getType().equals(HttpSession.class)) {
-            return request.getSession();
-        }
-
-        if (parameter.isPrimitiveType() || parameter.isString() || parameter.isWrapperType()) {
-            return getArgument(parameter, request.getParameter(parameter.getName()));
-        }
-
         return getNewInstance(parameter, request);
     }
 

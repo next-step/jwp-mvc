@@ -48,15 +48,9 @@ public class MethodParameter {
         return annotations == null || annotations.length == 0;
     }
 
-    public boolean isPrimitiveType() {
-        return PRIMITIVE_TYPE.contains(type);
-    }
-
-    public boolean isWrapperType() {
-        return WRAPPER_TYPE.contains(type);
-    }
-
-    public boolean isString() {
-        return type.equals(String.class);
+    public boolean isJavaDataType() {
+        return PRIMITIVE_TYPE.contains(type) ||
+                WRAPPER_TYPE.contains(type) ||
+                type.equals(String.class);
     }
 }
