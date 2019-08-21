@@ -11,7 +11,7 @@ public class AnnotationHandlerMappingTest {
     @BeforeEach
     public void setup() throws Exception {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
+        handlerMapping.init();
     }
 
     @Test
