@@ -1,6 +1,7 @@
 package next.controller.annotation;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
@@ -37,5 +38,16 @@ public class UserController {
 
         DataBase.addUser(user);
         return new ModelAndView(new JspView("redirect:/"));
+    }
+
+    @RequestMapping(USER_REQUEST + "/{userId}")
+    public ModelAndView profile(HttpServletRequest request, @PathVariable String userId) {
+        User user = DataBase.findUserById(userId);
+        if (user == null) {
+            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+        }
+
+        request.setAttribute("user", user);
+        return new ModelAndView(new JspView("/user/profile.jsp"));
     }
 }
