@@ -1,10 +1,8 @@
 package next.controller;
 
-import core.mvc.ModelAndView;
+import core.mvc.view.ModelAndView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +12,7 @@ class HomeControllerTest {
     @Test
     void homeControllerTest() {
         HomeController homeController = new HomeController();
-        ModelAndView mav = homeController.home(new MockHttpServletRequest(), new MockHttpServletResponse());
+        ModelAndView mav = homeController.home();
 
         assertThat(mav.getView().getViewName()).isEqualTo("home");
         assertThat(mav.getModel()).containsKeys("users");

@@ -1,14 +1,13 @@
 package next.controller;
 
 import core.db.DataBase;
-import core.mvc.ModelAndView;
-import core.mvc.View;
+import core.mvc.view.ModelAndView;
+import core.mvc.view.View;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +29,7 @@ class UserControllerTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new User("loginedUser", "1234", "testUser", "test@abc.com"));
         request.setSession(session);
-        ModelAndView mav = userController.users(request, new MockHttpServletResponse());
+        ModelAndView mav = userController.users(session);
 
         assertThat(mav.getView().getViewName()).isEqualTo("/user/list");
     }
@@ -38,7 +37,7 @@ class UserControllerTest {
     @DisplayName("로그인 하지 않은 유저 /users 요청시 로그인폼 반환 검증")
     @Test
     void notLoginedUserListTest() {
-        ModelAndView mav = userController.users(new MockHttpServletRequest(), new MockHttpServletResponse());
+        ModelAndView mav = userController.users(new MockHttpSession());
 
         View view = mav.getView();
         assertThat(view.getViewName()).isEqualTo("redirect:/users/loginForm");
@@ -47,14 +46,14 @@ class UserControllerTest {
     @DisplayName("회원가입 폼")
     @Test
     void userRegisterForm() {
-        ModelAndView mav = userController.userForm(new MockHttpServletRequest(), new MockHttpServletResponse());
+        ModelAndView mav = userController.userForm();
         assertThat(mav.getView().getViewName()).isEqualTo("/user/form");
     }
 
     @DisplayName("로그인 폼")
     @Test
     void loginForm() {
-        ModelAndView mav = userController.loginForm(new MockHttpServletRequest(), new MockHttpServletResponse());
+        ModelAndView mav = userController.loginForm();
         View view = mav.getView();
         assertThat(view.getViewName()).isEqualTo("/user/login");
     }
@@ -62,12 +61,8 @@ class UserControllerTest {
     @DisplayName("회원 가입")
     @Test
     void register() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("userId", "testUser");
-        request.setParameter("password", "1234");
-        request.setParameter("name", "test");
 
-        ModelAndView mav = userController.createUser(request, new MockHttpServletResponse());
+        ModelAndView mav = userController.createUser("testUser", "1234", "test", "test@test.com");
 
         User user = DataBase.findUserById("testUser");
         assertThat(user.getPassword()).isEqualTo("1234");
@@ -83,9 +78,7 @@ class UserControllerTest {
         User user = new User("testUser", "1234", "test", "test@abc.com");
         DataBase.addUser(user);
 
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("userId", "testUser");
-        ModelAndView mav = userController.showProfile(request, new MockHttpServletResponse());
+        ModelAndView mav = userController.showProfile("testUser");
         View view = mav.getView();
         User findUser = (User) mav.getObject("user");
         assertThat(view.getViewName()).isEqualTo("/user/profile");
@@ -95,7 +88,7 @@ class UserControllerTest {
     @DisplayName("유저 프로필 조회 실패")
     @Test
     void showProfileFail() {
-        assertThatThrownBy(() -> userController.showProfile(new MockHttpServletRequest(), new MockHttpServletResponse()))
+        assertThatThrownBy(() -> userController.showProfile(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("사용자를 찾을 수 없습니다.");
     }
@@ -109,15 +102,7 @@ class UserControllerTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", user);
 
-        MockHttpServletRequest request = new MockHttpServletRequest();
-
-        request.setSession(session);
-        request.setParameter("userId", user.getUserId());
-        request.setParameter("name", "updatedName");
-        request.setParameter("password", "5678");
-        request.setParameter("email", "updateTest@abc.com");
-
-        ModelAndView mav = userController.updateUser(request, new MockHttpServletResponse());
+        ModelAndView mav = userController.updateUser(session, user.getUserId(), "5678", "updatedName", "updateTest@abc.com");
         View view = mav.getView();
         User findUser = DataBase.findUserById(user.getUserId());
 
@@ -131,7 +116,7 @@ class UserControllerTest {
     @DisplayName("유저 수정 실패")
     @Test
     void updateFail() {
-        assertThatThrownBy(() -> userController.updateUser(new MockHttpServletRequest(), new MockHttpServletResponse()))
+        assertThatThrownBy(() -> userController.updateUser(new MockHttpSession(), null, null, null, null))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("다른 사용자의 정보를 수정할 수 없습니다.");
     }

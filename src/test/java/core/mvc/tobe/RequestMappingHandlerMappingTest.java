@@ -9,13 +9,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.util.stream.Stream;
 
-public class AnnotationHandlerMappingTest {
+public class RequestMappingHandlerMappingTest {
 
-    private AnnotationHandlerMapping handlerMapping;
+    private RequestMappingHandlerMapping handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new RequestMappingHandlerMapping("core.mvc.tobe");
     }
 
     @ParameterizedTest

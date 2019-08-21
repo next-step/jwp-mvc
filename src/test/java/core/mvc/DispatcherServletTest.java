@@ -1,7 +1,8 @@
-package core.mvc.asis;
+package core.mvc;
 
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.web.context.ApplicationContext;
 import next.controller.UserSessionUtils;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,9 @@ import org.springframework.mock.web.MockHttpSession;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
+import static core.web.WebApplicationInitializer.DEFAULT_CONTROLLER_PACKAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DispatcherServletTest extends AbstractDispatcherServletTest {
@@ -23,13 +26,13 @@ class DispatcherServletTest extends AbstractDispatcherServletTest {
     @BeforeEach
     void setUp() {
         DataBase.deleteAll();
-        dispatcherServlet = new DispatcherServlet();
+        dispatcherServlet = new DispatcherServlet(new ApplicationContext(DEFAULT_CONTROLLER_PACKAGE));
         dispatcherServlet.init();
     }
 
     @DisplayName("메인 조회")
     @Test
-    void home() throws ServletException {
+    void home() throws ServletException, IOException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -41,7 +44,7 @@ class DispatcherServletTest extends AbstractDispatcherServletTest {
 
     @DisplayName("회원가입")
     @Test
-    void createUser() throws ServletException {
+    void createUser() throws ServletException, IOException {
         User user = new User("testUserId", "1234", "testUser", "test@abc.com");
         MockHttpServletRequest request = userPostRequest("/users/create", RequestMethod.POST, user);
 
@@ -57,7 +60,7 @@ class DispatcherServletTest extends AbstractDispatcherServletTest {
 
     @DisplayName("유저 리스트 조회")
     @Test
-    void showUserList() throws ServletException {
+    void showUserList() throws ServletException, IOException {
 
         User loginUser = new User("testUserId", "1234", "testUser", "test@abc.com");
 
@@ -77,7 +80,7 @@ class DispatcherServletTest extends AbstractDispatcherServletTest {
 
     @DisplayName("로그인")
     @Test
-    void login() throws ServletException {
+    void login() throws ServletException, IOException {
         User user = new User("testUserId", "1234", "testUser", "test@abc.com");
 
         MockHttpServletRequest request = userPostRequest("/users/create", RequestMethod.POST, user);
@@ -97,7 +100,7 @@ class DispatcherServletTest extends AbstractDispatcherServletTest {
 
     @DisplayName("로그아웃")
     @Test
-    void logout() throws ServletException {
+    void logout() throws ServletException, IOException {
         User user = new User("testUserId", "1234", "testUser", "test@abc.com");
 
         MockHttpServletRequest request = userPostRequest("/users/create", RequestMethod.POST, user);
@@ -118,7 +121,7 @@ class DispatcherServletTest extends AbstractDispatcherServletTest {
 
     @DisplayName("유저 업데이트")
     @Test
-    void userUpdate() throws ServletException {
+    void userUpdate() throws ServletException, IOException {
         User user = new User("testUserId", "1234", "testUser", "test@abc.com");
 
         MockHttpServletRequest request = userPostRequest("/users/create", RequestMethod.POST, user);

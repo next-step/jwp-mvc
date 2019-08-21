@@ -1,8 +1,6 @@
 package next.controller;
 
 import core.db.DataBase;
-import core.mvc.ModelAndView;
-import core.mvc.View;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

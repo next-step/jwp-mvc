@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import java.util.Collections;
 import java.util.HashMap;
