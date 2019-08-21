@@ -11,8 +11,8 @@ public class HandlerExecution {
     private Object instance;
     private Method method;
 
-    public HandlerExecution(Method method) throws Exception {
-        this.instance = method.getDeclaringClass().newInstance();
+    public HandlerExecution(Object instance, Method method) {
+        this.instance = instance;
         this.method = method;
     }
 

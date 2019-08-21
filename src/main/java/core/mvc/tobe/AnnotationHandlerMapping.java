@@ -1,13 +1,8 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
-import org.reflections.scanners.AbstractScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
-    private static final AbstractScanner[] SCANNERS = { new SubTypesScanner(), new TypeAnnotationsScanner() };
 
     private Object[] basePackages;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -30,21 +26,28 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public void initialize() {
-        Arrays.stream(basePackages)
-                .peek(basePackage -> logger.info("Scan package [{}]", basePackage))
-                .map(it -> new Reflections(it, SCANNERS))
-                .flatMap(it -> it.getTypesAnnotatedWith(Controller.class).stream())
-                .flatMap(controllerClass -> Arrays.stream(controllerClass.getMethods()))
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(this::parseRequestMapping);
+        ControllerScanner controllerScanner = new ControllerScanner(basePackages);
+        Map<Class<?>, Object> controllers = controllerScanner.scan();
+        Set<Method> requestMappingMethods = getRequestMappingMethods(controllers.keySet());
+        requestMappingMethods.forEach(method -> addHandlerExecution(controllers, method));
     }
 
-    private void parseRequestMapping(Method method) {
+    private Set<Method> getRequestMappingMethods(Set<Class<?>> controllerClasses) {
+        return controllerClasses.stream()
+                .flatMap(controllerClass -> Arrays.stream(controllerClass.getMethods()))
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                .collect(Collectors.toSet());
+    }
+
+    private void addHandlerExecution(Map<Class<?>, Object> controllers, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        String url = requestMapping.value();
-        Arrays.stream(parseRequestMethods(requestMapping))
-                .map(requestMethod -> new HandlerKey(url, requestMethod))
-                .forEach(handlerKey -> createHandlerExecution(handlerKey, method));
+        RequestMethod[] requestMethods = parseRequestMethods(requestMapping);
+        for (RequestMethod requestMethod : requestMethods) {
+            logger.info("Request Mapping : {}[url={}, requestMethod={}]", method.getDeclaringClass().getSimpleName(), requestMapping.value(), requestMethod);
+            HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMethod);
+            HandlerExecution handlerExecution = new HandlerExecution(controllers.get(method.getDeclaringClass()), method);
+            handlerExecutions.put(handlerKey, handlerExecution);
+        }
     }
 
     private RequestMethod[] parseRequestMethods(RequestMapping requestMapping) {
@@ -53,16 +56,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
             return RequestMethod.values();
         }
         return methods;
-    }
-
-    private void createHandlerExecution(HandlerKey handlerKey, Method method) {
-        try {
-            handlerExecutions.put(handlerKey, new HandlerExecution(method));
-            logger.info("Request Mapping : {}[{}]", method.getDeclaringClass().getSimpleName(), handlerKey);
-        } catch (Exception e) {
-            logger.error("Failed to create HandlerExecution. class : {}, method : {}",
-                    method.getDeclaringClass().getSimpleName(), method.getName(), e);
-        }
     }
 
     @Override
