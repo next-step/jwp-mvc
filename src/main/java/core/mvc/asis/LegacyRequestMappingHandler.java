@@ -1,13 +1,8 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerExecutor;
-import core.mvc.RequestMappingHandler;
+import core.mvc.*;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,20 +27,16 @@ public class LegacyRequestMappingHandler implements RequestMappingHandler {
 
         HandlerExecutor handlerExecutor = (request, response) -> {
             String viewName = controller.execute(request, response);
-            move(viewName, request, response);
+            return createModelAndView(viewName);
         };
 
         return Optional.of(handlerExecutor);
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    private ModelAndView createModelAndView(String viewName) {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+            return new ModelAndView(new RedirectView(viewName.substring(DEFAULT_REDIRECT_PREFIX.length())));
         }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        return new ModelAndView(new JspView(viewName.substring(DEFAULT_REDIRECT_PREFIX.length())));
     }
 }

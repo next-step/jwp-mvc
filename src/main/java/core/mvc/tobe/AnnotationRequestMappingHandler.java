@@ -25,8 +25,7 @@ public class AnnotationRequestMappingHandler implements RequestMappingHandler {
             return Optional.empty();
         }
 
-        HandlerExecutor handlerExecutor = (request, response) ->
-                handlerExecution.handle(request, response).render(request, response);
+        HandlerExecutor handlerExecutor = (request, response) -> handlerExecution.handle(request, response);
 
         return Optional.of(handlerExecutor);
     }

@@ -47,7 +47,8 @@ public class DispatcherServlet extends HttpServlet {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findAny().orElseThrow(() -> new HandlerNotFoundException(requestUri))
-                    .execute(req, resp);
+                    .execute(req, resp)
+                    .render(req, resp);
 
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
