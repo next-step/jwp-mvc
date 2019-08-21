@@ -1,5 +1,6 @@
 package next.controller;
 
+import com.sun.tools.internal.xjc.model.Model;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -9,32 +10,29 @@ import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
 import next.model.User;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
+    public ModelAndView execute(String userId, String password, HttpSession session) throws Exception {
         User user = DataBase.findUserById(userId);
         if (user == null) {
-            req.setAttribute("loginFailed", true);
+            ModelAndView modelAndView = new ModelAndView(new JspView("/user/login.jsp"));
+            modelAndView.addObject("loginFailed", true);
 
-            return new ModelAndView(new JspView("/user/login.jsp"));
+            return modelAndView;
         }
 
         if (user.matchPassword(password)) {
-            HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
 
             return new ModelAndView(new RedirectView("redirect:/"));
         } else {
-            req.setAttribute("loginFailed", true);
+            ModelAndView modelAndView = new ModelAndView(new JspView("/user/login.jsp"));
+            modelAndView.addObject("loginFailed", true);
 
-            return new ModelAndView(new JspView("/user/login.jsp"));
+            return modelAndView;
         }
     }
 }

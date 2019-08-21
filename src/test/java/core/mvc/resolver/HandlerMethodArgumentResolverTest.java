@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.resolver;
 
 import core.mvc.ModelAndView;
 import org.junit.jupiter.api.Test;

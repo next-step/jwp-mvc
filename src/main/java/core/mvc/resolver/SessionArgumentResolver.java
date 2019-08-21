@@ -1,0 +1,19 @@
+package core.mvc.resolver;
+
+import core.mvc.MethodParameter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+public class SessionArgumentResolver extends AbstractHandlerMethodArgumentResolver {
+    @Override
+    public boolean supports(MethodParameter parameter) {
+        return parameter.getType().equals(HttpSession.class);
+    }
+
+    @Override
+    public Object getMethodArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return request.getSession();
+    }
+}
