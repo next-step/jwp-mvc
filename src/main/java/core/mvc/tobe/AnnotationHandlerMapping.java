@@ -15,11 +15,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
-    private static final int MIN_REQUEST_METHOD_NUMBER = 0;
 
     private Object[] basePackage;
 
@@ -56,7 +54,7 @@ public class AnnotationHandlerMapping {
 
     private void mapMethod(Object controller, String rootPath, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        List<HandlerKey> handlerKeys = createHandlerKeys(requestMapping, rootPath);
+        List<HandlerKey> handlerKeys = HandlerKey.createByRequestMapping(requestMapping, rootPath);
         handlerKeys.forEach(it -> putHandlerMapping(it, controller, method));
     }
 
@@ -70,18 +68,5 @@ public class AnnotationHandlerMapping {
 
         logger.info("request mapping, path : {}, method : {}", handlerKey.getUrl(), handlerKey.getRequestMethod());
         handlerExecutions.put(handlerKey, handlerExecution);
-    }
-
-    private List<HandlerKey> createHandlerKeys(RequestMapping requestMapping, String rootPath) {
-        String url = rootPath + requestMapping.value();
-        RequestMethod[] requestMethods = requestMapping.method();
-
-        if (requestMethods.length == MIN_REQUEST_METHOD_NUMBER) {
-            requestMethods = RequestMethod.values();
-        }
-
-        return Arrays.stream(requestMethods)
-                .map(it -> new HandlerKey(url, it))
-                .collect(Collectors.toList());
     }
 }
