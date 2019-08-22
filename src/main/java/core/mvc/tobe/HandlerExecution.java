@@ -9,17 +9,17 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HandlerExecution {
 
-  private Class handler;
+  private Object handler;
   private Method method;
 
-  public HandlerExecution(Class handler, Method method) {
+  public HandlerExecution(Object handler, Method method) {
     this.handler = handler;
     this.method = method;
   }
 
   public ModelAndView handle(HttpServletRequest request, HttpServletResponse response)
-      throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (ModelAndView) method.invoke(handler.newInstance(), request, response);
+      throws InvocationTargetException, IllegalAccessException {
+    return (ModelAndView) method.invoke(handler, request, response);
   }
 
   @Override
@@ -39,5 +39,4 @@ public class HandlerExecution {
   public int hashCode() {
     return Objects.hash(handler, method);
   }
-
 }

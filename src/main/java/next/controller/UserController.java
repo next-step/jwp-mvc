@@ -26,13 +26,13 @@ public class UserController {
     log.debug("User : {}", user);
 
     DataBase.addUser(user);
-    return new ModelAndView(new RedirectView("redirect:/"));
+    return new ModelAndView(new RedirectView("/"));
   }
 
   @RequestMapping("/users")
   public ModelAndView userList(HttpServletRequest req, HttpServletResponse resp) throws Exception {
     if (!UserSessionUtils.isLogined(req.getSession())) {
-      return new ModelAndView(new RedirectView("redirect:/users/loginForm"));
+      return new ModelAndView(new RedirectView("/users/loginForm"));
     }
     ModelAndView modelAndView = new ModelAndView(new JspView("/user/list"));
     modelAndView.addObject("users", DataBase.findAll());
