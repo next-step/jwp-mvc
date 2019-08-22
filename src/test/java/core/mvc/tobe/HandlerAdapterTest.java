@@ -1,14 +1,11 @@
 package core.mvc.tobe;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import core.mvc.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import core.mvc.ControllerHandlerAdapter;
-import core.mvc.ExecutionHandlerAdapter;
-import core.mvc.HandlerAdapter;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HandlerAdapterTest {
 
@@ -20,6 +17,13 @@ public class HandlerAdapterTest {
     private static final AnnotationHandlerMapping handlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
 
     static {
+        HandlerMethodArgumentResolvers.getInstance()
+                .add(new PathVariableArgumentResolver())
+                .add(new ParamNameArgumentResolver())
+                .add(new HttpRequestArgumentResolver())
+                .add(new HttpResponseArgumentResolver())
+                .add(new TestUserArgumentResolver());
+
     	handlerMapping.initialize();
     }
 

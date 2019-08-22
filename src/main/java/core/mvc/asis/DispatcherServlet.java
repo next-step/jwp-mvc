@@ -1,42 +1,52 @@
 package core.mvc.asis;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import core.exceptions.HandlerMappingException;
+import core.mvc.*;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import core.exceptions.HandlerMappingException;
-import core.mvc.ControllerHandlerAdapter;
-import core.mvc.ExecutionHandlerAdapter;
-import core.mvc.HandlerAdapter;
-import core.mvc.HandlerMapping;
-import core.mvc.ModelAndView;
-import core.mvc.tobe.AnnotationHandlerMapping;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String BASE_PACKAGE = "next.controller";
+    private static final String DEFAULT_BASE_PACKAGE = "next.controller";
 
     private List<HandlerMapping<?>> handlerMappings = new ArrayList<>();
     private List<HandlerAdapter> handlerAdapters = new ArrayList<>();
+    private String basePackage;
+
+    public DispatcherServlet() {
+        this(DEFAULT_BASE_PACKAGE);
+    }
+
+    public DispatcherServlet(String basePackage) {
+        this.basePackage = basePackage;
+    }
 
     @Override
     public void init() throws ServletException {
+
+        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = HandlerMethodArgumentResolvers.getInstance();
+        handlerMethodArgumentResolvers.add(new PathVariableArgumentResolver());
+        handlerMethodArgumentResolvers.add(new ParamNameArgumentResolver());
+        handlerMethodArgumentResolvers.add(new HttpRequestArgumentResolver());
+        handlerMethodArgumentResolvers.add(new HttpResponseArgumentResolver());
+
         LegacyHandlerMapping rm = new LegacyHandlerMapping();
         rm.initMapping();
         handlerMappings.add(rm);
 
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(basePackage);
         annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
         

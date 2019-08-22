@@ -1,27 +1,21 @@
 package core.mvc.tobe;
 
-import static java.util.stream.Collectors.toSet;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.common.collect.Maps;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
+import core.exceptions.HandlerMappingException;
+import core.mvc.HandlerMapping;
+import core.mvc.UriPathPatterns;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.collect.Maps;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.*;
 
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
-import core.exceptions.HandlerMappingException;
-import core.mvc.HandlerMapping;
+import static java.util.stream.Collectors.toSet;
 
 public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution> {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
@@ -44,19 +38,44 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
             throw e;
         }
     }
-    
+
     @Override
-	public boolean support(HttpServletRequest request) {
-		return handlerExecutions.containsKey(createHandlerKey(request));
-	}
+    public boolean support(HttpServletRequest request) {
+        return checkSupportCandidate(request);
+    }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        return handlerExecutions.get(createHandlerKey(request));
+        return handlerExecutions.get(getSupportCandidateHandlerKey(request).get());
     }
-    
+
+    private boolean checkSupportCandidate(HttpServletRequest request) {
+        Optional<HandlerKey> matchedKey = getSupportCandidateHandlerKey(request);
+        return matchedKey.isPresent();
+    }
+
+    private Optional<HandlerKey> getSupportCandidateHandlerKey(HttpServletRequest request) {
+        return handlerExecutions.keySet()
+                .stream()
+                .filter(key -> request.getMethod().equalsIgnoreCase(key.getRequestMethod().name()))
+                .filter(key -> isMatchedUri(request, key))
+
+                .findFirst();
+    }
+
+    private boolean isMatchedUri(HttpServletRequest request, HandlerKey key) {
+        UriPathPatterns uriPathPatterns = UriPathPatterns.getInstance();
+        return uriPathPatterns.getPattern(key.getUrl()).matches(UriPathPatterns.toPathContainer(request.getRequestURI()));
+    }
+
+    public static void main(String[] args) {
+        UriPathPatterns uriPathPatterns = UriPathPatterns.getInstance();
+        boolean isa =  uriPathPatterns.getPattern("/users/profile").matches(UriPathPatterns.toPathContainer("/users/profile"));
+        System.out.println(isa);
+    }
+
     private HandlerKey createHandlerKey(HttpServletRequest request) {
-    	String requestUri = request.getRequestURI();
+        String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return new HandlerKey(requestUri, rm);
     }
