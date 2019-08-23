@@ -1,10 +1,30 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class HandlerKey {
+    private static final int MIN_REQUEST_METHOD_NUMBER = 0;
+
     private String url;
     private RequestMethod requestMethod;
+
+    public static List<HandlerKey> createByRequestMapping(RequestMapping requestMapping, String path) {
+        String url = path + requestMapping.value();
+        RequestMethod[] requestMethods = requestMapping.method();
+
+        if (requestMethods.length == MIN_REQUEST_METHOD_NUMBER) {
+            requestMethods = RequestMethod.values();
+        }
+
+        return Arrays.stream(requestMethods)
+                .map(it -> new HandlerKey(url, it))
+                .collect(Collectors.toList());
+    }
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
