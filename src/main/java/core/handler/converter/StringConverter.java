@@ -1,4 +1,4 @@
-package core.mvc;
+package core.handler.converter;
 
 public interface StringConverter {
 

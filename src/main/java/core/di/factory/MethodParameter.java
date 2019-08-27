@@ -7,8 +7,8 @@ public class MethodParameter extends ParameterTypeName {
 
     private final Method method;
 
-    public MethodParameter(Method method, String name, Parameter parameter, int index) {
-        super(name, parameter, index);
+    public MethodParameter(Method method, ParameterTypeName parameterTypeName) {
+        super(parameterTypeName);
         this.method = method;
     }
 

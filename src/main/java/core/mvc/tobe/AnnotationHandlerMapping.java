@@ -1,21 +1,34 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Maps;
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
-import core.exceptions.HandlerMappingException;
-import core.mvc.HandlerMapping;
-import core.mvc.UriPathPatterns;
+import static java.util.stream.Collectors.toSet;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.*;
+import com.google.common.collect.Maps;
 
-import static java.util.stream.Collectors.toSet;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
+import core.exceptions.HandlerMappingException;
+import core.mvc.HandlerMapping;
+import core.mvc.UriPathPatterns;
+import core.resolver.HandlerMethodArgumentResolvers;
+import core.resolver.HttpRequestArgumentResolver;
+import core.resolver.HttpResponseArgumentResolver;
+import core.resolver.ParamClassTypeArgumentResolver;
+import core.resolver.ParamNameArgumentResolver;
+import core.resolver.PathVariableArgumentResolver;
 
 public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution> {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
@@ -29,6 +42,7 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
 
     public void initialize() {
         try {
+        	initMethodArgumentResolvers();
             ControllerAnnotationScanner scanner = ControllerAnnotationScanner.getScanner(this.basePackage);
             Map<Class<?>, Object> instantiateControllers = scanner.getInstantiateControllers();
             Set<Method> requestMappingMethods = getAllRequestMappingMethod(instantiateControllers.keySet());
@@ -39,6 +53,15 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
         }
     }
 
+	private void initMethodArgumentResolvers() {
+		HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = HandlerMethodArgumentResolvers.getInstance();
+		handlerMethodArgumentResolvers.setDefaultResolver(new ParamClassTypeArgumentResolver());
+		handlerMethodArgumentResolvers.add(new PathVariableArgumentResolver());
+		handlerMethodArgumentResolvers.add(new ParamNameArgumentResolver());
+		handlerMethodArgumentResolvers.add(new HttpRequestArgumentResolver());
+		handlerMethodArgumentResolvers.add(new HttpResponseArgumentResolver());
+	}
+
     @Override
     public boolean support(HttpServletRequest request) {
         return checkSupportCandidate(request);
@@ -48,6 +71,8 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
     public HandlerExecution getHandler(HttpServletRequest request) {
         return handlerExecutions.get(getSupportCandidateHandlerKey(request).get());
     }
+    
+    
 
     private boolean checkSupportCandidate(HttpServletRequest request) {
         Optional<HandlerKey> matchedKey = getSupportCandidateHandlerKey(request);
@@ -66,18 +91,6 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
     private boolean isMatchedUri(HttpServletRequest request, HandlerKey key) {
         UriPathPatterns uriPathPatterns = UriPathPatterns.getInstance();
         return uriPathPatterns.getPattern(key.getUrl()).matches(UriPathPatterns.toPathContainer(request.getRequestURI()));
-    }
-
-    public static void main(String[] args) {
-        UriPathPatterns uriPathPatterns = UriPathPatterns.getInstance();
-        boolean isa =  uriPathPatterns.getPattern("/users/profile").matches(UriPathPatterns.toPathContainer("/users/profile"));
-        System.out.println(isa);
-    }
-
-    private HandlerKey createHandlerKey(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return new HandlerKey(requestUri, rm);
     }
 
     private void setHandlerExecutions(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {

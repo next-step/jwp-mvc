@@ -2,20 +2,24 @@ package core.di.factory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
 
 public class ParameterTypeName {
     private final String name;
     private final Parameter parameter;
-    private final int index;
     private final Annotation[] annotations;
 
-    public ParameterTypeName(String name, Parameter parameter, int index) {
+    public ParameterTypeName(String name, Parameter parameter) {
         this.name = name;
         this.parameter = parameter;
-        this.index = index;
         this.annotations = this.parameter.getDeclaredAnnotations();
     }
+    
+    public ParameterTypeName(ParameterTypeName parameterTypeName) {
+        this.name = parameterTypeName.getName();
+        this.parameter = parameterTypeName.getParameter();
+        this.annotations = parameterTypeName.getAnnotations();
+    }
+    
 
     public String getName() {
         return name;
@@ -25,15 +29,16 @@ public class ParameterTypeName {
         return this.parameter.getType();
     }
 
-    public boolean hasAnnotation(Class annotationClass) {
-        return Arrays.stream(this.annotations)
-                .filter(annotation -> annotation.equals(annotationClass))
-                .findFirst()
-                .isPresent();
-    }
+    public Parameter getParameter() {
+		return parameter;
+	}
 
-    public Annotation[] getAnnotationsByType(Class annotationClass) {
-        return this.parameter.getAnnotationsByType(annotationClass);
+	public Annotation[] getAnnotations() {
+		return annotations;
+	}
+
+	public boolean hasAnnotation(Class<? extends Annotation> annotationClass) {
+        return this.parameter.isAnnotationPresent(annotationClass);
     }
 
     @Override

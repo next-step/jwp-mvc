@@ -4,6 +4,7 @@ package core.di.factory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
@@ -15,16 +16,25 @@ public class ParameterNameDiscoverUtils {
 
     private final static ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    public static List<MethodParameter> toMethodParmeters(Method method) {
+    public static ConstructorParameters toConstructorParameters(Constructor<?> constructor) {
+        String[] parameterNames = nameDiscoverer.getParameterNames(constructor);
+        Parameter[] parameters = constructor.getParameters();
+
+        return new ConstructorParameters(constructor, getParameterTypeNames(parameterNames, parameters));
+    }
+    
+    public static List<MethodParameter> toMethodParameters(Method method) {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Parameter[] parameters = method.getParameters();
 
-        return toMethodParameters(method, parameterNames, parameters);
+        return getParameterTypeNames(parameterNames, parameters).stream()
+                .map(parameterTypeName -> new MethodParameter(method, parameterTypeName))
+                .collect(toList());
     }
-
-    private static List<MethodParameter> toMethodParameters(Method method, String[] parameterNames, Parameter[] parameters) {
+    
+    private static List<ParameterTypeName> getParameterTypeNames(String[] parameterNames, Parameter[] parameters) {
         return IntStream.range(0, parameterNames.length)
-                .mapToObj(i -> new MethodParameter(method, parameterNames[i], parameters[i], i))
+                .mapToObj(i -> new ParameterTypeName(parameterNames[i], parameters[i]))
                 .collect(toList());
     }
 

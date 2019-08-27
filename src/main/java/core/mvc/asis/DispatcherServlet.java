@@ -1,19 +1,25 @@
 package core.mvc.asis;
 
-import core.exceptions.HandlerMappingException;
-import core.mvc.*;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import core.exceptions.HandlerMappingException;
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.handler.ControllerHandlerAdapter;
+import core.handler.ExecutionHandlerAdapter;
+import core.handler.HandlerAdapter;
+import core.mvc.tobe.AnnotationHandlerMapping;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -35,12 +41,6 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-
-        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = HandlerMethodArgumentResolvers.getInstance();
-        handlerMethodArgumentResolvers.add(new PathVariableArgumentResolver());
-        handlerMethodArgumentResolvers.add(new ParamNameArgumentResolver());
-        handlerMethodArgumentResolvers.add(new HttpRequestArgumentResolver());
-        handlerMethodArgumentResolvers.add(new HttpResponseArgumentResolver());
 
         LegacyHandlerMapping rm = new LegacyHandlerMapping();
         rm.initMapping();

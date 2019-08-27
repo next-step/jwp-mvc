@@ -1,6 +1,7 @@
-package core.mvc;
+package core.resolver;
 
 import core.di.factory.MethodParameter;
+import core.mvc.WebRequest;
 
 public interface HandlerMethodArgumentResolver {
 

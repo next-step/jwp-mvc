@@ -1,19 +1,20 @@
 package core.mvc.tobe;
 
-import core.annotation.web.RequestMapping;
-import core.di.factory.MethodParameter;
-import core.di.factory.ParameterNameDiscoverUtils;
-import core.mvc.HandlerMethodArgumentResolver;
-import core.mvc.HandlerMethodArgumentResolvers;
-import core.mvc.ModelAndView;
-import core.mvc.WebRequest;
+import static java.util.stream.Collectors.toList;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import core.annotation.web.RequestMapping;
+import core.di.factory.MethodParameter;
+import core.di.factory.ParameterNameDiscoverUtils;
+import core.mvc.ModelAndView;
+import core.mvc.WebRequest;
+import core.resolver.HandlerMethodArgumentResolver;
+import core.resolver.HandlerMethodArgumentResolvers;
 
 public class HandlerExecution {
     private final Object instance;
@@ -24,7 +25,7 @@ public class HandlerExecution {
     private HandlerExecution(Object instance, Method method) {
         this.instance = instance;
         this.method = method;
-        this.methodParameters = ParameterNameDiscoverUtils.toMethodParmeters(method);
+        this.methodParameters = ParameterNameDiscoverUtils.toMethodParameters(method);
         this.argumentResolvers = getArgumentResolvers(this.methodParameters);
     }
 
@@ -33,7 +34,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Object[] args = getArgs(this.methodParameters, this.argumentResolvers, getWebReqeust(request, response));
+        Object[] args = getArgs(this.methodParameters, this.argumentResolvers, getWebRequest(request, response));
         return (ModelAndView) this.method.invoke(this.instance, args);
     }
 
@@ -51,7 +52,7 @@ public class HandlerExecution {
                 .collect(toList());
     }
 
-    private WebRequest getWebReqeust(HttpServletRequest request, HttpServletResponse response) {
+    private WebRequest getWebRequest(HttpServletRequest request, HttpServletResponse response) {
         return WebRequest.of(method.getAnnotation(RequestMapping.class), request, response);
     }
 

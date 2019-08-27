@@ -1,10 +1,10 @@
 package core.mvc.tobe;
 
-import core.di.factory.MethodParameter;
-import core.mvc.HandlerMethodArgumentResolver;
-import core.mvc.WebRequest;
-
 import javax.servlet.http.HttpServletRequest;
+
+import core.di.factory.MethodParameter;
+import core.mvc.WebRequest;
+import core.resolver.HandlerMethodArgumentResolver;
 
 public class TestUserArgumentResolver implements HandlerMethodArgumentResolver {
     @Override

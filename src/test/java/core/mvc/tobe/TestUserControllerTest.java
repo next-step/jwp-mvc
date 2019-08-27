@@ -1,15 +1,16 @@
 package core.mvc.tobe;
 
-import core.mvc.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import core.mvc.ModelAndView;
 
 public class TestUserControllerTest {
     private static final String BASE_PACKAGE = "core.mvc.tobe";
@@ -26,13 +27,6 @@ public class TestUserControllerTest {
 
     @BeforeEach
     public void setup() {
-        HandlerMethodArgumentResolvers.getInstance()
-                .add(new PathVariableArgumentResolver())
-                .add(new ParamNameArgumentResolver())
-                .add(new HttpRequestArgumentResolver())
-                .add(new HttpResponseArgumentResolver())
-                .add(new TestUserArgumentResolver());
-
         handlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         handlerMapping.initialize();
     }

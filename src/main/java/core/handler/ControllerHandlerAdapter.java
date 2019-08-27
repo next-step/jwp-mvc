@@ -1,8 +1,10 @@
-package core.mvc;
+package core.handler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import core.mvc.JspView;
+import core.mvc.ModelAndView;
 import core.mvc.asis.Controller;
 
 public class ControllerHandlerAdapter extends AbstractHandlerAdapter<Controller>{
@@ -12,9 +14,9 @@ public class ControllerHandlerAdapter extends AbstractHandlerAdapter<Controller>
 	}
 
 	@Override
-	ModelAndView castHandle(HttpServletRequest request, HttpServletResponse response, Controller handler)
+	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		String path = handler.execute(request, response);
+		String path = ((Controller) handler).execute(request, response);
 		return new ModelAndView(new JspView(path));
 	}
 }

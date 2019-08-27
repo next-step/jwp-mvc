@@ -1,8 +1,9 @@
-package core.mvc;
+package core.handler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import core.mvc.ModelAndView;
 import core.mvc.tobe.HandlerExecution;
 
 public class ExecutionHandlerAdapter extends AbstractHandlerAdapter<HandlerExecution>{
@@ -12,8 +13,8 @@ public class ExecutionHandlerAdapter extends AbstractHandlerAdapter<HandlerExecu
 	}
 
 	@Override
-	ModelAndView castHandle(HttpServletRequest request, HttpServletResponse response, HandlerExecution handler)
+	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		return handler.handle(request, response);
+		return ((HandlerExecution) handler).handle(request, response);
 	}
 }

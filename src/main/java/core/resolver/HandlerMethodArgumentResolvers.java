@@ -1,14 +1,17 @@
-package core.mvc;
+package core.resolver;
 
 import core.di.factory.MethodParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class HandlerMethodArgumentResolvers {
 
     private final List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers = new ArrayList<>();
 
+    private Optional<HandlerMethodArgumentResolver> defaultResolver = Optional.empty();
+    
     private HandlerMethodArgumentResolvers() {
     }
 
@@ -17,10 +20,19 @@ public class HandlerMethodArgumentResolvers {
     }
 
     public HandlerMethodArgumentResolver getResolver(MethodParameter methodParameter) {
-        return handlerMethodArgumentResolvers.stream()
+        Optional<HandlerMethodArgumentResolver> firstResolver = handlerMethodArgumentResolvers.stream()
                 .filter(resolver -> resolver.supports(methodParameter))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cannot findResolver"));
+                .findFirst();
+        
+        if(firstResolver.isPresent()) {
+        	return firstResolver.get();
+        }
+        
+        if(this.defaultResolver.isPresent()) {
+        	return this.defaultResolver.get();
+        }
+        
+        throw new RuntimeException("Cannot findResolver");
     }
 
     public HandlerMethodArgumentResolvers add(HandlerMethodArgumentResolver handlerMethodArgumentResolver) {
@@ -28,6 +40,9 @@ public class HandlerMethodArgumentResolvers {
         return this;
     }
 
+    public void setDefaultResolver(HandlerMethodArgumentResolver defaultResolver) {
+    	this.defaultResolver = Optional.ofNullable(defaultResolver);
+    }
 
     private static class Lazy {
         public static final HandlerMethodArgumentResolvers INSTANCE = new HandlerMethodArgumentResolvers();

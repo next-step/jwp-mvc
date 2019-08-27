@@ -1,9 +1,11 @@
-package core.mvc;
+package core.resolver;
+
+import java.util.Map;
 
 import core.annotation.web.PathVariable;
 import core.di.factory.MethodParameter;
-
-import java.util.Map;
+import core.handler.converter.StringConverters;
+import core.mvc.WebRequest;
 
 public class PathVariableArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
@@ -13,7 +15,7 @@ public class PathVariableArgumentResolver implements HandlerMethodArgumentResolv
             return false;
         }
 
-        return methodParameter.getAnnotationsByType(PathVariable.class).length > 0;
+        return methodParameter.hasAnnotation(PathVariable.class);
     }
 
     @Override
