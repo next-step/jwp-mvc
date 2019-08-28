@@ -32,7 +32,7 @@ public class LogoutControllerTest {
 		dispatcherServlet.init();
 	}
 
-	@DisplayName("변경된 Login 컨트롤러 테스트 : 로그인 세션 존재")
+	@DisplayName("Legacy Login 컨트롤러 테스트 : 로그인 세션 존재")
 	@Test
 	public void memberLogout() throws Exception {
 		User user = new User(TEST_NAME, TEST_NAME, TEST_NAME, TEST_EMAIL);

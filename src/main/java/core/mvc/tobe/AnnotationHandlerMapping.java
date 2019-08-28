@@ -22,6 +22,13 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.exceptions.HandlerMappingException;
 import core.mvc.HandlerMapping;
+import core.mvc.UriPathPatterns;
+import core.resolver.HandlerMethodArgumentResolvers;
+import core.resolver.HttpRequestArgumentResolver;
+import core.resolver.HttpResponseArgumentResolver;
+import core.resolver.ParamClassTypeArgumentResolver;
+import core.resolver.ParamNameArgumentResolver;
+import core.resolver.PathVariableArgumentResolver;
 
 public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution> {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
@@ -35,6 +42,7 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
 
     public void initialize() {
         try {
+        	initMethodArgumentResolvers();
             ControllerAnnotationScanner scanner = ControllerAnnotationScanner.getScanner(this.basePackage);
             Map<Class<?>, Object> instantiateControllers = scanner.getInstantiateControllers();
             Set<Method> requestMappingMethods = getAllRequestMappingMethod(instantiateControllers.keySet());
@@ -44,21 +52,45 @@ public class AnnotationHandlerMapping implements HandlerMapping<HandlerExecution
             throw e;
         }
     }
-    
-    @Override
-	public boolean support(HttpServletRequest request) {
-		return handlerExecutions.containsKey(createHandlerKey(request));
+
+	private void initMethodArgumentResolvers() {
+		HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = HandlerMethodArgumentResolvers.getInstance();
+		handlerMethodArgumentResolvers.setDefaultResolver(new ParamClassTypeArgumentResolver());
+		handlerMethodArgumentResolvers.add(new PathVariableArgumentResolver());
+		handlerMethodArgumentResolvers.add(new ParamNameArgumentResolver());
+		handlerMethodArgumentResolvers.add(new HttpRequestArgumentResolver());
+		handlerMethodArgumentResolvers.add(new HttpResponseArgumentResolver());
 	}
 
     @Override
+    public boolean support(HttpServletRequest request) {
+        return checkSupportCandidate(request);
+    }
+
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        return handlerExecutions.get(createHandlerKey(request));
+        return handlerExecutions.get(getSupportCandidateHandlerKey(request).get());
     }
     
-    private HandlerKey createHandlerKey(HttpServletRequest request) {
-    	String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return new HandlerKey(requestUri, rm);
+    
+
+    private boolean checkSupportCandidate(HttpServletRequest request) {
+        Optional<HandlerKey> matchedKey = getSupportCandidateHandlerKey(request);
+        return matchedKey.isPresent();
+    }
+
+    private Optional<HandlerKey> getSupportCandidateHandlerKey(HttpServletRequest request) {
+        return handlerExecutions.keySet()
+                .stream()
+                .filter(key -> request.getMethod().equalsIgnoreCase(key.getRequestMethod().name()))
+                .filter(key -> isMatchedUri(request, key))
+
+                .findFirst();
+    }
+
+    private boolean isMatchedUri(HttpServletRequest request, HandlerKey key) {
+        UriPathPatterns uriPathPatterns = UriPathPatterns.getInstance();
+        return uriPathPatterns.getPattern(key.getUrl()).matches(UriPathPatterns.toPathContainer(request.getRequestURI()));
     }
 
     private void setHandlerExecutions(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {

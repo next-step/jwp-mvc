@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.mvc.HandlerMapping;
+import next.controller.LogoutController;
 
 public class LegacyHandlerMapping implements HandlerMapping<Controller> {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
@@ -16,6 +17,8 @@ public class LegacyHandlerMapping implements HandlerMapping<Controller> {
 
     void initMapping() {
         
+    	mappings.put("/users/logout", new LogoutController());
+    	
         logger.info("Initialized Request Mapping!");
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
