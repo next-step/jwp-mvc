@@ -19,7 +19,6 @@ public class MethodParameters {
 
     private final Map<String, MethodParameter> parameterMap = new HashMap<>();
     private final Executable executable;
-    private final Annotation[] annotations;
 
     public MethodParameters(final Method method) {
         final Parameter[] parameters = method.getParameters();
@@ -28,7 +27,6 @@ public class MethodParameters {
         init(parameters, parameterNames);
 
         this.executable = method;
-        this.annotations = method.getAnnotations();
     }
 
     public MethodParameters(final Constructor<?> constructor) {
@@ -38,7 +36,6 @@ public class MethodParameters {
         init(parameters, parameterNames);
 
         this.executable = constructor;
-        this.annotations = constructor.getAnnotations();
     }
 
     private void init(final Parameter[] parameters, final String[] parameterNames) {

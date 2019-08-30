@@ -7,15 +7,11 @@ public class MethodParameter {
 
     private final TypeDescriptor typeDescriptor;
     private final Parameter parameter;
-    private final Annotation[] annotations;
-    private final String name;
     private final int index;
 
     public MethodParameter(final Parameter parameter, final String name, final int index) {
         this.typeDescriptor = TypeDescriptor.valueOf(parameter.getType());
         this.parameter = parameter;
-        this.annotations = parameter.getAnnotations();
-        this.name = name;
         this.index = index;
     }
 
