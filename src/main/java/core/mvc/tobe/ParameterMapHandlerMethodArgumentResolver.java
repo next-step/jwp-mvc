@@ -17,13 +17,6 @@ public class ParameterMapHandlerMethodArgumentResolver implements HandlerMethodA
                                     final HttpServletRequest request,
                                     final HttpServletResponse response) {
 
-        return methodParameters.stream()
-                .filter(entry -> requestParameters.containsKey(entry.getKey()))
-                .map(entry -> {
-                    final String parameter = requestParameters.getFirst(entry.getKey());
-                    return entry.getValue()
-                            .convertStringTo(parameter);
-                })
-                .toArray();
+        return methodParameters.createArguments(requestParameters);
     }
 }

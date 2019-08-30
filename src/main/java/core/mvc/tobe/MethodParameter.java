@@ -34,4 +34,8 @@ public class MethodParameter {
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
         return parameter.isAnnotationPresent(annotationClass);
     }
+
+    public int getIndex() {
+        return index;
+    }
 }

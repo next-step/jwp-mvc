@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -68,5 +69,17 @@ public class MethodParameters {
 
     public Annotation getAnnotation(final Class<? extends Annotation> annotationClass) {
         return executable.getAnnotation(annotationClass);
+    }
+
+    public Object[] createArguments(final HttpRequestParameters requestParameters) {
+        return parameterMap.entrySet().stream()
+                .filter(entry -> requestParameters.containsKey(entry.getKey()))
+                .sorted(Comparator.comparingInt(entry -> entry.getValue().getIndex()))
+                .map(entry -> {
+                    final String parameter = requestParameters.getFirst(entry.getKey());
+                    return entry.getValue()
+                            .convertStringTo(parameter);
+                })
+                .toArray();
     }
 }

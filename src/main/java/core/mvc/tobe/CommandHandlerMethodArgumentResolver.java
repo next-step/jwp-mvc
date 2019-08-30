@@ -38,20 +38,10 @@ public class CommandHandlerMethodArgumentResolver implements HandlerMethodArgume
         return Arrays.stream(commandParameter.getDeclaredConstructors())
                 .map(ExceptionWrapper.function(constructor -> {
                     final MethodParameters constructorParameter = new MethodParameters(constructor);
-                    final Object[] parameters = getParameters(constructorParameter, requestParameters);
-                    return constructor.newInstance(parameters);
-                }));
-    }
+                    final Object[] initArguments = constructorParameter.createArguments(requestParameters);
 
-    private Object[] getParameters(final MethodParameters methodParameters, final HttpRequestParameters requestParameters) {
-        return methodParameters.stream()
-                .filter(entry -> requestParameters.containsKey(entry.getKey()))
-                .map(entry -> {
-                    final String parameter = requestParameters.getFirst(entry.getKey());
-                    return entry.getValue()
-                            .convertStringTo(parameter);
-                })
-                .toArray();
+                    return constructor.newInstance(initArguments);
+                }));
     }
 
 }
