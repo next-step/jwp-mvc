@@ -4,6 +4,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.Objects;
 
 public class JspView implements View {
 
@@ -22,5 +23,18 @@ public class JspView implements View {
 
         RequestDispatcher rd = request.getRequestDispatcher(path);
         rd.forward(request, response);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JspView)) return false;
+        JspView jspView = (JspView) o;
+        return Objects.equals(path, jspView.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 }

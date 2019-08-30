@@ -27,7 +27,7 @@ public class HandlerMethodArgumentResolverTest {
         request.addParameter("password", password);
 
         Class clazz = TestUserController.class;
-        Method method = getMethod("create_string", clazz.getDeclaredMethods());
+        Method method = getMethod("createString", clazz.getDeclaredMethods());
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
         for (int i = 0; i < parameterNames.length; i++) {
