@@ -2,7 +2,6 @@ package core.mvc.asis;
 
 import core.mvc.HandlerAdapter;
 import core.mvc.ModelAndView;
-import core.mvc.asis.view.LegacyView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

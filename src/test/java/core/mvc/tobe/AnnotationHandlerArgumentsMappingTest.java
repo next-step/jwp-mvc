@@ -12,7 +12,6 @@ public class AnnotationHandlerArgumentsMappingTest {
     @BeforeEach
     public void setup() {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
     }
 
     @DisplayName("String 매개변수")
