@@ -1,16 +1,15 @@
 package core.mvc.tobe;
 
-import core.annotation.web.PathVariable;
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
+import core.annotation.web.*;
 import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Controller
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/userList", method = RequestMethod.GET)
     public ModelAndView create_string(String userId, String password) {
         logger.debug("userId: {}, password: {}", userId, password);
         ModelAndView mav = new ModelAndView();
@@ -19,7 +18,7 @@ public class TestUserController {
         return mav;
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ModelAndView create_int_long(long id, int age) {
         logger.debug("id: {}, age: {}", id, age);
         ModelAndView mav = new ModelAndView();
@@ -36,9 +35,8 @@ public class TestUserController {
         return mav;
     }
 
-
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-    public ModelAndView show_pathvariable(@PathVariable long id) {
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.POST)
+    public ModelAndView show_pathVariable(@PathVariable long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
