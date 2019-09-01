@@ -31,22 +31,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-    private String[] basePackages;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
     private MultiValueMap<String, HandlerKey> urlMappings = new LinkedMultiValueMap<>();
 
     public AnnotationHandlerMapping(String... basePackages) {
-        this.basePackages = basePackages;
-    }
-
-    @Override
-    public HandlerMapping initialize() {
         Map<Class<?>, Object> beans = ComponentScanner.getControllers(basePackages);
         for (Class controller : beans.keySet()) {
             registerHandler(beans.get(controller), controller.getDeclaredMethods());
         }
-
-        return this;
     }
 
     private void registerHandler(Object bean, Method[] methods) {
