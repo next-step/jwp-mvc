@@ -14,6 +14,11 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
+    public boolean containsMethod(String method) {
+        return Arrays.stream(requestMethod)
+                .anyMatch(requestMethod -> requestMethod.name().equalsIgnoreCase(method));
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("{url=[");

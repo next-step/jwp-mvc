@@ -12,13 +12,14 @@ public class AnnotationHandlerMappingTest {
     @BeforeEach
     public void setup() {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
     }
 
     @DisplayName("단일 URL, 모든 Method")
     @Test
     public void getHandler() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/show");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
+        request.addParameter("id", "1");
+        request.addParameter("age", "11");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);

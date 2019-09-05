@@ -2,7 +2,6 @@ package core.mvc.tobe.view;
 
 import core.mvc.View;
 import core.mvc.ViewResolver;
-import core.mvc.asis.view.LegacyView;
 
 /**
  * @author : yusik
@@ -24,6 +23,6 @@ public class DefaultViewResolver implements ViewResolver {
             return new JspView(viewName);
         }
 
-        return new LegacyView(viewName);
+        return new JspView(viewName);
     }
 }

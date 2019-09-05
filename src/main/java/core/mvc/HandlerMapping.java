@@ -7,9 +7,5 @@ import javax.servlet.http.HttpServletRequest;
  * @date : 2019-08-15
  */
 public interface HandlerMapping {
-
-    HandlerMapping initialize();
-
     Object getHandler(HttpServletRequest request);
-
 }
