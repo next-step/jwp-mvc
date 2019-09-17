@@ -29,6 +29,7 @@ public class PathPatternTest {
         assertThat(variables.get("var2")).isEqualTo("bar");
     }
 
+
     private PathPattern parse(String path) {
         PathPatternParser pp = new PathPatternParser();
         pp.setMatchOptionalTrailingSeparator(true);

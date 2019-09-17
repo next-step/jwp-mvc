@@ -1,6 +1,7 @@
 package next.controller;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
@@ -45,6 +46,13 @@ public class UserController {
         }
         req.setAttribute("user", user);
         return new ModelAndView("/user/profile.jsp");
+    }
+
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    public ModelAndView show_pathvariable(@PathVariable long id) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("id", id);
+        return mav;
     }
 
 }

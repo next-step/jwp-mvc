@@ -51,7 +51,7 @@ public class AnnotationHandlerMapping implements HandlerMapping{
     }
 
     private void findControllerAnnotation(){
-        logger.debug("Find Controller Annotaion......");
+        logger.debug("Find Controller Annotation......");
         Reflections reflections = new Reflections(basePackage, new SubTypesScanner(), new TypeAnnotationsScanner());
         Set<Class<?>> controllerClass = reflections.getTypesAnnotatedWith(Controller.class);
         controllerClass.stream().forEach(clazz -> {
