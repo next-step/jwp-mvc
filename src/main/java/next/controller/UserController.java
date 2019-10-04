@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-    public ModelAndView show_pathvariable(@PathVariable long id) {
+    public ModelAndView showPathVariable(@PathVariable long id) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
         return mav;

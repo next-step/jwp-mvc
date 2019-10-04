@@ -11,7 +11,7 @@ public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView create_string(String userId, String password) {
+    public ModelAndView createString(String userId, String password) {
         logger.debug("userId: {}, password: {}", userId, password);
         ModelAndView mav = new ModelAndView();
         mav.addObject("userId", userId);
@@ -20,7 +20,7 @@ public class TestUserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView create_int_long(long id, int age) {
+    public ModelAndView createIntLong(long id, int age) {
         logger.debug("id: {}, age: {}", id, age);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
@@ -29,7 +29,7 @@ public class TestUserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView create_javabean(TestUser testUser) {
+    public ModelAndView createJavabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
         mav.addObject("testUser", testUser);
@@ -38,10 +38,18 @@ public class TestUserController {
 
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-    public ModelAndView show_pathvariable(@PathVariable long id) {
+    public ModelAndView showPathVariable(@PathVariable long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
+    public ModelAndView showPathVariableSetter(TestUser testUser) {
+        logger.debug("testUser: {}", testUser);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("testUser", testUser);
         return mav;
     }
 }

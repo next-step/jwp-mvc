@@ -19,7 +19,7 @@ public class HandlerMethodArgumentResolverTest {
 
     @Test
     void string() throws Exception {
-        HandlerExecution handlerExecution = new HandlerExecution();
+        ExecuteMethod handlerExecution = new ExecuteMethod();
         MockHttpServletRequest request = new MockHttpServletRequest();
         String userId = "javajigi";
         String password = "password";
@@ -27,7 +27,7 @@ public class HandlerMethodArgumentResolverTest {
         request.addParameter("password", password);
 
         Class clazz = TestUserController.class;
-        Method method = getMethod("create_string", clazz.getDeclaredMethods());
+        Method method = getMethod("createString", clazz.getDeclaredMethods());
         Object[] values = handlerExecution.getParameterValue(request, method);
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
@@ -37,7 +37,7 @@ public class HandlerMethodArgumentResolverTest {
 
     @Test
     void intLong() throws Exception {
-        HandlerExecution handlerExecution = new HandlerExecution();
+        ExecuteMethod handlerExecution = new ExecuteMethod();
         MockHttpServletRequest request = new MockHttpServletRequest();
         long id = 1;
         int age = 33;
@@ -45,7 +45,7 @@ public class HandlerMethodArgumentResolverTest {
         request.addParameter("age", String.valueOf(age));
 
         Class clazz = TestUserController.class;
-        Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
+        Method method = getMethod("createIntLong", clazz.getDeclaredMethods());
         Object[] values = handlerExecution.getParameterValue(request, method);
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
@@ -55,14 +55,14 @@ public class HandlerMethodArgumentResolverTest {
 
     @Test
     void initClass() throws Exception {
-        HandlerExecution handlerExecution = new HandlerExecution();
+        ExecuteMethod handlerExecution = new ExecuteMethod();
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("userId", "aaa");
         request.addParameter("password", "bbb");
         request.addParameter("age", "22");
 
         Class clazz = TestUserController.class;
-        Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
+        Method method = getMethod("createJavabean", clazz.getDeclaredMethods());
         Object[] values = handlerExecution.getParameterValue(request, method);
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
@@ -73,16 +73,34 @@ public class HandlerMethodArgumentResolverTest {
 
     @Test
     void initPath() throws Exception {
-        HandlerExecution handlerExecution = new HandlerExecution();
+        ExecuteMethod handlerExecution = new ExecuteMethod();
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setServletPath("/users/1");
 
         Class clazz = TestUserController.class;
-        Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
+        Method method = getMethod("showPathVariable", clazz.getDeclaredMethods());
         Object[] values = handlerExecution.getParameterValue(request, method);
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("id")).isEqualTo(1L);
+    }
+
+    @Test
+    void initPath2() throws Exception {
+        ExecuteMethod handlerExecution = new ExecuteMethod();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setServletPath("/users/1");
+        request.addParameter("password", "bbb");
+        request.addParameter("age", "22");
+
+        Class clazz = TestUserController.class;
+        Method method = getMethod("showPathVariableSetter", clazz.getDeclaredMethods());
+        Object[] values = handlerExecution.getParameterValue(request, method);
+
+        ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        assertThat(((TestUser)mav.getObject("testUser")).getUserId()).isEqualTo("1");
+        assertThat(((TestUser)mav.getObject("testUser")).getPassword()).isEqualTo("bbb");
+        assertThat(((TestUser)mav.getObject("testUser")).getAge()).isEqualTo(22);
     }
 
 
