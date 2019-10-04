@@ -1,10 +1,8 @@
 package core.mvc.tobe;
 
-
 import core.mvc.JspHandleView;
 import core.mvc.ModelAndView;
 import core.mvc.View;
-import core.mvc.asis.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,18 +15,23 @@ public class HandlerExecution implements AnnotationController {
 
     Class<?> clazz;
     Method executionMethod;
+    ExecuteMethod executeMethod;
+
+    public HandlerExecution() {
+    }
 
     public HandlerExecution(Class<?> clazz, Method executionMethod) {
         this.clazz = clazz;
         this.executionMethod = executionMethod;
+        this.executeMethod = new ExecuteMethod();
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Class<?> returnObjectType = executionMethod.getReturnType();
 
         try {
-            Object returnObject = executionMethod.invoke(clazz.newInstance(), request, response);
+            Object returnObject = initInvokeMethod(request);
             if (returnObjectType.equals(String.class)) {
                 String viewName = (String) returnObject;
                 View views = new JspHandleView(viewName);
@@ -38,7 +41,7 @@ public class HandlerExecution implements AnnotationController {
             if (returnObjectType.equals(ModelAndView.class)) {
                 return (ModelAndView) returnObject;
             }
-        }catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             logger.error("IllegalAccessException", e);
             throw new IllegalAccessException("잘못된 접근입니다.");
         } catch (Exception e) {
@@ -47,4 +50,10 @@ public class HandlerExecution implements AnnotationController {
         }
         return null;
     }
+
+    private Object initInvokeMethod(HttpServletRequest request) throws Exception {
+        return executionMethod.invoke(clazz.newInstance(),
+                executeMethod.getParameterValue(request, executionMethod));
+    }
+
 }
