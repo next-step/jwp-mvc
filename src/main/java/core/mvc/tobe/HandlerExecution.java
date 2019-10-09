@@ -2,8 +2,6 @@ package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
@@ -17,12 +15,15 @@ public class HandlerExecution {
         this.method = method;
     }
 
-    public ModelAndView handle(final HttpServletRequest request,
-                               final HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(controller, request, response);
+    public ModelAndView handle(final Object... args) throws Exception {
+        return (ModelAndView) method.invoke(controller, args);
     }
 
-    Object getController() {
+    public Object getController() {
         return controller;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 }
