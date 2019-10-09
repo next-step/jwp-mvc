@@ -45,7 +45,7 @@ class TestUserControllerTest {
     }
 
     @Test
-    void create_string() {
+    void createString() {
         // given
         final String USER_ID_KEY = "userId";
         final String USER_ID_VALUE = "jaeyeonling";
@@ -66,7 +66,7 @@ class TestUserControllerTest {
     }
 
     @Test
-    void create_int_long() throws NumberFormatException {
+    void createIntLong() throws NumberFormatException {
         // given
         final String ID_KEY = "id";
         final long ID_VALUE = 1;
@@ -87,7 +87,7 @@ class TestUserControllerTest {
     }
 
     @Test
-    void create_javabean() {
+    void createJavabean() {
         // given
         final String USER_ID_VALUE = "jaeyeonling";
         final String PASSWORD_VALUE = "P@ssw01d";
@@ -110,7 +110,7 @@ class TestUserControllerTest {
     }
 
     @Test
-    void show_pathVariable() {
+    void showPathVariable() {
         // given
         final long id = 1L;
 
