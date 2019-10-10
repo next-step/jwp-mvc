@@ -8,7 +8,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AnnotationHandlerMappingTest {
+class AnnotationHandlerMappingTest {
+    
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
@@ -21,7 +22,7 @@ public class AnnotationHandlerMappingTest {
     void getHandler() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecution execution = handlerMapping.getHandler(request).orElseThrow();
         execution.handle(request, response);
     }
 
@@ -32,7 +33,7 @@ public class AnnotationHandlerMappingTest {
         final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/findUserId");
 
         // when
-        final HandlerExecution execution = handlerMapping.getHandler(request);
+        final HandlerExecution execution = handlerMapping.getHandler(request).orElseThrow();
         final Object controller = execution.getController();
 
         // then
@@ -46,7 +47,7 @@ public class AnnotationHandlerMappingTest {
         final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
 
         // when
-        final HandlerExecution execution = handlerMapping.getHandler(request);
+        final HandlerExecution execution = handlerMapping.getHandler(request).orElseThrow();
         final Object controller = execution.getController();
 
         // then
@@ -59,10 +60,7 @@ public class AnnotationHandlerMappingTest {
         // given
         final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/not-found");
 
-        // when
-        final HandlerExecution execution = handlerMapping.getHandler(request);
-
-        // then
-        assertThat(execution).isNull();
+        // when / then
+        assertThat(handlerMapping.getHandler(request)).isNotPresent();
     }
 }

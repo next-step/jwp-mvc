@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 public class AnnotationHandlerMapping {
 
@@ -27,10 +28,15 @@ public class AnnotationHandlerMapping {
                 .forEach(this::bindController);
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    public Optional<HandlerExecution> getHandler(final HttpServletRequest request) {
+        final String requestUri = request.getRequestURI();
+        final RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+
+        return handlerExecutions.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().match(requestUri, requestMethod))
+                .findFirst()
+                .map(Map.Entry::getValue);
     }
 
     private void bindController(final Class<?> clazz) {
