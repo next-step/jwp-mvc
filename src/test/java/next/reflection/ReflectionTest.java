@@ -40,7 +40,7 @@ public class ReflectionTest {
 
         for (Method method : clazz.getDeclaredMethods()) {
             String modifier = Modifier.toString(method.getModifiers());
-            String returnType = method.getReturnType().toString();
+            String returnType = method.getReturnType().getName();
             String methodName = method.getName();
             String arguments = Arrays.stream(method.getParameterTypes())
                     .map(targetParameter -> targetParameter.getName())

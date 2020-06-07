@@ -8,7 +8,10 @@ import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -16,6 +19,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BeanFactoryTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(BeanFactoryTest.class);
     private Reflections reflections;
     private BeanFactory beanFactory;
 
@@ -38,6 +43,15 @@ public class BeanFactoryTest {
         MyQnaService qnaService = qnaController.getQnaService();
         assertNotNull(qnaService.getUserRepository());
         assertNotNull(qnaService.getQuestionRepository());
+    }
+    
+    @Test
+    public void printAnnotatedClasses() {
+        Set<Class<?>> annotatedClass = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+
+        for (Class<?> clazz : annotatedClass) {
+            logger.debug("AnnotatedClass : {}", clazz.getName());
+        }
     }
 
     @SuppressWarnings("unchecked")
