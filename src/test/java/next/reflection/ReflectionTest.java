@@ -11,12 +11,15 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
+        logger.debug(clazz.getName());
 
         for (Field field : clazz.getDeclaredFields()) {
             String modifier = Modifier.toString(field.getModifiers());
@@ -45,8 +48,6 @@ public class ReflectionTest {
 
             logger.debug("Method: {} {} " + methodName + "({})", modifier, returnType, arguments);
         }
-
-        logger.debug(clazz.getName());
     }
 
 
@@ -62,5 +63,40 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Student student = new Student();
+
+        Field name = clazz.getDeclaredField("name");
+        Field age = clazz.getDeclaredField("age");
+
+        name.setAccessible(true);
+        age.setAccessible(true);
+
+        name.set(student, "KingCjy");
+        age.set(student, 22);
+
+        logger.debug("Student: {}", student);
+        assertThat(student.getName()).isEqualTo("KingCjy");
+        assertThat(student.getAge()).isEqualTo(22);
+    }
+
+    @Test
+    public void createInstanceWithParameters() throws Exception {
+        Class<?> clazz = Question.class;
+
+        Constructor constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+
+        Question question = (Question) constructor.newInstance("writer", "title", "contents");
+        logger.debug("Question: {}", question);
+
+        assertThat(question.getWriter()).isEqualTo("writer");
+        assertThat(question.getTitle()).isEqualTo("title");
+        assertThat(question.getContents()).isEqualTo("contents");
     }
 }
