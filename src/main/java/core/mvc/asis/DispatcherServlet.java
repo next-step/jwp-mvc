@@ -1,5 +1,10 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.HandlerMappingComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +21,16 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-
-    private RequestMapping rm;
+    private HandlerMapping handlerMapping;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        RequestMapping requestMapping = new RequestMapping();
+        requestMapping.initMapping();
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core", "next");
+        annotationHandlerMapping.initialize();
+
+        handlerMapping = new HandlerMappingComposite(requestMapping, annotationHandlerMapping);
     }
 
     @Override
@@ -30,10 +38,18 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Object handler = handlerMapping.getHandler(req);
+
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            if(handler instanceof Controller) {
+                String viewName = ((Controller)handler).execute(req, resp);
+                move(viewName, req, resp);
+            } else if(handler instanceof HandlerExecution) {
+                ModelAndView modelAndView = ((HandlerExecution)handler).handle(req, resp);
+                render(modelAndView, req, resp);
+            } else {
+                throw new RuntimeException("404");
+            }
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
@@ -49,5 +65,9 @@ public class DispatcherServlet extends HttpServlet {
 
         RequestDispatcher rd = req.getRequestDispatcher(viewName);
         rd.forward(req, resp);
+    }
+
+    private void render(ModelAndView modelAndView, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        modelAndView.getView().render(modelAndView.getModel(), request, response);
     }
 }

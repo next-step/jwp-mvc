@@ -48,7 +48,6 @@ public class ControllerScanner {
     private Object createInstance(Class<?> targetClass) {
         try {
             Constructor constructor = targetClass.getConstructor();
-
             return constructor.newInstance();
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
