@@ -2,10 +2,34 @@ package next.reflection;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 public class Junit3TestRunner {
+
+    private final String INVOCABLE_METHODS_PREFIX = "test";
+
     @Test
-    public void run() throws Exception {
+    public void run() throws IllegalAccessException, InstantiationException {
         Class<Junit3Test> clazz = Junit3Test.class;
         // TODO Junit3Test에서 test로 시작하는 메소드 실행
+
+        Junit3Test junit3Test = clazz.newInstance();
+        Method[] methods = clazz.getDeclaredMethods();
+        invokeMethods(junit3Test, methods);
+    }
+
+    private void invokeMethods(Junit3Test junit3Test, Method[] methods) {
+        Arrays.stream(methods)
+            .filter(method -> method.getName().startsWith(INVOCABLE_METHODS_PREFIX))
+            .forEach(method -> {
+                try {
+                    method.invoke(junit3Test);
+                }
+                catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            });
     }
 }
