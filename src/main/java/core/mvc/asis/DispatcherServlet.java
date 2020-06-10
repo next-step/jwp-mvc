@@ -1,6 +1,6 @@
 package core.mvc.asis;
 
-import core.mvc.ModelAndView;
+import core.mvc.*;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMapping;
@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -22,15 +25,29 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private HandlerMapping handlerMapping;
+    private ViewResolver viewResolver;
 
     @Override
     public void init() throws ServletException {
+        initHandlerMapping();
+        initViewResolver();
+    }
+
+    private void initHandlerMapping() {
         RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core", "next");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
 
-        handlerMapping = new HandlerMappingComposite(requestMapping, annotationHandlerMapping);
+        handlerMapping = new HandlerMappingComposite(annotationHandlerMapping, requestMapping);
+    }
+
+    private void initViewResolver() {
+        RedirectViewResolver redirectViewResolver = new RedirectViewResolver();
+        JspViewResolver jspViewResolver = new JspViewResolver();
+        viewResolver = new ViewResolverComposite(new LinkedHashSet<>(
+                Arrays.asList(redirectViewResolver, jspViewResolver)
+        ));
     }
 
     @Override
@@ -68,6 +85,16 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void render(ModelAndView modelAndView, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        modelAndView.getView().render(modelAndView.getModel(), request, response);
+
+        View view;
+        String viewName = modelAndView.getViewName();
+
+        if(viewName == null) {
+            view = (View) modelAndView.getView();
+        } else {
+            view = viewResolver.resolveViewName(viewName);
+        }
+
+        view.render(modelAndView.getModel(), request, response);
     }
 }

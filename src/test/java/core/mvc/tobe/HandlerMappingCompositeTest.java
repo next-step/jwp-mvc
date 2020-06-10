@@ -25,13 +25,13 @@ public class HandlerMappingCompositeTest {
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         annotationHandlerMapping.initialize();
 
-        handlerMappingComposite = new HandlerMappingComposite(requestMapping, annotationHandlerMapping);
+        handlerMappingComposite = new HandlerMappingComposite(annotationHandlerMapping, requestMapping);
     }
 
     @Test
     @DisplayName("기존 레거시 RequestMapping 사용")
     public void getHandlerFromRequestMapping() {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/");
 
         Object handler = handlerMappingComposite.getHandler(request);
 
@@ -41,7 +41,7 @@ public class HandlerMappingCompositeTest {
     @Test
     @DisplayName("신규 AnnotationHandlerMapping 사용")
     public void getHandlerFromAnnotationHandlerMapping() {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/test");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
 
         Object handler = handlerMappingComposite.getHandler(request);
 
