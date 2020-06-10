@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,6 +121,28 @@ public class ReflectionTest {
             case "age":
                 field.set(student, age);
                 return;
+        }
+    }
+
+    @Test
+    public void createInstanceByConstructorWithArguments() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Class<Question> clazz = Question.class;
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+
+        for (Constructor constructor : constructors) {
+            if (constructor.getParameterCount() != 3) {
+                continue;
+            }
+
+            String writer = "ninjasul";
+            String title = "next-step jwp";
+            String contents = "훌륭한 개발자가 되기 위해 열심히 노력하겠습니다.";
+
+            Question question = (Question)constructor.newInstance(writer, title, contents);
+
+            assertThat(question.getWriter()).isEqualTo(writer);
+            assertThat(question.getTitle()).isEqualTo(title);
+            assertThat(question.getContents()).isEqualTo(contents);
         }
     }
 }
