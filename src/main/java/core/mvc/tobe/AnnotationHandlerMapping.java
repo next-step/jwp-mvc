@@ -44,13 +44,15 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
         String path = getPath(method);
 
-        if(requestMapping.method() == RequestMethod.ALL) {
-            return Arrays.stream(RequestMethod.values())
-                    .map(requestMethod -> new HandlerKey(path, requestMethod))
-                    .collect(Collectors.toSet());
+        RequestMethod[] requestMappings = requestMapping.method();
+
+        if(requestMapping.method().length == 0) {
+            requestMappings = RequestMethod.values();
         }
 
-        return new LinkedHashSet<>(Arrays.asList(new HandlerKey(path, requestMapping.method())));
+        return Arrays.stream(requestMappings)
+                .map(requestMethod -> new HandlerKey(path, requestMethod))
+                .collect(Collectors.toSet());
     }
 
     private String getPath(Method method) {

@@ -36,7 +36,7 @@ public class DispatcherServlet extends HttpServlet {
     private void initHandlerMapping() {
         RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next");
         annotationHandlerMapping.initialize();
 
         handlerMapping = new HandlerMappingComposite(annotationHandlerMapping, requestMapping);
