@@ -3,7 +3,10 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.asis.DispatcherServlet;
 import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -14,6 +17,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
+
+    private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -49,6 +55,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         if(requestMapping.method().length == 0) {
             requestMappings = RequestMethod.values();
         }
+
+        logger.info("Path : {}, Controller : {}", path, method.getDeclaringClass());
 
         return Arrays.stream(requestMappings)
                 .map(requestMethod -> new HandlerKey(path, requestMethod))
