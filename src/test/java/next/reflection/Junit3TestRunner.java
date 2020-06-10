@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Junit3TestRunner {
 
@@ -13,11 +14,13 @@ public class Junit3TestRunner {
     @Test
     public void run() throws IllegalAccessException, InstantiationException {
         Class<Junit3Test> clazz = Junit3Test.class;
-        // TODO Junit3Test에서 test로 시작하는 메소드 실행
-
         Junit3Test junit3Test = clazz.newInstance();
+
         Method[] methods = clazz.getDeclaredMethods();
-        invokeMethods(junit3Test, methods);
+
+        if (methods.length > 0) {
+            invokeMethods(junit3Test, methods);
+        }
     }
 
     private void invokeMethods(Junit3Test junit3Test, Method[] methods) {
