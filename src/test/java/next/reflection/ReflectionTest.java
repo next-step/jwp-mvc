@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger log = LoggerFactory.getLogger(ReflectionTest.class);
@@ -72,5 +76,54 @@ public class ReflectionTest {
             log.debug("");
         }
         log.debug("----------------------- methods starts ------------------------");
+    }
+
+    @Test
+    public void privateFieldAccess() {
+        Class<Student> clazz = Student.class;
+        log.debug("class name: {}", clazz.getName());
+
+        Student student = new Student();
+        String name = "동엽";
+        int age = 42;
+
+        setFields(clazz.getDeclaredFields(), student, name, age);
+
+        assertThat(student.getName()).isEqualTo(name);
+        assertThat(student.getAge()).isEqualTo(age);
+    }
+
+    private void setFields(Field[] declaredFields, Student student, String name, int age) {
+        if (declaredFields.length <= 0) {
+            return;
+        }
+
+        Arrays.stream(declaredFields)
+            .filter(this::isPrivateModifier)
+            .forEach(field -> {
+                field.setAccessible(true);
+                try {
+                    setField(field, student, name, age);
+                }
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
+    }
+
+    private boolean isPrivateModifier(Field field) {
+        return field.getModifiers() == Modifier.PRIVATE;
+    }
+
+    private void setField(Field field, Student student, String name, int age) throws IllegalAccessException {
+        switch(field.getName()) {
+            case "name":
+                field.set(student, name);
+                return;
+
+            case "age":
+                field.set(student, age);
+                return;
+        }
     }
 }
