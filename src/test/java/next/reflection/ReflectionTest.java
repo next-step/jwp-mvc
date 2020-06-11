@@ -18,14 +18,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
-    private static final Map<String, Object> REFERENCE_TYPE_VALUES;
+    private static final Map<Class<?>, Object> REFERENCE_TYPE_VALUES;
 
     static {
         REFERENCE_TYPE_VALUES = new HashMap<>();
-        REFERENCE_TYPE_VALUES.put("class java.lang.String", "TEXT");
-        REFERENCE_TYPE_VALUES.put("int", 0);
-        REFERENCE_TYPE_VALUES.put("long", 0L);
-        REFERENCE_TYPE_VALUES.put("class java.util.Date", new Date(0L));
+
+        REFERENCE_TYPE_VALUES.put(String.class, "TEXT");
+        REFERENCE_TYPE_VALUES.put(int.class, 0);
+        REFERENCE_TYPE_VALUES.put(long.class, 0L);
+        REFERENCE_TYPE_VALUES.put(Date.class, new Date(0L));
     }
 
     @Test
@@ -142,12 +143,11 @@ public class ReflectionTest {
                 .forEach(instance -> {
                     Question question = (Question) instance;
 
-                    // primitive type의 값을 맵핑시킬 좋은 방법이 없을까
-                    assertThat(question.getQuestionId()).isEqualTo(REFERENCE_TYPE_VALUES.get("long"));
-                    assertThat(question.getWriter()).isEqualTo(REFERENCE_TYPE_VALUES.get("class java.lang.String"));
-                    assertThat(question.getTitle()).isEqualTo(REFERENCE_TYPE_VALUES.get("class java.lang.String"));
-                    assertThat(question.getContents()).isEqualTo(REFERENCE_TYPE_VALUES.get("class java.lang.String"));
-                    assertThat(question.getCountOfComment()).isEqualTo(REFERENCE_TYPE_VALUES.get("int"));
+                    assertThat(question.getQuestionId()).isEqualTo(REFERENCE_TYPE_VALUES.get(long.class));
+                    assertThat(question.getWriter()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
+                    assertThat(question.getTitle()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
+                    assertThat(question.getContents()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
+                    assertThat(question.getCountOfComment()).isEqualTo(REFERENCE_TYPE_VALUES.get(int.class));
 
                     logger.debug("{}", question);
                 });
@@ -155,7 +155,6 @@ public class ReflectionTest {
 
     private <T> T createInstance(final Constructor<T> constructor) {
         List<Object> arguments = Arrays.stream(constructor.getParameterTypes())
-                .map(Type::toString)
                 .map(REFERENCE_TYPE_VALUES::get)
                 .collect(Collectors.toList());
 
