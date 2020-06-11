@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,5 +119,32 @@ public class ReflectionTest {
         assertThat(student.getAge()).isEqualTo(-25);
         assertThat(student.getName()).isEqualTo("kwang");
         logger.debug("{}", student);
+    }
+
+    @Test
+    @DisplayName("인자가 있는 생성자로 인스턴스 생성하기")
+    void createInstanceWithArguments() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Class<Question> clazz = Question.class;
+        logger.debug(clazz.getName());
+
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+
+        Question question = (Question) constructors[0].newInstance("writer", "title", "contents");
+        Question question2 = (Question) constructors[1].newInstance(1, "writer2", "title2", "contents2", new Date(), 1);
+
+        assertThat(question.getQuestionId()).isEqualTo(0);
+        assertThat(question.getWriter()).isEqualTo("writer");
+        assertThat(question.getTitle()).isEqualTo("title");
+        assertThat(question.getContents()).isEqualTo("contents");
+        assertThat(question.getCountOfComment()).isEqualTo(0);
+
+        assertThat(question2.getQuestionId()).isEqualTo(1);
+        assertThat(question2.getWriter()).isEqualTo("writer2");
+        assertThat(question2.getTitle()).isEqualTo("title2");
+        assertThat(question2.getContents()).isEqualTo("contents2");
+        assertThat(question2.getCountOfComment()).isEqualTo(1);
+
+        logger.debug("{}", question);
+        logger.debug("{}", question2);
     }
 }
