@@ -173,7 +173,7 @@ public class ReflectionTest {
         try {
             return constructor.newInstance(arguments.toArray(new Object[arguments.size()]));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            logger.debug("Fail to create instance : {}", e.getMessage());
+            logger.error("Fail to create instance : {}", e.getMessage());
             return null;
         }
     }
