@@ -2,12 +2,15 @@ package next.reflection;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class Junit3TestRunner {
+    private static final Logger log = LoggerFactory.getLogger(Junit3TestRunner.class);
 
     private final String INVOCABLE_METHODS_PREFIX = "test";
 
@@ -29,13 +32,17 @@ public class Junit3TestRunner {
 
         Arrays.stream(methods)
             .filter(method -> method.getName().startsWith(INVOCABLE_METHODS_PREFIX))
-            .forEach(method -> {
-                try {
-                    method.invoke(junit3Test);
-                }
-                catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            });
+            .forEach(method -> invokeMethod(junit3Test, method));
+    }
+
+    private Object invokeMethod(Junit3Test junit3Test, Method method) {
+        try {
+            return method.invoke(junit3Test);
+        }
+        catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage());
+        }
+
+        return null;
     }
 }
