@@ -17,8 +17,8 @@ public class Junit3TestRunner {
 
         // Junit3Test 에서 test 로 시작하는 메소드 실행
         Arrays.stream(clazz.getDeclaredMethods())
-                .filter(method -> method.getName().startsWith("test"))
-                .forEach(method -> runMethod(method, clazz)); // filter that method name start with test
+                .filter(method -> method.getName().startsWith("test")) // filter that method name start with test
+                .forEach(method -> runMethod(method, clazz));
     }
 
     private void runMethod(Method method, Class<Junit3Test> clazz) {
