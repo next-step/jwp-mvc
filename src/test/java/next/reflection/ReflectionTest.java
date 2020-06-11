@@ -111,23 +111,27 @@ public class ReflectionTest {
 
     @Test
     @DisplayName("private 필드에 값 할당하기")
-    void injectFieldValue() throws NoSuchFieldException, IllegalAccessException {
+    void injectFieldValue() {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
 
-        Field nameField = clazz.getDeclaredField("name");
-        nameField.setAccessible(true);
-
-        Field ageField = clazz.getDeclaredField("age");
-        ageField.setAccessible(true);
-
         Student student = new Student();
-        nameField.set(student, "kwang");
-        ageField.set(student, -25);
 
-        assertThat(student.getAge()).isEqualTo(-25);
-        assertThat(student.getName()).isEqualTo("kwang");
+        Arrays.stream(clazz.getDeclaredFields())
+                .forEach(field -> setPrivateFieldValue(student, field));
+
+        assertThat(student.getAge()).isEqualTo(REFERENCE_TYPE_VALUES.get(int.class));
+        assertThat(student.getName()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
         logger.debug("{}", student);
+    }
+
+    private void setPrivateFieldValue(final Student student, final Field field) {
+        try {
+            field.setAccessible(true);
+            field.set(student, REFERENCE_TYPE_VALUES.get(field.getType()));
+        } catch (IllegalAccessException e) {
+            logger.error("Fail to set value at private field : {}", e.getMessage());
+        }
     }
 
     @Test
