@@ -14,8 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ComponentScanTest {
@@ -26,9 +28,14 @@ public class ComponentScanTest {
     @Test
     public void printAllAnnotatedClasses() {
         reflections = new Reflections("core.di.factory.example");
-        Set<Class<?>> annotatedClasses = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
 
-        annotatedClasses.forEach(clazz -> log.debug("className: {}", clazz.getName()));
+        Class[] targetClasses = {Controller.class, Service.class, Repository.class};
+        Set<Class<?>> annotatedClasses = getTypesAnnotatedWith(targetClasses);
+
+        for (Class<?> clazz : annotatedClasses) {
+            assertThat(isAnnotationPresent(clazz, targetClasses)).isTrue();
+            log.debug("className: {}", clazz.getName());
+        }
     }
 
     private Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation>... annotations) {
@@ -37,5 +44,10 @@ public class ComponentScanTest {
             beans.addAll(reflections.getTypesAnnotatedWith(annotation));
         }
         return beans;
+    }
+
+    private boolean isAnnotationPresent(Class<?> clazz, Class<? extends Annotation>... annotations) {
+        return Arrays.stream(annotations)
+            .anyMatch(clazz::isAnnotationPresent);
     }
 }
