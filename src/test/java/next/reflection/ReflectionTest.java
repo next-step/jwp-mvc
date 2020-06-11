@@ -23,7 +23,7 @@ public class ReflectionTest {
         REFERENCE_TYPE_VALUES.put(String.class, "TEXT");
         REFERENCE_TYPE_VALUES.put(int.class, 0);
         REFERENCE_TYPE_VALUES.put(long.class, 0L);
-        REFERENCE_TYPE_VALUES.put(Date.class, new Date(0L));
+        REFERENCE_TYPE_VALUES.put(Date.class, new Date(0));
     }
 
     @Test
@@ -124,9 +124,9 @@ public class ReflectionTest {
         logger.debug("{}", student);
     }
 
-    private void invokeMethod(final Student student, final Method method) {
+    private void invokeMethod(final Object object, final Method method) {
         try {
-            assertThat(method.invoke(student)).isEqualTo(REFERENCE_TYPE_VALUES.get(method.getReturnType()));
+            assertThat(method.invoke(object)).isEqualTo(REFERENCE_TYPE_VALUES.get(method.getReturnType()));
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("Fail to invoke method : {}", e.getMessage());
         }
@@ -152,16 +152,17 @@ public class ReflectionTest {
         Arrays.stream(constructors)
                 .map(this::createInstance)
                 .forEach(instance -> {
-                    Question question = (Question) instance;
+                    invokeAllGetterMethod(clazz, instance);
 
-                    assertThat(question.getQuestionId()).isEqualTo(REFERENCE_TYPE_VALUES.get(long.class));
-                    assertThat(question.getWriter()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
-                    assertThat(question.getTitle()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
-                    assertThat(question.getContents()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
-                    assertThat(question.getCountOfComment()).isEqualTo(REFERENCE_TYPE_VALUES.get(int.class));
-
-                    logger.debug("{}", question);
+                    logger.debug("{}", instance);
                 });
+    }
+
+    private void invokeAllGetterMethod(final Class<?> clazz, final Object object) {
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("get"))
+                .filter(method -> !method.getName().contains("Date"))
+                .forEach(method -> invokeMethod(object, method));
     }
 
     private <T> T createInstance(final Constructor<T> constructor) {
