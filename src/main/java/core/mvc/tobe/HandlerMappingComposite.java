@@ -17,7 +17,7 @@ public class HandlerMappingComposite implements HandlerMapping {
     }
 
     @Override
-    public Object getHandler(HttpServletRequest request) {
+    public HandlerExecution getHandler(HttpServletRequest request) {
         return handlerMappings.stream()
                 .filter(handlerMapping -> handlerMapping.getHandler(request) != null)
                 .map(handlerMapping -> handlerMapping.getHandler(request))

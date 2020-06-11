@@ -44,6 +44,6 @@ public class HandlerMappingCompositeTest {
 
         Object handler = handlerMappingComposite.getHandler(request);
 
-        assertThat(handler).isInstanceOf(HandlerExecution.class);
+        assertThat(handler).isInstanceOf(HandlerExecutionImpl.class);
     }
 }

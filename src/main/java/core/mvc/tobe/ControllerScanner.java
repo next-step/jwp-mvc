@@ -49,11 +49,7 @@ public class ControllerScanner {
         try {
             Constructor constructor = targetClass.getConstructor();
             return constructor.newInstance();
-        } catch (NoSuchMethodException e) {
-            logger.error(e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            logger.error(e.getMessage(), e);
-        } catch (InstantiationException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException e) {
             logger.error(e.getMessage(), e);
         } catch (InvocationTargetException e) {
             logger.error(e.getTargetException().getMessage(), e.getTargetException());

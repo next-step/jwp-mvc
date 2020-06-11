@@ -54,18 +54,11 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Object handler = handlerMapping.getHandler(req);
+        HandlerExecution handler = handlerMapping.getHandler(req);
 
         try {
-            if (handler instanceof Controller) {
-                String viewName = ((Controller) handler).execute(req, resp);
-                move(viewName, req, resp);
-            } else if (handler instanceof HandlerExecution) {
-                ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
-                render(modelAndView, req, resp);
-            } else {
-                throw new RuntimeException("404");
-            }
+            ModelAndView modelAndView = handler.handle(req, resp);
+            render(modelAndView, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
