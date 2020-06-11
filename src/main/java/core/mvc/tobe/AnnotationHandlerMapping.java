@@ -36,11 +36,11 @@ public class AnnotationHandlerMapping {
     }
 
     private void initHandlerExecutions() {
-        Map<Method, Object> methods = ReflectionUtil.getControllerRequestMappingMethods(reflections);
-/*
+        Map<Method, Object> methods = ReflectionUtil.getControllerMethodsWithRequestMapping(reflections);
+
         for(Map.Entry<Method, Object> methodEntry : methods.entrySet()) {
-            addHandlerExecutions(annotatedClass, methodEntry.getValue(), methodEntry.getKey(), handlerKey);
-        }*/
+            addHandlerExecutions(handlerKey, methodEntry.getValue(), methodEntry.getKey());
+        }
     }
 
     private boolean isRequestMappingAnnotationPresent(Class<?> annotatedClass) {
@@ -75,13 +75,13 @@ public class AnnotationHandlerMapping {
         }
         return beans;
     }
-/*
-    private void addHandlerExecutions(Class<?> annotatedClass, Object instance, Method method, HandlerKey handlerKey) {
+
+    private void addHandlerExecutions(HandlerKey handlerKey, Object instance, Method method) {
         handlerExecutions.put(
             getOverriddenHandlerKey(handlerKey, annotation),
-            getHandlerExecution(annotatedClass, instance, method)
+            new HandlerExecution(instance, method)
         );
-    }*/
+    }
 
     private HandlerKey getOverriddenHandlerKey(HandlerKey handlerKey, RequestMapping annotation) {
         String requestUri = getBaseRequestUri(handlerKey) + annotation.value();
@@ -94,13 +94,5 @@ public class AnnotationHandlerMapping {
         }
 
         return handlerKey.getUrl();
-    }
-
-    private HandlerExecution getHandlerExecution(Class<?> annotatedClass, Object instance, Method method) {
-        if (Objects.isNull(instance)) {
-            instance = getInstance(annotatedClass);
-        }
-
-        return new HandlerExecution(instance, method);
     }
 }

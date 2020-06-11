@@ -4,15 +4,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 public class ReflectionUtil {
@@ -29,17 +27,28 @@ public class ReflectionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<Method, Object> getControllerRequestMappingMethods(Reflections reflections) {
-        Map<Method, Object> methodMap = Maps.newHashMap();
-
+    public static Map<Method, Object> getControllerMethodsWithRequestMapping(Reflections reflections) {
+        Map<Method, RequestMappingMethod> methodMap = Maps.newHashMap();
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(CONTROLLER_ANNOTATION_CLASS);
 
         for (Class<?> type : types) {
+            String baseUri = "";
+            Set<RequestMethod> requestMethods = Sets.newHashSet();
+
+            if (containsAnnotation(type, REQUEST_MAPPING_ANNOTATION_CLASS)) {
+                RequestMapping annotation = (RequestMapping) getAnnotation(type, REQUEST_MAPPING_ANNOTATION_CLASS);
+                baseUri = annotation.value();
+                requestMethods.addAll(Arrays.asList(annotation.method()));
+            }
+
             Object instance = null;
+
             for(Method method : type.getMethods()) {
                 if (containsAnnotation(method, REQUEST_MAPPING_ANNOTATION_CLASS)) {
+                    RequestMapping annotation = (RequestMapping) getAnnotation(method, REQUEST_MAPPING_ANNOTATION_CLASS);
                     instance = getInstance(type, instance);
-                    methodMap.put(method, instance);
+                    requestMethods.addAll(Arrays.asList(annotation.method()));
+                    methodMap.put(method, new RequestMappingMethod(method, instance, baseUri + annotation.value(), requestMethods));
                 }
             }
         }
