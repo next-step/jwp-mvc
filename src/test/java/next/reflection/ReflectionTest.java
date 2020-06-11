@@ -10,15 +10,23 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    private static final Map<String, Object> REFERENCE_TYPE_VALUES;
+
+    static {
+        REFERENCE_TYPE_VALUES = new HashMap<>();
+        REFERENCE_TYPE_VALUES.put("class java.lang.String", "TEXT");
+        REFERENCE_TYPE_VALUES.put("int", 0);
+        REFERENCE_TYPE_VALUES.put("long", 0L);
+        REFERENCE_TYPE_VALUES.put("class java.util.Date", new Date(0L));
+    }
 
     @Test
     @DisplayName("Question 클래스의 필드, 생성자, 메소드 를 모두 출력")
@@ -123,28 +131,39 @@ public class ReflectionTest {
 
     @Test
     @DisplayName("인자가 있는 생성자로 인스턴스 생성하기")
-    void createInstanceWithArguments() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    void createInstanceWithArguments() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
 
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
 
-        Question question = (Question) constructors[0].newInstance("writer", "title", "contents");
-        Question question2 = (Question) constructors[1].newInstance(1, "writer2", "title2", "contents2", new Date(), 1);
+        Arrays.stream(constructors)
+                .map(this::createInstance)
+                .forEach(instance -> {
+                    Question question = (Question) instance;
 
-        assertThat(question.getQuestionId()).isEqualTo(0);
-        assertThat(question.getWriter()).isEqualTo("writer");
-        assertThat(question.getTitle()).isEqualTo("title");
-        assertThat(question.getContents()).isEqualTo("contents");
-        assertThat(question.getCountOfComment()).isEqualTo(0);
+                    // primitive type의 값을 맵핑시킬 좋은 방법이 없을까
+                    assertThat(question.getQuestionId()).isEqualTo(REFERENCE_TYPE_VALUES.get("long"));
+                    assertThat(question.getWriter()).isEqualTo(REFERENCE_TYPE_VALUES.get("class java.lang.String"));
+                    assertThat(question.getTitle()).isEqualTo(REFERENCE_TYPE_VALUES.get("class java.lang.String"));
+                    assertThat(question.getContents()).isEqualTo(REFERENCE_TYPE_VALUES.get("class java.lang.String"));
+                    assertThat(question.getCountOfComment()).isEqualTo(REFERENCE_TYPE_VALUES.get("int"));
 
-        assertThat(question2.getQuestionId()).isEqualTo(1);
-        assertThat(question2.getWriter()).isEqualTo("writer2");
-        assertThat(question2.getTitle()).isEqualTo("title2");
-        assertThat(question2.getContents()).isEqualTo("contents2");
-        assertThat(question2.getCountOfComment()).isEqualTo(1);
+                    logger.debug("{}", question);
+                });
+    }
 
-        logger.debug("{}", question);
-        logger.debug("{}", question2);
+    private <T> T createInstance(final Constructor<T> constructor) {
+        List<Object> arguments = Arrays.stream(constructor.getParameterTypes())
+                .map(Type::toString)
+                .map(REFERENCE_TYPE_VALUES::get)
+                .collect(Collectors.toList());
+
+        try {
+            return constructor.newInstance(arguments.toArray(new Object[arguments.size()]));
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            logger.debug("Fail to create instance : {}", e.getMessage());
+            return null;
+        }
     }
 }
