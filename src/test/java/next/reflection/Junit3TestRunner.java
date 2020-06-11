@@ -21,7 +21,7 @@ public class Junit3TestRunner {
                 .forEach(method -> runMethod(method, clazz));
     }
 
-    private void runMethod(Method method, Class<Junit3Test> clazz) {
+    private void runMethod(final Method method, final Class<Junit3Test> clazz) {
         try {
             method.invoke(clazz.newInstance());
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
