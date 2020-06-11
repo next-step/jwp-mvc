@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,6 +12,7 @@ public class Junit3TestRunner {
     private final String INVOCABLE_METHODS_PREFIX = "test";
 
     @Test
+    @DisplayName("test로 시작하는 메소드만 실행하는 테스트")
     public void run() throws IllegalAccessException, InstantiationException {
         Class<Junit3Test> clazz = Junit3Test.class;
 

@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -7,7 +8,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class Junit4TestRunner {
+
     @Test
+    @DisplayName("MyTest 어노테이션이 있는 메소드만 실행하는 테스트")
     public void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
 

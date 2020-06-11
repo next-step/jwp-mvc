@@ -8,6 +8,7 @@ import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import next.reflection.ReflectionTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public class ComponentScanTest {
     private Reflections reflections;
 
     @Test
+    @DisplayName("특정 어노테이션을 가지고 있는 클래스를 출력하는 테스트")
     public void printAllAnnotatedClasses() {
         reflections = new Reflections("core.di.factory.example");
 

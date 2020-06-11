@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ public class ReflectionTest {
     private static final Logger log = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
+    @DisplayName("클래스 정보를 출력하는 테스트")
     public void showClass() throws Exception {
         Class<Question> clazz = Question.class;
 
@@ -76,6 +78,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("private 필드에 값을 셋팅하는 테스트")
     public void privateFieldAccess() {
         Class<Student> clazz = Student.class;
         log.debug("class name: {}", clazz.getName());
@@ -125,6 +128,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("인자가 있는 생성자를 통해 인스턴스를 생성하는 테스트")
     public void createInstanceByConstructorWithArguments() throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Class<Question> clazz = Question.class;
         Constructor[] constructors = clazz.getDeclaredConstructors();
