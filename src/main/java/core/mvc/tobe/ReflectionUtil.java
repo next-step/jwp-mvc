@@ -6,6 +6,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import lombok.extern.slf4j.Slf4j;
+import next.util.StringUtils;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -27,28 +28,35 @@ public class ReflectionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<Method, Object> getControllerMethodsWithRequestMapping(Reflections reflections) {
-        Map<Method, RequestMappingMethod> methodMap = Maps.newHashMap();
+    public static Set<RequestMappingMethod> getControllerMethodsWithRequestMapping(Reflections reflections) {
+        Set<RequestMappingMethod> methodMap = Sets.newHashSet();
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(CONTROLLER_ANNOTATION_CLASS);
 
         for (Class<?> type : types) {
             String baseUri = "";
-            Set<RequestMethod> requestMethods = Sets.newHashSet();
+            Set<RequestMethod> baseRequestMethods = Sets.newHashSet();
 
             if (containsAnnotation(type, REQUEST_MAPPING_ANNOTATION_CLASS)) {
                 RequestMapping annotation = (RequestMapping) getAnnotation(type, REQUEST_MAPPING_ANNOTATION_CLASS);
                 baseUri = annotation.value();
-                requestMethods.addAll(Arrays.asList(annotation.method()));
+                baseRequestMethods.addAll(Arrays.asList(annotation.method()));
             }
 
             Object instance = null;
 
             for(Method method : type.getMethods()) {
                 if (containsAnnotation(method, REQUEST_MAPPING_ANNOTATION_CLASS)) {
+                    Set<RequestMethod> requestMethods = Sets.newHashSet(baseRequestMethods);
+
                     RequestMapping annotation = (RequestMapping) getAnnotation(method, REQUEST_MAPPING_ANNOTATION_CLASS);
-                    instance = getInstance(type, instance);
+                    instance = newInstance(type, instance);
                     requestMethods.addAll(Arrays.asList(annotation.method()));
-                    methodMap.put(method, new RequestMappingMethod(method, instance, baseUri + annotation.value(), requestMethods));
+
+                    log.debug("methodName: {}", method.getName());
+                    log.debug("uri: {}", baseUri + annotation.value());
+                    log.debug("requestMethods: {}", StringUtils.toPrettyJson(requestMethods));
+
+                    methodMap.add(new RequestMappingMethod(method, instance, baseUri + annotation.value(), requestMethods));
                 }
             }
         }
@@ -80,14 +88,14 @@ public class ReflectionUtil {
             .orElse(null);
     }
 
-    private static Object getInstance(Class<?> declaringClass, Object instance) {
+    private static Object newInstance(Class<?> declaringClass, Object instance) {
         if (Objects.isNull(instance)) {
-            instance = getInstance(declaringClass);
+            instance = newInstance(declaringClass);
         }
         return instance;
     }
 
-    private static Object getInstance(Class<?> annotatedClass) {
+    private static Object newInstance(Class<?> annotatedClass) {
         Object instance = null;
         try {
             instance = annotatedClass.newInstance();

@@ -1,13 +1,9 @@
 package core.di.factory;
 
-import com.google.common.collect.Sets;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
-import core.di.factory.example.MyQnaService;
-import core.di.factory.example.QnaController;
-import next.reflection.ReflectionTest;
-import org.junit.jupiter.api.BeforeEach;
+import core.mvc.tobe.ReflectionUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -31,25 +27,17 @@ public class ComponentScanTest {
     public void printAllAnnotatedClasses() {
         reflections = new Reflections("core.di.factory.example");
 
-        Class[] targetClasses = {Controller.class, Service.class, Repository.class};
-        Set<Class<?>> annotatedClasses = getTypesAnnotatedWith(targetClasses);
+        Class<? extends Annotation>[] targetClasses = new Class[]{Controller.class, Service.class, Repository.class};
+        Set<Class<?>> annotatedClasses = ReflectionUtil.getTypesAnnotatedWith(reflections, targetClasses);
 
         for (Class<?> clazz : annotatedClasses) {
-            assertThat(isAnnotationPresent(clazz, targetClasses)).isTrue();
+            assertThat(containsAnyTargetAnnotation(clazz, targetClasses)).isTrue();
             log.debug("className: {}", clazz.getName());
         }
     }
 
-    private Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation>... annotations) {
-        Set<Class<?>> beans = Sets.newHashSet();
-        for (Class<? extends Annotation> annotation : annotations) {
-            beans.addAll(reflections.getTypesAnnotatedWith(annotation));
-        }
-        return beans;
-    }
-
-    private boolean isAnnotationPresent(Class<?> clazz, Class<? extends Annotation>... annotations) {
-        return Arrays.stream(annotations)
-            .anyMatch(clazz::isAnnotationPresent);
+    private boolean containsAnyTargetAnnotation(Class<?> clazz, Class<? extends Annotation>[] targetAnnotationClasses) {
+        return Arrays.stream(targetAnnotationClasses)
+                .anyMatch(clazz::isAnnotationPresent);
     }
 }

@@ -6,6 +6,7 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
+import core.mvc.tobe.ReflectionUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -23,7 +24,7 @@ public class BeanFactoryTest {
     @SuppressWarnings("unchecked")
     public void setup() {
         reflections = new Reflections("core.di.factory.example");
-        Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+        Set<Class<?>> preInstanticateClazz = ReflectionUtil.getTypesAnnotatedWith(reflections, Controller.class, Service.class, Repository.class);
         beanFactory = new BeanFactory(preInstanticateClazz);
         beanFactory.initialize();
     }
@@ -38,14 +39,5 @@ public class BeanFactoryTest {
         MyQnaService qnaService = qnaController.getQnaService();
         assertNotNull(qnaService.getUserRepository());
         assertNotNull(qnaService.getQuestionRepository());
-    }
-
-    @SuppressWarnings("unchecked")
-    private Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation>... annotations) {
-        Set<Class<?>> beans = Sets.newHashSet();
-        for (Class<? extends Annotation> annotation : annotations) {
-            beans.addAll(reflections.getTypesAnnotatedWith(annotation));
-        }
-        return beans;
     }
 }
