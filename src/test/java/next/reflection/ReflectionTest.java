@@ -6,10 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -120,9 +117,19 @@ public class ReflectionTest {
         Arrays.stream(clazz.getDeclaredFields())
                 .forEach(field -> setPrivateFieldValue(student, field));
 
-        assertThat(student.getAge()).isEqualTo(REFERENCE_TYPE_VALUES.get(int.class));
-        assertThat(student.getName()).isEqualTo(REFERENCE_TYPE_VALUES.get(String.class));
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("get"))
+                .forEach(method -> invokeMethod(student, method));
+
         logger.debug("{}", student);
+    }
+
+    private void invokeMethod(final Student student, final Method method) {
+        try {
+            assertThat(method.invoke(student)).isEqualTo(REFERENCE_TYPE_VALUES.get(method.getReturnType()));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("Fail to invoke method : {}", e.getMessage());
+        }
     }
 
     private void setPrivateFieldValue(final Student student, final Field field) {
