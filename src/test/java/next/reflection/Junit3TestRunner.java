@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ public class Junit3TestRunner {
     private static final Logger logger = LoggerFactory.getLogger(Junit3TestRunner.class);
 
     @Test
+    @DisplayName("test 로 시작하는 메소드 실행시키기")
     public void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
 

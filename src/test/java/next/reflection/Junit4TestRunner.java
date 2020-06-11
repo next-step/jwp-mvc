@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ public class Junit4TestRunner {
     private static final Logger logger = LoggerFactory.getLogger(Junit4TestRunner.class);
 
     @Test
+    @DisplayName("@MyTest 어노테이션이 붙어있는 메소드만 실행시키기")
     public void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
         // Junit4Test 에서 @MyTest 애노테이션이 있는 메소드 실행
