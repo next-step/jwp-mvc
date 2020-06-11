@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -58,11 +57,11 @@ public class DispatcherServlet extends HttpServlet {
         Object handler = handlerMapping.getHandler(req);
 
         try {
-            if(handler instanceof Controller) {
-                String viewName = ((Controller)handler).execute(req, resp);
+            if (handler instanceof Controller) {
+                String viewName = ((Controller) handler).execute(req, resp);
                 move(viewName, req, resp);
-            } else if(handler instanceof HandlerExecution) {
-                ModelAndView modelAndView = ((HandlerExecution)handler).handle(req, resp);
+            } else if (handler instanceof HandlerExecution) {
+                ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
                 render(modelAndView, req, resp);
             } else {
                 throw new RuntimeException("404");
@@ -89,7 +88,7 @@ public class DispatcherServlet extends HttpServlet {
         View view;
         String viewName = modelAndView.getViewName();
 
-        if(viewName == null) {
+        if (viewName == null) {
             view = (View) modelAndView.getView();
         } else {
             view = viewResolver.resolveViewName(viewName);

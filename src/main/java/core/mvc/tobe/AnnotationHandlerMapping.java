@@ -52,7 +52,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
         RequestMethod[] requestMappings = requestMapping.method();
 
-        if(requestMapping.method().length == 0) {
+        if (requestMapping.method().length == 0) {
             requestMappings = RequestMethod.values();
         }
 

@@ -21,14 +21,14 @@ public class HandlerExecution extends HandlerMethod {
         return (ModelAndView) this.invoke(request, response);
     }
 
-    private  Object invoke(Object... providedArguments) {
+    private Object invoke(Object... providedArguments) {
         Object[] args = getMethodArgumentValues(providedArguments);
         try {
             return method.invoke(instance, args);
         } catch (IllegalAccessException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } catch(InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             logger.error(e.getTargetException().getMessage(), e.getTargetException());
             throw new RuntimeException(e);
         }
@@ -37,12 +37,12 @@ public class HandlerExecution extends HandlerMethod {
     private Object[] getMethodArgumentValues(Object[] providedArguments) {
         Object[] args = new Object[parameters.length];
 
-        for(int i = 0; i < parameters.length; i++) {
+        for (int i = 0; i < parameters.length; i++) {
             MethodParameter parameter = parameters[i];
 
             args[i] = findProvidedArgument(parameter, providedArguments);
 
-            if(args[i] != null) {
+            if (args[i] != null) {
                 continue;
             }
         }
@@ -50,13 +50,13 @@ public class HandlerExecution extends HandlerMethod {
         return args;
     }
 
-    private static Object findProvidedArgument(MethodParameter parameter, Object ...providedArgs) {
-        if(providedArgs == null) {
+    private static Object findProvidedArgument(MethodParameter parameter, Object... providedArgs) {
+        if (providedArgs == null) {
             return null;
         }
 
         for (Object providedArg : providedArgs) {
-            if(parameter.getParameterType().isInstance(providedArg)) {
+            if (parameter.getParameterType().isInstance(providedArg)) {
                 return providedArg;
             }
         }

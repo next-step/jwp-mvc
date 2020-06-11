@@ -8,7 +8,7 @@ public class JspViewResolver implements ViewResolver {
 
     @Override
     public View resolveViewName(String viewName) {
-        if(viewName.endsWith(JSP_SUFFIX)) {
+        if (viewName.endsWith(JSP_SUFFIX)) {
             return new JspView(viewName);
         }
         return null;

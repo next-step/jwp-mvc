@@ -24,7 +24,7 @@ public class HandlerMethod {
 
         MethodParameter[] result = new MethodParameter[count];
 
-        for(int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             MethodParameter methodParameter = new MethodParameter(this.method, i);
             result[i] = methodParameter;
         }
