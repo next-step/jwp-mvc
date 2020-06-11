@@ -1,13 +1,11 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -32,8 +30,9 @@ public class ReflectionTest {
         for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
             String modifier = Modifier.toString(constructor.getModifiers());
             String className = constructor.getDeclaringClass().getName();
+
             String arguments = Arrays.stream(constructor.getParameterTypes())
-                    .map(targetParameter -> targetParameter.getName())
+                    .map(Class::getName)
                     .collect(Collectors.joining(", "));
             logger.debug("Constructor: {} " + className + "({})", modifier, arguments);
         }
@@ -43,7 +42,7 @@ public class ReflectionTest {
             String returnType = method.getReturnType().getName();
             String methodName = method.getName();
             String arguments = Arrays.stream(method.getParameterTypes())
-                    .map(targetParameter -> targetParameter.getName())
+                    .map(Class::getName)
                     .collect(Collectors.joining(", "));
 
             logger.debug("Method: {} {} " + methodName + "({})", modifier, returnType, arguments);
@@ -66,37 +65,51 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("private field에 값을 할당한다.")
     public void privateFieldAccess() throws Exception {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
 
         Student student = new Student();
 
-        Field name = clazz.getDeclaredField("name");
-        Field age = clazz.getDeclaredField("age");
-
-        name.setAccessible(true);
-        age.setAccessible(true);
-
-        name.set(student, "KingCjy");
-        age.set(student, 22);
+        setFieldValue(student, "name", "KingCjy");
+        setFieldValue(student, "age", 22);
 
         logger.debug("Student: {}", student);
         assertThat(student.getName()).isEqualTo("KingCjy");
         assertThat(student.getAge()).isEqualTo(22);
     }
 
+    private void setFieldValue(Object instance, String fieldName, Object value) throws IllegalAccessException, NoSuchFieldException {
+        Field field = instance.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(instance, value);
+    }
+
     @Test
     public void createInstanceWithParameters() throws Exception {
         Class<?> clazz = Question.class;
 
-        Constructor constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        Constructor[] constructors = clazz.getDeclaredConstructors();
 
-        Question question = (Question) constructor.newInstance("writer", "title", "contents");
-        logger.debug("Question: {}", question);
+        for (Constructor constructor : constructors) {
+            Object[] parameters = getParameterInstances(constructor.getParameterTypes());
+            constructor.newInstance(parameters);
+        }
+    }
 
-        assertThat(question.getWriter()).isEqualTo("writer");
-        assertThat(question.getTitle()).isEqualTo("title");
-        assertThat(question.getContents()).isEqualTo("contents");
+    private Object[] getParameterInstances(Class[] parameterTypes) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object[] instances = new Object[parameterTypes.length];
+
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (parameterTypes[i].isPrimitive()) {
+                instances[i] = 0;
+                continue;
+            }
+
+            instances[i] = parameterTypes[i].getConstructor().newInstance();
+        }
+
+        return instances;
     }
 }

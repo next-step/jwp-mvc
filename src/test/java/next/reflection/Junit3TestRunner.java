@@ -30,6 +30,6 @@ public class Junit3TestRunner {
     }
 
     public boolean isTestMethod(Method method) {
-        return method.getName().contains("test");
+        return method.getName().startsWith("test");
     }
 }

@@ -20,7 +20,7 @@ public class Junit4TestRunner {
             }
         }
 
-        if(testMethods.size() >= 1) {
+        if (testMethods.size() >= 1) {
             Object instance = clazz.getConstructor().newInstance();
 
             for (Method method : testMethods) {
