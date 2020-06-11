@@ -28,10 +28,7 @@ public class ComponentScanTest {
         reflections = new Reflections("core.di.factory.example");
         Set<Class<?>> annotatedClasses = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
 
-        annotatedClasses.stream()
-            .forEach(clazz -> {
-                log.debug("className: {}", clazz.getName());
-            });
+        annotatedClasses.forEach(clazz -> log.debug("className: {}", clazz.getName()));
     }
 
     private Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation>... annotations) {
