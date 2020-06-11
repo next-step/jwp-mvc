@@ -2,7 +2,6 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMethod;
-import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
