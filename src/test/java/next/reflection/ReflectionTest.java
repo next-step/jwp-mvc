@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +44,22 @@ public class ReflectionTest {
         assertThat(declaredConstructors.length).isEqualTo(2);
         IntStream.range(0, declaredConstructors.length)
                 .forEach(i -> System.out.println("Constructor: " + declaredConstructors[i]));
+    }
+
+    @DisplayName("Reflection - 모든 Methods 반환")
+    @Test
+    void showClass_Methods() {
+        //given
+        Class<Question> clazz = Question.class;
+        logger.debug(clazz.getName());
+
+        //then
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+
+        //then
+        assertThat(declaredMethods.length).isEqualTo(11);
+        IntStream.range(0, declaredMethods.length)
+                .forEach(i -> System.out.println(declaredMethods[i]));
     }
 
     @Test
