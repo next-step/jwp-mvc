@@ -24,7 +24,7 @@ public class HandlerExecutionImplTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        HandlerExecutionImpl handlerExecution = new HandlerExecutionImpl(new MyController(), MyController.class.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class));
+        HandlerExecution handlerExecution = new HandlerExecutionImpl(new MyController(), MyController.class.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class));
         handlerExecution.handle(request, response);
     }
 }

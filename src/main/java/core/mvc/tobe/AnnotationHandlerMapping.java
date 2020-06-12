@@ -22,7 +22,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecutionImpl> handlerExecutions = Maps.newHashMap();
+    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -40,7 +40,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void initHandlerExecutions(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {
         for (Method method : requestMappingMethods) {
             Set<HandlerKey> handlerKeys = createHandlerKeys(method);
-            HandlerExecutionImpl handlerExecution = new HandlerExecutionImpl(instantiateControllers.get(method.getDeclaringClass()), method);
+            HandlerExecution handlerExecution = new HandlerExecutionImpl(instantiateControllers.get(method.getDeclaringClass()), method);
             handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey, handlerExecution));
         }
     }
@@ -78,7 +78,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return requestMappingMethods;
     }
 
-    public HandlerExecutionImpl getHandler(HttpServletRequest request) {
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
