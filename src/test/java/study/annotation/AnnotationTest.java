@@ -4,6 +4,8 @@ import core.annotation.web.RequestMapping;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @DisplayName("어노테이션 학습 테스트")
 public class AnnotationTest {
     @Test
@@ -13,8 +15,8 @@ public class AnnotationTest {
                 .getDeclaredMethod("test")
                 .getDeclaredAnnotation(RequestMapping.class);
 
-        System.out.println(requestMapping.method().length);
-        System.out.println(requestMapping.value());
+        assertThat(requestMapping.method()).isEmpty();
+        assertThat(requestMapping.value()).isNotNull();
     }
 
     private static class AnnotatedClass {
