@@ -1,11 +1,16 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -41,4 +46,32 @@ public class ReflectionTest {
             }
         }
     }
+
+    @Test
+    @DisplayName("Reflection을 활용하여 Student 클래스의 name, age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인할 수 있다")
+    public void privateFieldAcces() throws ReflectiveOperationException {
+        // given
+        final Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        final Student student = clazz.getConstructor().newInstance();
+
+        final Field nameField = clazz.getDeclaredField("name");
+        final Field ageField = clazz.getDeclaredField("age");
+
+        nameField.setAccessible(true);
+        ageField.setAccessible(true);
+
+        nameField.set(student, "bactoria");
+        ageField.set(student, 28);
+
+        // when
+        final String name = student.getName();
+        final int age = student.getAge();
+
+        // then
+        assertThat(name).isEqualTo("bactoria");
+        assertThat(age).isEqualTo(28);
+    }
+
 }
