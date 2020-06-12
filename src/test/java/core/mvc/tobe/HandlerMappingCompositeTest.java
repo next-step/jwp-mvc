@@ -32,9 +32,9 @@ public class HandlerMappingCompositeTest {
     public void getHandlerFromRequestMapping() {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/");
 
-        Object handler = handlerMappingComposite.getHandler(request);
+        HandlerExecution handler = handlerMappingComposite.getHandler(request);
 
-        assertThat(handler).isInstanceOf(Controller.class);
+        assertThat(handler).isInstanceOf(LagacyHandlerExecution.class);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class HandlerMappingCompositeTest {
     public void getHandlerFromAnnotationHandlerMapping() {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
 
-        Object handler = handlerMappingComposite.getHandler(request);
+        HandlerExecution handler = handlerMappingComposite.getHandler(request);
 
         assertThat(handler).isInstanceOf(HandlerExecutionImpl.class);
     }

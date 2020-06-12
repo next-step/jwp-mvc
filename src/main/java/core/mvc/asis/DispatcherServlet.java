@@ -82,7 +82,7 @@ public class DispatcherServlet extends HttpServlet {
         String viewName = modelAndView.getViewName();
 
         if (viewName == null) {
-            view = (View) modelAndView.getView();
+            view = modelAndView.getView();
         } else {
             view = viewResolver.resolveViewName(viewName);
         }
