@@ -1,6 +1,10 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +12,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,16 +23,16 @@ public class ReflectionTest {
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
-        logger.debug("class name : " + clazz.getName());
-        logger.debug("class access modifier : " + Modifier.toString(clazz.getModifiers()));
+        logger.debug("class name : {}", clazz.getName());
+        logger.debug("class access modifier : {}", Modifier.toString(clazz.getModifiers()));
         Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
-            logger.debug("field : " + Modifier.toString(field.getModifiers()) + " " + field.getName());
+            logger.debug("field : {} {}", Modifier.toString(field.getModifiers()), field.getName());
         });
         Arrays.stream(clazz.getDeclaredConstructors()).forEach(constructor -> {
-            logger.debug("constructor : " + Modifier.toString(constructor.getModifiers()) + " " + constructor.getName());
+            logger.debug("constructor : {} {}", Modifier.toString(constructor.getModifiers()), constructor.getName());
         });
         Arrays.stream(clazz.getDeclaredMethods()).forEach(method -> {
-            logger.debug("method : " + Modifier.toString(method.getModifiers()) + " " + method.getName());
+            logger.debug("method : {} {}", Modifier.toString(method.getModifiers()), method.getName());
         });
     }
 
@@ -49,6 +55,24 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo(name);
         assertThat(student.getAge()).isEqualTo(age);
+    }
+
+    @Test
+    void componentScan() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        Set<Class<?>> classSet = new HashSet<>();
+        reflections.getTypesAnnotatedWith(Controller.class).stream()
+                .forEach(clazz -> classSet.add(clazz));
+
+        reflections.getTypesAnnotatedWith(Service.class).stream()
+                .forEach(clazz -> classSet.add(clazz));
+
+        reflections.getTypesAnnotatedWith(Repository.class).stream()
+                .forEach(clazz -> classSet.add(clazz));
+
+        classSet.stream()
+                .forEach(clazz -> logger.debug("class : {}", clazz.getSimpleName()));
     }
 
     @Test
