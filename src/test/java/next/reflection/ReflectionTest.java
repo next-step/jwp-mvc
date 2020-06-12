@@ -30,6 +30,21 @@ public class ReflectionTest {
                 .forEach(i -> System.out.println("Field : " + declaredFields[i]));
     }
 
+    @DisplayName("Reflection - 모든 생성자 반환")
+    @Test
+    void showClass_Constructors() {
+        //given
+        Class<Question> clazz = Question.class;
+
+        //when
+        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+
+        //then
+        assertThat(declaredConstructors.length).isEqualTo(2);
+        IntStream.range(0, declaredConstructors.length)
+                .forEach(i -> System.out.println("Constructor: " + declaredConstructors[i]));
+    }
+
     @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
