@@ -1,12 +1,17 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,15 +51,16 @@ public class AnnotationHandlerMappingTest {
         execution.handle(request, response);
     }
 
-    @Test
-    @DisplayName("initialize 를 하면 해당 패키지 내분에 존재하는 @Controller 가 붙은 클래스를 찾아서 url 에 맞춰 초기화한다")
-    void initialize() {
-/*
-        Reflections reflections = new Reflections(BASE_PACKAGE);
-//        reflections.getSubTypesOf(Object.class);
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("request method 가 설정되어 있지 않다면 모든 종류의 request method 에 대해서 맵핑해 준다.")
+    void initialize(final RequestMethod requestMethod) {
+        MockHttpServletRequest request = new MockHttpServletRequest(requestMethod.name(), "/test");
 
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-        controllers.forEach(System.out::println);
-*/
+        assertThat(handlerMapping.getHandler(request)).isNotNull();
+    }
+
+    private static Stream<RequestMethod> initialize() {
+        return Stream.of(RequestMethod.values());
     }
 }
