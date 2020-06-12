@@ -36,7 +36,7 @@ public class HandlerMethodArgumentResolverTest {
             values[i] = request.getParameter(parameterName);
         }
 
-        ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        ModelAndView mav = (ModelAndView) method.invoke(clazz.getDeclaredConstructor().newInstance(), values);
         assertThat(mav.getObject("userId")).isEqualTo(userId);
         assertThat(mav.getObject("password")).isEqualTo(password);
     }

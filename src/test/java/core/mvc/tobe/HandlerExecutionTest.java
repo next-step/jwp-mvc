@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -28,9 +29,9 @@ class HandlerExecutionTest {
 
     @Test
     @DisplayName("리플렉션을 이용해 함수를 실행하기 위해선 메소드와 인스턴스를 필드로 가지고 있어야한다")
-    void field() throws IllegalAccessException, InstantiationException {
+    void field() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Class<MyController> myController = MyController.class;
-        MyController instance = myController.newInstance();
+        MyController instance = myController.getDeclaredConstructor().newInstance();
         Method[] methods = myController.getMethods();
 
         Arrays.stream(methods)
@@ -92,11 +93,11 @@ class HandlerExecutionTest {
     }
 
     private static Stream<Arguments> constructFail()
-            throws IllegalAccessException, InstantiationException, NoSuchMethodException {
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Class<MyController> myControllerClass = MyController.class;
         return Stream.of(
                 Arguments.of(null, null),
-                Arguments.of(null, myControllerClass.newInstance()),
+                Arguments.of(null, myControllerClass.getDeclaredConstructor().newInstance()),
                 Arguments.of(myControllerClass.getMethod("save", HttpServletRequest.class, HttpServletResponse.class), null)
         );
     }
