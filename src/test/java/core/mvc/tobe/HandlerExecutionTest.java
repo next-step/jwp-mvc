@@ -5,15 +5,22 @@ import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 @DisplayName("@Controller 내부에 존재하는 @RequestMapping 과 해당 함수를 읽어서 하나의 HandlerExecution 으로 매칭한다.")
 class HandlerExecutionTest {
@@ -72,4 +79,23 @@ class HandlerExecutionTest {
             logger.error("Fail to execute method in my controller : {}", e.getMessage());
         }
     }
+
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("method 나 instance 가 null 인 경우 예외 발생")
+    void constructFail(final Method method, final Object instance) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new HandlerExecution(method, instance));
+    }
+
+    private static Stream<Arguments> constructFail()
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException {
+        Class<MyController> myControllerClass = MyController.class;
+        return Stream.of(
+                Arguments.of(null, null),
+                Arguments.of(null, myControllerClass.newInstance()),
+                Arguments.of(myControllerClass.getMethod("save", HttpServletRequest.class, HttpServletResponse.class), null)
+        );
+    }
+
 }
