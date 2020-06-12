@@ -53,7 +53,7 @@ public class ReflectionTest {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
 
-        //then
+        //when
         Method[] declaredMethods = clazz.getDeclaredMethods();
 
         //then
@@ -62,17 +62,20 @@ public class ReflectionTest {
                 .forEach(i -> System.out.println(declaredMethods[i]));
     }
 
+    @DisplayName("Reflection - 필드에 값 할당하기")
     @Test
-    @SuppressWarnings("rawtypes")
-    public void constructor() throws Exception {
-        Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+    void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        //given
+        Class<Student> clazz = Student.class;
+        Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+        Student student = new Student();
+        assertThat(student.getName()).isNull();
+
+        //when
+        name.set(student, "Lee Seunghee");
+
+        //then
+        assertThat(student.getName()).isEqualTo("Lee Seunghee");
     }
 }
