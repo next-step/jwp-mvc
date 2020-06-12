@@ -18,9 +18,9 @@ class HandlerKeyTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("스태틱 팩토리 메서드 from")
-    void from(final String path, final String method, final HandlerKey expected) {
+    void from(final String requestUri, final String method, final HandlerKey expected) {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setPathInfo(path);
+        request.setRequestURI(requestUri);
         request.setMethod(method);
 
         HandlerKey key = HandlerKey.from(request);

@@ -19,7 +19,7 @@ public class HandlerKey {
             throw new IllegalArgumentException("Fail to create HandlerKey cuz HttpRequest is null");
         }
 
-        return new HandlerKey(request.getPathInfo(), RequestMethod.valueOf(request.getMethod().toUpperCase()));
+        return new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod().toUpperCase()));
     }
 
     @Override
