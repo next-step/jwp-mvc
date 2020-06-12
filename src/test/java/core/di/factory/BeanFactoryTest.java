@@ -7,10 +7,12 @@ import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,5 +49,17 @@ public class BeanFactoryTest {
             beans.addAll(reflections.getTypesAnnotatedWith(annotation));
         }
         return beans;
+    }
+
+    @Test
+    @DisplayName("@Controller, @Service, @Repository 애노테이션이 있는 클래스 출력하기")
+    void componentScan() {
+        final Reflections scanReflections = new Reflections("core.di.factory.example");
+        Class[] classes = new Class[]{Controller.class, Service.class, Repository.class};
+
+        Arrays.stream(classes)
+                .map(a -> scanReflections.getTypesAnnotatedWith(a))
+                .flatMap(set -> set.stream())
+                .forEach(System.out::println);
     }
 }
