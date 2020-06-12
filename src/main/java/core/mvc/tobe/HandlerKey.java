@@ -10,6 +10,10 @@ public class HandlerKey {
     private final RequestMethod requestMethod;
 
     public HandlerKey(final String url, final RequestMethod requestMethod) {
+        if (Objects.isNull(url) || Objects.isNull(requestMethod)) {
+            throw new IllegalArgumentException("Fail to create HandlerKey cuz there is null argument");
+        }
+
         this.url = url;
         this.requestMethod = requestMethod;
     }
