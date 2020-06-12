@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -12,7 +14,17 @@ public class ReflectionTest {
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
-        logger.debug(clazz.getName());
+        logger.debug("class name : " + clazz.getName());
+        logger.debug("class access modifier : " + Modifier.toString(clazz.getModifiers()));
+        Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
+            logger.debug("field : " + Modifier.toString(field.getModifiers()) + " " + field.getName());
+        });
+        Arrays.stream(clazz.getDeclaredConstructors()).forEach(constructor -> {
+            logger.debug("constructor : " + Modifier.toString(constructor.getModifiers()) + " " + constructor.getName());
+        });
+        Arrays.stream(clazz.getDeclaredMethods()).forEach(method -> {
+            logger.debug("method : " + Modifier.toString(method.getModifiers()) + " " + method.getName());
+        });
     }
 
     @Test
