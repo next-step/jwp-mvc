@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,6 +72,20 @@ public class ReflectionTest {
         // then
         assertThat(name).isEqualTo("bactoria");
         assertThat(age).isEqualTo(28);
+    }
+
+    @Test
+    @DisplayName("Reflection을 활용하여 Question 클래스의 인스턴스를 생성할 수 있다")
+    public void InstanceCreateWithParams() throws Exception {
+        final Class<Question> clazz = Question.class;
+        final Constructor constructor = clazz.getConstructor(String.class, String.class, String.class);
+        final String writer = "bactoria";
+        final String title = "정말로!!";
+        final String contents = "궁금해요~";
+
+        Question question = (Question) constructor.newInstance(writer, title, contents);
+
+        assertThat(question).isEqualTo(new Question(0, writer, title, contents, new Date(), 0));
     }
 
 }
