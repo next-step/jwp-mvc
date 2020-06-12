@@ -15,10 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("특정 annotation 이 붙은 클래스, 메서드 로드 클래스")
 class AnnotatedTargetScannerTest {
 
+    public static final String BASE_PACKAGE = "core.mvc.tobe";
+
     @Test
     @DisplayName("패키지 내에서 특정 어노테이션이 붙은 클래스 모두 불러오기")
     void loadAnnotatedClasses() {
-        Set<Class<?>> classes = AnnotatedTargetScanner.loadClasses(Controller.class);
+        Set<Class<?>> classes = AnnotatedTargetScanner.loadClasses(Controller.class, BASE_PACKAGE);
 
         assertThat(classes).isNotNull();
         assertThat(classes).hasSize(1);
@@ -27,12 +29,12 @@ class AnnotatedTargetScannerTest {
     @Test
     @DisplayName("클래스 내에서 특정 어노테이션이 붙은 메소드 모두 불러오기")
     void loadAnnotatedMethods() {
-        List<Method> methods = AnnotatedTargetScanner.loadClasses(Controller.class)
+        List<Method> methods = AnnotatedTargetScanner.loadClasses(Controller.class, BASE_PACKAGE)
                 .stream()
                 .map(clazz -> AnnotatedTargetScanner.loadMethods(clazz, RequestMapping.class))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
 
-        assertThat(methods).hasSize(2);
+        assertThat(methods).hasSize(3);
     }
 }

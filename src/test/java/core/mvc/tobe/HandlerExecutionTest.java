@@ -40,6 +40,9 @@ class HandlerExecutionTest {
 
     private void execute(final HandlerExecution handler, final Method method) {
         RequestMapping declaredAnnotation = method.getDeclaredAnnotation(RequestMapping.class);
+        if (declaredAnnotation.method().length == 0) {
+            return;
+        }
 
         if (RequestMethod.GET == declaredAnnotation.method()[0]) {
             findUserTest(handler);
