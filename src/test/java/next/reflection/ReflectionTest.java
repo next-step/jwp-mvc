@@ -5,8 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -25,6 +28,27 @@ public class ReflectionTest {
         Arrays.stream(clazz.getDeclaredMethods()).forEach(method -> {
             logger.debug("method : " + Modifier.toString(method.getModifiers()) + " " + method.getName());
         });
+    }
+
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
+        String name = "eeseul";
+        int age = 30;
+
+        Class<Student> clazz = Student.class;
+
+        Student student = clazz.newInstance();
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+
+        nameField.setAccessible(true);
+        nameField.set(student, name);
+
+        ageField.setAccessible(true);
+        ageField.set(student, age);
+
+        assertThat(student.getName()).isEqualTo(name);
+        assertThat(student.getAge()).isEqualTo(age);
     }
 
     @Test
