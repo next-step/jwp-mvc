@@ -1,10 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.*;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
-import core.mvc.tobe.HandlerMappingComposite;
+import core.mvc.tobe.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,11 +51,13 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        HandlerExecution handler = handlerMapping.getHandler(req);
-
         try {
+            HandlerExecution handler = handlerMapping.getHandler(req);
             ModelAndView modelAndView = handler.handle(req, resp);
             render(modelAndView, req, resp);
+        } catch (PageNotFoundException e) {
+            logger.error("Page Not Found Exception ", e);
+            resp.sendError(404);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());

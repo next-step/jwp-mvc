@@ -3,11 +3,11 @@ package core.mvc.tobe;
 /**
  * @author KingCjy
  */
-public class PageNotFountException extends RuntimeException {
+public class PageNotFoundException extends RuntimeException {
 
     private String requestURI;
 
-    public PageNotFountException(String message, String requestURI) {
+    public PageNotFoundException(String message, String requestURI) {
         super(message);
         this.requestURI = requestURI;
     }

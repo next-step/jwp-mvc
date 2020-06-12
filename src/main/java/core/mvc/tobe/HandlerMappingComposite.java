@@ -21,7 +21,6 @@ public class HandlerMappingComposite implements HandlerMapping {
         return handlerMappings.stream()
                 .filter(handlerMapping -> handlerMapping.getHandler(request) != null)
                 .map(handlerMapping -> handlerMapping.getHandler(request))
-                .findAny()
-                .get();
+                .findAny().orElseThrow(() -> new PageNotFoundException("404 Page Not Found RequestURI = " + request.getRequestURI(), request.getRequestURI()));
     }
 }

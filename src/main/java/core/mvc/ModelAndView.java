@@ -16,8 +16,8 @@ public class ModelAndView {
         this.view = view;
     }
 
-    public ModelAndView(String view) {
-        this.viewName = view;
+    public ModelAndView(String viewName) {
+        this.viewName = viewName;
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
