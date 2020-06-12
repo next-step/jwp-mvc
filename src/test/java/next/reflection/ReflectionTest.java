@@ -1,14 +1,21 @@
 package next.reflection;
 
+import com.google.common.collect.Maps;
+import next.util.StringUtils;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import com.google.common.base.Defaults;
 
 public class ReflectionTest {
     private static final Logger log = LoggerFactory.getLogger(ReflectionTest.class);
@@ -134,19 +141,28 @@ public class ReflectionTest {
         Constructor[] constructors = clazz.getDeclaredConstructors();
 
         for (Constructor constructor : constructors) {
-            if (constructor.getParameterCount() != 3) {
+            List<Object> arguments = getConstructorArguments(constructor);
+
+            Object newInstance = constructor.newInstance(arguments.toArray());
+            log.debug("newInstance: {}", StringUtils.toPrettyJson(newInstance));
+
+            assertThat(newInstance).isNotNull();
+        }
+    }
+
+    private List<Object> getConstructorArguments(Constructor constructor) {
+        List<Object> arguments = Lists.newArrayList();
+        Class[] parameterTypes = constructor.getParameterTypes();
+
+        for (Class paramType : parameterTypes) {
+            if (paramType.equals(String.class)) {
+                arguments.add(paramType.getName());
                 continue;
             }
 
-            String writer = "ninjasul";
-            String title = "next-step jwp";
-            String contents = "훌륭한 개발자가 되기 위해 열심히 노력하겠습니다.";
-
-            Question question = (Question)constructor.newInstance(writer, title, contents);
-
-            assertThat(question.getWriter()).isEqualTo(writer);
-            assertThat(question.getTitle()).isEqualTo(title);
-            assertThat(question.getContents()).isEqualTo(contents);
+            arguments.add(Defaults.defaultValue(paramType));
         }
+
+        return arguments;
     }
 }

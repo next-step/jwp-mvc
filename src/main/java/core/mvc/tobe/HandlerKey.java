@@ -7,8 +7,8 @@ import java.util.Objects;
 
 @Getter
 public class HandlerKey {
-    private String url;
-    private RequestMethod requestMethod;
+    private final String url;
+    private final RequestMethod requestMethod;
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;

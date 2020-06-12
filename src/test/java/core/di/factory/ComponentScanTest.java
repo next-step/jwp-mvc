@@ -3,7 +3,7 @@ package core.di.factory;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
-import core.mvc.tobe.ReflectionUtil;
+import core.mvc.tobe.ReflectionUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -28,7 +28,7 @@ public class ComponentScanTest {
         reflections = new Reflections("core.di.factory.example");
 
         Class<? extends Annotation>[] targetClasses = new Class[]{Controller.class, Service.class, Repository.class};
-        Set<Class<?>> annotatedClasses = ReflectionUtil.getTypesAnnotatedWith(reflections, targetClasses);
+        Set<Class<?>> annotatedClasses = ReflectionUtils.getTypesAnnotatedWith(reflections, targetClasses);
 
         for (Class<?> clazz : annotatedClasses) {
             assertThat(containsAnyTargetAnnotation(clazz, targetClasses)).isTrue();

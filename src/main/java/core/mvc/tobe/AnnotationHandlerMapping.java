@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class AnnotationHandlerMapping {
-    private Object[] basePackage;
+    private final Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
@@ -26,7 +26,7 @@ public class AnnotationHandlerMapping {
     }
 
     private void initializeHandlerExecutions() {
-        Set<RequestMappingMethod> methods = ReflectionUtil.getControllerMethodsWithRequestMapping(reflections);
+        Set<RequestMappingMethod> methods = ReflectionUtils.getControllerMethodsWithRequestMapping(reflections);
 
         for(RequestMappingMethod method : methods) {
             for (RequestMethod requestMethod : method.getRequestMethods()) {
