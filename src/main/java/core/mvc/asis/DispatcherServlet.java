@@ -41,63 +41,70 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
+    protected void service(final HttpServletRequest request,
+                           final HttpServletResponse response) throws ServletException, IOException {
+        logger.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
 
         try {
-            Object handler = findHandler(req);
+            Object handler = findHandler(request);
 
-            handle(handler, req, resp);
+            handle(handler, request, response);
         } catch (NotFoundException e) {
             logger.error("{}", e.getMessage());
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void handle(final Object handler,
+                        final HttpServletRequest request,
+                        final HttpServletResponse response) throws Exception {
         View view = DummyView.INSTANCE;
         Map<String, Object> model = Collections.emptyMap();
 
         if (handler instanceof Controller) {
-            String viewName = ((Controller) handler).execute(req, resp);
+            String viewName = ((Controller) handler).execute(request, response);
 
-            view = resolve(viewName, req, resp);
+            view = resolve(viewName, request, response);
         } else if (handler instanceof HandlerExecution){
-            ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+            ModelAndView modelAndView = ((HandlerExecution) handler).handle(request, response);
 
-            view = extractView(req, resp, modelAndView);
+            view = extractView(request, response, modelAndView);
             model = modelAndView.getModel();
         }
 
-        view.render(model, req, resp);
+        view.render(model, request, response);
     }
 
-    private View extractView(HttpServletRequest req, HttpServletResponse resp, ModelAndView modelAndView) throws IOException {
+    private View extractView(final HttpServletRequest request,
+                             final HttpServletResponse response,
+                             final ModelAndView modelAndView) throws IOException {
         if (modelAndView.getView() != null) {
             return modelAndView.getView();
         } else {
             String viewName = modelAndView.getViewName();
-            return resolve(viewName, req, resp);
+            return resolve(viewName, request, response);
         }
     }
 
-    private View resolve(String viewName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private View resolve(final String viewName,
+                         final HttpServletRequest request,
+                         final HttpServletResponse response) throws IOException {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+            response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return DummyView.INSTANCE;
         }
 
         return new JspView(viewName);
     }
 
-    private Object findHandler(HttpServletRequest req) {
+    private Object findHandler(final HttpServletRequest request) {
         return requestHandlerMappings.stream()
-                .map(handlerMapping -> handlerMapping.getHandler(req))
+                .map(handlerMapping -> handlerMapping.getHandler(request))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(req.getRequestURI()));
+                .orElseThrow(() -> new NotFoundException(request.getRequestURI()));
     }
 }
