@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -64,5 +65,16 @@ class DispatcherServletTest {
                 Arguments.of("GET", "/users/create"), // @Controller
                 Arguments.of("GET", "/users/logout") // implement Controller
         );
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 url 에 대한 요청은 404 에러")
+    void serviceNotFound() throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/not-exist");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        dispatcher.service(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
     }
 }
