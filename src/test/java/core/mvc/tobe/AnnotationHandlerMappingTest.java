@@ -63,4 +63,12 @@ public class AnnotationHandlerMappingTest {
     private static Stream<RequestMethod> initialize() {
         return Stream.of(RequestMethod.values());
     }
+
+    @Test
+    @DisplayName("존재 하지 않는 url 을 호출하면 null 을 리턴한다")
+    void getHandlerThatIsNotExist() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/not-exist");
+
+        assertThat(handlerMapping.getHandler(request)).isNull();
+    }
 }
