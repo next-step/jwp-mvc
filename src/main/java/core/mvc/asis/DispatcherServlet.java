@@ -1,10 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.*;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
-import core.mvc.tobe.HandlerMappingComposite;
+import core.mvc.tobe.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -55,18 +51,13 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Object handler = handlerMapping.getHandler(req);
-
         try {
-            if(handler instanceof Controller) {
-                String viewName = ((Controller)handler).execute(req, resp);
-                move(viewName, req, resp);
-            } else if(handler instanceof HandlerExecution) {
-                ModelAndView modelAndView = ((HandlerExecution)handler).handle(req, resp);
-                render(modelAndView, req, resp);
-            } else {
-                throw new RuntimeException("404");
-            }
+            HandlerExecution handler = handlerMapping.getHandler(req);
+            ModelAndView modelAndView = handler.handle(req, resp);
+            render(modelAndView, req, resp);
+        } catch (PageNotFoundException e) {
+            logger.error("Page Not Found Exception ", e);
+            resp.sendError(404);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
@@ -89,8 +80,8 @@ public class DispatcherServlet extends HttpServlet {
         View view;
         String viewName = modelAndView.getViewName();
 
-        if(viewName == null) {
-            view = (View) modelAndView.getView();
+        if (viewName == null) {
+            view = modelAndView.getView();
         } else {
             view = viewResolver.resolveViewName(viewName);
         }

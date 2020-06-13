@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author KingCjy
  */
-public class HandlerExecutionTest {
+public class HandlerExecutionImplTest {
 
     @Test
     public void handleTest() throws Exception {
@@ -24,7 +24,7 @@ public class HandlerExecutionTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        HandlerExecution handlerExecution = new HandlerExecution(new MyController(), MyController.class.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class));
+        HandlerExecution handlerExecution = new HandlerExecutionImpl(new MyController(), MyController.class.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class));
         handlerExecution.handle(request, response);
     }
 }

@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
-    private Object view;
+    private View view;
+    private String viewName;
     private Map<String, Object> model = new HashMap<String, Object>();
 
     public ModelAndView() {
@@ -15,8 +16,8 @@ public class ModelAndView {
         this.view = view;
     }
 
-    public ModelAndView(String view) {
-        this.view = view;
+    public ModelAndView(String viewName) {
+        this.viewName = viewName;
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
@@ -32,11 +33,11 @@ public class ModelAndView {
         return Collections.unmodifiableMap(model);
     }
 
-    public Object getView() {
+    public View getView() {
         return view;
     }
 
     public String getViewName() {
-        return (this.view instanceof String ? (String) this.view : null);
+        return viewName;
     }
 }

@@ -22,7 +22,7 @@ public class MethodParameter {
 
     public <T> T getParameterAnnotation(Class<T> targetAnnotation) {
         for (Annotation annotation : method.getParameters()[this.parameterIndex].getAnnotations()) {
-            if(annotation.annotationType().equals(targetAnnotation)) {
+            if (annotation.annotationType().equals(targetAnnotation)) {
                 return (T) annotation;
             }
         }

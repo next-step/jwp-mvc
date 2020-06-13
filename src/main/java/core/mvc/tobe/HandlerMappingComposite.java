@@ -3,7 +3,6 @@ package core.mvc.tobe;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -13,16 +12,15 @@ public class HandlerMappingComposite implements HandlerMapping {
 
     private Set<HandlerMapping> handlerMappings = new LinkedHashSet<>();
 
-    public HandlerMappingComposite(HandlerMapping ... handlerMappings) {
+    public HandlerMappingComposite(HandlerMapping... handlerMappings) {
         this.handlerMappings.addAll(Arrays.asList(handlerMappings));
     }
 
     @Override
-    public Object getHandler(HttpServletRequest request) {
+    public HandlerExecution getHandler(HttpServletRequest request) {
         return handlerMappings.stream()
                 .filter(handlerMapping -> handlerMapping.getHandler(request) != null)
-                .map(handlerMapping ->  handlerMapping.getHandler(request))
-                .findAny()
-                .get();
+                .map(handlerMapping -> handlerMapping.getHandler(request))
+                .findAny().orElseThrow(() -> new PageNotFoundException("404 Page Not Found RequestURI = " + request.getRequestURI(), request.getRequestURI()));
     }
 }
