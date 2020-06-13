@@ -36,7 +36,6 @@ class RequestMappingTest {
                 "/users/loginForm",
                 "/users",
                 "/users/login",
-                "/users/profile",
                 "/users/logout",
                 "/users/update"
         );

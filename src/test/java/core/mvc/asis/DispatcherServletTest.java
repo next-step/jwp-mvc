@@ -2,12 +2,18 @@ package core.mvc.asis;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("디스패처 서블릿")
 class DispatcherServletTest {
@@ -18,34 +24,45 @@ class DispatcherServletTest {
         dispatcher.init();
     }
 
-    @Test
-    @DisplayName("서비스 결과는?")
-    void serviceGet() throws ServletException, IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/profile");
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("jsp 뷰 서비스")
+    void serviceGet(final String method, final String uri) throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         request.setParameter("userId", "admin");
 
         dispatcher.service(request, response);
 
-        System.out.println(response.getForwardedUrl());
-        System.out.println(request.getAttribute("user"));
-        System.out.println(response.getStatus());
-        System.out.println(response.getContentLength());
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
+        assertThat(response.getForwardedUrl()).isNotNull();
     }
 
-    @Test
-    @DisplayName("redirect 서비스 결과는?")
-    void serviceRedirect() throws ServletException, IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/logout");
-        MockHttpServletResponse response = new MockHttpServletResponse();
+    private static Stream<Arguments> serviceGet() {
+        return Stream.of(
+                Arguments.of("GET", "/users/profile"), // @Controller
+                Arguments.of("GET", "/") // implement Controller
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("302 redirect 서비스")
+    void serviceRedirect(final String method, final String uri) throws ServletException, IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         dispatcher.service(request, response);
 
-        System.out.println(response.getForwardedUrl());
-        System.out.println(response.getRedirectedUrl());
-        System.out.println(response.getStatus());
-        System.out.println(response.getContentLength());
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND);
+        assertThat(response.getRedirectedUrl()).isNotNull();
+    }
+
+    private static Stream<Arguments> serviceRedirect() {
+        return Stream.of(
+                Arguments.of("GET", "/users/create"), // @Controller
+                Arguments.of("GET", "/users/logout") // implement Controller
+        );
     }
 }
