@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Junit3TestRunner {
-    @DisplayName("Mehtod 네임이 test로 시작하면, JUnit3Test 인스턴스를 생성해 해당 메소드를 실행")
+    @DisplayName("Requirement - 2 : test로 작하는 메소드 실행")
     @Test
     public void run() throws Exception {
         //given

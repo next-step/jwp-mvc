@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.stream.IntStream;
 
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
-    @DisplayName("Reflection - 모든 Fields 반환")
+    @DisplayName("Requirement - 1 : 클래스 정보 출력 (Fields)")
     @Test
     public void showClass_Fields() {
         //given
@@ -31,7 +32,7 @@ public class ReflectionTest {
                 .forEach(i -> System.out.println("Field : " + declaredFields[i]));
     }
 
-    @DisplayName("Reflection - 모든 생성자 반환")
+    @DisplayName("Requirement - 1 : 클래스 정보 출력 (Constructors)")
     @Test
     void showClass_Constructors() {
         //given
@@ -46,7 +47,7 @@ public class ReflectionTest {
                 .forEach(i -> System.out.println("Constructor: " + declaredConstructors[i]));
     }
 
-    @DisplayName("Reflection - 모든 Methods 반환")
+    @DisplayName("Requirement - 1 : 클래스 정보 출력 (Methods)")
     @Test
     void showClass_Methods() {
         //given
@@ -62,7 +63,7 @@ public class ReflectionTest {
                 .forEach(i -> System.out.println(declaredMethods[i]));
     }
 
-    @DisplayName("Reflection - 필드에 값 할당하기")
+    @DisplayName("Requirement - 4 : private field에 값 할당")
     @Test
     void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
         //given
@@ -77,5 +78,21 @@ public class ReflectionTest {
 
         //then
         assertThat(student.getName()).isEqualTo("Lee Seunghee");
+    }
+
+    @DisplayName("Requirement - 5 : 인자를 가진 생성자의 인스턴스 생성")
+    @Test
+    void createInstanceWithArgs() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        //given
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+
+        //when
+        Question question = (Question) declaredConstructors[0].newInstance("Seunghee", "Reflection", "Contents");
+
+        //then
+        assertThat(question.getTitle()).isEqualTo("Reflection");
+        assertThat(question.getWriter()).isEqualTo("Seunghee");
+        assertThat(question.getContents()).isEqualTo("Contents");
     }
 }
