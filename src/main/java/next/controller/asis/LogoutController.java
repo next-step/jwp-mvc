@@ -1,4 +1,4 @@
-package next.controller;
+package next.controller.asis;
 
 import core.mvc.asis.Controller;
 

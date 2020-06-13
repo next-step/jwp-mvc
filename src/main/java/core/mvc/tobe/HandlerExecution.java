@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
-    private Object instance;
-    private Method method;
+    private final Object instance;
+    private final Method method;
 
     public HandlerExecution(Object instance, Method method) {
         this.instance = instance;
