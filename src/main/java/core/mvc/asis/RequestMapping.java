@@ -32,7 +32,7 @@ public class RequestMapping implements RequestHandlerMapping {
     }
 
     @Override
-    public Object getHandler(HttpServletRequest request) {
+    public Object getHandler(final HttpServletRequest request) {
         return mappings.get(request.getRequestURI());
     }
 }
