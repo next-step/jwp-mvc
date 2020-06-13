@@ -13,10 +13,4 @@ public class MockView implements View {
             throws Exception {
 
     }
-
-    @Override
-    public void setViewName(String viewName) {
-
-    }
-
 }

@@ -5,15 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
-    private final View view;
-    private final Map<String, Object> model = new HashMap<String, Object>();
+    private View view;
+    private String viewName;
+    private final Map<String, Object> model = new HashMap<>();
 
     public ModelAndView() {
-        this.view = new JspView();
     }
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public ModelAndView(String viewName) {
+        this.viewName = viewName;
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
@@ -34,6 +38,10 @@ public class ModelAndView {
     }
 
     public void setViewName(final String viewName) {
-        view.setViewName(viewName);
+        this.viewName = viewName;
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 }
