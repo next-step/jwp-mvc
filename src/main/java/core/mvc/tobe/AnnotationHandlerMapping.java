@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.RequestHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements RequestHandlerMapping {
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -28,6 +29,7 @@ public class AnnotationHandlerMapping {
         controllers.forEach(this::convertClassToHandlerExecution);
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
