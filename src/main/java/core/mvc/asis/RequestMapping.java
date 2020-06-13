@@ -31,16 +31,8 @@ public class RequestMapping implements RequestHandlerMapping {
         });
     }
 
-    public Controller findController(String url) {
-        return mappings.get(url);
-    }
-
-    void put(String url, Controller controller) {
-        mappings.put(url, controller);
-    }
-
     @Override
     public Object getHandler(HttpServletRequest request) {
-        return findController(request.getRequestURI());
+        return mappings.get(request.getRequestURI());
     }
 }
