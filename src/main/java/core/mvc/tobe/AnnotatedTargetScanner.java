@@ -25,8 +25,8 @@ public class AnnotatedTargetScanner {
        return reflections.getTypesAnnotatedWith(annotation);
     }
 
-    public static List<Method> loadMethods(final Class<?> clazz,
-                                           final Class<? extends Annotation> annotation) {
+    public static List<Method> loadMethodsFromClass(final Class<?> clazz,
+                                                    final Class<? extends Annotation> annotation) {
         return Arrays.stream(clazz.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(annotation))
                 .collect(Collectors.toList());

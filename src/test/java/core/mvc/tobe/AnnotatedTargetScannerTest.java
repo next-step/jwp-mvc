@@ -31,7 +31,7 @@ class AnnotatedTargetScannerTest {
     void loadAnnotatedMethods() {
         List<Method> methods = AnnotatedTargetScanner.loadClasses(Controller.class, BASE_PACKAGE)
                 .stream()
-                .map(clazz -> AnnotatedTargetScanner.loadMethods(clazz, RequestMapping.class))
+                .map(clazz -> AnnotatedTargetScanner.loadMethodsFromClass(clazz, RequestMapping.class))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
 

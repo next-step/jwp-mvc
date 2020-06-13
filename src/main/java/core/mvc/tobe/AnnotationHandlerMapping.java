@@ -4,17 +4,14 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ConfigurationBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AnnotationHandlerMapping {
     private final Object[] basePackage;
@@ -41,7 +38,7 @@ public class AnnotationHandlerMapping {
     private void convertClassToHandlerExecution(final Class<?> clazz) {
         Object instance = newInstance(clazz);
 
-        AnnotatedTargetScanner.loadMethods(clazz, RequestMapping.class)
+        AnnotatedTargetScanner.loadMethodsFromClass(clazz, RequestMapping.class)
                 .forEach(method -> putHandlerExecution(method, instance));
     }
 
