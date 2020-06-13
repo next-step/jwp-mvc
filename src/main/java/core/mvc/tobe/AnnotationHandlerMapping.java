@@ -9,10 +9,7 @@ import core.mvc.RequestHandlerMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AnnotationHandlerMapping implements RequestHandlerMapping {
     private final Object[] basePackage;
@@ -20,7 +17,15 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
+        validate(basePackage);
+
         this.basePackage = basePackage;
+    }
+
+    private void validate(Object[] basePackage) {
+        if (Objects.isNull(basePackage) || basePackage.length == 0) {
+            throw new IllegalArgumentException("BasePackage can't be empty");
+        }
     }
 
     public void initialize() {

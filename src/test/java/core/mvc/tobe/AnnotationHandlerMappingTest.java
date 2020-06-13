@@ -8,12 +8,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 public class AnnotationHandlerMappingTest {
     private static final String BASE_PACKAGE = "core.mvc.tobe";
@@ -70,5 +72,13 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/not-exist");
 
         assertThat(handlerMapping.getHandler(request)).isNull();
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("배이스 패키지가 비어있거나 널일 경우 스캐너를 초기화 할 수 없으므로 예외 발생")
+    void constructorThrowException(final Object... objects) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new AnnotationHandlerMapping(objects));
     }
 }
