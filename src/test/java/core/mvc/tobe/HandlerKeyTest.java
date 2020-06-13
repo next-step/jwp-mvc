@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -70,4 +71,10 @@ class HandlerKeyTest {
                 .isThrownBy(() -> HandlerKey.from(request));
     }
 
+    @Test
+    @DisplayName("동치성 테스트")
+    void equals() {
+        assertThat(new HandlerKey("/url", RequestMethod.GET))
+                .isEqualTo(new HandlerKey("/url", RequestMethod.GET));
+    }
 }
