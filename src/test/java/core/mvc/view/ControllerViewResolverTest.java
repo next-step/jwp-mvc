@@ -40,4 +40,13 @@ class ControllerViewResolverTest {
         assertThat(handle).isNull();
     }
 
+    @Test
+    @DisplayName("Jsp 를 서빙하는 경우 view 가 있는 model and view 를 리턴한다")
+    void handleWithController() throws Exception {
+        HomeController homeController = new HomeController();
+
+        ModelAndView modelAndView = controllerViewResolver.handle(homeController, request, response);
+
+        assertThat(modelAndView.getView()).isNotNull();
+    }
 }
