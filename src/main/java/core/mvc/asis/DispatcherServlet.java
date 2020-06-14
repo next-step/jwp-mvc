@@ -23,17 +23,15 @@ public class DispatcherServlet extends HttpServlet {
     private static final String BASE_PACKAGE = "next.controller";
 
     private List<RequestHandlerMapping> requestHandlerMappings;
-    private RequestMapping requestMapping;
-    private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() throws ServletException {
         requestHandlerMappings = new ArrayList<>();
 
-        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
 
-        requestMapping = new RequestMapping();
+        RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
 
         requestHandlerMappings.add(annotationHandlerMapping);
