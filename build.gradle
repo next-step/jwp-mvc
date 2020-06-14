@@ -45,6 +45,7 @@ dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'org.apache.ant:ant:1.10.8'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
 
     // tomcat
     implementation 'org.apache.tomcat.embed:tomcat-embed-core:' + tomcatVersion

@@ -8,10 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @Slf4j
 public class StringUtils {
     private static final Gson PRETTY_GSON = buildGson();
+
 
     private static Gson buildGson() {
         return new GsonBuilder()

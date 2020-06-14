@@ -5,6 +5,7 @@ import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.ModelAndViewGettable;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
-public class DispatcherServlet extends HttpServlet {
+public class DispatcherServlet extends HttpServlet implements ModelAndViewGettable {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String BASE_CONTROLLER_PACKAGE = "next.controller";
+    private static final String BASE_CONTROLLER_PACKAGE = "next.controller.tobe";
 
     private RequestMapping requestMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
@@ -66,40 +67,19 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private ModelAndView handle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-        ModelAndView mav;
+
         if (handler instanceof Controller) {
-            mav = getModelAndView(req, ((Controller)handler).execute(req, resp));
-        }
-        else if (handler instanceof HandlerExecution) {
-            mav = ((HandlerExecution)handler).handle(req, resp);
-        }
-        else {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+            return getModelAndView(req, ((Controller)handler).execute(req, resp));
         }
 
-        return mav;
-    }
-
-    private ModelAndView getModelAndView(HttpServletRequest req, String viewName) {
-        ModelAndView modelAndView = new ModelAndView(new JspView(viewName));
-        mergeRequestAttributes(req, modelAndView);
-        return modelAndView;
-    }
-
-    private void mergeRequestAttributes(HttpServletRequest req, ModelAndView modelAndView) {
-        Enumeration<String> attributeNames = req.getAttributeNames();
-
-        while (attributeNames.hasMoreElements()) {
-            String name = attributeNames.nextElement();
-            modelAndView.addObject(name, req.getAttribute(name));
+        if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution)handler).handle(req, resp);
         }
+
+        return new ModelAndView(new JspView(req.getRequestURI()));
     }
 
     private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (Objects.isNull(mav)) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        }
-
         View view = mav.getView();
 
         if (Objects.isNull(view)) {
