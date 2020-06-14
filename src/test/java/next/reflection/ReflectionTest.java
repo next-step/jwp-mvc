@@ -60,17 +60,11 @@ public class ReflectionTest {
         Reflections reflections = new Reflections("core.di.factory.example");
 
         Set<Class<?>> classSet = new HashSet<>();
-        reflections.getTypesAnnotatedWith(Controller.class).stream()
-                .forEach(clazz -> classSet.add(clazz));
+        classSet.addAll(reflections.getTypesAnnotatedWith(Controller.class));
+        classSet.addAll(reflections.getTypesAnnotatedWith(Service.class));
+        classSet.addAll(reflections.getTypesAnnotatedWith(Repository.class));
 
-        reflections.getTypesAnnotatedWith(Service.class).stream()
-                .forEach(clazz -> classSet.add(clazz));
-
-        reflections.getTypesAnnotatedWith(Repository.class).stream()
-                .forEach(clazz -> classSet.add(clazz));
-
-        classSet.stream()
-                .forEach(clazz -> logger.debug("class : {}", clazz.getSimpleName()));
+        classSet.forEach(clazz -> logger.debug("class : {}", clazz.getSimpleName()));
     }
 
     @Test
