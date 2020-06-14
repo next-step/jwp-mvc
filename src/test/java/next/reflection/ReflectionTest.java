@@ -47,14 +47,8 @@ public class ReflectionTest {
         Class<Student> clazz = Student.class;
 
         Student student = clazz.newInstance();
-        Field nameField = clazz.getDeclaredField("name");
-        Field ageField = clazz.getDeclaredField("age");
-
-        nameField.setAccessible(true);
-        nameField.set(student, name);
-
-        ageField.setAccessible(true);
-        ageField.set(student, age);
+        setField(clazz, "name", name, student);
+        setField(clazz, "age", age, student);
 
         assertThat(student.getName()).isEqualTo(name);
         assertThat(student.getAge()).isEqualTo(age);
@@ -91,5 +85,12 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    private void setField(Class<Student> clazz, String fieldName, Object value, Student student) throws NoSuchFieldException, IllegalAccessException {
+        Field nameField = clazz.getDeclaredField(fieldName);
+
+        nameField.setAccessible(true);
+        nameField.set(student, value);
     }
 }
