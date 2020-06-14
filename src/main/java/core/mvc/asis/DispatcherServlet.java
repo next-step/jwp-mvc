@@ -23,7 +23,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private List<RequestHandlerMapping> requestHandlerMappings;
     private final List<ViewResolver> viewResolvers =
-            Arrays.asList(new ControllerViewResolver(), new ModelAndViewViewResolver());
+            Arrays.asList(new ControllerViewResolver(), new HandlerExecutionViewResolver());
 
     @Override
     public void init() throws ServletException {

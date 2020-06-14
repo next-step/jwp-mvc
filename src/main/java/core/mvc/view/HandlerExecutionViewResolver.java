@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class ModelAndViewViewResolver extends AbstractViewResolver {
+public class HandlerExecutionViewResolver extends AbstractViewResolver {
     @Override
     public ModelAndView handle(final Object handler,
                                final HttpServletRequest request,
