@@ -1,5 +1,6 @@
 package core.mvc;
 
+import core.mvc.view.DummyView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +31,10 @@ public class ModelAndView {
 
     public Map<String, Object> getModel() {
         return Collections.unmodifiableMap(model);
+    }
+
+    public void setView(final View view) {
+        this.view = view;
     }
 
     public View getView() {
