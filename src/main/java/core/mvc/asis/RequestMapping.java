@@ -12,6 +12,15 @@ public class RequestMapping {
     private Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
+
+        mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
+        mappings.put("/users/form", new ForwardController("/user/form.jsp"));
+
+        logger.info("Initialized Request Mapping!");
+        mappings.keySet().forEach(path -> {
+            logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
+        });
+
         /*
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
