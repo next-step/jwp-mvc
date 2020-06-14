@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.exception.InternalServerErrorException;
 import core.exception.NotFoundException;
 import core.mvc.*;
 import core.mvc.tobe.AnnotationHandlerMapping;
@@ -51,6 +52,9 @@ public class DispatcherServlet extends HttpServlet {
         } catch (NotFoundException e) {
             logger.error("{}", e.getMessage());
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } catch (InternalServerErrorException e) {
+            logger.error("{}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
@@ -73,7 +77,7 @@ public class DispatcherServlet extends HttpServlet {
                     .map(resolver -> resolve(handler, request, response, resolver))
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("can't resolve"));
+                    .orElseThrow(() -> new InternalServerErrorException("Fail to find view resolver for " + handler));
     }
 
     private ModelAndView resolve(final Object handler,
@@ -83,7 +87,7 @@ public class DispatcherServlet extends HttpServlet {
         try {
             return resolver.handle(handler, request, response);
         } catch (Exception e) {
-            logger.error("Fail to resolve");
+            logger.error("Fail to resolve view from handler's result");
             return null;
         }
     }
