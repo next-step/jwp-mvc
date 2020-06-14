@@ -60,7 +60,7 @@ public class ReflectionTest {
         //then
         assertThat(declaredMethods.length).isEqualTo(11);
         IntStream.range(0, declaredMethods.length)
-                .forEach(i -> System.out.println(declaredMethods[i]));
+                .forEach(i -> logger.debug(String.valueOf(declaredMethods[i])));
     }
 
     @DisplayName("Requirement - 4 : private field에 값 할당")
