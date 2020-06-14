@@ -14,11 +14,10 @@ public class ModelAndViewViewResolver extends AbstractViewResolver {
         }
 
         ModelAndView modelAndView = ((HandlerExecution) handler).handle(request, response);
-        if (modelAndView.getView() != null) {
-            return modelAndView;
+        if (modelAndView.getView() == null) {
+            modelAndView.setView(extractView(request, response, modelAndView));
         }
 
-        modelAndView.setView(extractView(request, response, modelAndView));
         return modelAndView;
     }
 
