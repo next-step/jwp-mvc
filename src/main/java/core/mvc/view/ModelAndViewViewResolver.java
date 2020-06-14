@@ -8,7 +8,9 @@ import java.io.IOException;
 
 public class ModelAndViewViewResolver extends AbstractViewResolver {
     @Override
-    public ModelAndView handle(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView handle(final Object handler,
+                               final HttpServletRequest request,
+                               final HttpServletResponse response) throws Exception {
         if (!(handler instanceof HandlerExecution)) {
             return null;
         }
