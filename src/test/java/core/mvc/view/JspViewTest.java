@@ -1,6 +1,5 @@
-package core.mvc;
+package core.mvc.view;
 
-import core.mvc.view.JspView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

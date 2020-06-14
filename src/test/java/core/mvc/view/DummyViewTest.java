@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import core.mvc.view.DummyView;
 import org.junit.jupiter.api.DisplayName;
