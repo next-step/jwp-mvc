@@ -1,24 +1,25 @@
 package next.reflection;
 
-import com.google.common.collect.Maps;
+import com.google.common.base.Defaults;
 import next.util.StringUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import java.lang.reflect.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import com.google.common.base.Defaults;
 
 public class ReflectionTest {
     private static final Logger log = LoggerFactory.getLogger(ReflectionTest.class);
+
+    ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     @Test
     @DisplayName("클래스 정보를 출력하는 테스트")
@@ -153,10 +154,15 @@ public class ReflectionTest {
     private List<Object> getConstructorArguments(Constructor constructor) {
         List<Object> arguments = Lists.newArrayList();
         Class[] parameterTypes = constructor.getParameterTypes();
+        String[] parameterNames = nameDiscoverer.getParameterNames(constructor);
 
-        for (Class paramType : parameterTypes) {
+        log.debug("parameterNames: {}", StringUtils.toPrettyJson(parameterNames));
+
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class paramType = parameterTypes[i];
+
             if (paramType.equals(String.class)) {
-                arguments.add(paramType.getName());
+                arguments.add(StringUtils.getOrDefault(parameterNames[i], paramType.getName()));
                 continue;
             }
 
