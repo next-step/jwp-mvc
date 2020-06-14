@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Jsp 뷰")
 class JspViewTest {

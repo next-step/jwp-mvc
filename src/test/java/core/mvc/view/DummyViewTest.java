@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

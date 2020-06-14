@@ -1,9 +1,10 @@
 package core.mvc.asis;
 
+import core.exception.InternalServerErrorException;
 import core.exception.NotFoundException;
 import core.mvc.*;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,21 +20,20 @@ import java.util.*;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final String BASE_PACKAGE = "next.controller";
 
     private List<RequestHandlerMapping> requestHandlerMappings;
-    private RequestMapping requestMapping;
-    private AnnotationHandlerMapping annotationHandlerMapping;
+    private final List<ViewResolver> viewResolvers =
+            Arrays.asList(new ControllerViewResolver(), new HandlerExecutionViewResolver());
 
     @Override
     public void init() throws ServletException {
         requestHandlerMappings = new ArrayList<>();
 
-        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
 
-        requestMapping = new RequestMapping();
+        RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
 
         requestHandlerMappings.add(annotationHandlerMapping);
@@ -52,6 +52,9 @@ public class DispatcherServlet extends HttpServlet {
         } catch (NotFoundException e) {
             logger.error("{}", e.getMessage());
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } catch (InternalServerErrorException e) {
+            logger.error("{}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
@@ -61,43 +64,32 @@ public class DispatcherServlet extends HttpServlet {
     private void handle(final Object handler,
                         final HttpServletRequest request,
                         final HttpServletResponse response) throws Exception {
-        View view = DummyView.INSTANCE;
-        Map<String, Object> model = Collections.emptyMap();
+        ModelAndView modelAndView = resolve(handler, request, response);
 
-        if (handler instanceof Controller) {
-            String viewName = ((Controller) handler).execute(request, response);
-
-            view = resolve(viewName, request, response);
-        } else if (handler instanceof HandlerExecution){
-            ModelAndView modelAndView = ((HandlerExecution) handler).handle(request, response);
-
-            view = extractView(request, response, modelAndView);
-            model = modelAndView.getModel();
-        }
-
-        view.render(model, request, response);
+        View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), request, response);
     }
 
-    private View extractView(final HttpServletRequest request,
-                             final HttpServletResponse response,
-                             final ModelAndView modelAndView) throws IOException {
-        if (modelAndView.getView() != null) {
-            return modelAndView.getView();
-        } else {
-            String viewName = modelAndView.getViewName();
-            return resolve(viewName, request, response);
-        }
+    private ModelAndView resolve(final Object handler,
+                                 final HttpServletRequest request,
+                                 final HttpServletResponse response) {
+        return viewResolvers.stream()
+                    .map(resolver -> resolve(handler, request, response, resolver))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElseThrow(() -> new InternalServerErrorException("Fail to find view resolver for " + handler));
     }
 
-    private View resolve(final String viewName,
-                         final HttpServletRequest request,
-                         final HttpServletResponse response) throws IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return DummyView.INSTANCE;
+    private ModelAndView resolve(final Object handler,
+                                 final HttpServletRequest request,
+                                 final HttpServletResponse response,
+                                 final ViewResolver resolver) {
+        try {
+            return resolver.handle(handler, request, response);
+        } catch (Exception e) {
+            logger.error("Fail to resolve view from handler's result");
+            return null;
         }
-
-        return new JspView(viewName);
     }
 
     private Object findHandler(final HttpServletRequest request) {
