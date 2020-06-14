@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -9,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class QuestionTest {
     @Test
+    @DisplayName("인자를 가진 생성자의 인스턴스 생성")
     void newInstance() throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Class<Question> clazz = Question.class;
 

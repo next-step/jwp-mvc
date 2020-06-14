@@ -3,6 +3,7 @@ package next.reflection;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
+    @DisplayName("클래스 정보 출력")
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug("class name : {}", clazz.getName());
@@ -37,6 +39,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("private 필드에 값 할당")
     public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
         String name = "eeseul";
         int age = 30;
@@ -58,6 +61,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("@Controller, @Service, @Repository 애노테이션 클래스 스캔")
     void componentScan() {
         Reflections reflections = new Reflections("core.di.factory.example");
 
