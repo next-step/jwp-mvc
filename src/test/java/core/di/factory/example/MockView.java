@@ -13,5 +13,4 @@ public class MockView implements View {
             throws Exception {
 
     }
-
 }

@@ -25,8 +25,8 @@ public class Junit4TestRunner {
 
     private void runMethod(final Method method, final Class<Junit4Test> clazz) {
         try {
-            method.invoke(clazz.newInstance());
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            method.invoke(clazz.getDeclaredConstructor().newInstance());
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
             e.printStackTrace();
             logger.error("Fail to run method {}", method.getName());
         }

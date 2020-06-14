@@ -36,4 +36,9 @@ public class MyController {
         DataBase.addUser(user);
         return null;
     }
+
+    @RequestMapping(value = "/test")
+    public ModelAndView test() {
+        return null;
+    }
 }
