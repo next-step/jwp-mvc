@@ -9,11 +9,13 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,10 +62,7 @@ public class ReflectionTest {
         Reflections reflections = new Reflections("core.di.factory.example");
 
         Set<Class<?>> classSet = new HashSet<>();
-        classSet.addAll(reflections.getTypesAnnotatedWith(Controller.class));
-        classSet.addAll(reflections.getTypesAnnotatedWith(Service.class));
-        classSet.addAll(reflections.getTypesAnnotatedWith(Repository.class));
-
+        addAll(classSet, reflections, Arrays.asList(Controller.class, Service.class, Repository.class));
         classSet.forEach(clazz -> logger.debug("class : {}", clazz.getSimpleName()));
     }
 
@@ -79,6 +78,10 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    private void addAll (Set<Class<?>> classSet, Reflections reflections, List<Class<? extends Annotation>> annotations) {
+        annotations.forEach(annotation -> classSet.addAll(reflections.getTypesAnnotatedWith(annotation)));
     }
 
     private void setField(Class<Student> clazz, String fieldName, Object value, Student student) throws NoSuchFieldException, IllegalAccessException {
