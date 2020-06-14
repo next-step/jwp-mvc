@@ -8,7 +8,9 @@ public enum DummyView implements View {
     INSTANCE;
 
     @Override
-    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void render(final Map<String, ?> model,
+                       final HttpServletRequest request,
+                       final HttpServletResponse response) throws Exception {
         //do nothing
     }
 }

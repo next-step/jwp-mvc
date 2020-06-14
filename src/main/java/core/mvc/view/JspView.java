@@ -15,7 +15,7 @@ public class JspView implements View {
         this.viewName = viewName;
     }
 
-    private void validate(String viewName) {
+    private void validate(final String viewName) {
         if (viewName == null || viewName.isEmpty()) {
             throw new IllegalArgumentException("ViewName is null or empty");
         }
@@ -26,7 +26,9 @@ public class JspView implements View {
     }
 
     @Override
-    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void render(final Map<String, ?> model,
+                       final HttpServletRequest request,
+                       final HttpServletResponse response) throws Exception {
         model.keySet()
                 .forEach(key -> request.setAttribute(key, model.get(key)));
 

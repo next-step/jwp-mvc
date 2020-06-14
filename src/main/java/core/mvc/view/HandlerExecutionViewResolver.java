@@ -17,14 +17,13 @@ public class HandlerExecutionViewResolver extends AbstractViewResolver {
 
         ModelAndView modelAndView = ((HandlerExecution) handler).handle(request, response);
         if (modelAndView.getView() == null) {
-            modelAndView.setView(extractView(request, response, modelAndView));
+            modelAndView.setView(extractView(response, modelAndView));
         }
 
         return modelAndView;
     }
 
-    private View extractView(final HttpServletRequest request,
-                             final HttpServletResponse response,
+    private View extractView(final HttpServletResponse response,
                              final ModelAndView modelAndView) throws IOException {
         String viewName = modelAndView.getViewName();
         return resolve(viewName, response);

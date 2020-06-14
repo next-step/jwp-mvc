@@ -11,7 +11,7 @@ public abstract class AbstractViewResolver implements ViewResolver {
     public abstract ModelAndView handle(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     protected View resolve(final String viewName,
-                         final HttpServletResponse response) throws IOException {
+                           final HttpServletResponse response) throws IOException {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
             response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return DummyView.INSTANCE;
