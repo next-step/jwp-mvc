@@ -164,4 +164,26 @@ public class ReflectionUtils extends org.reflections.ReflectionUtils {
             .map(value -> (type.equals(String.class)) ? value : ConvertUtils.convert(value, type))
             .orElse(null);
     }
+
+    public static Object extractFromSingleValuedMap(Map<String, String> singleValuedParam, String name, Class<?> type) {
+        if (Objects.isNull(singleValuedParam) ||
+            singleValuedParam.size() <= 0 ||
+            StringUtils.isEmpty(name) ||
+            Objects.isNull(type)
+        ) {
+            return null;
+        }
+
+        return findNonNullValueByNameAndType(singleValuedParam, name, type);
+    }
+
+    private static Object findNonNullValueByNameAndType(Map<String, String> singleValuedParam, String name, Class<?> type) {
+        String value = singleValuedParam.get(name);
+
+        if (Objects.isNull(value)) {
+            return null;
+        }
+
+        return (type.equals(String.class)) ? value : ConvertUtils.convert(value, type);
+    }
 }

@@ -1,6 +1,7 @@
 package next.controller.tobe;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
 import next.controller.asis.UserSessionUtils;
@@ -10,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static core.annotation.web.RequestMethod.*;
+import static core.annotation.web.RequestMethod.GET;
+import static core.annotation.web.RequestMethod.POST;
 
 @Controller
 @RequestMapping(value = "/users")
@@ -90,14 +91,19 @@ public class UserController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/profile", method = GET)
-    public String profile(HttpServletRequest req, String userId) {
+    @RequestMapping(value = "/profile/{id}", method = GET)
+    public String profile(
+        HttpServletRequest req,
+        @PathVariable(name = "id") String userId
+    ) {
         log.debug("userId: {}", userId);
 
         User user = DataBase.findUserById(userId);
+
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
+
         req.setAttribute("user", user);
 
         return "/user/profile.jsp";
