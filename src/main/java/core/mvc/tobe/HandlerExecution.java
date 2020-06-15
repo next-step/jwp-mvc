@@ -3,11 +3,14 @@ package core.mvc.tobe;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import core.mvc.asis.Controller;
+import core.mvc.tobe.view.JspView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class HandlerExecution {
     private Object controller;
@@ -17,21 +20,27 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Method targetMethod = findTargetMethod(request);
-        return (ModelAndView) targetMethod.invoke(controller, request, response);
+        Optional<Method> targetMethod = findTargetMethod(request);
+
+        if(targetMethod.isPresent()){
+            return (ModelAndView) targetMethod.get().invoke(controller, request, response);
+        }
+
+        Controller controller = (Controller) this.controller;
+        String uri = controller.execute(request, response);
+        return new ModelAndView(new JspView(uri));
     }
 
     public Object getController() {
         return controller;
     }
 
-    private Method findTargetMethod(HttpServletRequest request) {
+    private Optional<Method> findTargetMethod(HttpServletRequest request) {
         return Arrays.stream(this.controller.getClass().getMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .filter(method -> matchUri(request, method))
                 .filter(method -> matchMethod(request, method))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not found matched method to the request!"));
+                .findFirst();
     }
 
     private boolean matchUri(HttpServletRequest request, Method method) {

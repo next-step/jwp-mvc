@@ -2,6 +2,8 @@ package core.mvc.tobe;
 
 import core.db.DataBase;
 import core.mvc.ModelAndView;
+import core.mvc.tobe.handlermapping.custom.AnnotationHandlerMapping;
+import core.mvc.tobe.handlermapping.custom.AnnotationHandlerMapping2;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,12 +16,12 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnnotationHandlerMappingTest {
-    private AnnotationHandlerMapping handlerMapping;
+    private AnnotationHandlerMapping2 handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
+        handlerMapping = new AnnotationHandlerMapping2("core.mvc.tobe");
+        handlerMapping.init();
     }
 
     @DisplayName("Request 객체 를 입력하면, mapping 된 컨트롤러를 가진 HandlerExecution 반환")
@@ -30,7 +32,7 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
 
         //when
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecution execution = handlerMapping.findHandler(request);
 
         //then
         assertThat(execution.getController()).isInstanceOf(MyController.class);
@@ -47,7 +49,7 @@ public class AnnotationHandlerMappingTest {
         //when
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
         request.setParameter("userId", user.getUserId());
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecution execution = handlerMapping.findHandler(request);
         ModelAndView modelAndView = execution.handle(request, new MockHttpServletResponse());
 
         //then
@@ -61,7 +63,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
 
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecution execution = handlerMapping.findHandler(request);
         execution.handle(request, new MockHttpServletResponse());
     }
 }
