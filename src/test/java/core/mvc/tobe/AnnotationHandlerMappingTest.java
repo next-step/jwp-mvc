@@ -1,11 +1,12 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
-import core.mvc.asis.Controller;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -20,13 +21,12 @@ public class AnnotationHandlerMappingTest {
         handlerMapping.initialize();
     }
 
-    @DisplayName("Request 객체 (타깃 URI, 메소드)를 입력하면, HandlerExecution (맵핑된 컨트롤러) 반환")
-    @Test
-    void getHandler() {
+    @DisplayName("Request 객체 를 입력하면, mapping 된 컨트롤러를 가진 HandlerExecution 반환")
+    @ParameterizedTest
+    @CsvSource(value = {"POST:/users", "GET:/users", "GET:/users/show"}, delimiter = ':')
+    void getHandler(String method, String uri) {
         //given
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        handlerMapping.initialize();
+        MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
 
         //when
         HandlerExecution execution = handlerMapping.getHandler(request);

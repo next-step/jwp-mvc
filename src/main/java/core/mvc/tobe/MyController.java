@@ -16,17 +16,22 @@ import javax.servlet.http.HttpServletResponse;
 public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping("/users")
+    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(new JspView("/users/list.jsp"));
+    }
+
+    @RequestMapping(value = "/users/show", method = RequestMethod.GET)
+    public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
         String userId = request.getParameter("userId");
         logger.debug("Find UserId : {}", userId);
         User user = DataBase.findUserById(userId);
         request.setAttribute("user", user);
-        return null;
+        return new ModelAndView(new JspView("/users/show.jsp"));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(
                 request.getParameter("userId"),
                 request.getParameter("password"),
@@ -34,6 +39,6 @@ public class MyController {
                 request.getParameter("email"));
         logger.debug("User : {}", user);
         DataBase.addUser(user);
-        return null;
+        return new ModelAndView(new JspView("redirect:/users"));
     }
 }
