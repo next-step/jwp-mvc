@@ -1,5 +1,9 @@
 package next.model;
 
+import org.springframework.http.HttpRequest;
+
+import javax.servlet.http.HttpServletRequest;
+
 public class User {
     private String userId;
     private String password;
@@ -11,6 +15,14 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User toEntity(HttpServletRequest request){
+        return new User(
+                request.getParameter("userId"),
+                request.getParameter("password"),
+                request.getParameter("name"),
+                request.getParameter("email"));
     }
 
     public String getUserId() {

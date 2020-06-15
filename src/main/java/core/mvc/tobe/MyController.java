@@ -18,16 +18,11 @@ public class MyController {
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(
-                request.getParameter("userId"),
-                request.getParameter("password"),
-                request.getParameter("name"),
-                request.getParameter("email"));
-        logger.debug("User : {}", user);
-        DataBase.addUser(user);
+        User user = saveUser(request);
 
         ModelAndView modelAndView = new ModelAndView(new JspView("redirect:/users"));
         modelAndView.addObject("user", user);
+
         return modelAndView;
     }
 
@@ -41,13 +36,26 @@ public class MyController {
 
     @RequestMapping(value = "/users/show", method = RequestMethod.GET)
     public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
-        logger.debug("UserId : {}", userId);
-        User user = DataBase.findUserById(userId);
+        User user = findByUserId(request);
 
         ModelAndView modelAndView = new ModelAndView(new JspView("/users/show.jsp"));
         modelAndView.addObject("user", user);
 
         return modelAndView;
+    }
+
+    private User saveUser(HttpServletRequest request){
+        User user = User.toEntity(request);
+        logger.debug("User : {}", user);
+        DataBase.addUser(user);
+
+        return user;
+    }
+
+    private User findByUserId(HttpServletRequest request){
+        String userId = request.getParameter("userId");
+        logger.debug("UserId : {}", userId);
+
+        return DataBase.findUserById(userId);
     }
 }

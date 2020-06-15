@@ -9,10 +9,8 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 public class AnnotationHandlerMapping {
     private Object[] basePackage;
@@ -24,20 +22,8 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections("core.mvc",
-                new TypeAnnotationsScanner(),
-                new SubTypesScanner());
-
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-
-        for (Class clazz : controllers) {
-            Method[] methods = clazz.getMethods();
-            Arrays.stream(methods)
-                    .filter(method -> method.getDeclaredAnnotation(RequestMapping.class) != null)
-                    .map(method -> method.getDeclaredAnnotation(RequestMapping.class))
-                    .map(annotation -> new HandlerKey(annotation.value(), annotation.method()))
-                    .forEach(handlerKey -> handlerExecutions.put(handlerKey, new HandlerExecution(getNewInstance(clazz))));
-        }
+        Arrays.stream(basePackage)
+                .forEach(basePackage -> executeComponentScan(basePackage));
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
@@ -58,5 +44,23 @@ public class AnnotationHandlerMapping {
         }
 
         return controller;
+    }
+
+    private void executeComponentScan(Object basePackage) {
+        Reflections reflections = new Reflections(basePackage,
+                new TypeAnnotationsScanner(),
+                new SubTypesScanner());
+
+        reflections.getTypesAnnotatedWith(Controller.class)
+                .stream()
+                .forEach(clazz -> initHandlerExecutions(clazz));
+    }
+
+    private void initHandlerExecutions(Class clazz) {
+        Arrays.stream(clazz.getMethods())
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                .map(method -> method.getDeclaredAnnotation(RequestMapping.class))
+                .map(annotation -> new HandlerKey(annotation.value(), annotation.method()))
+                .forEach(handlerKey -> handlerExecutions.put(handlerKey, new HandlerExecution(getNewInstance(clazz))));
     }
 }
