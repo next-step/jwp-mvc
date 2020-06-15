@@ -10,9 +10,7 @@ import org.apache.commons.beanutils.ConstructorUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.reflections.Reflections;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -20,8 +18,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class ReflectionUtils extends org.reflections.ReflectionUtils {
-    public static final Class REQUEST_MAPPING_ANNOTATION_CLASS = RequestMapping.class;
-    public static final Class CONTROLLER_ANNOTATION_CLASS = Controller.class;
+    public static final Class<RequestMapping> REQUEST_MAPPING_ANNOTATION_CLASS = RequestMapping.class;
+    public static final Class<Controller> CONTROLLER_ANNOTATION_CLASS = Controller.class;
 
     @SuppressWarnings("unchecked")
     public static Set<Class<?>> getTypesAnnotatedWith(Reflections reflections, Class<? extends Annotation>... annotations) {
