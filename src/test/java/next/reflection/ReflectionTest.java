@@ -76,4 +76,30 @@ public class ReflectionTest {
             }
         }
     }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        final Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+        final Student student = new Student();
+        for (Field field : clazz.getDeclaredFields()) {
+            injectValue(student, field, determineValueByFieldName(field));
+        }
+        logger.debug("result: {}", student);
+    }
+
+    private void injectValue(Student target, Field field, Object value) throws IllegalAccessException {
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    private Object determineValueByFieldName(Field field) {
+        final String name = field.getName();
+        if (name.startsWith("name")) {
+            return "이름 아닌 이름 같은거";
+        } else if (name.startsWith("age")) {
+            return 100;
+        }
+        return null;
+    }
 }
