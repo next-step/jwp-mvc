@@ -10,6 +10,7 @@ import org.apache.commons.beanutils.ConstructorUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.reflections.Reflections;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -136,6 +137,18 @@ public class ReflectionUtils extends org.reflections.ReflectionUtils {
             .collect(Collectors.toList());
 
         return extracted.toArray(new Object[0]);
+    }
+
+    public static Object extractFromMultiValuedMap(Map<String, String[]> multiValuedMap, String name, Class<?> type) {
+        if (Objects.isNull(multiValuedMap) ||
+            multiValuedMap.size() <= 0 ||
+            StringUtils.isEmpty(name) ||
+            Objects.isNull(type)
+        ) {
+            return null;
+        }
+
+        return findFirstNonNullValueByNameAndType(multiValuedMap, name, type);
     }
 
     private static Object findFirstNonNullValueByNameAndType(Map<String, String[]> multiValuedParam, String name, Class<?> type) {

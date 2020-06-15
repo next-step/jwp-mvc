@@ -2,8 +2,6 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import next.util.StringUtils;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -40,11 +38,11 @@ public class HandlerArgumentResolver {
             }
 
             if (isJavaType(type)) {
-                addJavaTypeParameter(request, arguments, type, parameterName);
+                addJavaTypeParameter(request, arguments, parameterName, type);
                 continue;
             }
 
-            addCustomObject(arguments, type, request.getParameterMap());
+            addCustomObject(arguments, request.getParameterMap(), type);
         }
 
         return arguments.toArray(new Object[0]);
@@ -56,49 +54,24 @@ public class HandlerArgumentResolver {
             .isPresent();
     }
 
-    private static void addJavaTypeParameter(HttpServletRequest request, List<Object> arguments, Class<?> type, String parameterName) {
-        String parameterValue = getParameterValue(request.getParameterMap(), parameterName);
-
-        if (Objects.nonNull(parameterValue)) {
-            arguments.add(getConvertedParameterValue(type, parameterValue));
-        }
-        else {
-            arguments.add(null);
-        }
-    }
-
-    private static String getParameterValue(Map<String, String[]> requestParameters, String parameterName) {
-        if (StringUtils.isEmpty(parameterName) ||
-            Objects.isNull(requestParameters) ||
-            !requestParameters.containsKey(parameterName)) {
-            return null;
-        }
-
-        return Arrays.stream(requestParameters.get(parameterName))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
-    }
-
-    private static Object getConvertedParameterValue(Class type, String parameterValue) {
-        return (type.equals(String.class)) ? parameterValue : ConvertUtils.convert(parameterValue, type);
+    private static void addJavaTypeParameter(HttpServletRequest request, List<Object> arguments, String name, Class<?> type) {
+        arguments.add(ReflectionUtils.extractFromMultiValuedMap(request.getParameterMap(), name, type));
     }
 
     private static void addCustomObject(
         List<Object> arguments,
-        Class<?> type,
-        Map<String, String[]> requestParameters) {
-
+        Map<String, String[]> multiValuedMap,
+        Class<?> type
+    ) {
         try {
-            Object[] parameters = ReflectionUtils.extractFromMultiValuedMap(requestParameters, type.getDeclaredFields());
+            Object[] parameters = ReflectionUtils.extractFromMultiValuedMap(multiValuedMap, type.getDeclaredFields());
             Object instance = ReflectionUtils.newInstance(type, parameters);
 
-            if (Objects.nonNull(instance)) {
-                arguments.add(instance);
-            }
+            arguments.add(instance);
         }
         catch (Exception e) {
             log.error(e.getMessage());
+            arguments.add(null);
         }
     }
 
