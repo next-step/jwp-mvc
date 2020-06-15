@@ -4,14 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -99,5 +99,26 @@ public class ReflectionTest {
 
             logger.debug("Modifier : {} , parameters : {}, Name : {} ", Modifier.toString(method.getModifiers()), parameterType, method.getName());
         }
+    }
+
+    @Test
+    void makeNewQuestionInstance() throws Exception{
+        Optional<Constructor<?>> constructorOptional = Arrays.stream(Question.class.getDeclaredConstructors())
+                .findFirst();
+
+        Constructor constructor = constructorOptional.orElseThrow(InstantiationError::new);
+
+        Question question = null;
+
+        if(constructor.getParameterTypes().length == 3) {
+            question = (Question) constructor.newInstance("지선", "타이틀", "콘텐트");
+        }
+
+        if(constructor.getParameterTypes().length == 6) {
+            question = (Question) constructor.newInstance(0,"지선", "타이틀","콘텐츠", new Date(), 0);
+        }
+
+        assertNotNull(question);
+
     }
 }
