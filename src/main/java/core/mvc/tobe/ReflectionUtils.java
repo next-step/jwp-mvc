@@ -1,21 +1,21 @@
 package core.mvc.tobe;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.tobe.RequestMappingMethod;
 import lombok.extern.slf4j.Slf4j;
 import next.util.StringUtils;
+import org.apache.commons.beanutils.ConstructorUtils;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ReflectionUtils extends org.reflections.ReflectionUtils {
@@ -109,4 +109,46 @@ public class ReflectionUtils extends org.reflections.ReflectionUtils {
         return instance;
     }
 
+    public static Object newInstance(Class<?> declaringClass, Object[] parameters) {
+        try {
+            return ConstructorUtils.invokeConstructor(declaringClass, parameters);
+        }
+        catch (Throwable t) {
+            log.error(t.getMessage());
+        }
+
+        return null;
+    }
+
+    public static Object[] extractFromMultiValuedMap(Map<String, String[]> multiValuedMap, Field[] fields) {
+        if (Objects.isNull(multiValuedMap) ||
+            multiValuedMap.size() <= 0 ||
+            Objects.isNull(fields) ||
+            fields.length <= 0
+        ) {
+            return null;
+        }
+
+        List<Object> extracted = Arrays.stream(fields)
+            .map(field -> findFirstNonNullValueByNameAndType(multiValuedMap, field.getName(), field.getType()))
+            .filter(Objects::nonNull)
+            .peek(value -> log.debug("value: {}, type: {}", value, value.getClass()))
+            .collect(Collectors.toList());
+
+        return extracted.toArray(new Object[0]);
+    }
+
+    private static Object findFirstNonNullValueByNameAndType(Map<String, String[]> multiValuedParam, String name, Class<?> type) {
+        String[] values = multiValuedParam.get(name);
+
+        if (Objects.isNull(values) || values.length <= 0) {
+            return null;
+        }
+
+        return Arrays.stream(values)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .map(value -> (type.equals(String.class)) ? value : ConvertUtils.convert(value, type))
+            .orElse(null);
+    }
 }

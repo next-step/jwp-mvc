@@ -35,6 +35,7 @@ public class DispatcherServlet extends HttpServlet implements ModelAndViewGettab
     public void init() {
         requestMapping = new RequestMapping();
         requestMapping.initMapping();
+
         annotationHandlerMapping = new AnnotationHandlerMapping(BASE_CONTROLLER_PACKAGE);
         annotationHandlerMapping.initialize();
     }

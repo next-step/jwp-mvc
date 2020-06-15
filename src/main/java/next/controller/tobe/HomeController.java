@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import static core.annotation.web.RequestMethod.GET;
 
 @Controller
-public class HomeModelAndViewGettable implements ModelAndViewGettable {
+public class HomeController implements ModelAndViewGettable {
 
     @RequestMapping(value = "/", method = GET)
-    public ModelAndView home(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public String home(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         req.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("home.jsp"));
+        return "home.jsp";
     }
 }

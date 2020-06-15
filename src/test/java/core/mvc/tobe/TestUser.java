@@ -1,8 +1,5 @@
 package core.mvc.tobe;
 
-import lombok.Getter;
-
-@Getter
 public class TestUser {
     private String userId;
     private String password;
@@ -12,6 +9,18 @@ public class TestUser {
         this.userId = userId;
         this.password = password;
         this.age = age;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getAge() {
+        return age;
     }
 
     @Override
