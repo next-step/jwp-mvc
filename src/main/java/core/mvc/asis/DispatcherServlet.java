@@ -77,7 +77,7 @@ public class DispatcherServlet extends HttpServlet implements ModelAndViewGettab
             return ((HandlerExecution)handler).handle(req, resp);
         }
 
-        return new ModelAndView(new JspView(req.getRequestURI()));
+        throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
     }
 
     private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws Exception {

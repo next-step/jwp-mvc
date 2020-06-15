@@ -3,7 +3,6 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMethod;
 import lombok.extern.slf4j.Slf4j;
-import next.util.StringUtils;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +43,16 @@ public class AnnotationHandlerMapping {
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        HandlerKey handlerKey = new HandlerKey(requestUri, rm);
+        return handlerExecutions.getOrDefault(handlerKey, getPathPatternMatchedHandler(handlerKey));
+    }
+
+    private HandlerExecution getPathPatternMatchedHandler(HandlerKey handlerKey) {
+        return handlerExecutions.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().matchesPathPattern(handlerKey))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }

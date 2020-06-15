@@ -13,6 +13,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -20,14 +21,6 @@ import java.util.*;
 @Slf4j
 public class HandlerArgumentResolver {
     private static ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-    private static PathPatternParser pathPatternParser = initPathPatternParser();
-
-    private static PathPatternParser initPathPatternParser() {
-        PathPatternParser pathPatternParser = new PathPatternParser();
-        pathPatternParser.setMatchOptionalTrailingSeparator(true);
-        return pathPatternParser;
-    }
-
     private static final String JAVA_LANG_PACKAGE_PREFIX = "java.lang";
 
     public static Object[] resolve(Method method, HttpServletRequest request, HttpServletResponse response) {
@@ -84,14 +77,24 @@ public class HandlerArgumentResolver {
 
     private static Map<String, String> getPathVariables(Method method, String requestURI) {
         return getPathPattern(method)
-            .map(pathPattern -> pathPattern.matchAndExtract(toPathContainer(requestURI)))
+            .map(pathPattern -> pathPattern.matchAndExtract(PathPatternUtil.toPathContainer(requestURI)))
             .map(PathPattern.PathMatchInfo::getUriVariables)
             .orElse(Collections.emptyMap());
     }
 
     private static Optional<PathPattern> getPathPattern(Method method) {
-        return Optional.ofNullable(method.getAnnotation(RequestMapping.class))
-            .map(annotation -> parsePath(annotation.value()));
+        String baseUri = "";
+        RequestMapping typeRequestMapping = method.getDeclaringClass().getAnnotation(RequestMapping.class);
+
+        if (Objects.nonNull(typeRequestMapping)) {
+            baseUri = typeRequestMapping.value();
+        }
+
+        RequestMapping methodRequestMapping = method.getAnnotation(RequestMapping.class);
+        String finalBaseUri = baseUri;
+
+        return Optional.ofNullable(methodRequestMapping)
+                        .map(annotation -> PathPatternUtil.parse(finalBaseUri + annotation.value()));
     }
 
     private static boolean isJavaType(Class<?> type) {
@@ -119,17 +122,5 @@ public class HandlerArgumentResolver {
             log.error(e.getMessage());
             arguments.add(null);
         }
-    }
-
-    private static PathPattern parsePath(String path) {
-        return pathPatternParser.parse(path);
-    }
-
-    private static PathContainer toPathContainer(String path) {
-        if (path == null) {
-            return null;
-        }
-
-        return PathContainer.parsePath(path);
     }
 }

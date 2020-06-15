@@ -26,15 +26,12 @@ public class HandlerKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HandlerKey that = (HandlerKey) o;
-        return matchesUrl(that) && requestMethod == that.requestMethod;
+        return Objects.equals(url, that.getUrl()) && requestMethod == that.requestMethod;
     }
 
-    private boolean matchesUrl(HandlerKey that) {
-        log.debug("this: {}", StringUtils.toPrettyJson(this));
-        log.debug("that: {}", StringUtils.toPrettyJson(that));
-
-        return Objects.equals(url, that.getUrl()) ||
-            parse(this.url).matches(toPathContainer(that.getUrl()));
+    public boolean matchesPathPattern(HandlerKey that) {
+        return PathPatternUtil.parse(this.url)
+                    .matches(PathPatternUtil.toPathContainer(that.getUrl()));
     }
 
     @Override
@@ -48,18 +45,5 @@ public class HandlerKey {
             "url='" + url + '\'' +
             ", requestMethod=" + requestMethod +
             '}';
-    }
-
-    private PathPattern parse(String path) {
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        return pp.parse(path);
-    }
-
-    private static PathContainer toPathContainer(String path) {
-        if (path == null) {
-            return null;
-        }
-        return PathContainer.parsePath(path);
     }
 }
