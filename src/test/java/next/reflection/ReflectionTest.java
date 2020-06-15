@@ -1,14 +1,17 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
+import java.util.Date;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("클래스의 정보를 투머치하게 보여줍시다")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
@@ -77,6 +80,7 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("private 필드에 접근해봅시당")
     @Test
     public void privateFieldAccess() throws Exception {
         final Class<Student> clazz = Student.class;
@@ -101,5 +105,23 @@ public class ReflectionTest {
             return 100;
         }
         return null;
+    }
+
+    @DisplayName("인자가 있는 생성자를 이용해 인스턴스를 생성해봐요!")
+    @Test
+    public void test_args_constructor() throws Exception {
+        final Class<Question> clazz = Question.class;
+        final Class<?>[] parameterTypes = {
+                long.class, String.class, String.class, String.class, Date.class, int.class
+        };
+        final Constructor<Question> constructor = clazz.getDeclaredConstructor(parameterTypes);
+        final Question question = constructor.newInstance(
+                1L,
+                "Chwon",
+                "질문이 있습니다!",
+                "오늘 출근 전에 아침을 사가고 싶은데 뭘 먹으면 좋을까요!",
+                new Date(System.currentTimeMillis()),
+                0);
+        logger.debug("question: {}", question);
     }
 }
