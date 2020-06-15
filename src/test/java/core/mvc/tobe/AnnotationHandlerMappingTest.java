@@ -36,7 +36,6 @@ public class AnnotationHandlerMappingTest {
         assertThat(execution.getController()).isInstanceOf(MyController.class);
     }
 
-
     @DisplayName("요구사항 1 - 애노테이션 기반 프레임워크")
     @Test
     public void create_find() throws Exception {
@@ -50,7 +49,7 @@ public class AnnotationHandlerMappingTest {
         HandlerExecution execution = handlerMapping.getHandler(request);
         ModelAndView modelAndView = execution.handle(request, response);
 
-        assertThat((User)modelAndView.getObject("user")).isEqualTo(user);
+        assertThat((User) modelAndView.getObject("user")).isEqualTo(user);
     }
 
     private void createUser(User user) throws Exception {

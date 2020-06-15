@@ -29,6 +29,7 @@ public class AnnotationHandlerMapping {
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod method = RequestMethod.valueOf(request.getMethod().toUpperCase());
+
         return handlerExecutions.get(new HandlerKey(requestUri, method));
     }
 
@@ -53,7 +54,7 @@ public class AnnotationHandlerMapping {
 
         reflections.getTypesAnnotatedWith(Controller.class)
                 .stream()
-                .forEach(clazz -> initHandlerExecutions(clazz));
+                .forEach(this::initHandlerExecutions);
     }
 
     private void initHandlerExecutions(Class clazz) {
