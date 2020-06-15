@@ -1,6 +1,7 @@
 package next.reflection;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -11,6 +12,23 @@ import org.slf4j.LoggerFactory;
 public class ReflectionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    @Test
+    void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Student student = new Student();
+        Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+        name.set(student, "iltaek");
+
+        Field age = clazz.getDeclaredField("age");
+        age.setAccessible(true);
+        age.set(student, 20);
+
+        logger.debug("student {}'s age is {}", student.getName(), student.getAge());
+    }
 
     @Test
     public void showClass() {
