@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -12,6 +13,21 @@ import org.slf4j.LoggerFactory;
 public class ReflectionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    @Test
+    void createInstanceWithParameter() throws Exception {
+        Class<Question> clazz = Question.class;
+
+        // String writer, String title, String contents
+        Constructor<?> constructor1 = clazz.getConstructor(String.class, String.class, String.class);
+        Question qustion1 = (Question) constructor1.newInstance("javajigi", "JWP", "Hi, guys");
+        logger.debug("{} attended {} class and said {}", qustion1.getWriter(), qustion1.getTitle(), qustion1.getContents());
+
+        // long questionId, String writer, String title, String contents, Date createdDate, int countOfComment
+        Constructor<?> constructor2 = clazz.getConstructor(long.class, String.class, String.class, String.class, Date.class, int.class);
+        Question qustion2 = (Question) constructor2.newInstance(1L, "conan", "JWP-MVC", "Hello, World!", new Date(), 0);
+        logger.debug("{} attended {} class and said {}", qustion2.getWriter(), qustion2.getTitle(), qustion2.getContents());
+    }
 
     @Test
     void privateFieldAccess() throws Exception {
