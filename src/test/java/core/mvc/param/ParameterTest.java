@@ -1,12 +1,12 @@
 package core.mvc.param;
 
 import core.annotation.web.Controller;
+import core.exception.ParameterNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("메소드의 파라미터를 표현하기 위한 클래스")
 class ParameterTest {
@@ -28,5 +28,15 @@ class ParameterTest {
         String refinedParam = parameter.searchParam(request);
 
         assertThat(refinedParam).isEqualTo("nokchax");
+    }
+
+    @Test
+    @DisplayName("해당 하는 파라미터가 없을 경우 예외를 던진다")
+    void cantSearchParam() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        Parameter<String> parameter = new Parameter<>("name", null);
+
+        assertThatExceptionOfType(ParameterNotFoundException.class)
+                .isThrownBy(() -> parameter.searchParam(request));
     }
 }
