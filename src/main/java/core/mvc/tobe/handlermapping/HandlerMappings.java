@@ -1,7 +1,5 @@
 package core.mvc.tobe.handlermapping;
 
-import core.mvc.tobe.handlermapping.HandlerMapping;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +7,7 @@ import java.util.Set;
 public class HandlerMappings {
     private static Set<HandlerMapping> handlerMappings = new HashSet<>();
 
-    public static void addHandlerMapping(HandlerMapping handlerMapping){
+    public static void addHandlerMapping(HandlerMapping handlerMapping) {
         handlerMappings.add(handlerMapping);
     }
 

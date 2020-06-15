@@ -6,15 +6,17 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerKey;
+import core.mvc.tobe.handlermapping.HandlerMapping;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Map;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -23,16 +25,28 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    public void initialize() {
+    @Override
+    public void init() {
         Arrays.stream(basePackage)
                 .forEach(basePackage -> executeComponentScan(basePackage));
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    @Override
+    public HandlerExecution findHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
-        RequestMethod method = RequestMethod.valueOf(request.getMethod().toUpperCase());
 
-        return handlerExecutions.get(new HandlerKey(requestUri, method));
+        if(request.getMethod() == null){
+            return null;
+        }
+
+        RequestMethod method = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, method));
+        return handlerExecution;
+    }
+
+    @Override
+    public boolean hasHandler(HttpServletRequest request) {
+        return findHandler(request) != null;
     }
 
     private Object getNewInstance(Class clazz) {

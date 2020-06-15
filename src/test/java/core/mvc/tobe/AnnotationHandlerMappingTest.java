@@ -3,7 +3,6 @@ package core.mvc.tobe;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.handlermapping.custom.AnnotationHandlerMapping;
-import core.mvc.tobe.handlermapping.custom.AnnotationHandlerMapping2;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,11 +15,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnnotationHandlerMappingTest {
-    private AnnotationHandlerMapping2 handlerMapping;
+    private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping2("core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         handlerMapping.init();
     }
 
