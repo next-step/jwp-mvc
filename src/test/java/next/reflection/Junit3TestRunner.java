@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,7 @@ public class Junit3TestRunner {
                 .filter(method -> method.getName().contains("test"))
                 .collect(Collectors.toList());
 
-        for(Method method : methods) {
+        for (Method method : methods) {
             method.invoke(clazz.newInstance());
         }
     }
