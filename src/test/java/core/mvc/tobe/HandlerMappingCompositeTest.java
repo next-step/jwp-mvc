@@ -34,7 +34,7 @@ public class HandlerMappingCompositeTest {
 
         HandlerExecution handler = handlerMappingComposite.getHandler(request);
 
-        assertThat(handler).isInstanceOf(LagacyHandlerExecution.class);
+        assertThat(handler).isInstanceOf(LegacyHandlerExecution.class);
     }
 
     @Test

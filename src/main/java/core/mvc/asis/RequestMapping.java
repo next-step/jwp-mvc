@@ -2,7 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMapping;
-import core.mvc.tobe.LagacyHandlerExecution;
+import core.mvc.tobe.LegacyHandlerExecution;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class RequestMapping implements HandlerMapping {
         Controller controller = findController(request.getRequestURI());
 
         if (controller != null) {
-            return new LagacyHandlerExecution(controller);
+            return new LegacyHandlerExecution(controller);
         }
 
         return null;

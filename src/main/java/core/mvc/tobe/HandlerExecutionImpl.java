@@ -13,17 +13,24 @@ public class HandlerExecutionImpl extends HandlerMethod implements HandlerExecut
 
     private static final Logger logger = LoggerFactory.getLogger(HandlerExecutionImpl.class);
 
+    private HandlerMethodArgumentResolver resolver = new HandlerMethodArgumentResolverComposite();
+
     public HandlerExecutionImpl(Object instance, Method method) {
         super(instance, method);
     }
 
-    @Override
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) this.invoke(request, response);
+    public HandlerExecutionImpl addResolvers(HandlerMethodArgumentResolver resolver) {
+        this.resolver = resolver;
+        return this;
     }
 
-    private Object invoke(Object... providedArguments) {
-        Object[] args = getMethodArgumentValues(providedArguments);
+    @Override
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return (ModelAndView) this.invoke(request, request, response);
+    }
+
+    private Object invoke(HttpServletRequest request, Object... providedArguments) {
+        Object[] args = getMethodArgumentValues(request, providedArguments);
         try {
             return method.invoke(instance, args);
         } catch (IllegalAccessException e) {
@@ -35,16 +42,21 @@ public class HandlerExecutionImpl extends HandlerMethod implements HandlerExecut
         }
     }
 
-    private Object[] getMethodArgumentValues(Object[] providedArguments) {
+    private Object[] getMethodArgumentValues(HttpServletRequest request, Object... providedArgs) {
+        MethodParameter[] parameters = getMethodParameters();
         Object[] args = new Object[parameters.length];
 
         for (int i = 0; i < parameters.length; i++) {
             MethodParameter parameter = parameters[i];
 
-            args[i] = findProvidedArgument(parameter, providedArguments);
+            args[i] = findProvidedArgument(parameter, providedArgs);
 
             if (args[i] != null) {
                 continue;
+            }
+
+            if (this.resolver.supportsParameter(parameter)) {
+                args[i] = this.resolver.resolveArgument(parameter, request);
             }
         }
 

@@ -6,11 +6,11 @@ import core.mvc.asis.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class LagacyHandlerExecution implements HandlerExecution {
+public class LegacyHandlerExecution implements HandlerExecution {
 
     private Controller controller;
 
-    public LagacyHandlerExecution(Controller controller) {
+    public LegacyHandlerExecution(Controller controller) {
         this.controller = controller;
     }
 

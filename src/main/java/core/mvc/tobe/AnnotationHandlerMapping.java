@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.asis.DispatcherServlet;
+import core.mvc.tobe.support.PathVariableHandlerMethodArgumentResolver;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private HandlerMethodArgumentResolver resolver;
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -35,12 +37,22 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Set<Method> requestMappingMethods = findRequestMappingMethods(instantiateControllers.keySet());
 
         initHandlerExecutions(instantiateControllers, requestMappingMethods);
+        initResolvers();
+    }
+
+    private void initResolvers() {
+        HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite(
+                new PathVariableHandlerMethodArgumentResolver()
+        );
+
+        this.resolver = handlerMethodArgumentResolverComposite;
     }
 
     private void initHandlerExecutions(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {
         for (Method method : requestMappingMethods) {
             Set<HandlerKey> handlerKeys = createHandlerKeys(method);
-            HandlerExecution handlerExecution = new HandlerExecutionImpl(instantiateControllers.get(method.getDeclaringClass()), method);
+            HandlerExecution handlerExecution = new HandlerExecutionImpl(instantiateControllers.get(method.getDeclaringClass()), method)
+                    .addResolvers(resolver);
             handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey, handlerExecution));
         }
     }
@@ -75,6 +87,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private Set<Method> findRequestMappingMethods(Set<Class<?>> controllers) {
         Set<Method> requestMappingMethods = new LinkedHashSet<>();
         controllers.forEach(targetClass -> requestMappingMethods.addAll(ReflectionUtils.getAllMethods(targetClass, ReflectionUtils.withAnnotation(RequestMapping.class))));
+
         return requestMappingMethods;
     }
 
@@ -82,6 +95,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+
+        return handlerExecutions.keySet().stream()
+                .filter(key -> key.matches(requestUri, rm))
+                .map(key -> handlerExecutions.get(key))
+                .findAny()
+                .orElse(null);
     }
 }

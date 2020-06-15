@@ -54,6 +54,7 @@ public class ControllerScanner {
         } catch (InvocationTargetException e) {
             logger.error(e.getTargetException().getMessage(), e.getTargetException());
         }
+
         return null;
     }
 }
