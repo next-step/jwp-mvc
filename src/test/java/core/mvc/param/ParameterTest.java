@@ -14,7 +14,7 @@ class ParameterTest {
     @Test
     @DisplayName("파라미터는 파라미터 이름과 그 파라미터의 타입, 그리고 해당 파라미터가 가지고 있는 어노테이션을 가지고 있다.")
     void constructor() {
-        assertThatCode(() -> new Parameter<String>("name", Controller.class))
+        assertThatCode(() -> new Parameter<>("name", String.class, Controller.class))
                 .doesNotThrowAnyException();
     }
 
@@ -23,7 +23,7 @@ class ParameterTest {
     void searchParam() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("name", "nokchax");
-        Parameter<String> parameter = new Parameter<>("name", null);
+        Parameter<String> parameter = new Parameter<>("name", String.class, null);
 
         String refinedParam = parameter.searchParam(request);
 
@@ -34,7 +34,7 @@ class ParameterTest {
     @DisplayName("해당 하는 파라미터가 없을 경우 예외를 던진다")
     void cantSearchParam() {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        Parameter<String> parameter = new Parameter<>("name", null);
+        Parameter<String> parameter = new Parameter<>("name", String.class, null);
 
         assertThatExceptionOfType(ParameterNotFoundException.class)
                 .isThrownBy(() -> parameter.searchParam(request));
