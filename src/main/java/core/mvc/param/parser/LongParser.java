@@ -1,4 +1,4 @@
-package core.mvc.param;
+package core.mvc.param.parser;
 
 public class LongParser implements Parser<Long> {
 

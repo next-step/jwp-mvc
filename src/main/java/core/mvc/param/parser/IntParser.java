@@ -1,4 +1,4 @@
-package core.mvc.param;
+package core.mvc.param.parser;
 
 public class IntParser implements Parser<Integer> {
 

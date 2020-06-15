@@ -1,4 +1,4 @@
-package core.mvc.param;
+package core.mvc.param.parser;
 
 public interface Parser<T> {
     boolean isParsable(Class<?> clazz);
