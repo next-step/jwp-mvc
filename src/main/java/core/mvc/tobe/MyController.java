@@ -16,20 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
-    @RequestMapping("/users")
-    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView(new JspView("/users/list.jsp"));
-    }
-
-    @RequestMapping(value = "/users/show", method = RequestMethod.GET)
-    public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
-        logger.debug("Find UserId : {}", userId);
-        User user = DataBase.findUserById(userId);
-        request.setAttribute("user", user);
-        return new ModelAndView(new JspView("/users/show.jsp"));
-    }
-
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(
@@ -39,6 +25,29 @@ public class MyController {
                 request.getParameter("email"));
         logger.debug("User : {}", user);
         DataBase.addUser(user);
-        return new ModelAndView(new JspView("redirect:/users"));
+
+        ModelAndView modelAndView = new ModelAndView(new JspView("redirect:/users"));
+        modelAndView.addObject("user", user);
+        return modelAndView;
+    }
+
+    @RequestMapping("/users")
+    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView modelAndView = new ModelAndView(new JspView("/users/list.jsp"));
+        modelAndView.addObject("users", DataBase.findAll());
+
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/users/show", method = RequestMethod.GET)
+    public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
+        String userId = request.getParameter("userId");
+        logger.debug("UserId : {}", userId);
+        User user = DataBase.findUserById(userId);
+
+        ModelAndView modelAndView = new ModelAndView(new JspView("/users/show.jsp"));
+        modelAndView.addObject("user", user);
+
+        return modelAndView;
     }
 }

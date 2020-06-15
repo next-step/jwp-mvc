@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
+import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,19 +36,21 @@ public class AnnotationHandlerMappingTest {
         assertThat(execution.getController()).isInstanceOf(MyController.class);
     }
 
+
+    @DisplayName("요구사항 1 - 애노테이션 기반 프레임워크")
     @Test
     public void create_find() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
 
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/show");
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        ModelAndView modelAndView = execution.handle(request, response);
 
-        assertThat(request.getAttribute("user")).isEqualTo(user);
+        assertThat((User)modelAndView.getObject("user")).isEqualTo(user);
     }
 
     private void createUser(User user) throws Exception {
