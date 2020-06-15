@@ -1,7 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.handler.HandlerExecution;
 import core.mvc.tobe.handlermapping.HandlerMapping;
 import core.mvc.tobe.handlermapping.HandlerMappingRegistry;
 import core.mvc.tobe.handlermapping.HandlerMappings;
@@ -47,11 +47,9 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private HandlerMapping findHandlerMapping(HttpServletRequest request) {
-        HandlerMapping not_found_matched_handlerMapping = handlerMappings.stream()
+        return handlerMappings.stream()
                 .filter(handlerMapping -> handlerMapping.hasHandler(request))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Not found matched HandlerMapping"));
-
-        return not_found_matched_handlerMapping;
     }
 }
