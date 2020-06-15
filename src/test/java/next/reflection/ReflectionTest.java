@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -102,7 +105,7 @@ public class ReflectionTest {
     }
 
     @Test
-    void makeNewQuestionInstance() throws Exception{
+    void makeNewQuestionInstance() throws Exception {
         Optional<Constructor<?>> constructorOptional = Arrays.stream(Question.class.getDeclaredConstructors())
                 .findFirst();
 
@@ -110,12 +113,12 @@ public class ReflectionTest {
 
         Question question = null;
 
-        if(constructor.getParameterTypes().length == 3) {
+        if (constructor.getParameterTypes().length == 3) {
             question = (Question) constructor.newInstance("지선", "타이틀", "콘텐트");
         }
 
-        if(constructor.getParameterTypes().length == 6) {
-            question = (Question) constructor.newInstance(0,"지선", "타이틀","콘텐츠", new Date(), 0);
+        if (constructor.getParameterTypes().length == 6) {
+            question = (Question) constructor.newInstance(0, "지선", "타이틀", "콘텐츠", new Date(), 0);
         }
 
         assertNotNull(question);
