@@ -4,7 +4,7 @@ import core.mvc.param.Parameter;
 import core.mvc.param.extractor.annotation.AnnotationValueExtractors;
 import core.mvc.param.extractor.complex.ComplexValueExtractor;
 import core.mvc.param.extractor.simple.SimpleValueExtractor;
-import core.mvc.param.extractor.type.TypeValueExtractor;
+import core.mvc.param.extractor.type.ContextValueExtractor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -15,7 +15,7 @@ public class ValueExtractors {
     private static final List<ValueExtractor> EXTRACTORS = Arrays.asList(
             new SimpleValueExtractor(),
             new AnnotationValueExtractors(),
-            new TypeValueExtractor(),
+            new ContextValueExtractor(),
             new ComplexValueExtractor()
     );
 

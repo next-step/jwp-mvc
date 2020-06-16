@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.param.Parameters;
-import core.mvc.param.extractor.type.TypeValueExtractor;
+import core.mvc.param.extractor.type.ContextValueExtractor;
 import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +49,6 @@ public class HandlerExecution {
         types.put(HttpServletResponse.class, response);
         types.put(HttpSession.class, request.getSession());
 
-        request.setAttribute(TypeValueExtractor.TYPES, types);
+        request.setAttribute(ContextValueExtractor.CONTEXTS, types);
     }
 }
