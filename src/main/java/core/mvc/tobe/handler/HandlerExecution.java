@@ -26,25 +26,10 @@ public class HandlerExecution {
         Optional<Method> targetMethod = findTargetMethod(request);
 
         if (targetMethod.isPresent()) {
-            Method method = targetMethod.get();
-            try {
-                return (ModelAndView) method.invoke(controller, request, response);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                throw new ReflectionMethodCallException(e);
-            }
+            return callMethodUsingReflection(targetMethod.get(), request, response);
         }
 
-        String uri = null;
-        try {
-            Controller controller = (Controller) this.controller;
-            uri = controller.execute(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ControllerExecutionException(e);
-        }
-
-        return new ModelAndView(new JspView(uri));
+        return executeController(request, response);
     }
 
     public Object getController() {
@@ -71,5 +56,28 @@ public class HandlerExecution {
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod());
 
         return providedMethod.equals(requestMethod);
+    }
+
+    private ModelAndView callMethodUsingReflection(Method targetMethod,
+                                                   HttpServletRequest request,
+                                                   HttpServletResponse response){
+        Method method = targetMethod;
+        try {
+            return (ModelAndView) method.invoke(controller, request, response);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            throw new ReflectionMethodCallException(e);
+        }
+    }
+
+    private ModelAndView executeController(HttpServletRequest request, HttpServletResponse response){
+        try {
+            Controller controller = (Controller) this.controller;
+            String uri = controller.execute(request, response);
+            return new ModelAndView(new JspView(uri));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ControllerExecutionException(e);
+        }
     }
 }
