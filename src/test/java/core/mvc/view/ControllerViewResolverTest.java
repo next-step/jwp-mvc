@@ -34,7 +34,7 @@ class ControllerViewResolverTest {
         Class<?> clazz = HomeController.class;
         Method method = clazz.getDeclaredMethod("execute", HttpServletRequest.class, HttpServletResponse.class);
         Object instance = clazz.getDeclaredConstructor().newInstance();
-        HandlerExecution handlerExecution = new HandlerExecution(method, instance);
+        HandlerExecution handlerExecution = new HandlerExecution(requestMapping.value(), method, instance);
 
         ModelAndView handle = controllerViewResolver.handle(handlerExecution, request, response);
 

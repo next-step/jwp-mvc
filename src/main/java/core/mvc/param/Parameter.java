@@ -1,7 +1,7 @@
 package core.mvc.param;
 
 import core.exception.ParameterNotFoundException;
-import core.mvc.param.parser.TypeParser;
+import core.mvc.param.parser.simple.TypeParser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
@@ -17,6 +17,10 @@ public class Parameter {
         this.annotation = annotation;
     }
 
+    public Class<?> getTypeClass() {
+        return type;
+    }
+
     public Object searchParam(final HttpServletRequest request) {
         String parameter = request.getParameter(name);
 
@@ -25,5 +29,13 @@ public class Parameter {
         }
 
         return TypeParser.parse(type, parameter);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Class<? extends Annotation> getAnnotation() {
+        return annotation;
     }
 }

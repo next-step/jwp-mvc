@@ -1,4 +1,4 @@
-package core.mvc.param.parser;
+package core.mvc.param.parser.simple;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +17,6 @@ public class TypeParser {
                 .filter(parser -> parser.isParsable(type))
                 .findFirst()
                 .map(parser -> (T) parser.parse(value))
-                .orElse((T) value);
+                .orElse(null);
     }
 }

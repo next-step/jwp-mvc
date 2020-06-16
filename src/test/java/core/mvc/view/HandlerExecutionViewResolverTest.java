@@ -49,7 +49,7 @@ class HandlerExecutionViewResolverTest {
         Method method = clazz.getDeclaredMethod("test", HttpServletRequest.class, HttpServletResponse.class);
         Object instance = clazz.getDeclaredConstructor(ModelAndView.class).newInstance(modelAndView);
 
-        HandlerExecution handlerExecution = new HandlerExecution(method, instance);
+        HandlerExecution handlerExecution = new HandlerExecution(requestMapping.value(), method, instance);
 
         assertThat(modelAndView.getView()).isNull();
         handlerExecutionViewResolver.handle(handlerExecution, request, response);

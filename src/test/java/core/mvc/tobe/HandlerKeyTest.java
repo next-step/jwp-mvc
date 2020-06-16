@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,5 +76,39 @@ class HandlerKeyTest {
     void equals() {
         assertThat(new HandlerKey("/url", RequestMethod.GET))
                 .isEqualTo(new HandlerKey("/url", RequestMethod.GET));
+    }
+
+    @Test
+    @DisplayName("패턴을 적용했을때도 동일한지")
+    void equalsUsingPathPattern() {
+        HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
+        HandlerKey request = new HandlerKey("/user/1", RequestMethod.GET);
+
+        assertThat(origin)
+                .isEqualTo(request);
+    }
+
+    @Test
+    @DisplayName("패턴을 셋에 적용했을때도 동일한지")
+    void equalsWhenUsingSet() {
+        HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
+        HandlerKey request = new HandlerKey("/user/1", RequestMethod.GET);
+
+        Set<HandlerKey> keys = new HashSet<>();
+        keys.add(origin);
+
+        assertThat(keys.contains(request)).isTrue();
+    }
+
+    @Test
+    @DisplayName("패턴을 맵에 적용했을때도 동일한지")
+    void equalsWhenUsingMap() {
+        HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
+        HandlerKey request = new HandlerKey("/user/1", RequestMethod.GET);
+
+        Map<HandlerKey, Object> keyMap = new HashMap();
+        keyMap.put(origin, origin);
+
+        assertThat(keyMap.containsKey(request)).isTrue();
     }
 }

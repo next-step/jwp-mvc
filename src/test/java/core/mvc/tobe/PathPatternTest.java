@@ -18,6 +18,24 @@ public class PathPatternTest {
     }
 
     @Test
+    void matchNoPattern() {
+        PathPattern pp = parse("/users");
+        assertThat(pp.matches(toPathContainer("/users/1"))).isFalse();
+        assertThat(pp.matches(toPathContainer("/users"))).isTrue();
+        assertThat(pp.matches(toPathContainer("/users/"))).isTrue();
+    }
+
+    @Test
+    void equalsTest() {
+        PathPattern pp1 = parse("/users/{userId}");
+        PathPattern pp2 = parse("/users/1");
+        System.out.println(pp1.getPatternString());
+        System.out.println(pp2.getPatternString());
+
+        assertThat(pp1).isEqualTo(pp2);
+    }
+
+    @Test
     void matchAndExtract() {
         Map<String, String> variables = parse("/users/{id}")
                 .matchAndExtract(toPathContainer("/users/1")).getUriVariables();

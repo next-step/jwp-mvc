@@ -36,7 +36,7 @@ class HandlerExecutionTest {
 
         Arrays.stream(methods)
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(method -> execute(new HandlerExecution(method, instance), method));
+                .forEach(method -> execute(new HandlerExecution(requestMapping.value(), method, instance), method));
     }
 
     private void execute(final HandlerExecution handler, final Method method) {
@@ -89,7 +89,7 @@ class HandlerExecutionTest {
     @DisplayName("method 나 instance 가 null 인 경우 예외 발생")
     void constructFail(final Method method, final Object instance) {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new HandlerExecution(method, instance));
+                .isThrownBy(() -> new HandlerExecution(requestMapping.value(), method, instance));
     }
 
     private static Stream<Arguments> constructFail()

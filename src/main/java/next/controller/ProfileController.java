@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 public class ProfileController {
 
+    // TODO: 2020-06-16 change /users/profile/{userId}
     @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
     public ModelAndView userProfile(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
