@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc;
 
 import core.db.DataBase;
 import next.model.User;
@@ -14,7 +14,7 @@ public class AnnotationHandlerMappingTest {
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping("core.mvc");
         handlerMapping.initialize();
     }
 
