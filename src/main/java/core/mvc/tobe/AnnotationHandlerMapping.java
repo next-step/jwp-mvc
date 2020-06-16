@@ -23,13 +23,9 @@ import java.util.Set;
 public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
-
-    private Object[] basePackage;
-
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
         final Set<Class<?>> targetControllers = AnnotationScanner.loadClasses(Controller.class, basePackage);
         targetControllers.forEach(this::convertClassToHandler);
     }
