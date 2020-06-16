@@ -2,6 +2,7 @@ package core.mvc.tobe.handler;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.mvc.tobe.handlermapping.exception.InstanceNotCreatedException;
 
 import java.util.Arrays;
@@ -27,6 +28,16 @@ public class HandlerExecutions {
                 .forEach(handlerKey -> handlers.put(handlerKey, createHandlerExecution(clazz)));
 
         return new HandlerExecutions(handlers);
+    }
+
+    public HandlerExecution findHandlerByUrl(String url){
+        HandlerKey handlerKey = new HandlerKey(url, null);
+        return this.handlerExecutions.get(handlerKey);
+    }
+
+    public HandlerExecution findHandlerByUrlAndMethod(String url, String method){
+        HandlerKey handlerKey = new HandlerKey(url, RequestMethod.valueOf(method.toUpperCase()));
+        return this.handlerExecutions.get(handlerKey);
     }
 
     public HandlerExecution getValueByKey(HandlerKey handlerKey) {

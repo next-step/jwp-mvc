@@ -12,6 +12,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Objects;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private final Reflections REFLECTIONS;
@@ -37,7 +38,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public HandlerExecution findHandler(HttpServletRequest request) {
-        return handlerExecutions.getValueByKey(HandlerKey.of(request));
+        HandlerExecution handler = handlerExecutions.getValueByKey(HandlerKey.of(request));
+
+        if(Objects.isNull(handler)){
+            return null;
+        }
+
+        return handler;
     }
 
     private HandlerExecutions executeComponentScan() {

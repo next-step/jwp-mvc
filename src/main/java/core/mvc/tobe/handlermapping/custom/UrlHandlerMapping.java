@@ -14,11 +14,13 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class UrlHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(UrlHandlerMapping.class);
 
     private Map<String, Controller> mappings = new HashMap<>();
+    private HandlerExecutions handlerExecutions;
 
     @Override
     public HandlerExecutions init() {
@@ -28,18 +30,24 @@ public class UrlHandlerMapping implements HandlerMapping {
         mappings.keySet().stream()
                 .forEach(url -> handlers.put(createHandlerKey(url), createHandler(url)));
 
-        return new HandlerExecutions(handlers);
+        handlerExecutions = new HandlerExecutions(handlers);
+        return handlerExecutions;
     }
 
     @Override
     public HandlerExecution findHandler(HttpServletRequest request) {
-        Controller controller = mappings.get(request.getRequestURI());
+        Controller controller = getController(request.getRequestURI());
+
+        if (Objects.isNull(controller)) {
+            return null;
+        }
+
         return new HandlerExecution(controller);
     }
 
     @Override
     public boolean hasHandler(HttpServletRequest request) {
-        return findHandler(request).getController() != null;
+        return findHandler(request) != null;
     }
 
     private void initializeUrlMappings() {
@@ -63,5 +71,15 @@ public class UrlHandlerMapping implements HandlerMapping {
 
     private HandlerKey createHandlerKey(String url) {
         return new HandlerKey(url, null);
+    }
+
+    private Controller getController(String url){
+        HandlerExecution handler = handlerExecutions.getValueByKey(createHandlerKey(url));
+
+        if(Objects.isNull(handler)){
+            return null;
+        }
+
+        return (Controller) handler.getController();
     }
 }
