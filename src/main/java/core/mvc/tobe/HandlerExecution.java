@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.mvc.param.Parameter;
 import core.mvc.param.Parameters;
 import core.mvc.view.ModelAndView;
 
@@ -13,6 +14,7 @@ public class HandlerExecution {
     private final HandlerKey key;
     private final Method method;
     private final Object instance;
+    private final Parameters parameters;
 
     public HandlerExecution(final HandlerKey key, final Method method, final Object instance) {
         if (Objects.isNull(key) || Objects.isNull(method) || Objects.isNull(instance)) {
@@ -22,11 +24,12 @@ public class HandlerExecution {
         this.key = key;
         this.method = method;
         this.instance = instance;
+        this.parameters = new Parameters(method);
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Parameters parameters = new Parameters(method);
         updateParams(request);
+        parameters.getValues(request);
         //get values = ValueExtractors.getValues(parameters, request);
         //method.invoke(instance, values);
         return (ModelAndView) method.invoke(instance, request, response);
