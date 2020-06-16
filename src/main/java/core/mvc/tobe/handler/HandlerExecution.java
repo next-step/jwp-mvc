@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
 public class HandlerExecution {
@@ -23,7 +22,7 @@ public class HandlerExecution {
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Optional<Method> targetMethod = findTargetMethod(request);
 
-        if(targetMethod.isPresent()){
+        if (targetMethod.isPresent()) {
             return (ModelAndView) targetMethod.get().invoke(controller, request, response);
         }
 

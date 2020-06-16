@@ -7,40 +7,40 @@ import core.annotation.web.RequestMethod;
 import core.mvc.tobe.handler.HandlerExecution;
 import core.mvc.tobe.handler.HandlerKey;
 import core.mvc.tobe.handlermapping.HandlerMapping;
+import core.mvc.tobe.handlermapping.exception.InstanceNotCreatedException;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.invoke.LambdaConversionException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
-    private Object[] basePackage;
+    private final Reflections REFLECTIONS;
 
+    private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
+        this.REFLECTIONS = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner());
     }
 
     @Override
     public void init() {
         Arrays.stream(basePackage)
-                .forEach(basePackage -> executeComponentScan(basePackage));
+                .forEach(basePackage -> executeComponentScan());
     }
 
     @Override
     public HandlerExecution findHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-
-        if(request.getMethod() == null){
-            return null;
-        }
-
-        RequestMethod method = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, method));
-        return handlerExecution;
+        return handlerExecutions.get(HandlerKey.of(request));
     }
 
     @Override
@@ -48,27 +48,10 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return findHandler(request) != null;
     }
 
-    private Object getNewInstance(Class clazz) {
-        Object controller = null;
-
-        try {
-            controller = clazz.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        return controller;
-    }
-
-    private void executeComponentScan(Object basePackage) {
-        Reflections reflections = new Reflections(basePackage,
-                new TypeAnnotationsScanner(),
-                new SubTypesScanner());
-
-        reflections.getTypesAnnotatedWith(Controller.class)
+    private void executeComponentScan() {
+        REFLECTIONS.getTypesAnnotatedWith(Controller.class)
                 .stream()
+                .filter(clazz -> isNonNull(createInstance(clazz)))
                 .forEach(this::initHandlerExecutions);
     }
 
@@ -77,6 +60,28 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .map(method -> method.getDeclaredAnnotation(RequestMapping.class))
                 .map(annotation -> new HandlerKey(annotation.value(), annotation.method()))
-                .forEach(handlerKey -> handlerExecutions.put(handlerKey, new HandlerExecution(getNewInstance(clazz))));
+                .forEach(handlerKey -> handlerExecutions.put(handlerKey, createHandlerExecution(clazz)));
+    }
+
+    private HandlerExecution createHandlerExecution(Class clazz) {
+        try {
+            return new HandlerExecution(clazz.newInstance());
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+            throw new InstanceNotCreatedException(e);
+        }
+    }
+
+    private boolean isNonNull(Object object){
+        return object != null;
+    }
+
+    private Object createInstance(Class clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new InstanceNotCreatedException(e);
+        }
     }
 }

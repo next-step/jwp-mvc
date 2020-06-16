@@ -2,6 +2,7 @@ package core.mvc.tobe.handler;
 
 import core.annotation.web.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -11,12 +12,17 @@ public class HandlerKey {
 
     public HandlerKey(String url, RequestMethod... requestMethod) {
         this.url = url;
-
-        if (requestMethod == null) {
-            this.requestMethod = RequestMethod.values();
-            return;
-        }
         this.requestMethod = requestMethod;
+    }
+
+    public static HandlerKey of(HttpServletRequest request){
+        String requestUri = request.getRequestURI();
+
+        if(request.getMethod() == null){
+            return new HandlerKey(requestUri, RequestMethod.values());
+        }
+        RequestMethod method = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return new HandlerKey(requestUri, method);
     }
 
     @Override
