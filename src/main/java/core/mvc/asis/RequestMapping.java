@@ -1,15 +1,21 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestMapping {
+/**
+ * Added interface for compatibility with new module (AnnotationHandlerMapping)
+ */
+public class RequestMapping implements HandlerMapping {
+
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private Map<String, Controller> mappings = new HashMap<>();
+    private final Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
         mappings.put("/", new HomeController());
@@ -29,11 +35,22 @@ public class RequestMapping {
         });
     }
 
+    /**
+     * See the link below:
+     * {@link RequestMapping#getHandler(HttpServletRequest)}
+     */
+    @Deprecated
     public Controller findController(String url) {
         return mappings.get(url);
     }
 
     void put(String url, Controller controller) {
         mappings.put(url, controller);
+    }
+
+    @Override
+    public Object getHandler(HttpServletRequest request) {
+        final String requestUri = request.getRequestURI();
+        return mappings.get(requestUri);
     }
 }
