@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 // 기본 타입의 객체가 아닌 사용자가 생성한 객체를 리플렉션을 이용해 생성 후 리턴
+// 기본 생성자가 있어야 한다. 기본 생성자 사용안할 경우 복잡해짐...
 public class ComplexValueExtractor implements ValueExtractor {
     private static final Logger logger = LoggerFactory.getLogger(ComplexValueExtractor.class);
 
