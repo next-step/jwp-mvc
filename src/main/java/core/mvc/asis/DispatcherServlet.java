@@ -24,8 +24,7 @@ public class DispatcherServlet extends HttpServlet {
     public void init() {
         HandlerMappings.addHandlerMapping(new UrlHandlerMapping());
         HandlerMappings.addHandlerMapping(new AnnotationHandlerMapping(BASE_PACKAGE_FOR_COMPONENT_SCAN));
-        HandlerMappings.getHandlerMappings()
-                .forEach(HandlerMapping::init);
+        HandlerMappings.initialize();
     }
 
     @Override

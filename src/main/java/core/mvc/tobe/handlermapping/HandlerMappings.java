@@ -14,6 +14,10 @@ public class HandlerMappings {
         handlerMappings.add(handlerMapping);
     }
 
+    public static void initialize(){
+        handlerMappings.forEach(HandlerMapping::init);
+    }
+
     public static List<HandlerMapping> getHandlerMappings() {
         return Collections.unmodifiableList(handlerMappings);
     }
