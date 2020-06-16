@@ -2,6 +2,10 @@ package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
 import core.mvc.ProxyHandlerMapping;
+import core.mvc.view.ModelAndView;
+import core.mvc.view.View;
+import core.mvc.view.ViewResolver;
+import core.mvc.view.ViewResolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +22,6 @@ public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private HandlerMapping handlerMapping;
 
@@ -29,26 +32,15 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        final Controller controller = (Controller) handlerMapping.getHandler(req);
-
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            final Object handler = handlerMapping.getHandler(req);
+            final ViewResolver viewResolver = ViewResolverFactory.of(handler, req, resp);
+            final ModelAndView mv = viewResolver.resolve(req, resp);
+            final View view = mv.getView();
+            view.render(mv.getModel(), req, resp);  // TODO: 모델을 애초에 뷰한테 넘겨주면 좋지 않을까?
         } catch (Throwable e) {
-            logger.error("Exception : {}", e);
+            logger.error("Exception : {}", e.getMessage());
             throw new ServletException(e.getMessage());
         }
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
     }
 }

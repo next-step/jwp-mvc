@@ -1,6 +1,6 @@
 package core.mvc.tobe;
 
-import core.mvc.ModelAndView;
+import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        method.invoke(instance, request, response);
-        return null;
+        // TODO: 왜 핸들러가 굳이 ModelAndView의 정체를 알아야하지??
+        return (ModelAndView) method.invoke(instance, request, response);
     }
 }
