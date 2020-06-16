@@ -47,6 +47,12 @@ public class AnnotationHandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
+    public boolean containsExecution(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return this.handlerExecutions.containsKey(new HandlerKey(requestUri, rm));
+    }
+
     private Set<Class<?>> getControllers() {
         Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner());
         return reflections.getTypesAnnotatedWith(Controller.class, true);
