@@ -11,13 +11,17 @@ import java.util.Map;
 
 /**
  * Added interface for compatibility with new module (AnnotationHandlerMapping)
+ * <p>
+ * This module has been deprecated. See the link below:
+ * {@link core.mvc.tobe.AnnotationHandlerMapping}
  */
+@Deprecated
 public class RequestMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private final Map<String, Controller> mappings = new HashMap<>();
 
-    void initMapping() {
+    public void initMapping() {
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
