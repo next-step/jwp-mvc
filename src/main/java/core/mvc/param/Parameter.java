@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 public class Parameter {
     private final Class<?> type;
     private final String name;
-    private final Class<? extends Annotation> annotation; // 활용은..?
+    private final Class<? extends Annotation> annotation;
 
     public Parameter(String name, Class<?> type, Class<? extends Annotation> annotation) {
         this.name = name;
