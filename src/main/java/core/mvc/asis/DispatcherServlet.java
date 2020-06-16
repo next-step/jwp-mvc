@@ -9,12 +9,10 @@ import core.mvc.tobe.handlermapping.custom.UrlHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,10 +21,8 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String BASE_PACKAGE_FOR_COMPONENT_SCAN = "core.mvc";
 
-    private Set<HandlerMapping> handlerMappings = new HashSet<>();
-
     @Override
-    public void init() throws ServletException {
+    public void init() {
         HandlerMappings.addHandlerMapping(new AnnotationHandlerMapping(BASE_PACKAGE_FOR_COMPONENT_SCAN));
         HandlerMappings.addHandlerMapping(new UrlHandlerMapping());
         HandlerMappings.getHandlerMappings()
@@ -34,9 +30,8 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HandlerMapping matched = findHandlerMapping(req);
-        HandlerExecution handlerExecution = matched.findHandler(req);
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
+        HandlerExecution handlerExecution = HandlerMappings.findHandler(req);
 
         try {
             ModelAndView modelAndView = handlerExecution.handle(req, resp);
@@ -46,12 +41,5 @@ public class DispatcherServlet extends HttpServlet {
             logger.error("Exception : {}", e);
             e.printStackTrace();
         }
-    }
-
-    private HandlerMapping findHandlerMapping(HttpServletRequest request) {
-        return handlerMappings.stream()
-                .filter(handlerMapping -> handlerMapping.hasHandler(request))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not found matched HandlerMapping"));
     }
 }

@@ -21,6 +21,7 @@ public class HandlerKey {
         if(request.getMethod() == null){
             return new HandlerKey(requestUri, RequestMethod.values());
         }
+
         RequestMethod method = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return new HandlerKey(requestUri, method);
     }
