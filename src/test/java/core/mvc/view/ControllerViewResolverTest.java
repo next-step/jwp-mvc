@@ -1,6 +1,8 @@
 package core.mvc.view;
 
+import core.annotation.web.RequestMethod;
 import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerKey;
 import next.controller.HomeController;
 import next.controller.ListUserController;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +36,8 @@ class ControllerViewResolverTest {
         Class<?> clazz = HomeController.class;
         Method method = clazz.getDeclaredMethod("execute", HttpServletRequest.class, HttpServletResponse.class);
         Object instance = clazz.getDeclaredConstructor().newInstance();
-        HandlerExecution handlerExecution = new HandlerExecution(requestMapping.value(), method, instance);
+        HandlerKey key = new HandlerKey("/test", RequestMethod.GET);
+        HandlerExecution handlerExecution = new HandlerExecution(key, method, instance);
 
         ModelAndView handle = controllerViewResolver.handle(handlerExecution, request, response);
 

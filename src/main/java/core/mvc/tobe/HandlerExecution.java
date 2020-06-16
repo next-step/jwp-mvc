@@ -15,9 +15,10 @@ public class HandlerExecution {
     private final Object instance;
 
     public HandlerExecution(final HandlerKey key, final Method method, final Object instance) {
-        if (Objects.isNull(method) || Objects.isNull(instance)) {
+        if (Objects.isNull(key) || Objects.isNull(method) || Objects.isNull(instance)) {
             throw new IllegalArgumentException("Fail to create HandlerExecution there is null parameter");
         }
+
         this.key = key;
         this.method = method;
         this.instance = instance;

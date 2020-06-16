@@ -33,10 +33,11 @@ class HandlerExecutionTest {
         Class<MyController> myController = MyController.class;
         MyController instance = myController.getDeclaredConstructor().newInstance();
         Method[] methods = myController.getMethods();
+        HandlerKey key = new HandlerKey("/test", RequestMethod.GET);
 
         Arrays.stream(methods)
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(method -> execute(new HandlerExecution(requestMapping.value(), method, instance), method));
+                .forEach(method -> execute(new HandlerExecution(key, method, instance), method));
     }
 
     private void execute(final HandlerExecution handler, final Method method) {
@@ -87,18 +88,20 @@ class HandlerExecutionTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("method 나 instance 가 null 인 경우 예외 발생")
-    void constructFail(final Method method, final Object instance) {
+    void constructFail(final HandlerKey key, final Method method, final Object instance) {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new HandlerExecution(requestMapping.value(), method, instance));
+                .isThrownBy(() -> new HandlerExecution(key, method, instance));
     }
 
     private static Stream<Arguments> constructFail()
             throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Class<MyController> myControllerClass = MyController.class;
+        HandlerKey key = new HandlerKey("/test", RequestMethod.GET);
         return Stream.of(
-                Arguments.of(null, null),
-                Arguments.of(null, myControllerClass.getDeclaredConstructor().newInstance()),
-                Arguments.of(myControllerClass.getMethod("save", HttpServletRequest.class, HttpServletResponse.class), null)
+                Arguments.of(null, null, null),
+                Arguments.of(key, null, null),
+                Arguments.of(key, null, myControllerClass.getDeclaredConstructor().newInstance()),
+                Arguments.of(key, myControllerClass.getMethod("save", HttpServletRequest.class, HttpServletResponse.class), null)
         );
     }
 
