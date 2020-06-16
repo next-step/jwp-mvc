@@ -25,7 +25,7 @@ class ParameterTest {
         request.addParameter("name", "nokchax");
         Parameter parameter = new Parameter("name", String.class, null);
 
-        Object refinedParam = parameter.searchParam(request);
+        Object refinedParam = parameter.extractValue(request);
 
         assertThat(refinedParam).isEqualTo("nokchax");
     }
@@ -37,6 +37,6 @@ class ParameterTest {
         Parameter parameter = new Parameter("name", String.class, null);
 
         assertThatExceptionOfType(ParameterNotFoundException.class)
-                .isThrownBy(() -> parameter.searchParam(request));
+                .isThrownBy(() -> parameter.extractValue(request));
     }
 }

@@ -26,7 +26,7 @@ public class Parameters {
 
     public Object[] getValues(final HttpServletRequest request) {
         return parameters.stream()
-                .map(parameter -> parameter.searchParam(request))
+                .map(parameter -> parameter.extractValue(request))
                 .toArray();
     }
 }
