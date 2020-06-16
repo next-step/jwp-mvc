@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
 import core.mvc.ProxyHandlerMapping;
+import core.mvc.exceptions.HandlerNotFoundException;
 import core.mvc.view.ModelAndView;
 import core.mvc.view.View;
 import core.mvc.view.ViewResolver;
@@ -9,7 +10,6 @@ import core.mvc.view.ViewResolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -38,6 +38,9 @@ public class DispatcherServlet extends HttpServlet {
             final ModelAndView mv = viewResolver.resolve(req, resp);
             final View view = mv.getView();
             view.render(mv.getModel(), req, resp);  // TODO: 모델을 애초에 뷰한테 넘겨주면 좋지 않을까?
+        } catch (HandlerNotFoundException e) {
+            logger.error(e.getMessage());
+            resp.sendRedirect("/404.jsp");
         } catch (Throwable e) {
             logger.error("Exception : {}", e.getMessage());
             throw new ServletException(e.getMessage());

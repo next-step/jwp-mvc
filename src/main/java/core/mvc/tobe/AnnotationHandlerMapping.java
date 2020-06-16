@@ -5,6 +5,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
+import core.mvc.exceptions.HandlerNotFoundException;
 import core.mvc.scanner.AnnotationScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +57,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private String getRootPathFromInstance(Object instance) {
         // request mapping의 retention policy가 type과 method이므로 스프링의 request mapping처럼 동작하려면 필요.
         return Optional
-                    .ofNullable(instance.getClass().getAnnotation(RequestMapping.class))
-                    .map(RequestMapping::value)
-                    .orElse("");
+                .ofNullable(instance.getClass().getAnnotation(RequestMapping.class))
+                .map(RequestMapping::value)
+                .orElse("");
     }
 
     private String resolveUri(String root, String relativePath) {
@@ -97,9 +98,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    public HandlerExecution getHandler(HttpServletRequest request) throws HandlerNotFoundException {
+        final String requestUri = request.getRequestURI();
+        final RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return Optional
+                .ofNullable(handlerExecutions.get(new HandlerKey(requestUri, rm)))
+                .orElseThrow(() -> new HandlerNotFoundException("핸들러가 존재하지 않아요!"));
     }
 }

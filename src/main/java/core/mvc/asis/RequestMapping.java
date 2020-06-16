@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
+import core.mvc.exceptions.HandlerNotFoundException;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Added interface for compatibility with new module (AnnotationHandlerMapping)
@@ -53,8 +55,10 @@ public class RequestMapping implements HandlerMapping {
     }
 
     @Override
-    public Object getHandler(HttpServletRequest request) {
+    public Object getHandler(HttpServletRequest request) throws HandlerNotFoundException {
         final String requestUri = request.getRequestURI();
-        return mappings.get(requestUri);
+        return Optional
+                .ofNullable(mappings.get(requestUri))
+                .orElseThrow(() -> new HandlerNotFoundException("핸들러가 존재하지 않아요!"));
     }
 }

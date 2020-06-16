@@ -1,12 +1,12 @@
 package core.mvc;
 
 import core.mvc.asis.RequestMapping;
+import core.mvc.exceptions.HandlerNotFoundException;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -31,14 +31,13 @@ public class ProxyHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public Object getHandler(HttpServletRequest request) {
+    public Object getHandler(HttpServletRequest request) throws HandlerNotFoundException {
         final String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
         final Object handler = Optional
                 .ofNullable(rm.getHandler(request))
                 .orElse(annotationHandlerMapping.getHandler(request));
-        Objects.requireNonNull(handler, "Handler not found.");
         return handler;
     }
 }
