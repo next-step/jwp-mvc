@@ -25,8 +25,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public void init() {
+    public HandlerExecutions init() {
         this.handlerExecutions = executeComponentScan();
+        return handlerExecutions;
     }
 
     @Override
