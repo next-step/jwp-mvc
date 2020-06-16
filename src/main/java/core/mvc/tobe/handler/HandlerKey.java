@@ -25,6 +25,10 @@ public class HandlerKey {
         return new HandlerKey(requestUri, method);
     }
 
+    public RequestMethod[] getRequestMethod() {
+        return requestMethod;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
