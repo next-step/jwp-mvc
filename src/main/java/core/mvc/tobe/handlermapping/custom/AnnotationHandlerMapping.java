@@ -3,10 +3,8 @@ package core.mvc.tobe.handlermapping.custom;
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
 import core.mvc.tobe.handler.HandlerExecution;
 import core.mvc.tobe.handler.HandlerKey;
-import core.mvc.tobe.handler.exception.NotFoundHandlerException;
 import core.mvc.tobe.handlermapping.HandlerMapping;
 import core.mvc.tobe.handlermapping.exception.InstanceNotCreatedException;
 import org.reflections.Reflections;
@@ -14,13 +12,9 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.invoke.LambdaConversionException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private final Reflections REFLECTIONS;
@@ -53,7 +47,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void executeComponentScan() {
         REFLECTIONS.getTypesAnnotatedWith(Controller.class)
                 .stream()
-                .filter(clazz -> isNonNull(createInstance(clazz)))
                 .forEach(this::initHandlerExecutions);
     }
 
@@ -66,24 +59,23 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private HandlerExecution createHandlerExecution(Class clazz) {
-        try {
-            return new HandlerExecution(clazz.newInstance());
-        } catch (IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-            throw new InstanceNotCreatedException(e);
-        }
+        return new HandlerExecution(getNewInstance(clazz));
     }
 
-    private boolean isNonNull(Object object){
-        return object != null;
-    }
-
-    private Object createInstance(Class clazz) {
+    private Object getNewInstance(Class clazz) {
         try {
-            return clazz.newInstance();
+            return validateNull(clazz.newInstance());
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             throw new InstanceNotCreatedException(e);
         }
+    }
+
+    private Object validateNull(Object object) {
+        if (Objects.isNull(object)) {
+            throw new InstanceNotCreatedException();
+        }
+
+        return object;
     }
 }

@@ -22,7 +22,7 @@ public class HandlerMappings {
         HandlerMapping handlerMapping = findHandlerMapping(request);
         HandlerExecution handler = handlerMapping.findHandler(request);
 
-        if(handler == null){
+        if(handler.isNullOrEmpty()){
             throw new NotFoundHandlerException();
         }
 

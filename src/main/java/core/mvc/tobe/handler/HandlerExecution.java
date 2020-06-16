@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 public class HandlerExecution {
@@ -30,6 +31,10 @@ public class HandlerExecution {
         }
 
         return executeController(request, response);
+    }
+
+    public boolean isNullOrEmpty(){
+        return Objects.isNull(this) || Objects.isNull(this.getController());
     }
 
     public Object getController() {
