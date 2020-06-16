@@ -1,5 +1,6 @@
 package core.mvc.param.extractor;
 
+import core.annotation.web.PathVariable;
 import core.mvc.param.Parameter;
 import core.mvc.tobe.TestUser;
 import org.junit.jupiter.api.DisplayName;
@@ -54,5 +55,18 @@ class ValueExtractorsTest {
         assertThat(((TestUser) extract).getUserId()).isEqualTo("nokchax");
         assertThat(((TestUser) extract).getPassword()).isEqualTo("1234");
         assertThat(((TestUser) extract).getAge()).isEqualTo(30);
+    }
+
+    @Test
+    @DisplayName("어노테이션이 붙은 클래스에 대한 테스트")
+    void extractAnnotationAttachedParameter() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute("user", "nokchax");
+        Parameter parameter = new Parameter("user", String.class, PathVariable.class);
+
+        Object value = ValueExtractors.extractValue(parameter, request);
+
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).isEqualTo("nokchax");
     }
 }
