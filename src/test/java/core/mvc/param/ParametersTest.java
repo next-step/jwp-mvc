@@ -23,7 +23,7 @@ class ParametersTest {
 
         Parameters parameters = new Parameters(method);
 
-        Object[] values = parameters.getValues(request);
+        Object[] values = parameters.extractValues(request);
         assertThat(values[0]).isEqualTo(1);
         assertThat(values[1]).isEqualTo(2);
     }

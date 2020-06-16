@@ -1,12 +1,14 @@
 package core.mvc.tobe;
 
-import core.mvc.param.Parameter;
 import core.mvc.param.Parameters;
+import core.mvc.param.extractor.type.TypeValueExtractor;
 import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,18 +30,25 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        updateParams(request);
-        parameters.getValues(request);
-        //get values = ValueExtractors.getValues(parameters, request);
-        //method.invoke(instance, values);
-        return (ModelAndView) method.invoke(instance, request, response);
+        updateParams(request, response);
+        Object[] values = parameters.extractValues(request);
+
+        return (ModelAndView) method.invoke(instance, values);
     }
 
-    public void updateParams(HttpServletRequest request) {
+    public void updateParams(HttpServletRequest request, HttpServletResponse response) {
         String requestURI = request.getRequestURI();
         Map<String, String> requestParams = key.parseRequestParam(requestURI);
 
         requestParams.keySet()
                 .forEach(key -> request.setAttribute(key, requestParams.get(key)));
+
+        // 좋은 방법이 없을까...
+        Map<Class<?>, Object> types = new HashMap<>();
+        types.put(HttpServletRequest.class, request);
+        types.put(HttpServletResponse.class, response);
+        types.put(HttpSession.class, request.getSession());
+
+        request.setAttribute(TypeValueExtractor.TYPES, types);
     }
 }

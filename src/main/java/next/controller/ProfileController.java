@@ -1,22 +1,19 @@
 package next.controller;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.view.ModelAndView;
 import next.model.User;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Controller
 public class ProfileController {
 
     // TODO: 2020-06-16 change /users/profile/{userId}
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView userProfile(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
+    @RequestMapping(value = "/users/profile/{userId}", method = RequestMethod.GET)
+    public ModelAndView userProfile(@PathVariable String userId) throws Exception {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");

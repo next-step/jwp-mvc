@@ -39,6 +39,24 @@ public class HandlerKey {
         return new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod().toUpperCase()));
     }
 
+    private static PathContainer toPathContainer(String path) {
+        if (path == null) {
+            return null;
+        }
+
+        return PathContainer.parsePath(path);
+    }
+
+    public Map<String, String> parseRequestParam(String requestURI) {
+        PathPattern.PathMatchInfo pathMatchInfo = pathPattern.matchAndExtract(toPathContainer(requestURI));
+
+        if (pathMatchInfo == null) {
+            return Collections.emptyMap();
+        }
+
+        return pathMatchInfo.getUriVariables();
+    }
+
     @Override
     public String toString() {
         return "HandlerKey [url=" + url + ", requestMethod=" + requestMethod + "]";
@@ -56,23 +74,5 @@ public class HandlerKey {
         HandlerKey that = (HandlerKey) o;
         return that.pathPattern.matches(toPathContainer(this.url)) &&
                 requestMethod == that.requestMethod;
-    }
-
-    private static PathContainer toPathContainer(String path) {
-        if (path == null) {
-            return null;
-        }
-
-        return PathContainer.parsePath(path);
-    }
-
-    public Map<String, String> parseRequestParam(String requestURI) {
-        PathPattern.PathMatchInfo pathMatchInfo = pathPattern.matchAndExtract(toPathContainer(requestURI));
-
-        if (pathMatchInfo == null) {
-            return Collections.emptyMap();
-        }
-
-        return pathMatchInfo.getUriVariables();
     }
 }
