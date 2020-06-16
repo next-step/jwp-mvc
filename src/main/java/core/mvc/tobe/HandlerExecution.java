@@ -44,11 +44,11 @@ public class HandlerExecution {
                 .forEach(key -> request.setAttribute(key, requestParams.get(key)));
 
         // 좋은 방법이 없을까...
-        Map<Class<?>, Object> types = new HashMap<>();
-        types.put(HttpServletRequest.class, request);
-        types.put(HttpServletResponse.class, response);
-        types.put(HttpSession.class, request.getSession());
+        Map<Class<?>, Object> context = new HashMap<>();
+        context.put(HttpServletRequest.class, request);
+        context.put(HttpServletResponse.class, response);
+        context.put(HttpSession.class, request.getSession());
 
-        request.setAttribute(ContextValueExtractor.CONTEXTS, types);
+        request.setAttribute(ContextValueExtractor.CONTEXTS, context);
     }
 }
