@@ -27,7 +27,7 @@ public class ProxyHandlerMapping implements HandlerMapping {
     public ProxyHandlerMapping() {
         rm = new RequestMapping();
         rm.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping();
+        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
     }
 
     @Override
