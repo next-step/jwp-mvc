@@ -1,7 +1,7 @@
 package core.mvc.param;
 
 import core.exception.ParameterNotFoundException;
-import core.mvc.param.parser.simple.TypeParser;
+import core.mvc.param.extractor.simple.TypeParser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;

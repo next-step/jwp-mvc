@@ -1,4 +1,4 @@
-package core.mvc.param.parser.simple;
+package core.mvc.param.extractor.simple;
 
 import java.util.Arrays;
 import java.util.List;

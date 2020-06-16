@@ -1,4 +1,4 @@
-package core.mvc.param.parser.annotation;
+package core.mvc.param.extractor.annotation;
 
 import core.annotation.web.PathVariable;
 import core.mvc.param.Parameter;

@@ -1,7 +1,7 @@
-package core.mvc.param.parser.simple;
+package core.mvc.param.extractor.simple;
 
 import core.mvc.param.Parameter;
-import core.mvc.param.parser.ValueExtractor;
+import core.mvc.param.extractor.ValueExtractor;
 
 import javax.servlet.http.HttpServletRequest;
 

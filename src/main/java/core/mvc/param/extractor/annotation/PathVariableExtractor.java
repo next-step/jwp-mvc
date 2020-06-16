@@ -1,8 +1,8 @@
-package core.mvc.param.parser.annotation;
+package core.mvc.param.extractor.annotation;
 
 import core.annotation.web.PathVariable;
 import core.mvc.param.Parameter;
-import core.mvc.param.parser.simple.TypeParser;
+import core.mvc.param.extractor.simple.TypeParser;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -1,6 +1,6 @@
-package core.mvc.param.parser;
+package core.mvc.param.extractor;
 
-import core.mvc.param.parser.simple.TypeParser;
+import core.mvc.param.extractor.simple.TypeParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

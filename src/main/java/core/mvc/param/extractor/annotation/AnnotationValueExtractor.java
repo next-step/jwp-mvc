@@ -1,6 +1,6 @@
-package core.mvc.param.parser.annotation;
+package core.mvc.param.extractor.annotation;
 
-import core.mvc.param.parser.ValueExtractor;
+import core.mvc.param.extractor.ValueExtractor;
 
 import java.lang.annotation.Annotation;
 

@@ -1,4 +1,4 @@
-package core.mvc.param.parser.simple;
+package core.mvc.param.extractor.simple;
 
 public class StringParser implements Parser<String> {
     @Override

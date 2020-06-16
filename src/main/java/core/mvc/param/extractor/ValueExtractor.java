@@ -1,4 +1,4 @@
-package core.mvc.param.parser;
+package core.mvc.param.extractor;
 
 import core.mvc.param.Parameter;
 
