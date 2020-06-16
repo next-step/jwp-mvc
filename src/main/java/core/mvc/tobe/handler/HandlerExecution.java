@@ -58,10 +58,9 @@ public class HandlerExecution {
         return providedMethod.equals(requestMethod);
     }
 
-    private ModelAndView callMethodUsingReflection(Method targetMethod,
+    private ModelAndView callMethodUsingReflection(Method method,
                                                    HttpServletRequest request,
-                                                   HttpServletResponse response){
-        Method method = targetMethod;
+                                                   HttpServletResponse response) {
         try {
             return (ModelAndView) method.invoke(controller, request, response);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -70,7 +69,7 @@ public class HandlerExecution {
         }
     }
 
-    private ModelAndView executeController(HttpServletRequest request, HttpServletResponse response){
+    private ModelAndView executeController(HttpServletRequest request, HttpServletResponse response) {
         try {
             Controller controller = (Controller) this.controller;
             String uri = controller.execute(request, response);
