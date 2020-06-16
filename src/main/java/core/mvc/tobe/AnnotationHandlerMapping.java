@@ -23,21 +23,20 @@ public class AnnotationHandlerMapping {
     /**
      * 1. base 패키지에 있는 class 들 scan
      * 2. class 정보 별로 handlerkey / handlerExecution을 만들어 handlerExecutions 에 넣음
-     *
-     *  HadlerKey = url(String) , requestMethod (GET,POST,PUT,DELETE....)
-     *  HandleExecutions handle구현 (method invoke?)
+     * <p>
+     * HadlerKey = url(String) , requestMethod (GET,POST,PUT,DELETE....)
+     * HandleExecutions handle구현 (method invoke?)
      */
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner());
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class,true);
+        Set<Class<?>> controllers = this.getControllers();
 
-        for(Class<?> controller : controllers) {
-            this.handlerExecutions = Arrays.stream(controller.getDeclaredMethods())
+        for (Class<?> controller : controllers) {
+            this.handlerExecutions.putAll(Arrays.stream(controller.getDeclaredMethods())
                     .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                     .collect(Collectors.toMap(method -> {
                         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
                         return new HandlerKey(requestMapping.value(), requestMapping.method());
-                        }, method -> new HandlerExecution(controller,method)));
+                    }, method -> new HandlerExecution(controller, method))));
         }
 
     }
@@ -46,5 +45,10 @@ public class AnnotationHandlerMapping {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    private Set<Class<?>> getControllers() {
+        Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner());
+        return reflections.getTypesAnnotatedWith(Controller.class, true);
     }
 }
