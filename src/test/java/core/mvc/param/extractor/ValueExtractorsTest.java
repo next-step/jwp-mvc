@@ -1,7 +1,9 @@
 package core.mvc.param.extractor;
 
 import core.mvc.param.Parameter;
+import core.mvc.tobe.TestUser;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,5 +36,23 @@ class ValueExtractorsTest {
                 Arguments.of(Long.class, 1L),
                 Arguments.of(String.class, "1")
         );
+    }
+
+    @Test
+    @DisplayName("사용자 정의 클래스에 대한 테스트")
+    void extractComplexValue() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        Parameter parameter = new Parameter("user", TestUser.class, null);
+        request.setParameter("userId", "nokchax");
+        request.setParameter("password", "1234");
+        request.setParameter("age", "30");
+
+        Object extract = ValueExtractors.extractValue(parameter, request);
+
+        assertThat(extract).isNotNull();
+        assertThat(extract).isInstanceOf(TestUser.class);
+        assertThat(((TestUser) extract).getUserId()).isEqualTo("nokchax");
+        assertThat(((TestUser) extract).getPassword()).isEqualTo("1234");
+        assertThat(((TestUser) extract).getAge()).isEqualTo(30);
     }
 }
