@@ -4,10 +4,13 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 import core.mvc.asis.Controller;
+import core.mvc.tobe.handler.exception.ControllerExecutionException;
+import core.mvc.tobe.handler.exception.ReflectionMethodCallException;
 import core.mvc.tobe.view.JspView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Optional;
@@ -19,15 +22,28 @@ public class HandlerExecution {
         this.controller = newInstance;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
         Optional<Method> targetMethod = findTargetMethod(request);
 
         if (targetMethod.isPresent()) {
-            return (ModelAndView) targetMethod.get().invoke(controller, request, response);
+            Method method = targetMethod.get();
+            try {
+                return (ModelAndView) method.invoke(controller, request, response);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+                throw new ReflectionMethodCallException(e);
+            }
         }
 
-        Controller controller = (Controller) this.controller;
-        String uri = controller.execute(request, response);
+        String uri = null;
+        try {
+            Controller controller = (Controller) this.controller;
+            uri = controller.execute(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ControllerExecutionException(e);
+        }
+
         return new ModelAndView(new JspView(uri));
     }
 

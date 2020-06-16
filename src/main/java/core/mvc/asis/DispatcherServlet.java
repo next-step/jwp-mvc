@@ -13,8 +13,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashSet;
-import java.util.Set;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -23,8 +21,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        HandlerMappings.addHandlerMapping(new AnnotationHandlerMapping(BASE_PACKAGE_FOR_COMPONENT_SCAN));
         HandlerMappings.addHandlerMapping(new UrlHandlerMapping());
+        HandlerMappings.addHandlerMapping(new AnnotationHandlerMapping(BASE_PACKAGE_FOR_COMPONENT_SCAN));
         HandlerMappings.getHandlerMappings()
                 .forEach(HandlerMapping::init);
     }
@@ -33,13 +31,7 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
         HandlerExecution handlerExecution = HandlerMappings.findHandler(req);
 
-        try {
-            ModelAndView modelAndView = handlerExecution.handle(req, resp);
-            modelAndView.getView()
-                    .render(modelAndView.getModel(), req, resp);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e);
-            e.printStackTrace();
-        }
+        ModelAndView modelAndView = handlerExecution.handle(req, resp);
+        modelAndView.getView().render(modelAndView.getModel(), req, resp);
     }
 }

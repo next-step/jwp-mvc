@@ -1,32 +1,38 @@
 package core.mvc.tobe.handlermapping;
 
 import core.mvc.tobe.handler.HandlerExecution;
+import core.mvc.tobe.handler.exception.NotFoundHandlerException;
+import core.mvc.tobe.handlermapping.exception.NotFoundHandlerMappingException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class HandlerMappings {
-    private static Set<HandlerMapping> handlerMappings = new HashSet<>();
+    private static List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     public static void addHandlerMapping(HandlerMapping handlerMapping) {
         handlerMappings.add(handlerMapping);
     }
 
-    public static Set<HandlerMapping> getHandlerMappings() {
-        return Collections.unmodifiableSet(handlerMappings);
+    public static List<HandlerMapping> getHandlerMappings() {
+        return Collections.unmodifiableList(handlerMappings);
     }
 
-    public static HandlerExecution findHandler(HttpServletRequest request){
+    public static HandlerExecution findHandler(HttpServletRequest request) {
         HandlerMapping handlerMapping = findHandlerMapping(request);
-        return handlerMapping.findHandler(request);
+        HandlerExecution handler = handlerMapping.findHandler(request);
+
+        if(handler == null){
+            throw new NotFoundHandlerException();
+        }
+
+        return handler;
     }
 
     private static HandlerMapping findHandlerMapping(HttpServletRequest request){
         return handlerMappings.stream()
                 .filter(handlerMapping -> handlerMapping.hasHandler(request))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not found matched HandlerMapping"));
+                .orElseThrow(NotFoundHandlerMappingException::new);
     }
 }
