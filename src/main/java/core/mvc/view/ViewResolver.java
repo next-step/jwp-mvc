@@ -9,5 +9,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author hyeyoom
  */
 public interface ViewResolver {
-    ModelAndView resolve(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    boolean isSupports(Object handler);
+
+    ModelAndView resolve(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception;
 }

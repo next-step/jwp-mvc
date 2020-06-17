@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -21,13 +24,14 @@ public class ProxyHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyHandlerMapping.class);
 
-    private final RequestMapping rm;
-    private final AnnotationHandlerMapping annotationHandlerMapping;
+    private final List<HandlerMapping> handlerMappingList = new ArrayList<>();
 
     public ProxyHandlerMapping() {
-        rm = new RequestMapping();
+        final RequestMapping rm = new RequestMapping();
         rm.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        handlerMappingList.add(rm);
+        handlerMappingList.add(new AnnotationHandlerMapping("next.controller"));
+
     }
 
     @Override
@@ -35,9 +39,20 @@ public class ProxyHandlerMapping implements HandlerMapping {
         final String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        final Object handler = Optional
-                .ofNullable(rm.getHandler(request))
-                .orElse(annotationHandlerMapping.getHandler(request));
-        return handler;
+        final Optional<Object> maybeHandler = handlerMappingList.stream()
+                .map(handlerMapping -> {
+                    try {
+                        return handlerMapping.getHandler(request);
+                    } catch (HandlerNotFoundException ignore) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst();
+
+        if (maybeHandler.isPresent()) {
+            return maybeHandler.get();
+        }
+        throw new HandlerNotFoundException("핸들러가 존재하지 않아요..!");
     }
 }

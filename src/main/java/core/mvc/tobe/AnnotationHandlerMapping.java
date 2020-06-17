@@ -7,6 +7,8 @@ import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
 import core.mvc.exceptions.HandlerNotFoundException;
 import core.mvc.scanner.AnnotationScanner;
+import core.mvc.utils.ReflectionUtil;
+import core.mvc.utils.UnableToCreateInstanceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,13 +34,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private void convertClassToHandler(Class<?> clazz) {
-        final Object instance = instantiateClass(clazz);
-        if (instance == null) {
-            return;
+        try {
+            final Object instance = ReflectionUtil.instantiateClass(clazz);
+            AnnotationScanner.loadMethods(clazz, RequestMapping.class)
+                    .forEach(method -> storeHandlerMap(method, instance));
+        } catch (UnableToCreateInstanceException e) {
+            log.error(e.getMessage(), e);
         }
-
-        AnnotationScanner.loadMethods(clazz, RequestMapping.class)
-                .forEach(method -> storeHandlerMap(method, instance));
     }
 
     private void storeHandlerMap(Method method, Object instance) {
@@ -69,32 +71,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         } catch (URISyntaxException e) {
             return relativePath;
         }
-    }
-
-    // TODO: 흠.. Reflection과 관련된 util로 빼도 되지 않을까?? - 필요해지면 그때 그렇게 합시다!
-    private Object instantiateClass(Class<?> clazz) {
-        return createInstance(determineNonArgsConstructor(clazz));
-    }
-
-    private Constructor<?> determineNonArgsConstructor(Class<?> clazz) {
-        for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
-            if (constructor.getParameterCount() == 0) {
-                return constructor;
-            }
-        }
-        return null;
-    }
-
-    private Object createInstance(Constructor<?> constructor) {
-        try {
-            if (constructor == null) {
-                return null;
-            }
-            return constructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
     }
 
     @Override
