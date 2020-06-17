@@ -23,7 +23,7 @@ class AnnotatedTargetScannerTest {
         Set<Class<?>> classes = AnnotatedTargetScanner.loadClasses(Controller.class, BASE_PACKAGE);
 
         assertThat(classes).isNotNull();
-        assertThat(classes).hasSize(1);
+        assertThat(classes).hasSize(2);
     }
 
     @Test
@@ -35,6 +35,6 @@ class AnnotatedTargetScannerTest {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
 
-        assertThat(methods).hasSize(3);
+        assertThat(methods).hasSize(5);
     }
 }
