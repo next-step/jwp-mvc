@@ -1,12 +1,17 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-
-import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import org.reflections.ReflectionUtils;
 
 public class AnnotationHandlerMapping {
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -16,7 +21,29 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
+        Set<Class<?>> annotatedTypedClazz = AnnotatedTypeScanner.getAnnotatedTypedClazz(Controller.class, basePackage);
+        for (Class<?> clazz : annotatedTypedClazz) {
+            Set<Method> methods = getAnnotatedTypedMethods(clazz);
+            methods.forEach(method -> fillHandlerMap(clazz, method));
+        }
+    }
 
+    private Set<Method> getAnnotatedTypedMethods(Class<?> clazz) {
+        return ReflectionUtils.getMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
+    }
+
+    private void fillHandlerMap(Class<?> clazz, Method method) {
+        HandlerKey key = createHandlerKey(method.getAnnotation(RequestMapping.class));
+        HandlerExecution value = createHandlerExecution(clazz, method);
+        this.handlerExecutions.put(key, value);
+    }
+
+    private HandlerExecution createHandlerExecution(Class<?> clazz, Method method) {
+        return new HandlerExecution(AnnotatedTypeScanner.getClazzObject(clazz), method);
+    }
+
+    private HandlerKey createHandlerKey(RequestMapping rm) {
+        return new HandlerKey(rm.value(), rm.method());
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
