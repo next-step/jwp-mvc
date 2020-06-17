@@ -10,8 +10,28 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        final Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        final Student student = new Student();
+        final Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+        name.set(student, "jinwoo");
+
+        final Field age = clazz.getDeclaredField("age");
+        age.setAccessible(true);
+        age.set(student, 30);
+
+        assertThat(student.getName()).isEqualTo("jinwoo");
+        assertThat(student.getAge()).isEqualTo(30);
+    }
 
     @Test
     public void showClass() {
