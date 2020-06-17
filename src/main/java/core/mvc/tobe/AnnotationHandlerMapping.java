@@ -96,4 +96,8 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
             throw new IllegalArgumentException("Fail to create new instance of " + clazz.getName());
         }
     }
+
+    public int getNumOfHandler() {
+        return handlers.size();
+    }
 }

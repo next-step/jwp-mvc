@@ -12,7 +12,6 @@ public class PathVariableExtractor extends AnnotationValueExtractor<PathVariable
         super(PathVariable.class);
     }
 
-    // value of path pattern exist in attribute
     public Object extract(Parameter parameter, HttpServletRequest request) {
         String attribute = (String) request.getAttribute(parameter.getName());
 

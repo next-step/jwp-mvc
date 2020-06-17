@@ -24,7 +24,7 @@ public class HandlerKey implements Comparable<HandlerKey> {
     }
 
     public HandlerKey(final String url, final RequestMethod requestMethod, final Parameters parameters) {
-        if (Objects.isNull(url) || Objects.isNull(requestMethod) || Objects.isNull(parameters)) {
+        if (Objects.isNull(url) || Objects.isNull(requestMethod)) {
             throw new IllegalArgumentException("Fail to create HandlerKey cuz there is null argument");
         }
 
@@ -32,6 +32,10 @@ public class HandlerKey implements Comparable<HandlerKey> {
         this.pathPattern = PATH_PATTERN_PARSER.parse(url);
         this.requestMethod = requestMethod;
         this.parameters = parameters;
+    }
+
+    public HandlerKey(final String url, final RequestMethod requestMethod) {
+        this(url, requestMethod, null);
     }
 
     public String getUrl() {

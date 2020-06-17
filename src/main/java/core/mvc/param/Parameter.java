@@ -34,7 +34,6 @@ public class Parameter {
     }
 
     public boolean isParamExist(HttpServletRequest request) {
-        System.out.println("Type : " + type + " / name : " + name + " / value : " + extractValue(request) );
         return extractValue(request) != null;
     }
 
