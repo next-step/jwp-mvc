@@ -16,6 +16,12 @@ import java.util.*;
 @Slf4j
 public class HandlerArgumentResolver {
     private static ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+
+    private static final List<HandlerMethodArgumentResolver> handlerArgumentResolver = Arrays.asList(
+        new HttpServletRequestArgumentResolver(),
+        new HttpServletResponseArgumentResolver()
+    );
+
     private static final String JAVA_LANG_PACKAGE_PREFIX = "java.lang";
 
     public static Object[] resolve(Method method, HttpServletRequest request, HttpServletResponse response) {
