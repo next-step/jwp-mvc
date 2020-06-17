@@ -31,4 +31,8 @@ public class Parameter {
     public Object extractValue(HttpServletRequest request) {
         return ValueExtractors.extractValue(this, request);
     }
+
+    public boolean isParamExist(HttpServletRequest request) {
+        return extractValue(request) != null;
+    }
 }

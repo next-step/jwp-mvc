@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.exception.NotFoundException;
 import core.mvc.RequestHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ import java.util.*;
 public class AnnotationHandlerMapping implements RequestHandlerMapping {
     private final Object[] basePackage;
 
-    private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private final Map<HandlerKey, HandlerExecutions> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         validate(basePackage);
@@ -36,9 +37,12 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        HandlerKey requestKey = HandlerKey.from(request);
-
-        return handlerExecutions.get(requestKey);
+        return handlerExecutions.keySet()
+                .stream()
+                .filter(handlerKey -> handlerKey.isSupport(request))
+                .map(handlerKey -> handlerExecutions.get(handlerKey).getHandler(request))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("There is no match method for request"));
     }
 
     private void convertClassToHandlerExecution(final Class<?> clazz) {
@@ -55,10 +59,10 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
                 .forEach(requestMethod ->
                         {
                             HandlerKey key = new HandlerKey(requestMapping.value(), requestMethod);
-                            handlerExecutions.put(
-                                    key,
-                                    new HandlerExecution(key, method, instance)
-                            );
+                            HandlerExecutions executions = handlerExecutions.getOrDefault(key, new HandlerExecutions());
+                            executions.add(new HandlerExecution(key, method, instance));
+
+                            handlerExecutions.put(key, executions);
                         }
                 );
     }

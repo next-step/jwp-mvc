@@ -38,4 +38,9 @@ public class Parameters {
                 .map(parameter -> parameter.extractValue(request))
                 .toArray();
     }
+
+    public boolean isParamsExist(final HttpServletRequest request) {
+        return parameters.stream()
+                .allMatch(parameter -> parameter.isParamExist(request));
+    }
 }

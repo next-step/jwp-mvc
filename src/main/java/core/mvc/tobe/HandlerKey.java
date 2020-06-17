@@ -31,6 +31,13 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
+    public boolean isSupport(HttpServletRequest request) {
+        HandlerKey requestKey = HandlerKey.from(request);
+        PathContainer pathContainer = toPathContainer(request.getRequestURI());
+
+        return requestMethod == requestKey.requestMethod && pathPattern.matches(pathContainer);
+    }
+
     public static HandlerKey from(final HttpServletRequest request) {
         if (Objects.isNull(request)) {
             throw new IllegalArgumentException("Fail to create HandlerKey cuz HttpRequest is null");
@@ -62,18 +69,21 @@ public class HandlerKey {
         return "HandlerKey [url=" + url + ", requestMethod=" + requestMethod + "]";
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(requestMethod); // url이 다 다른데 hash값 처리를 어떻게 해야지 좋을까
-    }
-
+    /*
+     * url과 메서드가 같은 경우일 때만 키가 같다. 따라서 path Pattern이 들어가는 순간 애매해짐
+     * path pattern 매칭을 위한 함수를 두고 일치하는 것들을 리턴하는 것이 나음
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HandlerKey that = (HandlerKey) o;
-        return requestMethod == that.requestMethod &&
-                (that.pathPattern.matches(toPathContainer(this.url)) ||
-                        pathPattern.matches(toPathContainer(that.url)));
+        return Objects.equals(url, that.url) &&
+                requestMethod == that.requestMethod;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, requestMethod);
     }
 }

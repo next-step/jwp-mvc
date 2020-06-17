@@ -29,6 +29,10 @@ public class HandlerExecution {
         this.parameters = new Parameters(method);
     }
 
+    public boolean isSupport(HttpServletRequest request) {
+        return parameters.isParamsExist(request);
+    }
+
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         updateParams(request, response);
         Object[] values = parameters.extractValues(request);
