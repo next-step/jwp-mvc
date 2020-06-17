@@ -1,6 +1,5 @@
 package core.mvc.param.extractor.complex;
 
-import core.exception.ParameterNotFoundException;
 import core.mvc.param.Parameter;
 import core.mvc.param.extractor.ValueExtractor;
 import core.mvc.param.extractor.simple.TypeParser;
@@ -67,8 +66,6 @@ public class ComplexValueExtractor implements ValueExtractor {
     }
 
     private String findParameter(Field field, HttpServletRequest request) {
-        String parameter = request.getParameter(field.getName());
-
-        return parameter;
+        return request.getParameter(field.getName());
     }
 }

@@ -13,6 +13,6 @@ public class ContextValueExtractor implements ValueExtractor {
     public Object extract(final Parameter parameter, final HttpServletRequest request) {
         Map<Class<?>, Object> contexts = (Map<Class<?>, Object>) request.getAttribute(CONTEXTS);
 
-        return contexts.get(parameter.getTypeClass());
+        return contexts == null ? null : contexts.get(parameter.getTypeClass());
     }
 }

@@ -2,6 +2,7 @@ package core.mvc.param;
 
 import core.annotation.web.Controller;
 import core.exception.ParameterNotFoundException;
+import core.mvc.Texture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -31,12 +32,11 @@ class ParameterTest {
     }
 
     @Test
-    @DisplayName("해당 하는 파라미터가 없을 경우 예외를 던진다")
+    @DisplayName("해당 하는 파라미터가 없을 경우 null 을 리턴한다")
     void cantSearchParam() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletRequest request = Texture.request;
         Parameter parameter = new Parameter("name", String.class, null);
 
-        assertThatExceptionOfType(ParameterNotFoundException.class)
-                .isThrownBy(() -> parameter.extractValue(request));
+        assertThat(parameter.extractValue(request)).isNull();
     }
 }

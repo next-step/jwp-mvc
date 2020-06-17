@@ -72,7 +72,8 @@ public class HandlerKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HandlerKey that = (HandlerKey) o;
-        return that.pathPattern.matches(toPathContainer(this.url)) &&
-                requestMethod == that.requestMethod;
+        return requestMethod == that.requestMethod &&
+                (that.pathPattern.matches(toPathContainer(this.url)) ||
+                        pathPattern.matches(toPathContainer(that.url)));
     }
 }

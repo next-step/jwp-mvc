@@ -26,16 +26,6 @@ public class PathPatternTest {
     }
 
     @Test
-    void equalsTest() {
-        PathPattern pp1 = parse("/users/{userId}");
-        PathPattern pp2 = parse("/users/1");
-        System.out.println(pp1.getPatternString());
-        System.out.println(pp2.getPatternString());
-
-        assertThat(pp1).isEqualTo(pp2);
-    }
-
-    @Test
     void matchAndExtract() {
         Map<String, String> variables = parse("/users/{id}")
                 .matchAndExtract(toPathContainer("/users/1")).getUriVariables();
