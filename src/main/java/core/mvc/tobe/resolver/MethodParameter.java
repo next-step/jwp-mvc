@@ -1,14 +1,17 @@
 package core.mvc.tobe.resolver;
 
+import core.annotation.web.RequestMapping;
+import core.mvc.tobe.ReflectionUtils;
 import lombok.Getter;
 import next.util.StringUtils;
+import org.springframework.web.util.pattern.PathPattern;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
+import static core.mvc.tobe.ReflectionUtils.REQUEST_MAPPING_ANNOTATION_CLASS;
 
 @Getter
 public class MethodParameter {
@@ -19,7 +22,8 @@ public class MethodParameter {
     private List<Annotation> annotations;
 
     public static MethodParameter from(String name, Parameter parameter, Method method) {
-        if (StringUtils.isEmpty(name) ||
+        if (Objects.isNull(method) ||
+            StringUtils.isEmpty(name) ||
             Objects.isNull(parameter) ||
             Objects.isNull(method)
         ) {

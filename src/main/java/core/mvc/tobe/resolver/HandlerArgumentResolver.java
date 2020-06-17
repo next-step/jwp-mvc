@@ -1,17 +1,21 @@
 package core.mvc.tobe.resolver;
 
 import com.google.common.collect.Lists;
+import core.annotation.web.RequestMapping;
 import core.mvc.tobe.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import next.util.StringUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+
+import static core.mvc.tobe.ReflectionUtils.REQUEST_MAPPING_ANNOTATION_CLASS;
 
 @Slf4j
 public class HandlerArgumentResolver {
@@ -90,5 +94,34 @@ public class HandlerArgumentResolver {
             log.error(e.getMessage());
             arguments.add(null);
         }
+    }
+
+
+    public Map<String, String> getPathVariables(Method method, String requestURI) {
+        return getPathPattern(method)
+                .map(pathPattern -> pathPattern.matchAndExtract(PathPatternUtil.toPathContainer(requestURI)))
+                .map(PathPattern.PathMatchInfo::getUriVariables)
+                .orElse(Collections.emptyMap());
+    }
+
+    public Optional<PathPattern> getPathPattern(Method method) {
+        String baseUri = getBaseUri(method);
+
+        RequestMapping methodRequestMapping = ReflectionUtils.getAnnotation(method, REQUEST_MAPPING_ANNOTATION_CLASS);
+
+        return Optional.ofNullable(methodRequestMapping)
+                .map(annotation -> PathPatternUtil.parse(baseUri + annotation.value()));
+    }
+
+    public String getBaseUri(Method method) {
+        String baseUri = "";
+
+        RequestMapping typeRequestMapping = ReflectionUtils.getAnnotation(method.getDeclaringClass(), REQUEST_MAPPING_ANNOTATION_CLASS);
+
+        if (Objects.nonNull(typeRequestMapping)) {
+            baseUri = typeRequestMapping.value();
+        }
+
+        return baseUri;
     }
 }

@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,38 +27,13 @@ public class PathVariableArgumentResolver extends AbstractHandlerMethodArgumentR
 
     @Override
     public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
-        return resolve(request.getParameterMap(), parameter.getName(), parameter.getType());
+        return resolve(request.getParameterMap(), parameter.getParameter(), parameter.getName(), parameter.getType());
     }
 
-    public Object resolve(
-        Parameter parameter,
-        Map<String, String> pathVariables,
-        String name,
-        Class<?> type
-    ) {
+    public Object resolve(Map<String, String> pathVariables, Parameter parameter, String name, Class<?> type) {
         PathVariable pathVariable = parameter.getAnnotation(PATH_VARIABLE_ANNOTATION_CLASS);
         name = StringUtils.getOrDefault(StringUtils.getOrDefault(pathVariable.name(), pathVariable.value()), name);
         return resolve(pathVariables, name, type);
     }
 
-    public Optional<PathPattern> getPathPattern(Method method) {
-        String baseUri = getBaseUri(method);
-
-        RequestMapping methodRequestMapping = ReflectionUtils.getAnnotation(method, REQUEST_MAPPING_ANNOTATION_CLASS);
-
-        return Optional.ofNullable(methodRequestMapping)
-            .map(annotation -> PathPatternUtil.parse(baseUri + annotation.value()));
-    }
-
-    public String getBaseUri(Method method) {
-        String baseUri = "";
-
-        RequestMapping typeRequestMapping = ReflectionUtils.getAnnotation(method.getDeclaringClass(), REQUEST_MAPPING_ANNOTATION_CLASS);
-
-        if (Objects.nonNull(typeRequestMapping)) {
-            baseUri = typeRequestMapping.value();
-        }
-
-        return baseUri;
-    }
 }
