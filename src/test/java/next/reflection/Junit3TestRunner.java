@@ -26,16 +26,18 @@ public class Junit3TestRunner {
         //then
         assertThat(methods).hasSize(2);
         methods.stream()
-                .forEach(method -> {
-                    try {
-                        method.invoke(clazz.newInstance());
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    }
-                });
+                .forEach(method -> invokeMethod(clazz, method));
+    }
+
+    private void invokeMethod(Class clazz, Method method) {
+        try {
+            method.invoke(clazz.newInstance());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 }
