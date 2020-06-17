@@ -11,7 +11,6 @@ import next.model.User;
 @Controller
 public class ProfileController {
 
-    // TODO: 2020-06-16 change /users/profile/{userId}
     @RequestMapping(value = "/users/profile/{userId}", method = RequestMethod.GET)
     public ModelAndView userProfile(@PathVariable String userId) throws Exception {
         User user = DataBase.findUserById(userId);

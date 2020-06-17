@@ -1,15 +1,57 @@
 package core.mvc.tobe;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PathPatternTest {
+    @Test
+    @DisplayName("정렬에 대한 테스트")
+    void compareTo() {
+        PathPattern users = parse("/users");
+        PathPattern usersSpecificId = parse("/users/id");
+        PathPattern usersId = parse("/users/{id}");
+
+        List<PathPattern> pathPatterns = Arrays.asList(users, usersSpecificId, usersId);
+
+        System.out.println("BEFORE");
+        Collections.shuffle(pathPatterns);
+        pathPatterns.forEach(System.out::println);
+
+        System.out.println("AFTER");
+        Collections.sort(pathPatterns);
+        pathPatterns.forEach(System.out::println);
+    }
+
+    @Test
+    @DisplayName("트리맵에서 정렬 및 찾기 테스트")
+    void sortWithTreeMap() {
+        PathPattern users = parse("/users");
+        PathPattern usersSpecificId = parse("/users/id");
+        PathPattern usersId = parse("/users/{id}");
+
+        Map<PathPattern, Object> map = new TreeMap<>();
+        map.put(users, users);
+        map.put(usersSpecificId, usersSpecificId);
+        map.put(usersId, usersId);
+
+        PathContainer pathContainer = toPathContainer("/users/id");
+
+        PathPattern result = map.keySet()
+                .stream()
+                .filter(pathPattern -> pathPattern.matches(pathContainer))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(result).isEqualTo(usersSpecificId);
+    }
+
     @Test
     void match() {
         PathPattern pp = parse("/users/{id}");

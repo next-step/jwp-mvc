@@ -1,11 +1,11 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.exception.NotFoundException;
 import core.mvc.RequestHandlerMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
@@ -13,9 +13,11 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class AnnotationHandlerMapping implements RequestHandlerMapping {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private final Object[] basePackage;
 
-    private final Map<HandlerKey, HandlerExecutions> handlerExecutions = Maps.newHashMap();
+    private final Map<HandlerKey, HandlerExecution> handlerExecutions = new HashMap<>();
+    private final List<HandlerKey> handlers = new ArrayList<>();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         validate(basePackage);
@@ -33,14 +35,20 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
         Set<Class<?>> controllers = AnnotatedTargetScanner.loadClasses(Controller.class, basePackage);
 
         controllers.forEach(this::convertClassToHandlerExecution);
+
+        handlers.addAll(handlerExecutions.keySet());
+        Collections.sort(handlers);
+
+        logger.info("Initialized Request Mapping!");
+        handlers.forEach(handler -> logger.info("Url : {}, Method : {}", handler.getUrl(), handler.getRequestMethod()));
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        return handlerExecutions.keySet()
-                .stream()
-                .filter(handlerKey -> handlerKey.isSupport(request))
-                .map(handlerKey -> handlerExecutions.get(handlerKey).getHandler(request))
+        return handlers.stream()
+                .filter(handlerKey -> handlerKey.isSupport(request)) // url check
+                .filter(handlerKey -> handlerExecutions.get(handlerKey).isSupport(request)) // parameter check
+                .map(handlerExecutions::get)
                 .findFirst()
                 .orElse(null);
     }
@@ -58,11 +66,14 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
         getRequestMethods(requestMapping)
                 .forEach(requestMethod ->
                         {
-                            HandlerKey key = new HandlerKey(requestMapping.value(), requestMethod);
-                            HandlerExecutions executions = handlerExecutions.getOrDefault(key, new HandlerExecutions());
-                            executions.add(new HandlerExecution(key, method, instance));
+                            HandlerExecution handlerExecution = new HandlerExecution(method, instance);
+                            HandlerKey key = new HandlerKey(
+                                    requestMapping.value(),
+                                    requestMethod,
+                                    handlerExecution.getParameters()
+                            );
 
-                            handlerExecutions.put(key, executions);
+                            handlerExecutions.put(key, handlerExecution);
                         }
                 );
     }

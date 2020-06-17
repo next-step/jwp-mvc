@@ -1,15 +1,12 @@
 package core.mvc.view;
 
 
-import core.annotation.web.RequestMethod;
 import core.mvc.asis.Controller;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerKey;
 import next.controller.HomeController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -52,7 +49,7 @@ class HandlerExecutionViewResolverTest {
         Method method = clazz.getDeclaredMethod("test", HttpServletRequest.class, HttpServletResponse.class);
         Object instance = clazz.getDeclaredConstructor(ModelAndView.class).newInstance(modelAndView);
 
-        HandlerExecution handlerExecution = new HandlerExecution(new HandlerKey("/test", RequestMethod.GET), method, instance);
+        HandlerExecution handlerExecution = new HandlerExecution(method, instance);
 
         assertThat(modelAndView.getView()).isNull();
         handlerExecutionViewResolver.handle(handlerExecution, request, response);

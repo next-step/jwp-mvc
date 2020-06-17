@@ -4,6 +4,7 @@ import core.mvc.param.extractor.ValueExtractors;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 
 public class Parameter {
     private final Class<?> type;
@@ -35,5 +36,20 @@ public class Parameter {
     public boolean isParamExist(HttpServletRequest request) {
         System.out.println("Type : " + type + " / name : " + name + " / value : " + extractValue(request) );
         return extractValue(request) != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Parameter parameter = (Parameter) o;
+        return Objects.equals(type, parameter.type) &&
+                Objects.equals(name, parameter.name) &&
+                Objects.equals(annotation, parameter.annotation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, name, annotation);
     }
 }

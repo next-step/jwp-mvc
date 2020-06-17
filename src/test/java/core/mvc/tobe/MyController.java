@@ -17,7 +17,7 @@ public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView findUserId(HttpServletRequest request) {
         String userId = request.getParameter("userId");
         logger.debug("Find UserId : {}", userId);
         User user = DataBase.findUserById(userId);
@@ -26,7 +26,7 @@ public class MyController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView save(HttpServletRequest request) {
         User user = new User(
                 request.getParameter("userId"),
                 request.getParameter("password"),

@@ -1,8 +1,6 @@
 package core.mvc.view;
 
-import core.annotation.web.RequestMethod;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerKey;
 import next.controller.HomeController;
 import next.controller.ListUserController;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +11,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,8 +33,7 @@ class ControllerViewResolverTest {
         Class<?> clazz = HomeController.class;
         Method method = clazz.getDeclaredMethod("execute", HttpServletRequest.class, HttpServletResponse.class);
         Object instance = clazz.getDeclaredConstructor().newInstance();
-        HandlerKey key = new HandlerKey("/test", RequestMethod.GET);
-        HandlerExecution handlerExecution = new HandlerExecution(key, method, instance);
+        HandlerExecution handlerExecution = new HandlerExecution(method, instance);
 
         ModelAndView handle = controllerViewResolver.handle(handlerExecution, request, response);
 
