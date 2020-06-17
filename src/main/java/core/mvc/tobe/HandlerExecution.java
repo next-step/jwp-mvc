@@ -46,17 +46,5 @@ public class HandlerExecution {
 
         requestParams.keySet()
                 .forEach(key -> request.setAttribute(key, requestParams.get(key)));
-
-        addContext(request, response);
-    }
-
-    private void addContext(HttpServletRequest request, HttpServletResponse response) {
-        // 좋은 방법이 없을까...
-        Map<Class<?>, Object> context = new HashMap<>();
-        context.put(HttpServletRequest.class, request);
-        context.put(HttpServletResponse.class, response);
-        context.put(HttpSession.class, request.getSession());
-
-        request.setAttribute(ContextValueExtractor.CONTEXTS, context);
     }
 }

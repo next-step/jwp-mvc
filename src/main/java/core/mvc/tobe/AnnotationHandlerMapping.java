@@ -42,7 +42,7 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
                 .filter(handlerKey -> handlerKey.isSupport(request))
                 .map(handlerKey -> handlerExecutions.get(handlerKey).getHandler(request))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("There is no match method for request"));
+                .orElse(null);
     }
 
     private void convertClassToHandlerExecution(final Class<?> clazz) {

@@ -33,7 +33,7 @@ public class HandlerKey {
 
     public boolean isSupport(HttpServletRequest request) {
         HandlerKey requestKey = HandlerKey.from(request);
-        PathContainer pathContainer = toPathContainer(request.getRequestURI());
+        PathContainer pathContainer = toPathContainer(requestKey.url);
 
         return requestMethod == requestKey.requestMethod && pathPattern.matches(pathContainer);
     }
