@@ -4,7 +4,7 @@ import core.mvc.param.Parameter;
 import core.mvc.param.extractor.annotation.AnnotationValueExtractors;
 import core.mvc.param.extractor.complex.ComplexValueExtractor;
 import core.mvc.param.extractor.simple.SimpleValueExtractor;
-import core.mvc.param.extractor.type.ContextValueExtractor;
+import core.mvc.param.extractor.context.ContextValueExtractor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;

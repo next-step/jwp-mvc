@@ -69,10 +69,6 @@ public class ComplexValueExtractor implements ValueExtractor {
     private String findParameter(Field field, HttpServletRequest request) {
         String parameter = request.getParameter(field.getName());
 
-        if (parameter == null) {
-            throw new ParameterNotFoundException(field.getName());
-        }
-
         return parameter;
     }
 }
