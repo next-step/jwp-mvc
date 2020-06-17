@@ -14,7 +14,7 @@ public class ViewResolverComposite implements ViewResolver {
     public View resolveViewName(String viewName) {
         for (ViewResolver viewResolver : this.viewResolvers) {
             View view = viewResolver.resolveViewName(viewName);
-            
+
             if (view != null) {
                 return view;
             }

@@ -30,6 +30,10 @@ public class RequestParamHandlerMethodArgumentResolver implements HandlerMethodA
             return PathPatternUtils.toPrimitive(parameter.getParameterType(), request.getParameter(parameter.getName()));
         }
 
+        if (String.class.equals(parameter.getParameterType())) {
+            return request.getParameter(parameter.getName());
+        }
+
         Map<String, Object> parameterMap = request.getParameterMap().keySet().stream()
                 .collect(Collectors.toMap(key -> key, key -> request.getParameterMap().get(key)[0]));
         Object object = objectMapper.convertValue(parameterMap, parameter.getParameterType());

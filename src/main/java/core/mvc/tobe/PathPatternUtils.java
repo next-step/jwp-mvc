@@ -20,7 +20,6 @@ public class PathPatternUtils {
     }
 
     public static Object toPrimitive(Class targetClass, String value) {
-
         if (Integer.class == targetClass || int.class == targetClass) return Math.toIntExact(Long.parseLong(value));
         if (Long.class == targetClass || long.class == targetClass) return Long.parseLong(value);
         if (Boolean.class == targetClass || boolean.class == targetClass) return Boolean.parseBoolean(value);

@@ -26,7 +26,7 @@ public class HandlerExecutionImpl extends HandlerMethod implements HandlerExecut
 
     @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) this.invoke(request, request, response);
+        return (ModelAndView) this.invoke(request, request, response, request.getSession());
     }
 
     private Object invoke(HttpServletRequest request, Object... providedArguments) {

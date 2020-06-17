@@ -1,10 +1,12 @@
 package core.mvc.tobe;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.asis.DispatcherServlet;
 import core.mvc.tobe.support.PathVariableHandlerMethodArgumentResolver;
+import core.mvc.tobe.support.RequestParamHandlerMethodArgumentResolver;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +38,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Map<Class<?>, Object> instantiateControllers = controllerScanner.getInstantiateControllers();
         Set<Method> requestMappingMethods = findRequestMappingMethods(instantiateControllers.keySet());
 
-        initHandlerExecutions(instantiateControllers, requestMappingMethods);
         initResolvers();
+        initHandlerExecutions(instantiateControllers, requestMappingMethods);
     }
 
     private void initResolvers() {
         HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite(
-                new PathVariableHandlerMethodArgumentResolver()
+                new PathVariableHandlerMethodArgumentResolver(),
+                new RequestParamHandlerMethodArgumentResolver(new ObjectMapper())
         );
 
         this.resolver = handlerMethodArgumentResolverComposite;
