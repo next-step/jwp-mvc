@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import core.annotation.Inject;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import static org.reflections.ReflectionUtils.getAllConstructors;
