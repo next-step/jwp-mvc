@@ -82,33 +82,8 @@ class HandlerKeyTest {
     @DisplayName("패턴을 적용했을때도 동일한지")
     void equalsUsingPathPattern() {
         HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
-        HandlerKey request = new HandlerKey("/user/1", RequestMethod.GET);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/user/1");
 
-        assertThat(origin)
-                .isEqualTo(request);
-    }
-
-    @Test
-    @DisplayName("패턴을 셋에 적용했을때도 동일한지")
-    void equalsWhenUsingSet() {
-        HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
-        HandlerKey request = new HandlerKey("/user/1", RequestMethod.GET);
-
-        Set<HandlerKey> keys = new HashSet<>();
-        keys.add(origin);
-
-        assertThat(keys.contains(request)).isTrue();
-    }
-
-    @Test
-    @DisplayName("패턴을 맵에 적용했을때도 동일한지")
-    void equalsWhenUsingMap() {
-        HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
-        HandlerKey request = new HandlerKey("/user/1", RequestMethod.GET);
-
-        Map<HandlerKey, Object> keyMap = new HashMap();
-        keyMap.put(origin, origin);
-
-        assertThat(keyMap.containsKey(request)).isTrue();
+        assertThat(origin.isSupport(request)).isTrue();
     }
 }
