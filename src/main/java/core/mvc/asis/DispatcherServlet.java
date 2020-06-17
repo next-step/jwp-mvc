@@ -74,10 +74,10 @@ public class DispatcherServlet extends HttpServlet {
                                  final HttpServletRequest request,
                                  final HttpServletResponse response) {
         return viewResolvers.stream()
-                    .map(resolver -> resolve(handler, request, response, resolver))
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElseThrow(() -> new InternalServerErrorException("Fail to find view resolver for " + handler));
+                .filter(viewResolver -> viewResolver.supports(handler))
+                .findFirst()
+                .map(resolver -> resolve(handler, request, response, resolver))
+                .orElseThrow(() -> new InternalServerErrorException("Fail to find view resolver for " + handler));
     }
 
     private ModelAndView resolve(final Object handler,

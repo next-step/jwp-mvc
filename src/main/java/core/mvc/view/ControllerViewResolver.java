@@ -8,13 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 public class ControllerViewResolver extends AbstractViewResolver {
 
     @Override
+    public boolean supports(Object handler) {
+        return handler instanceof Controller;
+    }
+
+    @Override
     public ModelAndView handle(final Object handler,
                                final HttpServletRequest request,
                                final HttpServletResponse response) throws Exception {
-        if (!(handler instanceof Controller)) {
-            return null;
-        }
-
         String viewName = ((Controller) handler).execute(request, response);
         View view = resolve(viewName, response);
 
