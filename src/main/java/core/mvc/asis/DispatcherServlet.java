@@ -28,10 +28,14 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        HandlerExecution handlerExecution = HandlerMappings.findHandler(req);
+    protected void service(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView modelAndView = getModelAndView(request, response);
+        modelAndView.getView()
+                .render(modelAndView.getModel(), request, response);
+    }
 
-        ModelAndView modelAndView = handlerExecution.handle(req, resp);
-        modelAndView.getView().render(modelAndView.getModel(), req, resp);
+    public ModelAndView getModelAndView(HttpServletRequest request, HttpServletResponse response){
+        HandlerExecution handlerExecution = HandlerMappings.findHandler(request);
+        return handlerExecution.handle(request, response);
     }
 }

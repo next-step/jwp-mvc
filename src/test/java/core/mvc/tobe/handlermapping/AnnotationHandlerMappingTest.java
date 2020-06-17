@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handlermapping;
 
 import core.db.DataBase;
 import core.mvc.ModelAndView;

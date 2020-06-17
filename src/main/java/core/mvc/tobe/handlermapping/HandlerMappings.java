@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 public class HandlerMappings {
-    private static List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private static Set<HandlerMapping> handlerMappings = new HashSet<>();
 
     public static void addHandlerMapping(HandlerMapping handlerMapping) {
         handlerMappings.add(handlerMapping);
@@ -18,8 +18,8 @@ public class HandlerMappings {
         handlerMappings.forEach(HandlerMapping::init);
     }
 
-    public static List<HandlerMapping> getHandlerMappings() {
-        return Collections.unmodifiableList(handlerMappings);
+    public static Set<HandlerMapping> getHandlerMappings() {
+        return Collections.unmodifiableSet(handlerMappings);
     }
 
     public static HandlerExecution findHandler(HttpServletRequest request) {
@@ -31,6 +31,10 @@ public class HandlerMappings {
         }
 
         return handler;
+    }
+
+    public static void clear(){
+        handlerMappings.clear();
     }
 
     private static HandlerMapping findHandlerMapping(HttpServletRequest request){

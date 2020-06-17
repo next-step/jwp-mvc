@@ -1,7 +1,6 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handler;
 
 import core.annotation.web.RequestMethod;
-import core.mvc.tobe.handler.HandlerKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

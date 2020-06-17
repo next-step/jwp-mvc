@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handlermapping;
 
 import core.mvc.tobe.handler.HandlerExecution;
 import core.mvc.tobe.handler.HandlerExecutions;
