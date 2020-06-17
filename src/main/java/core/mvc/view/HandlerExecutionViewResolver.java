@@ -7,15 +7,14 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HandlerExecutionViewResolver implements ViewResolver {
 
-    private final HandlerExecution handlerExecution;
-
-    public HandlerExecutionViewResolver(HandlerExecution handlerExecution) {
-        this.handlerExecution = handlerExecution;
+    @Override
+    public boolean isSupports(Object handler) {
+        return handler instanceof HandlerExecution;
     }
 
     @Override
-    public ModelAndView resolve(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final ModelAndView temp = handlerExecution.handle(request, response);
+    public ModelAndView resolve(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        final ModelAndView temp = ((HandlerExecution) handler).handle(request, response);
         final String viewName = getJspNameFromRequest(request);
         final JspView jspView = new JspView(viewName);
         final ModelAndView mv = new ModelAndView(jspView);

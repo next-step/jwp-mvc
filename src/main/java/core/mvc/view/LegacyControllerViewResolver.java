@@ -13,15 +13,14 @@ public class LegacyControllerViewResolver implements ViewResolver {
 
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private final Controller controller;
-
-    public LegacyControllerViewResolver(Controller controller) {
-        this.controller = controller;
+    @Override
+    public boolean isSupports(Object handler) {
+        return handler instanceof Controller;
     }
 
     @Override
-    public ModelAndView resolve(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final String viewName = controller.execute(request, response);
+    public ModelAndView resolve(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        final String viewName = ((Controller) handler).execute(request, response);
         final View view = determineViewByName(viewName, response);
         return new ModelAndView(view);
     }
@@ -33,4 +32,5 @@ public class LegacyControllerViewResolver implements ViewResolver {
         }
         return new JspView(viewName);
     }
+
 }
