@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,16 +80,14 @@ public class ReflectionTest {
                 .collect(Collectors.joining(", "));
     }
     @Test
-    @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+        Constructor<Question> constructor = clazz.getConstructor(String.class, String.class, String.class);
+        Question question = constructor.newInstance("jinwoo", "title", "Hello World");
+        logger.debug(question.toString());
+
+        Constructor<Question> constructor1 = clazz.getConstructor(long.class, String.class, String.class, String.class, Date.class, int.class);
+        Question question1 = constructor1.newInstance(1L, "jw", "title2", "Hello World", new Date(), 0);
+        logger.debug(question1.toString());
     }
 }
