@@ -62,7 +62,7 @@ class ValueExtractorsTest {
     void extractAnnotationAttachedParameter() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute("user", "nokchax");
-        Parameter parameter = new Parameter("user", String.class, PathVariable.class);
+        Parameter parameter = new Parameter("user", String.class, new PathVariable("123", "123", false));
 
         Object value = ValueExtractors.extractValue(parameter, request);
 
