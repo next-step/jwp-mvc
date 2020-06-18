@@ -2,6 +2,10 @@ package core.mvc.asis;
 
 import core.mvc.*;
 import core.mvc.tobe.*;
+import core.mvc.tobe.AnnotationHandlerExecutor;
+import core.mvc.tobe.ControllerExecutor;
+import core.mvc.tobe.HandlerExecutor;
+import core.mvc.tobe.HandlerExecutorComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +26,15 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private HandlerMapping handlerMapping;
     private ViewResolver viewResolver;
+    private HandlerExecutor handlerExecutor;
 
     @Override
     public void init() throws ServletException {
         initHandlerMapping();
         initViewResolver();
+        initHandlerExecutor();
     }
+
 
     private void initHandlerMapping() {
         RequestMapping requestMapping = new RequestMapping();
@@ -46,16 +53,28 @@ public class DispatcherServlet extends HttpServlet {
         ));
     }
 
+    private void initHandlerExecutor() {
+        this.handlerExecutor = new HandlerExecutorComposite(
+                new ControllerExecutor(),
+                new AnnotationHandlerExecutor()
+        );
+    }
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            HandlerExecution handler = handlerMapping.getHandler(req);
-            ModelAndView modelAndView = handler.handle(req, resp);
+            Object handler = handlerMapping.getHandler(req);
+
+            if(!handlerExecutor.supportHandler(handler)) {
+                throw new HandlerNotSupportException("Type " + handler.getClass().getName() + " not supported", handler.getClass());
+            }
+
+            ModelAndView modelAndView = handlerExecutor.execute(req, resp, handler);
             render(modelAndView, req, resp);
-        } catch (PageNotFoundException e) {
+        } catch (PageNotFoundException | HandlerNotSupportException e) {
             logger.error("Page Not Found Exception ", e);
             resp.sendError(404);
         } catch (Throwable e) {

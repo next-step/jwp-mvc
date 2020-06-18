@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author KingCjy
  */
-public class HandlerExecutionImplTest {
+public class AnnotationHandlerTest {
 
     @Test
     public void handleTest() throws Exception {
@@ -24,7 +24,7 @@ public class HandlerExecutionImplTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        HandlerExecution handlerExecution = new HandlerExecutionImpl(new MyController(), MyController.class.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class));
-        handlerExecution.handle(request, response);
+        AnnotationHandler annotationHandler = new AnnotationHandler(new MyController(), MyController.class.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class));
+        annotationHandler.handle(request, response);
     }
 }

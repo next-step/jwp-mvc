@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.mvc.asis.Controller;
 import core.mvc.asis.RequestMapping;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,24 +28,24 @@ public class HandlerMappingCompositeTest {
         handlerMappingComposite = new HandlerMappingComposite(annotationHandlerMapping, requestMapping);
     }
 
-//    @Test
-//    @DisplayName("기존 레거시 RequestMapping 사용")
-//    public void getHandlerFromRequestMapping() {
-//        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/");
-//
-//        HandlerExecution handler = handlerMappingComposite.getHandler(request);
-//
-//        assertThat(handler).isInstanceOf(LegacyHandlerExecution.class);
-//    }
+    @Test
+    @DisplayName("기존 레거시 RequestMapping 사용")
+    public void getHandlerFromRequestMapping() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+
+        Object handler = handlerMappingComposite.getHandler(request);
+
+        assertThat(handler).isInstanceOf(Controller.class);
+    }
 
     @Test
     @DisplayName("신규 AnnotationHandlerMapping 사용")
     public void getHandlerFromAnnotationHandlerMapping() {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
 
-        HandlerExecution handler = handlerMappingComposite.getHandler(request);
+        Object handler = handlerMappingComposite.getHandler(request);
 
-        assertThat(handler).isInstanceOf(HandlerExecutionImpl.class);
+        assertThat(handler).isInstanceOf(AnnotationHandler.class);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class HandlerMappingCompositeTest {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/test/hi/do");
 
         assertThatThrownBy(() -> {
-            HandlerExecution handler = handlerMappingComposite.getHandler(request);
+            Object handler = handlerMappingComposite.getHandler(request);
         }).isInstanceOf(PageNotFoundException.class);
     }
 }

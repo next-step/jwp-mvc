@@ -9,22 +9,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class HandlerExecutionImpl extends HandlerMethod implements HandlerExecution {
+public class AnnotationHandler extends HandlerMethod {
 
-    private static final Logger logger = LoggerFactory.getLogger(HandlerExecutionImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandler.class);
 
     private HandlerMethodArgumentResolver resolver = new HandlerMethodArgumentResolverComposite();
 
-    public HandlerExecutionImpl(Object instance, Method method) {
+    public AnnotationHandler(Object instance, Method method) {
         super(instance, method);
     }
 
-    public HandlerExecutionImpl addResolvers(HandlerMethodArgumentResolver resolver) {
+    public AnnotationHandler addResolvers(HandlerMethodArgumentResolver resolver) {
         this.resolver = resolver;
         return this;
     }
 
-    @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return (ModelAndView) this.invoke(request, request, response, request.getSession());
     }
