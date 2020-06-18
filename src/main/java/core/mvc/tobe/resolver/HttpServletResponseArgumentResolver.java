@@ -7,7 +7,7 @@ public class HttpServletResponseArgumentResolver extends AbstractHandlerMethodAr
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return isHttpServletResponseType(parameter);
+        return isHttpServletResponseType(parameter.getType());
     }
 
     @Override

@@ -5,7 +5,7 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
-import core.mvc.tobe.ReflectionUtils;
+import core.mvc.tobe.util.ReflectionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;

@@ -14,7 +14,7 @@ class HandlerKeyTest {
         HandlerKey handlerKey = new HandlerKey("/users/profile/{id}", RequestMethod.GET);
         HandlerKey requestHandlerKey = new HandlerKey("/users/profile/ninjasul", RequestMethod.GET);
 
-        assertThat(handlerKey.equals(requestHandlerKey)).isTrue();
+        assertThat(handlerKey.matchesPathPattern(requestHandlerKey)).isTrue();
     }
 
     @Test
@@ -23,7 +23,7 @@ class HandlerKeyTest {
         HandlerKey handlerKey = new HandlerKey("/users/profile/{id}", RequestMethod.GET);
         HandlerKey requestHandlerKey = new HandlerKey("/users/profile", RequestMethod.GET);
 
-        assertThat(handlerKey.equals(requestHandlerKey)).isFalse();
+        assertThat(handlerKey.matchesPathPattern(requestHandlerKey)).isFalse();
     }
 
 }

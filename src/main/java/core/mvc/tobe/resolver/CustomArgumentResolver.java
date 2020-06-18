@@ -1,8 +1,7 @@
 package core.mvc.tobe.resolver;
 
-import core.mvc.tobe.ReflectionUtils;
+import core.mvc.tobe.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -22,17 +20,17 @@ public class CustomArgumentResolver extends AbstractHandlerMethodArgumentResolve
     public boolean supportsParameter(MethodParameter parameter) {
         return !isHttpServletRequestType(parameter.getType()) &&
             !isHttpServletResponseType(parameter.getType()) &&
-            !ClassUtils.isPrimitiveOrWrapper(parameter.getType());
+            !isPrimitiveOrWrapperType(parameter.getType());
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
-        return resolve(request.getParameterMap(), parameter.getType());
+        return getCustomObjectArgument(request, parameter.getType());
     }
 
-    private Object resolve(Map<String, String[]> multiValuedMap, Class<?> type) {
+    private Object getCustomObjectArgument(HttpServletRequest request, Class<?> type) {
         try {
-            Object[] parameters = resolveFromMultiValuedMap(multiValuedMap, type.getDeclaredFields());
+            Object[] parameters = resolveParameters(request, type.getDeclaredFields());
             return ReflectionUtils.newInstance(type, parameters);
         }
         catch (Exception e) {
@@ -41,13 +39,13 @@ public class CustomArgumentResolver extends AbstractHandlerMethodArgumentResolve
         }
     }
 
-    public Object[] resolveFromMultiValuedMap(Map<String, String[]> multiValuedMap, Field[] fields) {
-        if (MapUtils.isEmpty(multiValuedMap) || ArrayUtils.isEmpty(fields)) {
+    public Object[] resolveParameters(HttpServletRequest request, Field[] fields) {
+        if (ArrayUtils.isEmpty(fields)) {
             return null;
         }
 
         List<Object> extracted = Arrays.stream(fields)
-            .map(field -> resolveFromRequestParams(multiValuedMap, field.getName(), field.getType()))
+            .map(field -> resolveArgument(request.getParameter(field.getName()), field.getType()))
             .filter(Objects::nonNull)
             .peek(value -> log.debug("value: {}, type: {}", value, value.getClass()))
             .collect(Collectors.toList());

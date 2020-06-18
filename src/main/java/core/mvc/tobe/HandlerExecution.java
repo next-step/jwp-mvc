@@ -19,7 +19,7 @@ public class HandlerExecution implements ModelAndViewGettable {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Object[] arguments = HandlerArgumentResolver.resolve(method, request, response);
+        Object[] arguments = HandlerArgumentResolver.resolveParameters(method, request, response);
         return resolveModelAndView(request, method.invoke(instance, arguments));
     }
 

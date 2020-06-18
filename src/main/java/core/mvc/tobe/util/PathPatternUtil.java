@@ -1,4 +1,4 @@
-package core.mvc.tobe.resolver;
+package core.mvc.tobe.util;
 
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;

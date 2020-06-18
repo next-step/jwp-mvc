@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
-import core.mvc.tobe.resolver.PathPatternUtil;
+import core.mvc.tobe.util.PathPatternUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

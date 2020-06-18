@@ -1,16 +1,11 @@
 package core.mvc.tobe.resolver;
 
+import next.util.StringUtils;
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public abstract class AbstractHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -26,26 +21,15 @@ public abstract class AbstractHandlerMethodArgumentResolver implements HandlerMe
         return ClassUtils.isPrimitiveOrWrapper(type);
     }
 
-    protected Object resolveFromRequestParams(Map<String, String[]> requestParams, String name, Class<?> type) {
-        return Optional.ofNullable(requestParams)
-            .map(p -> p.get(name))
-            .filter(ArrayUtils::isNotEmpty)
-            .map(Arrays::stream)
-            .map(Stream::findFirst)
-            .flatMap(values -> values)
-            .map(value -> convertValue(type, value))
-            .orElse(null);
+    protected Object resolveArgument(String parameterValue, Class<?> type) {
+        if (StringUtils.isEmpty(parameterValue)) {
+            return null;
+        }
+
+        return convertValue(parameterValue, type);
     }
 
-    protected Object resolve(Map<String, String> requestParams, String name, Class<?> type) {
-        return Optional.ofNullable(requestParams)
-            .map(p -> p.get(name))
-            .filter(Objects::nonNull)
-            .map(value -> convertValue(type, value))
-            .orElse(null);
-    }
-
-    protected Object convertValue(Class<?> type, String value) {
+    protected Object convertValue(String value, Class<?> type) {
         if (String.class.equals(type)) {
             return value;
         }

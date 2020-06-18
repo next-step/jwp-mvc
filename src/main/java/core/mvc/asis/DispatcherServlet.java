@@ -1,11 +1,15 @@
 package core.mvc.asis;
 
+import com.google.common.collect.Maps;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.ModelAndViewGettable;
+import core.mvc.tobe.handler.ControllerHandler;
+import core.mvc.tobe.handler.Handler;
+import core.mvc.tobe.handler.HandlerExecutionHandler;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet implements ModelAndViewGettable {
@@ -30,6 +35,7 @@ public class DispatcherServlet extends HttpServlet implements ModelAndViewGettab
 
     private RequestMapping requestMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
+    private Handlers handlers;
 
     @Override
     public void init() {
@@ -38,14 +44,19 @@ public class DispatcherServlet extends HttpServlet implements ModelAndViewGettab
 
         annotationHandlerMapping = new AnnotationHandlerMapping(BASE_CONTROLLER_PACKAGE);
         annotationHandlerMapping.initialize();
+
+        handlers = new Handlers();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
         try {
-            Object handler = getHandler(req);
-            ModelAndView mav = handle(req, resp, handler);
+            Object handlerObj = getHandler(req);
+            logger.debug("handler class: {}", handlerObj.getClass());
+
+            Handler handler = handlers.getHandler(handlerObj);
+            ModelAndView mav = handler.handle(handlerObj, req, resp);
             render(mav, req, resp);
         }
         catch (Throwable e) {
@@ -65,19 +76,6 @@ public class DispatcherServlet extends HttpServlet implements ModelAndViewGettab
         }
 
         return annotationHandlerMapping.getHandler(req);
-    }
-
-    private ModelAndView handle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-
-        if (handler instanceof Controller) {
-            return getModelAndView(req, ((Controller)handler).execute(req, resp));
-        }
-
-        if (handler instanceof HandlerExecution) {
-            return ((HandlerExecution)handler).handle(req, resp);
-        }
-
-        throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
     }
 
     private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws Exception {
