@@ -75,7 +75,7 @@ public class DispatcherServlet extends HttpServlet {
             ModelAndView modelAndView = handlerExecutor.execute(req, resp, handler);
             render(modelAndView, req, resp);
         } catch (PageNotFoundException | HandlerNotSupportException e) {
-            logger.error("Page Not Found Exception ", e);
+            logger.error(e.getMessage(), e);
             resp.sendError(404);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
