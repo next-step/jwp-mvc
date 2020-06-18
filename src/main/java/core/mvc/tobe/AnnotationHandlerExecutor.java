@@ -17,6 +17,7 @@ public class AnnotationHandlerExecutor implements HandlerExecutor {
     @Override
     public ModelAndView execute(HttpServletRequest request, HttpServletResponse response, Object object) throws Exception {
         AnnotationHandler annotationHandler = (AnnotationHandler) object;
+
         return annotationHandler.handle(request, response);
     }
 }
