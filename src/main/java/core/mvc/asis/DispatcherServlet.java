@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class DispatcherServlet extends HttpServlet {
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.asis","next.controller");
+        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.asis", "next.controller");
         annotationHandlerMapping.initialize();
     }
 
@@ -34,8 +35,9 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        if(annotationHandlerMapping.containsExecution(req)) {
-            annotationHandlerMapping.getHandler(req).handle(req,resp);
+        if (annotationHandlerMapping.containsExecution(req)) {
+            ModelAndView mv = annotationHandlerMapping.getHandler(req).handle(req, resp);
+            this.viewRender(mv, req, resp);
             return;
         }
         Controller controller = rm.findController(requestUri);
@@ -48,6 +50,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
+    //modelAndView의 view render 메소드랑 비슷하넹?
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
@@ -57,6 +60,14 @@ public class DispatcherServlet extends HttpServlet {
 
         RequestDispatcher rd = req.getRequestDispatcher(viewName);
         rd.forward(req, resp);
+    }
+
+    private void viewRender(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            modelAndView.getView().render(modelAndView.getModel(), req, resp);
+        } catch (Exception e) {
+            logger.error("view render error: {}", e);
+        }
     }
 
 }
