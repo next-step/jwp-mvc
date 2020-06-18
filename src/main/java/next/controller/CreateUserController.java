@@ -16,9 +16,7 @@ public class CreateUserController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @RequestMapping("/users/create")
-    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
+    public ModelAndView createUser(User user) throws Exception {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);

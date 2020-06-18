@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,5 +76,14 @@ class HandlerKeyTest {
     void equals() {
         assertThat(new HandlerKey("/url", RequestMethod.GET))
                 .isEqualTo(new HandlerKey("/url", RequestMethod.GET));
+    }
+
+    @Test
+    @DisplayName("패턴을 적용했을때도 동일한지")
+    void equalsUsingPathPattern() {
+        HandlerKey origin = new HandlerKey("/user/{userId}", RequestMethod.GET);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/user/1");
+
+        assertThat(origin.isSupport(request)).isTrue();
     }
 }

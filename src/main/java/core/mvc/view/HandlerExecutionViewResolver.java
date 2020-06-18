@@ -8,6 +8,11 @@ import java.io.IOException;
 
 public class HandlerExecutionViewResolver extends AbstractViewResolver {
     @Override
+    public boolean supports(Object handler) {
+        return handler instanceof HandlerExecution;
+    }
+
+    @Override
     public ModelAndView handle(final Object handler,
                                final HttpServletRequest request,
                                final HttpServletResponse response) throws Exception {

@@ -32,8 +32,6 @@ class DispatcherServletTest {
         MockHttpServletRequest request = new MockHttpServletRequest(method, uri);
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        request.setParameter("userId", "admin");
-
         dispatcher.service(request, response);
 
         assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
@@ -42,7 +40,7 @@ class DispatcherServletTest {
 
     private static Stream<Arguments> serviceGet() {
         return Stream.of(
-                Arguments.of("GET", "/users/profile"), // @Controller
+                Arguments.of("GET", "/users/profile/admin"), // @Controller
                 Arguments.of("GET", "/") // implement Controller
         );
     }

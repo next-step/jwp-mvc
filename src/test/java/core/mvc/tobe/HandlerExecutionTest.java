@@ -95,10 +95,11 @@ class HandlerExecutionTest {
     private static Stream<Arguments> constructFail()
             throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Class<MyController> myControllerClass = MyController.class;
+
         return Stream.of(
                 Arguments.of(null, null),
                 Arguments.of(null, myControllerClass.getDeclaredConstructor().newInstance()),
-                Arguments.of(myControllerClass.getMethod("save", HttpServletRequest.class, HttpServletResponse.class), null)
+                Arguments.of(myControllerClass.getMethod("save", HttpServletRequest.class), null)
         );
     }
 
