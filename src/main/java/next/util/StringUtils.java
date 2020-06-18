@@ -8,10 +8,19 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @Slf4j
 public class StringUtils {
-    private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson PRETTY_GSON = buildGson();
+
+
+    private static Gson buildGson() {
+        return new GsonBuilder()
+            .setExclusionStrategies(new JsonIgnoreExclusionStrategy())
+            .setPrettyPrinting()
+            .create();
+    }
 
     public static boolean isEmpty(String target) {
         return Objects.isNull(target) || target.length() <= 0;
@@ -45,5 +54,13 @@ public class StringUtils {
         }
 
         return 0;
+    }
+
+    public static String getOrDefault(String target) {
+        return getOrDefault(target, "");
+    }
+
+    public static String getOrDefault(String target, String defaultValue) {
+        return isNotEmpty(target) ? target : defaultValue;
     }
 }

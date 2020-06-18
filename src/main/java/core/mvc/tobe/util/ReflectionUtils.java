@@ -1,6 +1,5 @@
-package core.mvc.tobe;
+package core.mvc.tobe.util;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
@@ -8,19 +7,20 @@ import core.annotation.web.RequestMethod;
 import core.mvc.tobe.RequestMappingMethod;
 import lombok.extern.slf4j.Slf4j;
 import next.util.StringUtils;
+import org.apache.commons.beanutils.ConstructorUtils;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ReflectionUtils extends org.reflections.ReflectionUtils {
-    public static final Class REQUEST_MAPPING_ANNOTATION_CLASS = RequestMapping.class;
-    public static final Class CONTROLLER_ANNOTATION_CLASS = Controller.class;
+    public static final Class<RequestMapping> REQUEST_MAPPING_ANNOTATION_CLASS = RequestMapping.class;
+    public static final Class<Controller> CONTROLLER_ANNOTATION_CLASS = Controller.class;
 
     @SuppressWarnings("unchecked")
     public static Set<Class<?>> getTypesAnnotatedWith(Reflections reflections, Class<? extends Annotation>... annotations) {
@@ -74,7 +74,7 @@ public class ReflectionUtils extends org.reflections.ReflectionUtils {
             .isPresent();
     }
 
-    public static <T extends Annotation> T getAnnotation(Class<?> annotatedClass, Class<? extends Annotation> annotationClass) {
+    public static <T extends Annotation> T getAnnotation(Class<?> annotatedClass, Class<T> annotationClass) {
         return (T) Optional.ofNullable(annotatedClass)
             .map(clazz -> clazz.getAnnotation(annotationClass))
             .orElse(null);
@@ -86,7 +86,7 @@ public class ReflectionUtils extends org.reflections.ReflectionUtils {
             .isPresent();
     }
 
-    public static <T extends Annotation> T getAnnotation(Method method, Class<? extends Annotation> annotationClass) {
+    public static <T extends Annotation> T getAnnotation(Method method, Class<T> annotationClass) {
         return (T) Optional.ofNullable(method)
             .map(m -> m.getAnnotation(annotationClass))
             .orElse(null);
@@ -109,4 +109,14 @@ public class ReflectionUtils extends org.reflections.ReflectionUtils {
         return instance;
     }
 
+    public static Object newInstance(Class<?> declaringClass, Object[] parameters) {
+        try {
+            return ConstructorUtils.invokeConstructor(declaringClass, parameters);
+        }
+        catch (Throwable t) {
+            log.error(t.getMessage());
+        }
+
+        return null;
+    }
 }
