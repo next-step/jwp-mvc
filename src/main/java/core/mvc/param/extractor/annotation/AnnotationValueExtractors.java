@@ -17,11 +17,11 @@ public class AnnotationValueExtractors implements ValueExtractor {
 
     @Override
     public Object extract(Parameter parameter, HttpServletRequest request) {
-        if (!EXTRACTORS.containsKey(parameter.getAnnotation())) {
+        if (!EXTRACTORS.containsKey(parameter.getAnnotationType())) {
             return null;
         }
 
-        return EXTRACTORS.get(parameter.getAnnotation())
+        return EXTRACTORS.get(parameter.getAnnotationType())
                 .extract(parameter, request);
     }
 }

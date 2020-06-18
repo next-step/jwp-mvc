@@ -28,7 +28,7 @@ public class Parameters {
                         parameterTypes[i],
                         parameterAnnotations[i].length == 0 ?
                                 null :
-                                parameterAnnotations[i][0].annotationType()
+                                parameterAnnotations[i][0]
                         )
                 ).collect(Collectors.toList());
     }
