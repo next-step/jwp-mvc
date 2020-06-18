@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;

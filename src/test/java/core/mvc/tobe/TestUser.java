@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.tobe;
 
 public class TestUser {
     private String userId;
