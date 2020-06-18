@@ -1,13 +1,12 @@
 package core.mvc.asis;
 
+import core.mvc.ControllerExecutor;
 import core.mvc.ModelAndView;
-import core.mvc.ModelView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,21 +32,23 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        ModelAndView modelAndView;
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        ModelAndView modelAndView = new ModelAndView();
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
+
+        ControllerExecutor controllerExecutor = new ControllerExecutor(rm, annotationHandlerMapping);
+        Object executor = controllerExecutor.findExecutor(req);
         try {
-            if (annotationHandlerMapping.containsExecution(req)) {
-                HandlerExecution execution = annotationHandlerMapping.getHandler(req);
-                modelAndView = execution.handle(req, resp);
-            } else {
-                Controller controller = rm.findController(requestUri);
-                String viewName = controller.execute(req, resp);
-                modelAndView = new ModelAndView(viewName);
+            if (executor instanceof Controller) {
+                modelAndView = new ModelAndView(((Controller) executor).execute(req, resp));
             }
+
+            if (executor instanceof HandlerExecution) {
+                modelAndView = ((HandlerExecution) executor).handle(req, resp);
+            }
+
             this.viewRender(modelAndView, req, resp);
         } catch (Exception e) {
-            logger.error("dispatch service error : {}", e);
+            throw new ServletException("Displatcher servlet throw Exception", e);
         }
     }
 

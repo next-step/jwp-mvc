@@ -20,16 +20,9 @@ public class HandlerExecution {
         this.method = method;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            return (ModelAndView) method.invoke(clazz.newInstance(), request,response);
-        } catch (IllegalAccessException e) {
-            logger.error("handle execution error : {}" ,"IllegalAccess");
-        } catch (InvocationTargetException e) {
-            logger.error("handle execution error : {}" ,"InvocationTarget");
-        } catch (InstantiationException e) {
-            logger.error("handle execution error : {}" ,"instantiation");
-        }
-        return new ModelAndView();
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+
+        return (ModelAndView) method.invoke(clazz.newInstance(), request,response);
+
     }
 }
