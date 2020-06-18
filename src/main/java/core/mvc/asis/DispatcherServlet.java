@@ -1,7 +1,9 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.ModelView;
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,6 @@ import java.io.IOException;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private RequestMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
@@ -33,41 +34,25 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestUri = req.getRequestURI();
+        ModelAndView modelAndView;
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
-
-        if (annotationHandlerMapping.containsExecution(req)) {
-            ModelAndView mv = annotationHandlerMapping.getHandler(req).handle(req, resp);
-            this.viewRender(mv, req, resp);
-            return;
-        }
-        Controller controller = rm.findController(requestUri);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    //modelAndView의 view render 메소드랑 비슷하넹?
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
-    }
-
-    private void viewRender(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp) {
-        try {
-            modelAndView.getView().render(modelAndView.getModel(), req, resp);
+            if (annotationHandlerMapping.containsExecution(req)) {
+                HandlerExecution execution = annotationHandlerMapping.getHandler(req);
+                modelAndView = execution.handle(req, resp);
+            } else {
+                Controller controller = rm.findController(requestUri);
+                String viewName = controller.execute(req, resp);
+                modelAndView = new ModelAndView(viewName);
+            }
+            this.viewRender(modelAndView, req, resp);
         } catch (Exception e) {
-            logger.error("view render error: {}", e);
+            logger.error("dispatch service error : {}", e);
         }
+    }
+
+    private void viewRender(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        modelAndView.getView().render(modelAndView.getModel(), req, resp);
     }
 
 }

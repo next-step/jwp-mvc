@@ -17,7 +17,6 @@ public class UserController {
 
     @RequestMapping(value = "/users/form", method = RequestMethod.GET)
     public ModelAndView createUser(HttpServletRequest req, HttpServletResponse res) {
-        final ModelAndView modelAndView = new ModelAndView(new ModelView("/user/form.jsp"));
-        return modelAndView;
+        return new ModelAndView("/user/form.jsp");
     }
 }
