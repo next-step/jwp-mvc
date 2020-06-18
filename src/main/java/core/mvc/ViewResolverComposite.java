@@ -12,7 +12,6 @@ public class ViewResolverComposite implements ViewResolver {
 
     @Override
     public View resolveViewName(String viewName) {
-
         for (ViewResolver viewResolver : this.viewResolvers) {
             View view = viewResolver.resolveViewName(viewName);
 
@@ -20,6 +19,7 @@ public class ViewResolverComposite implements ViewResolver {
                 return view;
             }
         }
+
         return null;
     }
 }

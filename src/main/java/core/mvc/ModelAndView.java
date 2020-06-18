@@ -40,4 +40,8 @@ public class ModelAndView {
     public String getViewName() {
         return viewName;
     }
+
+    public void setViewName(String viewName) {
+        this.viewName = viewName;
+    }
 }

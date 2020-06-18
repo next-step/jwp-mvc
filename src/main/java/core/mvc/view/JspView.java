@@ -17,6 +17,8 @@ public class JspView implements View {
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        model.keySet().forEach(key -> request.setAttribute(key, model.get(key)));
+
         RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
         requestDispatcher.forward(request, response);
     }

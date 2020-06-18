@@ -13,10 +13,10 @@ public class MethodParameter {
     private String name;
     private Class<?> parameterType;
 
-    public MethodParameter(Method method, int parameterIndex) {
+    public MethodParameter(Method method, String name, int parameterIndex) {
         this.method = method;
+        this.name = name;
         this.parameterIndex = parameterIndex;
-        this.name = method.getParameters()[parameterIndex].getName();
         this.parameterType = method.getParameterTypes()[this.parameterIndex];
     }
 
@@ -26,6 +26,7 @@ public class MethodParameter {
                 return (T) annotation;
             }
         }
+
         return null;
     }
 

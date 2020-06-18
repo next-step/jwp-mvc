@@ -11,6 +11,7 @@ public class JspViewResolver implements ViewResolver {
         if (viewName.endsWith(JSP_SUFFIX)) {
             return new JspView(viewName);
         }
+
         return null;
     }
 }
