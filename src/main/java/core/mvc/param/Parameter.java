@@ -9,7 +9,6 @@ import java.util.Objects;
 public class Parameter {
     private final Class<?> type;
     private final String name;
-//    private final Class<? extends Annotation> annotation;
     private final Annotation annotation;
 
     public Parameter(String name, Class<?> type, Annotation annotation) {
@@ -25,10 +24,6 @@ public class Parameter {
     public String getName() {
         return name;
     }
-
-//    public Class<? extends Annotation> getAnnotation() {
-//        return annotation;
-//    }
 
     public Annotation getAnnotation() {
         return annotation;
