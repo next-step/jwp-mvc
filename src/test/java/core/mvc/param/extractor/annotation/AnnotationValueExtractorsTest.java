@@ -1,5 +1,6 @@
 package core.mvc.param.extractor.annotation;
 
+import core.AnnotationInstance;
 import core.annotation.web.PathVariable;
 import core.mvc.param.Parameter;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,11 @@ class AnnotationValueExtractorsTest {
     @Test
     @DisplayName("해당하는 어노테이션에 대한 추출기가 있는지 테스트")
     void extract() {
-        Parameter parameter = new Parameter("userId", int.class, PathVariable.class);
+        Parameter parameter = new Parameter(
+                "userId",
+                int.class,
+                AnnotationInstance.newPathVariable("userId", "userId", true)
+        );
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute("userId", "1");
 
@@ -28,7 +33,7 @@ class AnnotationValueExtractorsTest {
     @Test
     @DisplayName("해당하는 어노테이션에 대한 추출기가 없다면 null을 반환")
     void extractFail() {
-        Parameter parameter = new Parameter("userId", int.class, Annotation.class);
+        Parameter parameter = new Parameter("userId", int.class, () -> null);
         MockHttpServletRequest request = new MockHttpServletRequest();
 
         assertThat(ANNOTATION_VALUE_EXTRACTORS.extract(parameter, request)).isNull();

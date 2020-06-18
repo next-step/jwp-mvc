@@ -1,6 +1,8 @@
 package core.mvc.param.extractor;
 
+import core.AnnotationInstance;
 import core.annotation.web.PathVariable;
+import core.annotation.web.RequestParam;
 import core.mvc.param.Parameter;
 import core.mvc.tobe.TestUser;
 import org.junit.jupiter.api.DisplayName;
@@ -62,8 +64,13 @@ class ValueExtractorsTest {
     void extractAnnotationAttachedParameter() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute("user", "nokchax");
-        Parameter parameter = new Parameter("user", String.class, new PathVariable("123", "123", false));
+        Parameter parameter = new Parameter(
+                "user",
+                String.class,
+                AnnotationInstance.newRequestParam("user", "user", true)
+        );
 
+        RequestParam requestParam = AnnotationInstance.newRequestParam("user", "user", true);
         Object value = ValueExtractors.extractValue(parameter, request);
 
         assertThat(value).isInstanceOf(String.class);

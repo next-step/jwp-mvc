@@ -35,7 +35,7 @@ public class Parameter {
     }
 
     public Class<? extends Annotation> getAnnotationType() {
-        return annotation == null ? null : annotation.getClass();
+        return annotation == null ? null : annotation.annotationType();
     }
 
     public Object extractValue(HttpServletRequest request) {

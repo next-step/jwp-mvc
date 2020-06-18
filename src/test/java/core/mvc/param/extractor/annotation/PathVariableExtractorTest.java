@@ -1,5 +1,6 @@
 package core.mvc.param.extractor.annotation;
 
+import core.AnnotationInstance;
 import core.annotation.web.PathVariable;
 import core.mvc.param.Parameter;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +21,11 @@ class PathVariableExtractorTest {
     @MethodSource
     @DisplayName("추출을 잘 하는지 테스트")
     void extract(final Class<?> clazz, final Object expected) {
-        Parameter parameter = new Parameter("userId", clazz, PathVariable.class);
+        Parameter parameter = new Parameter(
+                "userId",
+                clazz,
+                AnnotationInstance.newPathVariable("userId", "userId", true)
+        );
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute("userId", "1");
 

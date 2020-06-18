@@ -28,16 +28,16 @@ class ControllerViewResolverTest {
     }
 
     @Test
-    @DisplayName("핸들러가 컨트롤러가 아닌 경우 null 을 리턴")
-    void handle() throws Exception {
+    @DisplayName("핸들러가 컨트롤러가 아닌 경우 false 을 리턴")
+    void supports() throws Exception {
         Class<?> clazz = HomeController.class;
         Method method = clazz.getDeclaredMethod("execute", HttpServletRequest.class, HttpServletResponse.class);
         Object instance = clazz.getDeclaredConstructor().newInstance();
         HandlerExecution handlerExecution = new HandlerExecution(method, instance);
 
-        ModelAndView handle = controllerViewResolver.handle(handlerExecution, request, response);
+        boolean supports = controllerViewResolver.supports(handlerExecution);
 
-        assertThat(handle).isNull();
+        assertThat(supports).isFalse();
     }
 
     @Test
