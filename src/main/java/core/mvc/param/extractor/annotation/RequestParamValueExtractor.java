@@ -28,9 +28,9 @@ public class RequestParamValueExtractor extends AnnotationValueExtractor<Request
 
     private String getParameter(Parameter parameter, HttpServletRequest request, RequestParam requestParam) {
         if (requestParam.value().isEmpty()) {
-            return (String) request.getAttribute(parameter.getName());
+            return request.getParameter(parameter.getName());
         }
 
-        return (String) request.getAttribute(requestParam.value());
+        return request.getParameter(requestParam.value());
     }
 }
