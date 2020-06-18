@@ -19,13 +19,13 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = new HashMap<>();
     private final List<HandlerKey> handlers = new ArrayList<>();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
+    public AnnotationHandlerMapping(final Object... basePackage) {
         validate(basePackage);
 
         this.basePackage = basePackage;
     }
 
-    private void validate(Object[] basePackage) {
+    private void validate(final Object[] basePackage) {
         if (Objects.isNull(basePackage) || basePackage.length == 0) {
             throw new IllegalArgumentException("BasePackage can't be empty");
         }
@@ -33,7 +33,6 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
 
     public void initialize() {
         Set<Class<?>> controllers = AnnotatedTargetScanner.loadClasses(Controller.class, basePackage);
-
         controllers.forEach(this::convertClassToHandlerExecution);
 
         handlers.addAll(handlerExecutions.keySet());
@@ -44,7 +43,7 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public HandlerExecution getHandler(final HttpServletRequest request) {
         return handlers.stream()
                 .filter(handlerKey -> handlerKey.isSupport(request)) // url check
                 .filter(handlerKey -> handlerExecutions.get(handlerKey).isSupport(request)) // parameter check
@@ -88,7 +87,7 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
         return Arrays.asList(RequestMethod.values());
     }
 
-    private Object newInstance(Class<?> clazz) {
+    private Object newInstance(final Class<?> clazz) {
         try {
             return clazz.getDeclaredConstructor()
                     .newInstance();
