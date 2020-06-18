@@ -13,8 +13,8 @@ import java.util.Objects;
 
 public class ValueExtractors {
     private static final List<ValueExtractor> EXTRACTORS = Arrays.asList(
-            new SimpleValueExtractor(),
             new AnnotationValueExtractors(),
+            new SimpleValueExtractor(),
             new ContextValueExtractor(),
             new ComplexValueExtractor()
     );
