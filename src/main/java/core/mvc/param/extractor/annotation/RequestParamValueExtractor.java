@@ -14,6 +14,12 @@ public class RequestParamValueExtractor extends AnnotationValueExtractor<Request
 
     @Override
     public Object extract(Parameter parameter, HttpServletRequest request) {
+        if (!(parameter.getAnnotation() == RequestParam.class)) {
+            return null;
+        }
+
+
+
         return null;
     }
 }
