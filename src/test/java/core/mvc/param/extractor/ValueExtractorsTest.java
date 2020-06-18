@@ -67,10 +67,9 @@ class ValueExtractorsTest {
         Parameter parameter = new Parameter(
                 "user",
                 String.class,
-                AnnotationInstance.newRequestParam("user", "user", true)
+                AnnotationInstance.newPathVariable("user", "user", true)
         );
 
-        RequestParam requestParam = AnnotationInstance.newRequestParam("user", "user", true);
         Object value = ValueExtractors.extractValue(parameter, request);
 
         assertThat(value).isInstanceOf(String.class);
