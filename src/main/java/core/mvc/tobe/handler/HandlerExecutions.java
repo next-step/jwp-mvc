@@ -17,7 +17,6 @@ public class HandlerExecutions {
         this.handlerExecutions = Collections.unmodifiableMap(handlerExecutions);
     }
 
-
     public static HandlerExecutions init(Class clazz) {
         Map<HandlerKey, HandlerExecution> handlers = Maps.newHashMap();
 
