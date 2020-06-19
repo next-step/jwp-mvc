@@ -39,8 +39,8 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
-
         Object executor = ControllerExecutor.findExecutor(requestMappings, req);
+
         try {
             if (executor instanceof Controller) {
                 modelAndView = new ModelAndView(((Controller) executor).execute(req, resp));
