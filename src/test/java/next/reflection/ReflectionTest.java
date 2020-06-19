@@ -27,7 +27,9 @@ public class ReflectionTest {
             logger.info("field Name:{}, Type:{}", field.getName(), field.getType());
         }
 
-        List<String> names = Arrays.stream(declaredFields).map(Field::getName).collect(Collectors.toList());
+        List<String> names = Arrays.stream(declaredFields)
+                .map(Field::getName)
+                .collect(Collectors.toList());
         assertThat(names).contains("questionId", "writer", "title", "contents", "createdDate", "countOfComment");
     }
 
@@ -40,7 +42,9 @@ public class ReflectionTest {
         for (Constructor<?> constructor : constructors) {
             logger.info("constructor Name:{}, ParameterTypes:{}", constructor.getName(), constructor.getParameterTypes());
         }
-        List<String> names = Arrays.stream(constructors).map(Constructor::getName).collect(Collectors.toList());
+        List<String> names = Arrays.stream(constructors)
+                .map(Constructor::getName)
+                .collect(Collectors.toList());
         assertThat(names).contains("next.reflection.Question");
     }
 
@@ -54,7 +58,9 @@ public class ReflectionTest {
             logger.info("method Name:{}, ParameterTypes:{}, ReturnType:{}", method.getName(), method.getParameterTypes(), method.getReturnType());
         }
 
-        List<String> names = Arrays.stream(declaredMethods).map(Method::getName).collect(Collectors.toList());
+        List<String> names = Arrays.stream(declaredMethods)
+                .map(Method::getName)
+                .collect(Collectors.toList());
         assertThat(names).contains("update", "getQuestionId", "getWriter", "getCreatedDate", "getTimeFromCreateDate",
                 "getCountOfComment", "getTitle", "getContents", "equals", "toString", "hashCode");
     }

@@ -1,11 +1,18 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Junit3TestRunner {
 
+    @DisplayName("Junit3Test 클래스의 메소드를 실행한다.")
     @Test
     public void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
@@ -14,5 +21,10 @@ public class Junit3TestRunner {
         for (Method declaredMethod : declaredMethods) {
             declaredMethod.invoke(clazz.newInstance());
         }
+
+        List<String> names = Arrays.stream(declaredMethods)
+                .map(Method::getName)
+                .collect(Collectors.toList());
+        assertThat(names).containsExactlyInAnyOrder("test1", "test2", "three");
     }
 }
