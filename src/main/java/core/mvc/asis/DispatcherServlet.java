@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ControllerExecutor;
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -13,21 +14,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private RequestMapping rm;
-    private AnnotationHandlerMapping annotationHandlerMapping;
+    private List<HandlerMapping> requestMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.asis", "next.controller");
+        RequestMapping rm = new RequestMapping();
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.asis", "next.controller");
         annotationHandlerMapping.initialize();
+        rm.initialize();
+
+        requestMappings.add(rm);
+        requestMappings.add(annotationHandlerMapping);
     }
 
     @Override
@@ -35,8 +40,7 @@ public class DispatcherServlet extends HttpServlet {
         ModelAndView modelAndView = new ModelAndView();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        ControllerExecutor controllerExecutor = new ControllerExecutor(rm, annotationHandlerMapping);
-        Object executor = controllerExecutor.findExecutor(req);
+        Object executor = ControllerExecutor.findExecutor(requestMappings, req);
         try {
             if (executor instanceof Controller) {
                 modelAndView = new ModelAndView(((Controller) executor).execute(req, resp));

@@ -1,27 +1,22 @@
 package core.mvc;
 
-import core.mvc.asis.RequestMapping;
-import core.mvc.tobe.AnnotationHandlerMapping;
-
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Created By kjs4395 on 2020-06-18
  */
 public class ControllerExecutor {
-    private final RequestMapping requestMapping;
-    private final AnnotationHandlerMapping annotationHandlerMapping;
 
-    public ControllerExecutor(RequestMapping requestMapping, AnnotationHandlerMapping annotationHandlerMapping) {
-        this.requestMapping = requestMapping;
-        this.annotationHandlerMapping = annotationHandlerMapping;
-    }
+    public static Object findExecutor(List<HandlerMapping> mappings, HttpServletRequest request) {
 
-    public Object findExecutor(HttpServletRequest request) {
-        if(annotationHandlerMapping.containsExecution(request)) {
-            return annotationHandlerMapping.getHandler(request);
-        }
+        Optional<Object> executor = mappings.stream()
+                .map(mapping -> mapping.getHandler(request))
+                .filter(Objects::nonNull)
+                .findFirst();
 
-        return requestMapping.findController(request.getRequestURI());
+        return executor.get();
     }
 }
