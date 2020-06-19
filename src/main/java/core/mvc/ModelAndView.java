@@ -12,7 +12,7 @@ public class ModelAndView {
     }
 
     public ModelAndView(String viewName) {
-        this.view = new ModelView(viewName);
+        this.view = new TemplateView(viewName);
     }
 
     public ModelAndView(View view) {

@@ -8,11 +8,11 @@ import java.util.Map;
 /**
  * Created By kjs4395 on 2020-06-17
  */
-public class ModelView implements View {
+public class TemplateView implements View {
 
     private String viewName;
 
-    public ModelView(String viewName) {
+    public TemplateView(String viewName) {
         this.viewName = viewName;
     }
 
