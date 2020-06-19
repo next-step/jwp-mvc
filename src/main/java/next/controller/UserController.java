@@ -102,13 +102,13 @@ public class UserController {
         return new ModelAndView("redirect:/");
     }
 
-    @RequestMapping("/form")
-    public ModelAndView form() {
-        return new ModelAndView("/user/form.jsp");
-    }
-
-    @RequestMapping("/loginForm")
-    public ModelAndView loginForm() {
-        return new ModelAndView("/user/login.jsp");
-    }
+//    @RequestMapping("/form")
+//    public ModelAndView form() {
+//        return new ModelAndView("/user/form.jsp");
+//    }
+//
+//    @RequestMapping("/loginForm")
+//    public ModelAndView loginForm() {
+//        return new ModelAndView("/user/login.jsp");
+//    }
 }

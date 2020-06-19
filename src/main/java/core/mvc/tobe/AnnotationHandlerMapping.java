@@ -25,7 +25,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private Map<HandlerKey, AnnotationHandler> annotationHandlers = Maps.newHashMap();
     private HandlerMethodArgumentResolver resolver;
 
     public AnnotationHandlerMapping(Object... basePackage) {
@@ -39,7 +39,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Set<Method> requestMappingMethods = findRequestMappingMethods(instantiateControllers.keySet());
 
         initResolvers();
-        initHandlerExecutions(instantiateControllers, requestMappingMethods);
+        initAnnotationHandlers(instantiateControllers, requestMappingMethods);
     }
 
     private void initResolvers() {
@@ -51,12 +51,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         this.resolver = handlerMethodArgumentResolverComposite;
     }
 
-    private void initHandlerExecutions(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {
+    private void initAnnotationHandlers(Map<Class<?>, Object> instantiateControllers, Set<Method> requestMappingMethods) {
         for (Method method : requestMappingMethods) {
             Set<HandlerKey> handlerKeys = createHandlerKeys(method);
-            HandlerExecution handlerExecution = new HandlerExecutionImpl(instantiateControllers.get(method.getDeclaringClass()), method)
+            AnnotationHandler annotationHandler = new AnnotationHandler(instantiateControllers.get(method.getDeclaringClass()), method)
                     .addResolvers(resolver);
-            handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey, handlerExecution));
+            handlerKeys.forEach(handlerKey -> annotationHandlers.put(handlerKey, annotationHandler));
         }
     }
 
@@ -95,13 +95,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public Object getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
 
-        return handlerExecutions.keySet().stream()
+        return annotationHandlers.keySet().stream()
                 .filter(key -> key.matches(requestUri, rm))
-                .map(key -> handlerExecutions.get(key))
+                .map(key -> annotationHandlers.get(key))
                 .findAny()
                 .orElse(null);
     }
