@@ -18,7 +18,6 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 
 public class AnnotationHandlerMapping {
     private Object[] basePackage;
-
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
@@ -29,40 +28,57 @@ public class AnnotationHandlerMapping {
         final Reflections reflections = new Reflections(basePackage);
         final Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class, true);
 
-        try {
-            for (Class<?> controllerClass : controllers) {
-                Constructor constructor = controllerClass.getDeclaredConstructor();
-                Object controllerInstance = constructor.newInstance();
-                Set<Method> handlers = getAllMethods(controllerClass, withAnnotation(RequestMapping.class));
+        for (Class<?> controllerClass : controllers) {
+            final Object controllerInstance = newInstance(controllerClass);
+            final Set<Method> handlers = getAllMethods(controllerClass, withAnnotation(RequestMapping.class));
 
-                for (Method handler : handlers) {
-                    RequestMapping requestMapping = handler.getAnnotation(RequestMapping.class);
-                    final String path = requestMapping.value();
-
-
-                    List<RequestMethod> httpMethods = new ArrayList<>();
-
-                    try {
-                        RequestMethod httpMethod = requestMapping.method();
-                        httpMethods.add(httpMethod);
-                    } catch (IncompleteAnnotationException e) {
-                        httpMethods.addAll(Arrays.asList(RequestMethod.values()));
-                    }
-
-                    final HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, handler);
-
-                    for (RequestMethod httpMethod : httpMethods) {
-                        final HandlerKey handlerKey = new HandlerKey(path, httpMethod);
-                        if (httpMethods.size() > 1 && handlerExecutions.get(handlerKey) != null) {
-                            continue;
-                        }
-                        handlerExecutions.put(handlerKey, handlerExecution);
-                    }
-                }
-            }
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ignored) {
-            ignored.printStackTrace();
+            addHandlerExecutions(controllerInstance, handlers);
         }
+    }
+
+    private Object newInstance(Class<?> controllerClass) {
+        Object instance = null;
+        try {
+            Constructor constructor = controllerClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            instance = constructor.newInstance();
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return instance;
+    }
+
+    private void addHandlerExecutions(Object controllerInstance, Set<Method> handlers) {
+        for (Method handler : handlers) {
+            addHandlerExecution(controllerInstance, handler);
+        }
+    }
+
+    private void addHandlerExecution(Object controllerInstance, Method handler) {
+        final HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, handler);
+
+        final RequestMapping requestMapping = handler.getAnnotation(RequestMapping.class);
+        final String path = requestMapping.value();
+
+        final List<RequestMethod> httpMethods = extractHandlerMethods(requestMapping);
+        for (RequestMethod httpMethod : httpMethods) {
+            final HandlerKey handlerKey = new HandlerKey(path, httpMethod);
+            if (httpMethods.size() == 1 || handlerExecutions.get(handlerKey) == null) {
+                handlerExecutions.put(handlerKey, handlerExecution);
+           }
+        }
+    }
+
+    private List<RequestMethod> extractHandlerMethods(RequestMapping requestMapping) {
+        final List<RequestMethod> result = new ArrayList<>();
+
+        try {
+            result.add(requestMapping.method());
+        } catch (IncompleteAnnotationException e) {
+            result.addAll(Arrays.asList(RequestMethod.values()));
+        }
+
+        return Collections.unmodifiableList(result);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
