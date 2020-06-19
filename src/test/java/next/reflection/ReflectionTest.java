@@ -65,6 +65,18 @@ public class ReflectionTest {
                 "getCountOfComment", "getTitle", "getContents", "equals", "toString", "hashCode");
     }
 
+    @DisplayName("private field에 값을 할당한다.")
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+        Student student = new Student();
+        setField(clazz, student, "name", "세희");
+        setField(clazz, student, "age", 25);
+
+        assertThat(student.getName()).isEqualTo("세희");
+        assertThat(student.getAge()).isEqualTo(25);
+    }
+
     @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
@@ -77,5 +89,11 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    private void setField(Class<Student> clazz, Student student, String name, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(student, value);
     }
 }
