@@ -18,7 +18,8 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
+    // TODO 주석 제거
+//    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
     public ModelAndView create(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"), req.getParameter("email"));
         log.debug("User : {}", user);
@@ -66,7 +67,8 @@ public class UserController {
         return new ModelAndView(new JspView("/user/login.jsp"));
     }
 
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
+    // TODO 주석 제거
+//    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
     public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
@@ -77,14 +79,16 @@ public class UserController {
         return new ModelAndView(new JspView("/user/profile.jsp"));
     }
 
-    @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
+    // TODO 주석 제거
+//    @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return new ModelAndView(new JspView("redirect:/"));
     }
 
-    @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
+    // TODO 주석 제거
+//    @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
     public ModelAndView updateForm(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
@@ -95,7 +99,8 @@ public class UserController {
         return new ModelAndView(new JspView("/user/updateForm.jsp"));
     }
 
-    @RequestMapping(value = "/users/update", method = RequestMethod.POST)
+    // TODO 주석 제거
+//    @RequestMapping(value = "/users/update", method = RequestMethod.POST)
     public ModelAndView update(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
