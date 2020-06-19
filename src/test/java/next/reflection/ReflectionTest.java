@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Slf4j
 public class ReflectionTest {
 
@@ -43,6 +45,24 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("private Field에 값 할당하기")
+    @Test
+    void privateFieldAccess() throws Exception {
+        /* given */
+        Student student = new Student();
+
+        String expectedName = "luke";
+        int expectedAge = 20;
+
+        /* when */
+        setFieldToInstance(student, "name", expectedName);
+        setFieldToInstance(student, "age", expectedAge);
+
+        /* then */
+        assertThat(student.getName()).isEqualTo(expectedName);
+        assertThat(student.getAge()).isEqualTo(expectedAge);
+    }
+
     @Test
     @SuppressWarnings("rawtypes")
     public void constructor() {
@@ -56,5 +76,14 @@ public class ReflectionTest {
                 log.debug("param type : {}", paramType);
             }
         }
+    }
+
+    private <T> void setFieldToInstance(T instance, String fieldName, Object fieldValue) throws Exception {
+        Class<?> clazz = instance.getClass();
+
+        Field field = clazz.getDeclaredField(fieldName);
+
+        field.setAccessible(true);
+        field.set(instance, fieldValue);
     }
 }
