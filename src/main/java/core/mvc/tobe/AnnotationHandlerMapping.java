@@ -4,14 +4,16 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import core.mvc.AnnotationScanner;
+import core.mvc.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -20,15 +22,10 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    /**
-     * 1. base 패키지에 있는 class 들 scan
-     * 2. class 정보 별로 handlerkey / handlerExecution을 만들어 handlerExecutions 에 넣음
-     * <p>
-     * HadlerKey = url(String) , requestMethod (GET,POST,PUT,DELETE....)
-     * HandleExecutions handle구현 (method invoke?)
-     */
+    @Override
     public void initialize() {
-        Set<Class<?>> controllers = this.getControllers();
+        AnnotationScanner annotationScanner = new AnnotationScanner(this.basePackage);
+        Set<Class<?>> controllers = annotationScanner.findAnnotationClass(Controller.class);
 
         for (Class<?> controller : controllers) {
             this.handlerExecutions.putAll(Arrays.stream(controller.getDeclaredMethods())
@@ -41,20 +38,10 @@ public class AnnotationHandlerMapping {
 
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
-    }
-
-    public boolean containsExecution(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return this.handlerExecutions.containsKey(new HandlerKey(requestUri, rm));
-    }
-
-    private Set<Class<?>> getControllers() {
-        Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner());
-        return reflections.getTypesAnnotatedWith(Controller.class, true);
+        return handlerExecutions.getOrDefault(new HandlerKey(requestUri, rm), null);
     }
 }
