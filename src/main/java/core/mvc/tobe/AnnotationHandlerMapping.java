@@ -4,8 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import core.mvc.AnnotationFinder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -20,15 +19,9 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    /**
-     * 1. base 패키지에 있는 class 들 scan
-     * 2. class 정보 별로 handlerkey / handlerExecution을 만들어 handlerExecutions 에 넣음
-     * <p>
-     * HadlerKey = url(String) , requestMethod (GET,POST,PUT,DELETE....)
-     * HandleExecutions handle구현 (method invoke?)
-     */
     public void initialize() {
-        Set<Class<?>> controllers = this.getControllers();
+        AnnotationFinder annotationFinder = new AnnotationFinder(this.basePackage);
+        Set<Class<?>> controllers = annotationFinder.findAnnotationClass(Controller.class);
 
         for (Class<?> controller : controllers) {
             this.handlerExecutions.putAll(Arrays.stream(controller.getDeclaredMethods())
@@ -51,10 +44,5 @@ public class AnnotationHandlerMapping {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return this.handlerExecutions.containsKey(new HandlerKey(requestUri, rm));
-    }
-
-    private Set<Class<?>> getControllers() {
-        Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner());
-        return reflections.getTypesAnnotatedWith(Controller.class, true);
     }
 }
