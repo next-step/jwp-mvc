@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,17 +64,30 @@ public class ReflectionTest {
         assertThat(student.getAge()).isEqualTo(expectedAge);
     }
 
+    @DisplayName("인자를 가진 Question 클래스의 인스턴스 생성하기")
     @Test
     @SuppressWarnings("rawtypes")
-    public void constructor() {
+    public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
+        Constructor[] constructors = clazz.getDeclaredConstructors();
 
+        Object instance;
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
             log.debug("paramer length : {}", parameterTypes.length);
+
             for (Class paramType : parameterTypes) {
                 log.debug("param type : {}", paramType);
+            }
+
+            if (parameterTypes.length == 3) {
+                instance = constructor.newInstance("testWriter", "testTitle", "testContents");
+                log.debug("instance : {}", instance);
+            }
+
+            if (parameterTypes.length == 6) {
+                instance = constructor.newInstance(1L, "testWriter", "testTitle", "testContents", new Date(), 0);
+                log.debug("instance : {}", instance);
             }
         }
     }
