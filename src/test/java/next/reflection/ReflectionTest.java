@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -75,6 +76,19 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo("세희");
         assertThat(student.getAge()).isEqualTo(25);
+    }
+
+    @DisplayName("생성자의 인스턴스를 생성한다")
+    @Test
+    void newInstance() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        Constructor<?> constructor = constructors[0];
+        Question question = (Question) constructor.newInstance("세희", "제목", "내용");
+
+        assertThat(question.getWriter()).isEqualTo("세희");
+        assertThat(question.getTitle()).isEqualTo("제목");
+        assertThat(question.getContents()).isEqualTo("내용");
     }
 
     @Test
