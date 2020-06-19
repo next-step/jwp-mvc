@@ -7,11 +7,11 @@ import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.IncompleteAnnotationException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -38,11 +38,26 @@ public class AnnotationHandlerMapping {
                 for (Method handler : handlers) {
                     RequestMapping requestMapping = handler.getAnnotation(RequestMapping.class);
                     final String path = requestMapping.value();
-                    final RequestMethod httpMethod = requestMapping.method();
 
-                    final HandlerKey handlerKey = new HandlerKey(path, httpMethod);
+
+                    List<RequestMethod> httpMethods = new ArrayList<>();
+
+                    try {
+                        RequestMethod httpMethod = requestMapping.method();
+                        httpMethods.add(httpMethod);
+                    } catch (IncompleteAnnotationException e) {
+                        httpMethods.addAll(Arrays.asList(RequestMethod.values()));
+                    }
+
                     final HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, handler);
-                    handlerExecutions.put(handlerKey, handlerExecution);
+
+                    for (RequestMethod httpMethod : httpMethods) {
+                        final HandlerKey handlerKey = new HandlerKey(path, httpMethod);
+                        if (httpMethods.size() > 1 && handlerExecutions.get(handlerKey) != null) {
+                            continue;
+                        }
+                        handlerExecutions.put(handlerKey, handlerExecution);
+                    }
                 }
             }
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ignored) {
