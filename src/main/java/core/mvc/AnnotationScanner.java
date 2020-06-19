@@ -9,11 +9,11 @@ import java.util.Set;
  * Created By kjs4395 on 2020-06-19
  *
  */
-public class AnnotationFinder {
+public class AnnotationScanner {
 
     private final Reflections reflections;
 
-    public AnnotationFinder(Object[]... basePackage) {
+    public AnnotationScanner(Object[]... basePackage) {
         this.reflections = new Reflections(basePackage);
     }
 

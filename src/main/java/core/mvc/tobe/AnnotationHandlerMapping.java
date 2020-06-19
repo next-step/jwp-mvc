@@ -4,7 +4,8 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.AnnotationFinder;
+import core.mvc.AnnotationScanner;
+import org.reflections.ReflectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -20,8 +21,8 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        AnnotationFinder annotationFinder = new AnnotationFinder(this.basePackage);
-        Set<Class<?>> controllers = annotationFinder.findAnnotationClass(Controller.class);
+        AnnotationScanner annotationScanner = new AnnotationScanner(this.basePackage);
+        Set<Class<?>> controllers = annotationScanner.findAnnotationClass(Controller.class);
 
         for (Class<?> controller : controllers) {
             this.handlerExecutions.putAll(Arrays.stream(controller.getDeclaredMethods())
