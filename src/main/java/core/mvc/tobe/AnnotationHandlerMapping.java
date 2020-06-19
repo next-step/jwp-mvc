@@ -29,7 +29,7 @@ public class AnnotationHandlerMapping {
             Reflections reflections = new Reflections(basePackage);
             Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class, true);
             for (Class<?> clazz : classes) {
-                findMethod(clazz);
+                putHandlerExecution(clazz);
             }
         }
     }
@@ -40,23 +40,23 @@ public class AnnotationHandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private void findMethod(Class<?> clazz) {
+    private void putHandlerExecution(Class<?> clazz) {
+        Object instance = getInstance(clazz);
         for (Method method : clazz.getDeclaredMethods()) {
             boolean isRequestMapping = method.isAnnotationPresent(RequestMapping.class);
-
             if (isRequestMapping) {
-                putHandlerExecution(clazz, method);
+                RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+                HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
+
+                HandlerExecution handlerExecution = new HandlerExecution(instance, method);
+                handlerExecutions.put(handlerKey, handlerExecution);
             }
         }
     }
 
-    private void putHandlerExecution(Class<?> clazz, Method method) {
-        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-
+    private Object getInstance(Class<?> clazz) {
         try {
-            HandlerExecution handlerExecution = new HandlerExecution(clazz.newInstance(), method);
-            handlerExecutions.put(handlerKey, handlerExecution);
+            return clazz.newInstance();
         } catch (IllegalAccessException | InstantiationException e) {
             throw new CoreException(CoreExceptionStatus.CLASS_NEW_INSTANCE_FAIL, e);
         }
