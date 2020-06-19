@@ -1,6 +1,6 @@
 package core.mvc.asis;
 
-import next.controller.*;
+import next.controller.asis.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

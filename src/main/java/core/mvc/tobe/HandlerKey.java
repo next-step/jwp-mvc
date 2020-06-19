@@ -1,7 +1,9 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
+import lombok.Getter;
 
+@Getter
 public class HandlerKey {
     private String url;
     private RequestMethod requestMethod;
