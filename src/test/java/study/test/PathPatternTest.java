@@ -15,6 +15,9 @@ public class PathPatternTest {
         PathPattern pp = parse("/users/{id}");
         assertThat(pp.matches(toPathContainer("/users/1"))).isTrue();
         assertThat(pp.matches(toPathContainer("/users"))).isFalse();
+
+        PathPattern pp2 = parse("/abc");
+        assertThat(pp2.matches(toPathContainer("/abc"))).isTrue();
     }
 
     @Test

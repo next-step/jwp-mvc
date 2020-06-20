@@ -73,7 +73,7 @@ public class AnnotationHandlerMappingTest {
     }
 
     @Controller
-    static class PathVariableController {
+    public static class PathVariableController {
 
         @RequestMapping(value = "/test/{id}", method = RequestMethod.GET)
         public ModelAndView test(@PathVariable long id) {

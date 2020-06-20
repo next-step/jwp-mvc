@@ -13,11 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -65,20 +61,29 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private String resolveUri(String root, String relativePath) {
-        try {
-            final URI uri = new URI(root);
-            return uri.resolve(relativePath).toString();
-        } catch (URISyntaxException e) {
-            return relativePath;
+        final StringBuilder sb = new StringBuilder();
+        if (!root.startsWith("/") && !relativePath.startsWith("/")) {
+            sb.append("/");
         }
+        sb.append(root);
+        if (!relativePath.startsWith("/")) {
+            sb.append("/");
+        }
+        sb.append(relativePath);
+        return sb.toString();
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) throws HandlerNotFoundException {
         final String requestUri = request.getRequestURI();
         final RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return Optional
-                .ofNullable(handlerExecutions.get(new HandlerKey(requestUri, rm)))
-                .orElseThrow(() -> new HandlerNotFoundException("핸들러가 존재하지 않아요!"));
+        final HandlerKey key = new HandlerKey(requestUri, rm);
+        return handlerExecutions.entrySet()
+                .stream()
+                .filter(e -> e.getKey().equals(key))
+                .findFirst()
+                .orElseThrow(() -> new HandlerNotFoundException("핸들러가 존재하지 않아요!"))
+                .getValue();
     }
+
 }
