@@ -1,5 +1,7 @@
 package core.mvc.support;
 
+import core.annotation.web.PathVariable;
+
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -31,5 +33,9 @@ public class MethodParameter {
                 ", parameterName='" + parameterName + '\'' +
                 ", parameterAnnotations=" + Arrays.toString(parameterAnnotations) +
                 '}';
+    }
+
+    public <A extends Annotation> A getAnnotation(Class<A> annotation) {
+        return null;
     }
 }
