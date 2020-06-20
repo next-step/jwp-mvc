@@ -1,6 +1,13 @@
 package core.mvc.asis;
 
-import next.controller.*;
+import next.controller.asis.CreateUserController;
+import next.controller.HomeController;
+import next.controller.asis.ListUserController;
+import next.controller.asis.LoginController;
+import next.controller.asis.LogoutController;
+import next.controller.asis.ProfileController;
+import next.controller.asis.UpdateFormUserController;
+import next.controller.asis.UpdateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +19,7 @@ public class RequestMapping {
     private Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/", new HomeController());
+//        mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
         mappings.put("/users", new ListUserController());

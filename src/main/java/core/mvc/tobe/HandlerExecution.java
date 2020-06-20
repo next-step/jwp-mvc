@@ -17,7 +17,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        method.invoke(instance, request, response);
-        return null;
+        Object modelAndView = method.invoke(instance, request, response);
+        return (ModelAndView) modelAndView;
     }
 }
