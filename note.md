@@ -3,6 +3,13 @@
 - PathVariable
 - RequestParameter
 
+## 작업 노트
+
+pr 전 bad smell 처리하고 가야 할 것 목록
+
+- TypeConverter
+    - if문 떡칠 -> 다형성으로 처리
+
 
 ## 1. PathVariable
 
