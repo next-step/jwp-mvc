@@ -1,5 +1,7 @@
 package core.mvc.tobe;
 
+import core.mvc.support.MethodSignature;
+import core.mvc.support.resolvers.Resolvers;
 import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +20,8 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // TODO: 왜 핸들러가 굳이 ModelAndView의 정체를 알아야하지??
-        return (ModelAndView) method.invoke(instance, request, response);
+        final Object[] args = Resolvers.resolveArguments(new MethodSignature(method), request);
+        return (ModelAndView) method.invoke(instance, args);
     }
 
     @Override
