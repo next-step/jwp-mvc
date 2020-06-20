@@ -22,9 +22,6 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String CONTROLLER_PATH = "next.controller";
 
-    // TODO 추후 삭제
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private static final List<HandlerMapping> handlerMappings = new ArrayList<>();
