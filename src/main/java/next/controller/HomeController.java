@@ -16,4 +16,15 @@ public class HomeController {
     public ModelAndView home(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         return new ModelAndView(new JspView("home.jsp"));
     }
+
+    @RequestMapping(value = "/users/form", method = RequestMethod.GET)
+    public ModelAndView joinForm(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        return new ModelAndView(new JspView("/user/form.jsp"));
+    }
+
+    @RequestMapping(value = "/users/loginForm", method = RequestMethod.GET)
+    public ModelAndView loginForm(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        return new ModelAndView(new JspView("/user/login.jsp"));
+    }
+
 }
