@@ -64,4 +64,25 @@ public class ReflectionTest {
         }
     }
 
+    @Test
+    void privateFieldAccess() throws NoSuchFieldException {
+        Class<Student> clazz = Student.class;
+
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+        nameField.setAccessible(true);
+        ageField.setAccessible(true);
+
+        Student student = new Student();
+        try {
+            nameField.set(student, "성주");
+            ageField.set(student, 29);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        logger.debug("object : {}", student.toString());
+    }
+
+
 }
