@@ -37,13 +37,18 @@ public class MethodParameter {
     }
 
     @SuppressWarnings("unchecked")
-    public @Nullable <A extends Annotation> A getAnnotation(Class<A> annotation) {
+    public @Nullable <A extends Annotation> A getParameterAnnotation(Class<A> annotation) {
         Objects.requireNonNull(annotation, "Give annotation is null.");
         for (Annotation parameterAnnotation : parameterAnnotations) {
             if (annotation.isInstance(parameterAnnotation)) {
                 return (A) parameterAnnotation;
             }
         }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public @Nullable <A extends Annotation> A getMethodAnnotation(Class<A> annotation) {
         return null;
     }
 }
