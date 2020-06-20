@@ -36,7 +36,9 @@ class PathVariableMethodArgumentResolverTest {
         final MethodSignature methodSignature = new MethodSignature(method);
         final MethodParameter parameter = methodSignature.getMethodParameters().get(0);
         assertTrue(resolver.supportsParameter(parameter));
-        assertThat(resolver.resolveArgument(parameter, request)).isEqualTo(10);
+        final Object resolvedData = resolver.resolveArgument(parameter, request);
+        assertThat(resolvedData).isEqualTo(10L);
+        assertThat(resolvedData).isInstanceOf(Long.class);
     }
 
     @Controller

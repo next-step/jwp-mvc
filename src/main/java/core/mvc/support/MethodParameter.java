@@ -1,7 +1,5 @@
 package core.mvc.support;
 
-import core.annotation.web.PathVariable;
-
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -34,6 +32,14 @@ public class MethodParameter {
                 ", parameterName='" + parameterName + '\'' +
                 ", parameterAnnotations=" + Arrays.toString(parameterAnnotations) +
                 '}';
+    }
+
+    public String getParameterName() {
+        return parameterName;
+    }
+
+    public Class<?> getParameterType() {
+        return parameter.getType();
     }
 
     @SuppressWarnings("unchecked")
