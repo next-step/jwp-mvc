@@ -22,14 +22,6 @@ public class HandlerExecution {
         return (ModelAndView) method.invoke(instance, request, response);
     }
 
-    public Object getInstance() {
-        return instance;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
