@@ -2,14 +2,13 @@ package core.mvc.support.resolvers;
 
 import core.mvc.support.MethodParameter;
 import core.mvc.utils.ReflectionUtil;
-import core.mvc.utils.TypeConverter;
+import core.mvc.utils.type.TypeConverter;
 import core.mvc.utils.UnableToCreateInstanceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class JavaBeanHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
