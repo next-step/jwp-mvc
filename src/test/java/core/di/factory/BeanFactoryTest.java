@@ -6,6 +6,7 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -15,7 +16,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Slf4j
 public class BeanFactoryTest {
+
     private Reflections reflections;
     private BeanFactory beanFactory;
 
@@ -23,8 +26,13 @@ public class BeanFactoryTest {
     @SuppressWarnings("unchecked")
     public void setup() {
         reflections = new Reflections("core.di.factory.example");
-        Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
-        beanFactory = new BeanFactory(preInstanticateClazz);
+        Set<Class<?>> preInstantiateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+
+        for (Class<?> clazz : preInstantiateClazz) {
+            log.debug("instantiate bean : name={}", clazz.getName());
+        }
+
+        beanFactory = new BeanFactory(preInstantiateClazz);
         beanFactory.initialize();
     }
 
