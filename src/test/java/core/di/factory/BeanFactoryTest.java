@@ -13,7 +13,9 @@ import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -56,10 +58,9 @@ public class BeanFactoryTest {
     void componentScan() {
         final Reflections scanReflections = new Reflections("core.di.factory.example");
         Class[] classes = new Class[]{Controller.class, Service.class, Repository.class};
-
         Arrays.stream(classes)
-                .map(a -> scanReflections.getTypesAnnotatedWith(a))
-                .flatMap(set -> set.stream())
+                .map((Function<Class, Set>) scanReflections::getTypesAnnotatedWith)
+                .flatMap(Collection::stream)
                 .forEach(System.out::println);
     }
 }
