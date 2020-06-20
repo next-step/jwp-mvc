@@ -42,6 +42,10 @@ public class MethodParameter {
         return parameter.getType();
     }
 
+    public boolean isAnnotated() {
+        return parameterAnnotations.length != 0;
+    }
+
     @SuppressWarnings("unchecked")
     public @Nullable <A extends Annotation> A getParameterAnnotation(Class<A> annotation) {
         Objects.requireNonNull(annotation, "Given annotation is null.");
