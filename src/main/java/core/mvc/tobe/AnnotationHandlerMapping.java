@@ -7,7 +7,6 @@ import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.annotation.IncompleteAnnotationException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -65,20 +64,16 @@ public class AnnotationHandlerMapping {
             final HandlerKey handlerKey = new HandlerKey(path, httpMethod);
             if (httpMethods.size() == 1 || handlerExecutions.get(handlerKey) == null) {
                 handlerExecutions.put(handlerKey, handlerExecution);
-           }
+            }
         }
     }
 
     private List<RequestMethod> extractHandlerMethods(RequestMapping requestMapping) {
-        final List<RequestMethod> result = new ArrayList<>();
-
-        try {
-            result.add(requestMapping.method());
-        } catch (IncompleteAnnotationException e) {
-            result.addAll(Arrays.asList(RequestMethod.values()));
+        List<RequestMethod> requestMethods = Arrays.asList(requestMapping.method());
+        if (requestMethods.isEmpty()) {
+            requestMethods = Arrays.asList(RequestMethod.values());
         }
-
-        return Collections.unmodifiableList(result);
+        return requestMethods;
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

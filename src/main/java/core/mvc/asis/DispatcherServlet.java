@@ -4,7 +4,6 @@ import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.exceptions.ViewRenderingFailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
