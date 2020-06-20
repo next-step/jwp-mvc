@@ -54,9 +54,12 @@ class JavaBeanHandlerMethodArgumentResolverTest {
 
     public static class JavaBean {
 
-        private final String userId;
-        private final String password;
-        private final long age;
+        private String userId;
+        private String password;
+        private long age;
+
+        public JavaBean() {
+        }
 
         public JavaBean(String userId, String password, long age) {
             this.userId = userId;
@@ -77,6 +80,15 @@ class JavaBeanHandlerMethodArgumentResolverTest {
         @Override
         public int hashCode() {
             return Objects.hash(userId, password, age);
+        }
+
+        @Override
+        public String toString() {
+            return "JavaBean{" +
+                    "userId='" + userId + '\'' +
+                    ", password='" + password + '\'' +
+                    ", age=" + age +
+                    '}';
         }
     }
 }
