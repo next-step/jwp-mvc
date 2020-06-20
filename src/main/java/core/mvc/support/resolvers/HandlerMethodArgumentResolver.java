@@ -1,4 +1,6 @@
-package core.mvc.support;
+package core.mvc.support.resolvers;
+
+import core.mvc.support.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
 
