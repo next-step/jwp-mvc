@@ -40,7 +40,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private HandlerExecutions executeComponentScan() {
-        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
-        return controllerScanner.scan();
+        return ControllerScanner.scan(basePackage);
     }
 }

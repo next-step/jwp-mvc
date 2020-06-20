@@ -14,16 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class ControllerScanner {
-    private final Reflections REFLECTIONS;
-
-    public ControllerScanner(Object basePackage) {
-        this.REFLECTIONS = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner());
-    }
-
-    public HandlerExecutions scan() {
+    public static HandlerExecutions scan(Object basePackage) {
         Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-        getTypesAnnotatedWith(Controller.class)
+        getTypesAnnotatedWith(Controller.class, basePackage)
                 .stream()
                 .map(clazz -> HandlerExecutions.init(clazz))
                 .forEach(handler -> handlerExecutions.putAll(handler.getHandlerExecutions()));
@@ -31,9 +25,10 @@ public class ControllerScanner {
         return new HandlerExecutions(handlerExecutions);
     }
 
-    private Set<Class> getTypesAnnotatedWith(Class clazz) {
+    private static Set<Class> getTypesAnnotatedWith(Class clazz, Object basePackage) {
         try {
-            return REFLECTIONS.getTypesAnnotatedWith(clazz);
+            Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner());
+            return reflections.getTypesAnnotatedWith(clazz);
         } catch (Exception e) {
             throw new ControllerScanException(e);
         }

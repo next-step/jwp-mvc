@@ -13,10 +13,9 @@ public class ControllerScannerTest {
     void scanController() {
         //given
         Object basePackage = "core.mvc";
-        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
 
         //when
-        HandlerExecutions handlerExecutions = controllerScanner.scan();
+        HandlerExecutions handlerExecutions = ControllerScanner.scan(basePackage);
 
         //then
         int handlerCountInMyController = 3;
@@ -28,11 +27,10 @@ public class ControllerScannerTest {
     void scanControllerWhenControllerNotExist() {
         //given
         Object basePackage = "core.jdbc";
-        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
 
         //when, then
         assertThatThrownBy(() -> {
-            controllerScanner.scan();
+            HandlerExecutions handlerExecutions = ControllerScanner.scan(basePackage);
         }).isInstanceOf(ControllerScanException.class);
     }
 }
