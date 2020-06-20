@@ -29,7 +29,7 @@ class CookieValueHandlerMethodArgumentResolverTest {
     void setUp() throws Exception {
         final Method method = CookieValueHandlerMethodArgumentResolverTest
                 .class
-                .getMethod("testMethod", JavaBeanHandlerMethodArgumentResolverTest.JavaBean.class);
+                .getMethod("testMethod", String.class);
         final MethodSignature methodSignature = new MethodSignature(method);
         methodParameter = methodSignature.getMethodParameters().get(0);
 
