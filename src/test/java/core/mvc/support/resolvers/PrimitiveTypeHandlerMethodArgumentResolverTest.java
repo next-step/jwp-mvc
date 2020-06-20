@@ -54,7 +54,7 @@ class PrimitiveTypeHandlerMethodArgumentResolverTest {
 
         final String userId = (String) resolver.resolveArgument(userIdParam, request);
         final String password = (String) resolver.resolveArgument(passwordParam, request);
-        final long age = (long) resolver.resolveArgument(userIdParam, request);
+        final long age = (long) resolver.resolveArgument(ageParam, request);
 
         assertEquals(userId, answerId);
         assertEquals(password, answerPassword);

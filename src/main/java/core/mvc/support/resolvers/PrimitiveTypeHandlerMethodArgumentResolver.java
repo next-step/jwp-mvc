@@ -1,6 +1,9 @@
 package core.mvc.support.resolvers;
 
 import core.mvc.support.MethodParameter;
+import core.mvc.utils.TypeConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class PrimitiveTypeHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+    private static final Logger log = LoggerFactory.getLogger(PrimitiveTypeHandlerMethodArgumentResolver.class);
+
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
         return !methodParameter.isAnnotated();
@@ -18,6 +23,9 @@ public class PrimitiveTypeHandlerMethodArgumentResolver implements HandlerMethod
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest request) {
-        return null;
+        final String parameter = request.getParameter(methodParameter.getParameterName());
+        final Object converted = TypeConverter.convert(parameter, methodParameter.getParameterType());
+        log.debug("converted data: {}, type: {}", converted, methodParameter.getParameterType());
+        return converted;
     }
 }
