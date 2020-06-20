@@ -10,8 +10,6 @@ import core.mvc.view.ModelAndView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.lang.reflect.Method;
@@ -21,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PathVariableMethodArgumentResolverTest {
 
-    private static final Logger log = LoggerFactory.getLogger(PathVariableMethodArgumentResolverTest.class);
     private static final HandlerMethodArgumentResolver resolver = new PathVariableMethodArgumentResolver();
 
     private MockHttpServletRequest request;
@@ -31,7 +28,7 @@ class PathVariableMethodArgumentResolverTest {
         request = new MockHttpServletRequest("GET", "/users/10");
     }
 
-    @DisplayName("")
+    @DisplayName("PathVariable 값을 잘 가져오는지 테스트")
     @Test
     void test_path_variable_value() throws Exception {
         final Method method = DummyController.class.getDeclaredMethod("test1", long.class);
