@@ -24,12 +24,13 @@ public class CookieValueHandlerMethodArgumentResolver implements HandlerMethodAr
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest request) {
-        final String cookieName = methodParameter.getParameterName();
+        final CookieValue cookieValue = methodParameter.getParameterAnnotation(CookieValue.class);
+        final String cookieName = cookieValue.value().isEmpty() ? methodParameter.getParameterName() : cookieValue.value();
         final Optional<String> maybeCookieValue = Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findFirst()
                 .map(Cookie::getValue);
-        
+
         if (maybeCookieValue.isPresent()) {
             final Object converted = TypeConverter.convert(maybeCookieValue.get(), methodParameter.getParameterType());
             log.debug("converted: {}", converted);
