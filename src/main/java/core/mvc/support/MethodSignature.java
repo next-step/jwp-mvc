@@ -30,4 +30,8 @@ public class MethodSignature {
             methodParameters.add(methodParameter);
         }
     }
+
+    public List<MethodParameter> getMethodParameters() {
+        return methodParameters;
+    }
 }
