@@ -54,7 +54,7 @@ public class DispatcherServlet extends HttpServlet {
         try {
             final ModelAndView mav = handler.handle(req, resp);
             render(mav, req, resp);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new ServletException(e.getMessage());
         }
         return true;
@@ -65,8 +65,7 @@ public class DispatcherServlet extends HttpServlet {
         try {
             final String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
+        } catch (Exception e) {
             throw new ServletException(e.getMessage());
         }
     }
@@ -78,7 +77,6 @@ public class DispatcherServlet extends HttpServlet {
         try {
             view.render(model, req, resp);
         } catch (Exception e) {
-            logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
