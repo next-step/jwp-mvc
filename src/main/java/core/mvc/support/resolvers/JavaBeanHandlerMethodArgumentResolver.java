@@ -8,7 +8,8 @@ public class JavaBeanHandlerMethodArgumentResolver implements HandlerMethodArgum
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        return false;
+        final boolean isPrimitive = methodParameter.getParameterType().isPrimitive();
+        return !methodParameter.isAnnotated() && !isPrimitive;
     }
 
     @Override
