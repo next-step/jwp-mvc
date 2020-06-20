@@ -2,6 +2,8 @@ package core.mvc.support.resolvers;
 
 import core.annotation.web.CookieValue;
 import core.annotation.web.PathVariable;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.mvc.support.MethodSignature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +57,7 @@ class ResolversTest {
         assertThat(expected).isEqualTo(actual);
     }
 
+    @RequestMapping(value = "/test/{id}", method = RequestMethod.POST)
     public void testMethod(TestObject testObject, @CookieValue String sessionId, @PathVariable long id, String name) {
         // no-op
     }

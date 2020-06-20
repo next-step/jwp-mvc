@@ -18,7 +18,9 @@ public class PrimitiveTypeHandlerMethodArgumentResolver implements HandlerMethod
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        return !methodParameter.isAnnotated();
+        final Class<?> parameterType = methodParameter.getParameterType();
+        final boolean isPrimitive = parameterType.isPrimitive();
+        return !methodParameter.isAnnotated() && (isPrimitive || String.class.equals(parameterType));
     }
 
     @Override
