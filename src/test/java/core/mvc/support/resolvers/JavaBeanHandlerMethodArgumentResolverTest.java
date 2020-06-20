@@ -5,10 +5,13 @@ import core.mvc.support.MethodSignature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JavaBeanHandlerMethodArgumentResolverTest {
 
@@ -32,7 +35,17 @@ class JavaBeanHandlerMethodArgumentResolverTest {
     @DisplayName("자바빈을 잘 해석하는지 테스트한다.")
     @Test
     void test_resolve_argument() {
+        final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/random");
+        final String answerId = "hyeyoom";
+        request.addParameter("userId", "hyeyoom");
+        final String answerPassword = "1234abcd";
+        request.addParameter("password", "1234abcd");
+        final long answerAge = 100;
+        request.addParameter("age", String.valueOf(answerAge));
 
+        final JavaBean bean = new JavaBean(answerId, answerPassword, answerAge);
+        final JavaBean argument = (JavaBean) resolver.resolveArgument(methodParameter, request);
+        assertThat(bean).isEqualTo(argument);
     }
 
     public void testMethod(JavaBean bean) {
@@ -49,6 +62,21 @@ class JavaBeanHandlerMethodArgumentResolverTest {
             this.userId = userId;
             this.password = password;
             this.age = age;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            JavaBean javaBean = (JavaBean) o;
+            return age == javaBean.age &&
+                    Objects.equals(userId, javaBean.userId) &&
+                    Objects.equals(password, javaBean.password);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId, password, age);
         }
     }
 }
