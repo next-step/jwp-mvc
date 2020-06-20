@@ -18,12 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class CookieValueHandlerMethodArgumentResolverTest {
 
     private static final HandlerMethodArgumentResolver resolver = new CookieValueHandlerMethodArgumentResolver();
-    private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String ACCESS_TOKEN_KEY = "sessionId";
     private static final String ACCESS_TOKEN_VALUE = UUID.randomUUID().toString();
 
     private MethodParameter methodParameter;
     private MockHttpServletRequest request;
-
 
     @BeforeEach
     void setUp() throws Exception {
