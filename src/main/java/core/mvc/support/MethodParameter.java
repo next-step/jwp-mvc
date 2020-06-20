@@ -7,6 +7,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class MethodParameter {
 
@@ -35,7 +36,14 @@ public class MethodParameter {
                 '}';
     }
 
-    public <A extends Annotation> A getAnnotation(Class<A> annotation) {
+    @SuppressWarnings("unchecked")
+    public @Nullable <A extends Annotation> A getAnnotation(Class<A> annotation) {
+        Objects.requireNonNull(annotation, "Give annotation is null.");
+        for (Annotation parameterAnnotation : parameterAnnotations) {
+            if (annotation.isInstance(parameterAnnotation)) {
+                return (A) parameterAnnotation;
+            }
+        }
         return null;
     }
 }
