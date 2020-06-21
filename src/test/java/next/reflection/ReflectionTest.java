@@ -1,13 +1,22 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,5 +91,17 @@ public class ReflectionTest {
 
         assertThat(question)
                 .isEqualTo(new Question("writer", "title", "contents"));
+    }
+
+    @DisplayName("애노테이션이 설정된 클래스 이름 출력")
+    @Test
+    void showClassWithAnnotation() {
+        Reflections reflection = new Reflections("core.di.factory.example");
+        List<Class<?>> classes = Stream.of(Controller.class, Service.class, Repository.class)
+                .map(reflection::getTypesAnnotatedWith)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        classes.forEach(clazz -> logger.debug("class name : {}", clazz.getSimpleName()));
     }
 }
