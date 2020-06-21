@@ -17,11 +17,19 @@ public class ReflectionTest {
 
     private Class<Question> clazz = Question.class;
 
+    @DisplayName("클래스명 확인")
     @Test
     public void showClass() {
-        logger.debug(clazz.getName());
+
+        // when
+        String name = clazz.getSimpleName();
+
+        // then
+        assertThat(name)
+                .isEqualTo("Question");
     }
 
+    @DisplayName("클래스의 생성자 출력")
     @Test
     @SuppressWarnings("rawtypes")
     public void showConstructor() {
@@ -31,12 +39,14 @@ public class ReflectionTest {
                         constructor.getParameterCount(), constructor.getParameterTypes()));
     }
 
+    @DisplayName("클래스의 필드 이름 출력")
     @Test
     void showFields() {
         Arrays.stream(clazz.getDeclaredFields())
                 .forEach(field -> logger.debug("filed name : {}, field type : {}", field.getName(), field.getType()));
     }
 
+    @DisplayName("클래스의 메서드 이름 출력")
     @Test
     void showMethod() {
         Arrays.stream(clazz.getDeclaredMethods())
@@ -44,6 +54,7 @@ public class ReflectionTest {
                         method.getName(), method.getParameterCount(), method.getParameterTypes(), method.getReturnType()));
     }
 
+    @DisplayName("접근제어자가 private인 필드 값 변경")
     @Test
     void privateFieldAccess() throws Exception {
         Class<Student> clazz = Student.class;
@@ -62,6 +73,7 @@ public class ReflectionTest {
                 .isEqualTo(27);
     }
 
+    @DisplayName("인자가 있는 생성자를 통해 객체 생성")
     @Test
     void createInstance() throws Exception {
         Class<Question> clazz = Question.class;
