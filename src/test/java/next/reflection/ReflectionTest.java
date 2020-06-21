@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,5 +60,15 @@ public class ReflectionTest {
                 .isEqualTo("dowon");
         assertThat(student.getAge())
                 .isEqualTo(27);
+    }
+
+    @Test
+    void createInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+        Constructor<Question> constructor = clazz.getConstructor(String.class, String.class, String.class);
+        Question question = constructor.newInstance("writer", "title", "contents");
+
+        assertThat(question)
+                .isEqualTo(new Question("writer", "title", "contents"));
     }
 }
