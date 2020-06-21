@@ -10,4 +10,8 @@ public class CoreException extends RuntimeException{
         super(cause);
         this.message = status.getMessage();
     }
+
+    public CoreException(CoreExceptionStatus status) {
+        this.message = status.getMessage();
+    }
 }

@@ -7,6 +7,7 @@ import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
+import next.view.UserCreateView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +19,9 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    // TODO 주석 제거
-//    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView create(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"), req.getParameter("email"));
+    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
+    public ModelAndView create(UserCreateView userCreateView) throws Exception {
+        User user = userCreateView.toUser();
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -44,18 +44,18 @@ public class UserController {
             return new ModelAndView(new JspView("redirect:/users/loginForm"));
         }
 
-        req.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("/user/list.jsp"));
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/list.jsp"));
+        modelAndView.addObject("users", DataBase.findAll());
+        return modelAndView;
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView login(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
+    public ModelAndView login(String userId, String password, HttpServletRequest req) throws Exception {
         User user = DataBase.findUserById(userId);
         if (user == null) {
-            req.setAttribute("loginFailed", true);
-            return new ModelAndView(new JspView("/user/login.jsp"));
+            ModelAndView modelAndView = new ModelAndView(new JspView("/user/login.jsp"));
+            modelAndView.addObject("loginFailed", true);
+            return modelAndView;
         }
         if (user.matchPassword(password)) {
             HttpSession session = req.getSession();
@@ -63,8 +63,9 @@ public class UserController {
             return new ModelAndView(new JspView("redirect:/"));
         }
 
-        req.setAttribute("loginFailed", true);
-        return new ModelAndView(new JspView("/user/login.jsp"));
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/login.jsp"));
+        modelAndView.addObject("loginFailed", true);
+        return modelAndView;
     }
 
     // TODO 주석 제거
@@ -95,8 +96,9 @@ public class UserController {
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
-        req.setAttribute("user", user);
-        return new ModelAndView(new JspView("/user/updateForm.jsp"));
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/updateForm.jsp"));
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 
     // TODO 주석 제거

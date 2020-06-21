@@ -38,8 +38,8 @@ public class DispatcherServlet extends HttpServlet {
         rm = new LegacyHandlerMapping();
         rm.initMapping();
 
-        handlerMappings.add(mapping);
         handlerMappings.add(rm);
+        handlerMappings.add(mapping);
     }
 
     @Override
