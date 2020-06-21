@@ -27,21 +27,11 @@ public class MethodParameter {
         return namedParameter.isAnnotated();
     }
 
-    @SuppressWarnings("unchecked")
-    public @Nullable
-    <A extends Annotation> A getParameterAnnotation(Class<A> annotation) {
-        Objects.requireNonNull(annotation, "Given annotation is null.");
-        for (Annotation parameterAnnotation : namedParameter.getParameterAnnotations()) {
-            if (annotation.isInstance(parameterAnnotation)) {
-                return (A) parameterAnnotation;
-            }
-        }
-        return null;
+    public @Nullable <A extends Annotation> A getParameterAnnotation(Class<A> annotation) {
+        return namedParameter.getParameterAnnotation(annotation);
     }
 
-    @SuppressWarnings("unchecked")
-    public @Nullable
-    <A extends Annotation> A getMethodAnnotation(Class<A> annotation) {
+    public @Nullable <A extends Annotation> A getMethodAnnotation(Class<A> annotation) {
         Objects.requireNonNull(annotation, "Given annotation is null.");
         return method.getAnnotation(annotation);
     }
