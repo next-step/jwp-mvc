@@ -1,7 +1,8 @@
-package next.controller;
+package next.controller.asis;
 
 import core.db.DataBase;
 import core.mvc.asis.Controller;
+import next.controller.UserSessionUtils;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
