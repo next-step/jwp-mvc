@@ -1,14 +1,13 @@
-/*
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
-
-import static java.lang.reflect.Array.newInstance;
 
 public class ControllerScanner {
     private final Map<Class<?>, Object> classInstances = Maps.newHashMap();
@@ -22,9 +21,24 @@ public class ControllerScanner {
         }
     }
 
+    private Object newInstance(Class<?> controllerClass) {
+        Object instance = null;
+        try {
+            Constructor<?> constructor = controllerClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            instance = constructor.newInstance();
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return instance;
+    }
 
     public Set<Class<?>> getControllers() {
         return classInstances.keySet();
     }
+
+    public Object getInstance(Class<?> clazz) {
+        return classInstances.get(clazz);
+    }
+
 }
-*/

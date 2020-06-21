@@ -8,18 +8,25 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.ReflectionUtils.withAnnotation;
 
 public class HandlerExecutions {
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public void add(Object controllerInstance, Method handler) {
-        final HandlerExecution handlerExecution = new HandlerExecution(controllerInstance, handler);
-        final List<HandlerKey> handlerKeys = convertHandlerKeys(handler);
+    public void add(Class<?> clazz, Object instance) {
+        final Set<Method> handlers = getAllMethods(clazz, withAnnotation(RequestMapping.class));
 
-        for (HandlerKey handlerKey : handlerKeys) {
-            handlerExecutions.put(handlerKey, handlerExecution);
+        for (Method handler : handlers) {
+            final HandlerExecution handlerExecution = new HandlerExecution(instance, handler);
+            final List<HandlerKey> handlerKeys = convertHandlerKeys(handler);
+            for (HandlerKey handlerKey : handlerKeys) {
+                handlerExecutions.put(handlerKey, handlerExecution);
+            }
         }
     }
 

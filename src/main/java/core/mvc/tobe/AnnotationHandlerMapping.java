@@ -1,19 +1,10 @@
 package core.mvc.tobe;
 
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Set;
-
-import static org.reflections.ReflectionUtils.getAllMethods;
-import static org.reflections.ReflectionUtils.withAnnotation;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
@@ -24,28 +15,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        final Reflections reflections = new Reflections(basePackage);
-        final Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class, true);
+        final ControllerScanner scanner = new ControllerScanner(basePackage);
+        final Set<Class<?>> scannedClasses = scanner.getControllers();
 
-        for (Class<?> controllerClass : controllers) {
-            final Object controllerInstance = newInstance(controllerClass);
-            final Set<Method> handlers = getAllMethods(controllerClass, withAnnotation(RequestMapping.class));
-            for (Method handler: handlers) {
-                handlerExecutions.add(controllerInstance, handler);
-            }
+        for (Class<?> clazz : scannedClasses) {
+            final Object instance = scanner.getInstance(clazz);
+            handlerExecutions.add(clazz, instance);
         }
-    }
-
-    private Object newInstance(Class<?> controllerClass) {
-        Object instance = null;
-        try {
-            Constructor<?> constructor = controllerClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            instance = constructor.newInstance();
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return instance;
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
