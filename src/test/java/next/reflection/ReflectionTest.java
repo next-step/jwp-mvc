@@ -184,4 +184,5 @@ public class ReflectionTest {
 
         assertThat(question1).isEqualTo(new Question(1, "글쓴이", "제목", "내용", date, 0));
     }
+
 }
