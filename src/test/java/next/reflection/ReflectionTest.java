@@ -102,4 +102,28 @@ public class ReflectionTest {
                 });
 
     }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+
+        nameField.setAccessible(true);
+        ageField.setAccessible(true);
+
+        Student student = clazz.newInstance();
+        nameField.set(student, "길동");
+        ageField.set(student, 30);
+
+        String name = clazz.getMethod("getName").invoke(student).toString();
+        int age = (int) clazz.getMethod("getAge").invoke(student);
+
+        assertThat(name).isEqualTo(student.getName());
+        assertThat(age).isEqualTo(student.getAge());
+        assertThat(name).isEqualTo("길동");
+        assertThat(age).isEqualTo(30);
+    }
 }
