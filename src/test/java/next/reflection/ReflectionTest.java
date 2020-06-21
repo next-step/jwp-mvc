@@ -37,14 +37,12 @@ public class ReflectionTest {
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+        Constructor<Question> constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        Question question = constructor.newInstance("writer", "title", "content");
+
+        assertThat(question.getWriter()).isEqualTo("writer");
+        assertThat(question.getTitle()).isEqualTo("title");
+        assertThat(question.getContents()).isEqualTo("content");
     }
 
     @Test
