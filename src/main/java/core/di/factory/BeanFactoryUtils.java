@@ -31,15 +31,15 @@ public class BeanFactoryUtils {
      * 인터페이스인 경우 BeanFactory가 관리하는 모든 클래스 중에 인터페이스를 구현하는 클래스를 찾아 반환
      *
      * @param injectedClazz
-     * @param preInstanticateBeans
+     * @param preInstantiateBeans
      * @return
      */
-    public static Class<?> findConcreteClass(Class<?> injectedClazz, Set<Class<?>> preInstanticateBeans) {
+    public static Class<?> findConcreteClass(Class<?> injectedClazz, Set<Class<?>> preInstantiateBeans) {
         if (!injectedClazz.isInterface()) {
             return injectedClazz;
         }
 
-        for (Class<?> clazz : preInstanticateBeans) {
+        for (Class<?> clazz : preInstantiateBeans) {
             Set<Class<?>> interfaces = Sets.newHashSet(clazz.getInterfaces());
             if (interfaces.contains(injectedClazz)) {
                 return clazz;
