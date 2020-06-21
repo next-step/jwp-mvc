@@ -1,5 +1,8 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,25 +21,48 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping am;
 
     @Override
-    public void init() throws ServletException {
+    public void init(){
         rm = new RequestMapping();
         rm.initMapping();
+        am = new AnnotationHandlerMapping("core.next");
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
+        if(controller != null){
+            render(controller,req, resp);
+        }else{
+            HandlerExecution execution = am.getHandler(req);
+            render(execution, req, resp);
+        }
+    }
+
+    private void render(Controller controller, HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException {
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
+        }
+    }
+
+    private void render(HandlerExecution execution , HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException {
+        try {
+            ModelAndView modelAndView = execution.handle(req, resp);
+            modelAndView.getView().render(modelAndView.getModel(), req, resp);
+        } catch (Exception e) {
+            logger.error("Exception : {}", e);
+            throw new ServletException();
         }
     }
 
