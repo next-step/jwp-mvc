@@ -58,8 +58,12 @@ public class UserDao {
 
             User user = null;
             if (rs.next()) {
-                user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                        rs.getString("email"));
+                user = User.builder()
+                        .userId(rs.getString("userId"))
+                        .password(rs.getString("password"))
+                        .name(rs.getString("name"))
+                        .email(rs.getString("email"))
+                        .build();
             }
 
             return user;

@@ -20,7 +20,12 @@ public class AnnotationHandlerMappingTest {
 
     @Test
     public void create_find() throws Exception {
-        User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
+        User user = User.builder()
+                .userId("pobi")
+                .password("password")
+                .name("포비")
+                .email("pobi@nextstep.camp")
+                .build();
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
 
@@ -40,6 +45,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
+
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
     }

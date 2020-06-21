@@ -1,14 +1,21 @@
 package core.mvc.asis;
 
-import next.controller.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import next.controller.CreateUserController;
+import next.controller.HomeController;
+import next.controller.ListUserController;
+import next.controller.LoginController;
+import next.controller.LogoutController;
+import next.controller.ProfileController;
+import next.controller.UpdateFormUserController;
+import next.controller.UpdateUserController;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class RequestMapping {
-    private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
+
     private Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
@@ -23,9 +30,9 @@ public class RequestMapping {
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
 
-        logger.info("Initialized Request Mapping!");
+        log.info("Initialized Request Mapping!");
         mappings.keySet().forEach(path -> {
-            logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
+            log.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });
     }
 

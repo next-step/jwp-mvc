@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class AnnotationHandlerMapping {
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -16,7 +17,7 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-
+        // TODO: 2020/06/21 annotation scan
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
