@@ -21,18 +21,12 @@ import java.util.Set;
 public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
-    private String[] basePackage;
-
     private HandlerExecutions handlerExecutions;
 
-    public AnnotationHandlerMapping(String... basePackage) {
-        this.basePackage = basePackage;
-    }
-
-    public void initialize() {
+    public AnnotationHandlerMapping(String... basePackages) {
         Map<HandlerKey, HandlerExecution> handlerExecutionMap = Maps.newHashMap();
 
-        for (String basePackage : basePackage) {
+        for (String basePackage : basePackages) {
             Reflections reflections = new Reflections(basePackage);
             Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class, true);
             for (Class<?> clazz : classes) {
