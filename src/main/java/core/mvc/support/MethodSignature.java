@@ -1,12 +1,13 @@
 package core.mvc.support;
 
+import core.mvc.utils.StreamUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MethodSignature {
 
@@ -15,15 +16,11 @@ public class MethodSignature {
     private final List<MethodParameter> methodParameters;
 
     public MethodSignature(Method method) {
-        this.methodParameters = new ArrayList<>();
-
-        final String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        final Parameter[] parameters = method.getParameters();
-        for (int paramIdx = 0; paramIdx < parameters.length; paramIdx++) {
-            final NamedParameter namedParameter = new NamedParameter(parameters[paramIdx], parameterNames[paramIdx]);
-            final MethodParameter methodParameter = new MethodParameter(method, namedParameter);
-            methodParameters.add(methodParameter);
-        }
+        this.methodParameters = StreamUtils.zip(
+                Arrays.asList(Objects.requireNonNull(nameDiscoverer.getParameterNames(method))),
+                Arrays.asList(method.getParameters()),
+                (name, parameter) -> new MethodParameter(method, new NamedParameter(parameter, name))
+        );
     }
 
     public List<MethodParameter> getMethodParameters() {
