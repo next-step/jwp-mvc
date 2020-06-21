@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 @DisplayName("Reflection 테스트")
@@ -25,6 +26,24 @@ public class ReflectionTest {
 
         Arrays.stream(clazz.getDeclaredMethods())
                 .forEach(method -> logger.debug("Class의 모든 메소드 : {}", method));
+    }
+
+    @DisplayName("자바 Reflection API를 활용해 Student 클래스의 name과 age 필드에 값을 할당한 후, getter 메소드를 통해 값을 확인한다")
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+
+        Field nameField = clazz.getDeclaredField("name");
+        nameField.setAccessible(true);
+
+        Field ageField = clazz.getDeclaredField("age");
+        ageField.setAccessible(true);
+
+        Student student = new Student();
+        nameField.set(student, "홍종완");
+        ageField.set(student, 20);
+
+        logger.debug(student.toString());
     }
 
     @Test
