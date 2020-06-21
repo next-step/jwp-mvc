@@ -62,6 +62,4 @@ public class BeanFactoryTest {
                     logger.debug("name: {}", b.getName());
                 });
     }
-
-
 }
