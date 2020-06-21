@@ -8,8 +8,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -125,5 +127,61 @@ public class ReflectionTest {
         assertThat(age).isEqualTo(student.getAge());
         assertThat(name).isEqualTo("길동");
         assertThat(age).isEqualTo(30);
+    }
+
+
+    @Test
+    public void questionInstanceException() {
+        Class<Question> clazz = Question.class;
+
+        assertThatThrownBy(() -> {
+            Question question = clazz.newInstance();
+        }).isInstanceOf(InstantiationException.class);
+    }
+
+    @Test
+    public void questionInstanceException1() {
+        Class<Question> clazz = Question.class;
+
+        assertThatThrownBy(() -> {
+            Constructor<Question> constructor = clazz.getConstructor();
+        }).isInstanceOf(NoSuchMethodException.class);
+    }
+
+    @Test
+    public void questionInstanceException2() throws Exception {
+        Class<Question> clazz = Question.class;
+
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+        Constructor<Question> questionConstructor = clazz.getConstructor(constructors[0].getParameterTypes());
+
+        assertThatThrownBy(() -> {
+            Question question = questionConstructor.newInstance("0");
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void questionInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+        Constructor<Question> questionConstructor = clazz.getConstructor(constructors[0].getParameterTypes());
+
+        Question question = questionConstructor.newInstance("글쓴이", "제목", "내용");
+
+        assertThat(question).isEqualTo(new Question("글쓴이", "제목", "내용"));
+    }
+
+    @Test
+    public void questionInstance2() throws Exception {
+        Class<Question> clazz = Question.class;
+
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+
+        Date date = new Date();
+        Constructor<Question> questionConstructor2 = clazz.getConstructor(constructors[1].getParameterTypes());
+        Question question1 = questionConstructor2.newInstance(1, "글쓴이", "제목", "내용", date, 0);
+
+        assertThat(question1).isEqualTo(new Question(1, "글쓴이", "제목", "내용", date, 0));
     }
 }
