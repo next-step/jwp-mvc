@@ -23,7 +23,7 @@ import java.util.Objects;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String BASE_PACKAGE = "core.mvc.tobe";
+    private static final String BASE_PACKAGE = "next.controller.tobe";
 
     private List<HandlerMapping> handlerMappings;
 
