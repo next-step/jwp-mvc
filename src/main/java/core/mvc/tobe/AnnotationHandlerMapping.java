@@ -3,15 +3,14 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
@@ -29,14 +28,13 @@ public class AnnotationHandlerMapping {
             controllerScanner.initiateControllers(basePackage);
             Map<Class<?>, Object> controllers = controllerScanner.getControllers();
             for (Class<?> clazz : controllers.keySet()) {
-                List<Method> methods = findRequestMappingMethods(clazz);
+                Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
                 putHandlerExecutions(controllers.get(clazz), methods);
             }
         } catch (InstantiationException | IllegalAccessException e) {
             logger.error(e.getMessage());
         }
     }
-
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
@@ -48,31 +46,18 @@ public class AnnotationHandlerMapping {
                 .orElseThrow(() -> new IllegalArgumentException("Handler를 찾을 수 없습니다."));
     }
 
-    private List<Method> findRequestMappingMethods(Class<?> instantiateClazz) {
-        return Arrays.stream(instantiateClazz.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toList());
-    }
-
-    private void putHandlerExecutions(Object instance, List<Method> methods) {
+    private void putHandlerExecutions(Object instance, Set<Method> methods) {
         for (Method declaredMethod : methods) {
             RequestMapping annotation = declaredMethod.getAnnotation(RequestMapping.class);
-            putHandlerExecution(instance, declaredMethod, annotation);
+            handlerExecutions.put(createHandlerKey(annotation), new HandlerExecution(instance, declaredMethod));
         }
     }
 
-    private void putHandlerExecution(Object instance, Method declaredMethod, RequestMapping annotation) {
-        RequestMethod[] requestMethods = getRequestMethods(annotation);
-        handlerExecutions.put(
-                new HandlerKey(annotation.value(), requestMethods),
-                new HandlerExecution(instance, declaredMethod));
-    }
-
-    private RequestMethod[] getRequestMethods(RequestMapping annotation) {
-        if (annotation.method().length == 0) {
-            return RequestMethod.values();
+    private HandlerKey createHandlerKey(RequestMapping rm) {
+        if (rm.method().length == 0) {
+            return new HandlerKey(rm.value(), RequestMethod.values());
         }
-        return annotation.method();
+        return new HandlerKey(rm.value(), rm.method());
     }
 
 }
