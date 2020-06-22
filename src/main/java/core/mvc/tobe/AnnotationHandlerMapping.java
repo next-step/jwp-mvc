@@ -26,7 +26,7 @@ public class AnnotationHandlerMapping {
             Reflections reflections = new Reflections(
                     new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage((String) o)));
 
-            ControllerAnnotationHandler controllerAnnotationHandler = new ControllerAnnotationHandler(reflections);
+            AnnotationHandler controllerAnnotationHandler = new ControllerAnnotationHandler(reflections);
             controllerAnnotationHandler.init();
             handlerExecutions.putAll(controllerAnnotationHandler.getExecutionMap());
         }

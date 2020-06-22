@@ -2,13 +2,11 @@ package core.mvc.tobe;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class ControllerAnnotationHandler implements AnnotationHandler {
 
@@ -24,21 +22,36 @@ public class ControllerAnnotationHandler implements AnnotationHandler {
     public void init() {
         final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Controller.class);
         for (final Class<?> clazz : annotated) {
-            final Method[] methods = clazz.getDeclaredMethods();
-            for (final Method method : methods) {
+            initByRequestMappingMethod(clazz);
+        }
+    }
 
-                final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                // requestmapping 인자가 있냐 없냐에 따라 분기 post, get (servlet 처럼
-                if (Objects.nonNull(requestMapping)) {
-                    executionMap.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new ControllerHandlerExecution(clazz, method));
-                }
+    private void initByRequestMappingMethod(final Class clazz) {
+        final Method[] methods = clazz.getDeclaredMethods();
+        for (final Method method : methods) {
+            final RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+            if (Objects.nonNull(requestMapping)) {
+                final ControllerHandlerExecution execution = new ControllerHandlerExecution(clazz, method);
+                applyExecution(requestMapping, execution);
             }
         }
     }
 
+    private void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
+        final Method[] declaredMethods = requestMapping.annotationType().getDeclaredMethods();
+        for (final Method method : declaredMethods) {
+            if (Objects.isNull(method.getDefaultValue())) {
+                Arrays.stream(RequestMethod.values())
+                        .forEach(requestMethod -> executionMap.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution));
+                continue;
+            }
+            final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
+            executionMap.put(handlerKey, handlerExecution);
+        }
+    }
+
+    @Override
     public Map<HandlerKey, HandlerExecution> getExecutionMap() {
         return new HashMap<>(executionMap);
     }
-
-
 }
