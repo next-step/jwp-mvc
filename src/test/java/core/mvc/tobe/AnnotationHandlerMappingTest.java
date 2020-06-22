@@ -1,7 +1,13 @@
 package core.mvc.tobe;
 
+import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.HandlerMapping;
 import core.mvc.exceptions.HandlerNotFoundException;
+import core.mvc.view.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,5 +59,25 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
+    }
+
+    @DisplayName("파라미터가 다르더라도 같은 pattern이면 핸들러도 동일해야함")
+    @Test
+    public void test_path_variable_mapping() throws Exception {
+        final HandlerMapping handlerMapping = new AnnotationHandlerMapping(PathVariableController.class);
+        final MockHttpServletRequest request1 = new MockHttpServletRequest("GET", "/test/1");
+        final MockHttpServletRequest request2 = new MockHttpServletRequest("GET", "/test/2");
+        final Object handler1 = handlerMapping.getHandler(request1);
+        final Object handler2 = handlerMapping.getHandler(request2);
+        assertThat(handler1).isEqualTo(handler2);
+    }
+
+    @Controller
+    public static class PathVariableController {
+
+        @RequestMapping(value = "/test/{id}", method = RequestMethod.GET)
+        public ModelAndView test(@PathVariable long id) {
+            return null;
+        }
     }
 }

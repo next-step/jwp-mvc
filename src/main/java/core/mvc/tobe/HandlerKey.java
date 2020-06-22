@@ -1,47 +1,53 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
+
+import java.util.Objects;
 
 public class HandlerKey {
 
-    private final String url;
+    private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
+
+    static {
+        PATH_PATTERN_PARSER.setMatchOptionalTrailingSeparator(true);
+    }
+
+    private final String uri;
+    private final PathPattern pathPattern;
     private final RequestMethod requestMethod;
 
-    public HandlerKey(String url, RequestMethod requestMethod) {
-        this.url = url;
+    public HandlerKey(String uri, RequestMethod requestMethod) {
+        this.uri = uri;
         this.requestMethod = requestMethod;
+        this.pathPattern = PATH_PATTERN_PARSER.parse(uri);
     }
 
     @Override
     public String toString() {
-        return "HandlerKey [url=" + url + ", requestMethod=" + requestMethod + "]";
+        return "HandlerKey [url=" + uri + ", requestMethod=" + requestMethod + "]";
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((requestMethod == null) ? 0 : requestMethod.hashCode());
-        result = prime * result + ((url == null) ? 0 : url.hashCode());
-        return result;
+        return Objects.hash(uri, requestMethod);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        HandlerKey other = (HandlerKey) obj;
-        if (requestMethod != other.requestMethod)
-            return false;
-        if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HandlerKey that = (HandlerKey) o;
+        return pathPattern.matches(toPathContainer(that.uri)) &&
+                requestMethod == that.requestMethod;
+    }
+
+    private static PathContainer toPathContainer(String path) {
+        if (path == null) {
+            return null;
+        }
+        return PathContainer.parsePath(path);
     }
 }
