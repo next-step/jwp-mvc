@@ -1,7 +1,8 @@
 package core.mvc.view;
 
+import static core.mvc.view.RedirectView.DEFAULT_REDIRECT_PREFIX;
+
 public class JspViewResolver implements ViewResolver {
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private final Class<? extends JspView> viewClass = JspView.class;
 
