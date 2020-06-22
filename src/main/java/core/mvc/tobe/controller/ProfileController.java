@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 public class ProfileController {
 
-    @RequestMapping("/users/profile")
+    @RequestMapping(value = "/users/profile")
     public ModelAndView getProfile(HttpServletRequest request, HttpServletResponse response) {
         String userId = request.getParameter("userId");
         User user = DataBase.findUserById(userId);
