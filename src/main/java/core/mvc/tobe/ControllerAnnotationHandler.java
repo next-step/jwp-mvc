@@ -23,14 +23,14 @@ public class ControllerAnnotationHandler implements AnnotationHandler {
     @Override
     public void init() {
         final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Controller.class);
-        for (final Class<?> aClass : annotated) {
-            final Method[] methods = aClass.getDeclaredMethods();
+        for (final Class<?> clazz : annotated) {
+            final Method[] methods = clazz.getDeclaredMethods();
             for (final Method method : methods) {
 
                 final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
                 // requestmapping 인자가 있냐 없냐에 따라 분기 post, get (servlet 처럼
                 if (Objects.nonNull(requestMapping)) {
-                    executionMap.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution());
+                    executionMap.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new ControllerHandlerExecution(clazz, method));
                 }
             }
         }
