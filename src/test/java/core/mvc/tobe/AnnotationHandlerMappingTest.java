@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.db.DataBase;
 import next.model.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,11 @@ public class AnnotationHandlerMappingTest {
         handlerMapping.initialize();
     }
 
+    @AfterEach
+    void tearDown() {
+        DataBase.clear();
+    }
+
     @Test
     public void create_find() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
@@ -41,7 +47,7 @@ public class AnnotationHandlerMappingTest {
 
     @DisplayName("RequestMethod를 설정하지 않은 handler는 다른 RequestMethod 요청이 들어와도 수행한다")
     @Test
-    void testRequestMethod() throws Exception {
+    void anyRequestMethod() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("DELETE", "/request-method-test");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
@@ -49,6 +55,30 @@ public class AnnotationHandlerMappingTest {
 
         List<User> users = new ArrayList<>(DataBase.findAll());
         assertThat(users.get(0).getUserId()).isEqualTo("TEST");
+    }
+
+    @DisplayName("복수개의 메소드를 선언한 메소드에 POST 로 요청한다")
+    @Test
+    void postRequestMethod() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/post-and-get-test");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.handle(request, response);
+
+        List<User> users = new ArrayList<>(DataBase.findAll());
+        assertThat(users.get(0).getUserId()).isEqualTo("POST_AND_GET");
+    }
+
+    @DisplayName("복수개의 메소드를 선언한 메소드에 GET 으로 요청한다")
+    @Test
+    void getRequestMethod() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/post-and-get-test");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.handle(request, response);
+
+        List<User> users = new ArrayList<>(DataBase.findAll());
+        assertThat(users.get(0).getUserId()).isEqualTo("POST_AND_GET");
     }
 
     private void createUser(User user) throws Exception {

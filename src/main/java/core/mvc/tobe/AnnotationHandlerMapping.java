@@ -44,12 +44,11 @@ public class AnnotationHandlerMapping {
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        HandlerKey handlerKey = handlerExecutions.keySet().stream()
+        return handlerExecutions.keySet().stream()
                 .filter(h -> h.isMatchKey(requestUri, requestMethod))
                 .findFirst()
+                .map(key -> handlerExecutions.get(key))
                 .orElseThrow(() -> new IllegalArgumentException("Handler를 찾을 수 없습니다."));
-
-        return handlerExecutions.get(handlerKey);
     }
 
     private List<Method> findRequestMappingMethods(Class<?> instantiateClazz) {
