@@ -1,11 +1,5 @@
-package core.mvc.asis;
+package core.mvc;
 
-import core.mvc.HandlerMapping;
-import core.mvc.JspView;
-import core.mvc.ModelAndView;
-import core.mvc.View;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +23,10 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        RegacyHandlerMapping rhm = new RegacyHandlerMapping();
-        rhm.initMapping();
-
         AnnotationHandlerMapping ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
         ahm.initialize();
 
-        handlerMappings = Arrays.asList(rhm, ahm);
+        handlerMappings = Arrays.asList(ahm);
     }
 
     @Override
@@ -52,7 +43,7 @@ public class DispatcherServlet extends HttpServlet {
             if (handler instanceof HandlerExecution) {
                 return ((HandlerExecution) handler).handle(req, resp);
             }
-            return new ModelAndView(new JspView(((Controller) handler).execute(req, resp)));
+            throw new ServletException("handler not found");
         } catch (Exception e) {
             throw new ServletException(e.getMessage());
         }

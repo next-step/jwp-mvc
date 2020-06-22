@@ -1,4 +1,4 @@
-package next.controller.tobe;
+package next.controller;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
