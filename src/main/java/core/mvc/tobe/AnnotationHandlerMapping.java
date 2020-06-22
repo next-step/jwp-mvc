@@ -1,21 +1,16 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
@@ -29,17 +24,19 @@ public class AnnotationHandlerMapping {
 
     @SuppressWarnings("unchecked")
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        Set<Class<?>> preInstantiateClasses = getTypesAnnotatedWith(reflections, Controller.class);
-        for (Class<?> preInstantiateClass : preInstantiateClasses) {
-            List<Method> methods = findRequestMappingMethods(preInstantiateClass);
-            try {
-                putHandlerExecutions(preInstantiateClass.newInstance(), methods);
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.error(e.getMessage());
+        ControllerScanner controllerScanner = new ControllerScanner();
+        try {
+            controllerScanner.initiateControllers(basePackage);
+            Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+            for (Class<?> clazz : controllers.keySet()) {
+                List<Method> methods = findRequestMappingMethods(clazz);
+                putHandlerExecutions(controllers.get(clazz), methods);
             }
+        } catch (InstantiationException | IllegalAccessException e) {
+            logger.error(e.getMessage());
         }
     }
+
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
@@ -78,12 +75,4 @@ public class AnnotationHandlerMapping {
         return annotation.method();
     }
 
-    @SuppressWarnings("unchecked")
-    private Set<Class<?>> getTypesAnnotatedWith(Reflections reflections, Class<? extends Annotation>... annotations) {
-        Set<Class<?>> beans = Sets.newHashSet();
-        for (Class<? extends Annotation> annotation : annotations) {
-            beans.addAll(reflections.getTypesAnnotatedWith(annotation, true));
-        }
-        return beans;
-    }
 }
