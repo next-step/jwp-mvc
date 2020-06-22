@@ -25,7 +25,7 @@ public class UserCreateTest {
         final String expectedLocation = "/";
 
         assertThat(response.getStatusCode().is3xxRedirection()).isTrue();
-        assertThat(response.getHeaders().getLocation()).isEqualTo(expectedLocation);
+        assertThat(response.getHeaders().getLocation().getPath()).isEqualTo(expectedLocation);
     }
 
 
