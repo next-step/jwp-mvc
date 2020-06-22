@@ -15,19 +15,20 @@ public class HandlerExecution {
     private Object object;
     private Method method;
     private String path;
+    private MethodParameters methodParameters;
 
     public HandlerExecution(Object object, Method method, String path) {
         this.object = object;
         this.method = method;
         this.path = path;
+        this.methodParameters = new MethodParameters(method);
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        MethodParameters methodParameters = new MethodParameters(method);
         RequestParameters requestParameters = new RequestParameters(request);
         PathVariables pathVariables = new PathVariables(this.path, request.getRequestURI());
 
-        Object[] args = methodParameters.getArgs(request, response, requestParameters, pathVariables);
+        Object[] args = this.methodParameters.getArgs(request, response, requestParameters, pathVariables);
         return (ModelAndView) method.invoke(this.object, args);
     }
 }
