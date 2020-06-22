@@ -14,10 +14,10 @@ public class HandlerExecution {
         this.targetMethod = targetMethod;
     }
 
-    public String handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Constructor<?> defaultConstructor = clazz.getDeclaredConstructor();
         Object targetObject = defaultConstructor.newInstance();
 
-        return (String) targetMethod.invoke(targetObject, request, response);
+        return (ModelAndView) targetMethod.invoke(targetObject, request, response);
     }
 }
