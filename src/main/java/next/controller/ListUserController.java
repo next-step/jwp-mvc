@@ -3,6 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
+import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,13 +12,14 @@ import javax.servlet.http.HttpServletResponse;
 public class ListUserController {
 
     @RequestMapping("/users")
-    public String getUsers(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView getUsers(HttpServletRequest request,
+                                 HttpServletResponse response) {
         if (!UserSessionUtils.isLogined(request.getSession())) {
-            return "redirect:/users/loginForm";
+            return new ModelAndView("redirect:/users/loginForm");
         }
 
         request.setAttribute("users", DataBase.findAll());
-        return "/user/list.jsp";
+        return new ModelAndView("/user/list.jsp");
     }
 
 }
