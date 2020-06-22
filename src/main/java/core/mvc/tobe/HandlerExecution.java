@@ -1,7 +1,5 @@
 package core.mvc.tobe;
 
-import core.mvc.ModelAndView;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
@@ -16,10 +14,10 @@ public class HandlerExecution {
         this.targetMethod = targetMethod;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Constructor<?> defaultConstructor = clazz.getDeclaredConstructor();
         Object targetObject = defaultConstructor.newInstance();
 
-        return (ModelAndView) targetMethod.invoke(targetObject, request, response);
+        return (String) targetMethod.invoke(targetObject, request, response);
     }
 }
