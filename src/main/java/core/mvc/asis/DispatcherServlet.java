@@ -1,24 +1,26 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.IOException;
+import java.util.Optional;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final View EMPTY_VIEW = (model, request, response) -> {};
 
     private RequestMapping rm;
     private AnnotationHandlerMapping am;
@@ -28,6 +30,7 @@ public class DispatcherServlet extends HttpServlet {
         rm = new RequestMapping();
         rm.initMapping();
         am = new AnnotationHandlerMapping("core.next");
+        am.initialize();
     }
 
     @Override
@@ -35,16 +38,17 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
-        if(controller != null){
-            render(controller,req, resp);
-        }else{
-            HandlerExecution execution = am.getHandler(req);
-            render(execution, req, resp);
+        HandlerExecution execution = am.getHandler(req);
+        if (execution != null) {
+            handle(execution, req, resp);
+            return;
         }
+
+        Controller controller = rm.findController(requestUri);
+        handle(controller, req, resp);
     }
 
-    private void render(Controller controller, HttpServletRequest req, HttpServletResponse resp)
+    private void handle(Controller controller, HttpServletRequest req, HttpServletResponse resp)
         throws ServletException {
         try {
             String viewName = controller.execute(req, resp);
@@ -55,11 +59,12 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private void render(HandlerExecution execution , HttpServletRequest req, HttpServletResponse resp)
+    private void handle(HandlerExecution execution , HttpServletRequest req, HttpServletResponse resp)
         throws ServletException {
         try {
             ModelAndView modelAndView = execution.handle(req, resp);
-            modelAndView.getView().render(modelAndView.getModel(), req, resp);
+            Optional.ofNullable(modelAndView.getView()).orElse(EMPTY_VIEW)
+                .render(modelAndView.getModel(), req, resp);
         } catch (Exception e) {
             logger.error("Exception : {}", e);
             throw new ServletException();
