@@ -3,11 +3,16 @@ package core.mvc.tobe;
 import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HandlerExecution {
     private static final Logger logger = LoggerFactory.getLogger(HandlerExecution.class);
@@ -21,8 +26,14 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-        return (ModelAndView) method.invoke(clazz.newInstance(), request,response);
+        String[] valueNames = nameDiscoverer.getParameterNames(method);
 
+        Object[] parameters = Stream.of(valueNames)
+                .map(request::getParameter)
+                .toArray();
+
+        return (ModelAndView) method.invoke(clazz.newInstance(),parameters);
     }
 }
