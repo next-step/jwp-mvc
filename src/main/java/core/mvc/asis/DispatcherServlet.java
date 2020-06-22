@@ -1,7 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.View;
+import core.mvc.view.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class DispatcherServlet extends HttpServlet {
     public void init(){
         rm = new RequestMapping();
         rm.initMapping();
-        am = new AnnotationHandlerMapping("core.next");
+        am = new AnnotationHandlerMapping("next.controller");
         am.initialize();
     }
 

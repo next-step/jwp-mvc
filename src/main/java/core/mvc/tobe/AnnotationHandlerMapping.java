@@ -56,7 +56,7 @@ public class AnnotationHandlerMapping {
         Controller controller = method.getDeclaringClass().getAnnotation(Controller.class);
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
 
-        String url = controller.path() + requestMapping.value();
+        String url = controller.value() + requestMapping.value();
         HandlerKey handlerKey = new HandlerKey(url, requestMapping.method());
         handlerExecutions.put(handlerKey, (request, response) -> (ModelAndView) method.invoke(bean, request, response));
     }
