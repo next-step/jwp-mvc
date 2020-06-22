@@ -1,14 +1,10 @@
 package core.mvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequestParameters {
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private Map<String, Object> parameters = new HashMap<>();
 
     public RequestParameters(HttpServletRequest request) {
@@ -32,7 +28,7 @@ public class RequestParameters {
     }
 
     public <T> T getBodyObject(Class<T> type) {
-        return mapper.convertValue(this.parameters, type);
+        return ObjectMapperUtils.convertValue(this.parameters, type);
     }
 
     public Object getParameter(String name) {
