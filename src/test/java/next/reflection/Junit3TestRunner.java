@@ -22,8 +22,8 @@ public class Junit3TestRunner {
                 .forEach(m -> {
                     try {
                         m.invoke(instance);
-                    } catch (IllegalAccessException | InvocationTargetException ignored) {
-                        ignored.printStackTrace();
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
                     }
                 });
     }

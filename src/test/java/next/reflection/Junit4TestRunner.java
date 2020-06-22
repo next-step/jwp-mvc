@@ -23,7 +23,7 @@ public class Junit4TestRunner {
                     try {
                         m.invoke(instance);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 });
 
