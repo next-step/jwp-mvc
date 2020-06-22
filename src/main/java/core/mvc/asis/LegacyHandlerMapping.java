@@ -2,7 +2,6 @@ package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
 import next.controller.asis.LogoutController;
-import next.controller.asis.ProfileController;
 import next.controller.asis.UpdateFormUserController;
 import next.controller.asis.UpdateUserController;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ public class LegacyHandlerMapping implements HandlerMapping {
     private Map<String, Controller> mappings = new HashMap<>();
 
     public LegacyHandlerMapping() {
-        mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
