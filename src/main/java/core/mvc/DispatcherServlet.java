@@ -1,7 +1,5 @@
-package core.mvc.asis;
+package core.mvc;
 
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,14 +17,10 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping manualHandlerMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() throws ServletException {
-        manualHandlerMapping = new RequestMapping();
-        manualHandlerMapping.initMapping();
-
         annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
     }
@@ -36,23 +30,17 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        Controller controller = manualHandlerMapping.findController(requestUri);
         try {
-            if (controller != null) {
-                move(controller.execute(request, response), request, response);
+            HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(request);
+            move(handlerExecution.handle(request, response), request, response);
 
-            } else {
-                HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(request);
-                move(handlerExecution.handle(request, response), request, response);
-            }
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
             resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;
