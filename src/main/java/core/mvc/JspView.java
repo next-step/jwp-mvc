@@ -10,7 +10,7 @@ public class JspView implements View {
 
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private String viewName;
+    private final String viewName;
 
     public JspView(String viewName) {
         this.viewName = viewName;
@@ -23,7 +23,7 @@ public class JspView implements View {
             return;
         }
 
-        RequestDispatcher rd = request.getRequestDispatcher(viewName);
+        final RequestDispatcher rd = request.getRequestDispatcher(viewName);
         rd.forward(request, response);
     }
 

@@ -1,9 +1,14 @@
 package core.mvc;
 
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
@@ -19,8 +24,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
         for (Class<?> clazz : scannedClasses) {
             final Object instance = scanner.getInstance(clazz);
-            handlerExecutions.add(clazz, instance);
+            final List<Method> handlers = convertHandlers(clazz);
+
+            for (Method handler : handlers) {
+                HandlerExecution handlerExecution = new HandlerExecution(instance, handler);
+                handlerExecutions.add(handlerExecution);
+            }
         }
+    }
+
+    private List<Method> convertHandlers(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(m -> m.isAnnotationPresent(RequestMapping.class))
+                .collect(Collectors.toList());
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

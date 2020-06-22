@@ -17,13 +17,13 @@ import java.util.Objects;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String BASE_PACKAGE = "next.controller.tobe";
+    private static final String BASE_PACKAGE = "next.controller";
 
     private List<HandlerMapping> handlerMappings;
 
     @Override
     public void init() {
-        AnnotationHandlerMapping ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
+        final AnnotationHandlerMapping ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
         ahm.initialize();
 
         handlerMappings = Arrays.asList(ahm);
