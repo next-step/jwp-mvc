@@ -2,6 +2,8 @@ package core.mvc.view;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.HandlerExecution;
+import java.util.Objects;
+import javassist.NotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,16 +12,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HandlerExecutionViewResolver implements ViewResolver {
 
+    private static final String ILLEGAL_HANDLER = "해당 요청을 처리할 handler가 없습니다: ";
+
     @Override
     public ModelAndView resolve(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final ModelAndView mav = ((HandlerExecution) handler).handle(request, response);
-        final View view = new JspView(getJspViewName(request.getRequestURI()));
-        mav.setView(view);
-
-        return mav;
-    }
-
-    private String getJspViewName(String requestURI) {
-        return requestURI.endsWith(".jsp") ? requestURI : requestURI + ".jsp";
+        if (Objects.isNull(handler)) {
+            throw new NotFoundException(ILLEGAL_HANDLER + request.getRequestURI());
+        }
+        return ((HandlerExecution) handler).handle(request, response);
     }
 }

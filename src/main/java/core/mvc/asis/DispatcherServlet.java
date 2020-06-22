@@ -1,9 +1,11 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.view.HandlerExecutionViewResolver;
 import core.mvc.view.View;
-import core.mvc.view.ViewResolvers;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import javassist.NotFoundException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,30 +20,34 @@ import org.springframework.http.HttpStatus;
 public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static final String ANNOTATION_HANDLER_BASE_PACKAGE = "next.controller";
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private HandlerMappings handlerMappings;
-    private ViewResolvers viewResolvers;
+    private AnnotationHandlerMapping handlerMapping;
+    private HandlerExecutionViewResolver viewResolver;
 
     @Override
     public void init() {
-        handlerMappings = new HandlerMappings();
-        viewResolvers = new ViewResolvers();
+        handlerMapping = new AnnotationHandlerMapping(ANNOTATION_HANDLER_BASE_PACKAGE);
+        handlerMapping.initialize();
+        viewResolver = new HandlerExecutionViewResolver();
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
         try {
-            Object handler = handlerMappings.getHandler(req);
-            ModelAndView mav = viewResolvers.resolve(handler, req, resp);
+            Object handler = handlerMapping.getHandler(req);
+            ModelAndView mav = viewResolver.resolve(handler, req, resp);
             View view = mav.getView();
             view.render(mav.getModel(), req, resp);
         } catch (NotFoundException ne) {
             logger.error("Not found : {}", ne.getMessage());
             resp.sendError(HttpStatus.NOT_FOUND.value(), ne.getMessage());
+        } catch (InvocationTargetException ie) {
+            logger.error("Invocation Exception : {}", ie.getTargetException().getMessage());
+            resp.sendError(HttpStatus.FORBIDDEN.value(), ie.getTargetException().getMessage());
         } catch (Exception e) {
             logger.error("Exception : {}", e.getMessage());
             throw new ServletException(e.getMessage());
