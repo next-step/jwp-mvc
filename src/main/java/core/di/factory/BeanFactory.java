@@ -10,12 +10,12 @@ import java.util.Set;
 public class BeanFactory {
     private static final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
-    private Set<Class<?>> preInstanticateBeans;
+    private final PreInstanticateBeans preInstanticateBeans;
 
     private Map<Class<?>, Object> beans = Maps.newHashMap();
 
     public BeanFactory(Set<Class<?>> preInstanticateBeans) {
-        this.preInstanticateBeans = preInstanticateBeans;
+        this.preInstanticateBeans = new PreInstanticateBeans(preInstanticateBeans);
     }
 
     @SuppressWarnings("unchecked")
@@ -24,9 +24,6 @@ public class BeanFactory {
     }
 
     public void initialize() {
-        preInstanticateBeans.stream()
-                .forEach(b -> {
-                    beans.put(b, BeanFactoryUtils.createInstance(b, preInstanticateBeans));
-                });
+        beans.putAll(preInstanticateBeans.createBeanObject());
     }
 }

@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +18,10 @@ public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
+    @DisplayName("Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.")
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
-
-        //Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
     }
 
     @Test
@@ -39,6 +39,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("reflection Constructor 테스트")
     public void constructor1() throws Exception {
         Class<Question> clazz = Question.class;
         Constructor[] constructors = clazz.getConstructors();
@@ -56,6 +57,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("reflection method 테스트")
     public void method() throws Exception {
         Class<Question> clazz = Question.class;
         Method[] methods = clazz.getMethods();
