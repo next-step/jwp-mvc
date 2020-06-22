@@ -40,7 +40,7 @@ public class ControllerAnnotationHandler implements AnnotationHandler {
     private void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
         final Method[] declaredMethods = requestMapping.annotationType().getDeclaredMethods();
         for (final Method method : declaredMethods) {
-            if (Objects.isNull(method.getDefaultValue())) {
+            if (Objects.nonNull(method.getDefaultValue())) {
                 Arrays.stream(RequestMethod.values())
                         .forEach(requestMethod -> executionMap.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution));
                 continue;
