@@ -24,6 +24,9 @@ public class BeanFactory {
     }
 
     public void initialize() {
-
+        preInstanticateBeans.stream()
+                .forEach(b -> {
+                    beans.put(b, BeanFactoryUtils.createInstance(b, preInstanticateBeans));
+                });
     }
 }
