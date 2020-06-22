@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.db.DataBase;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -13,13 +14,14 @@ public class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws ReflectiveOperationException {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         handlerMapping.initialize();
     }
 
     @Test
     public void create_find() throws Exception {
+        /* given */
         User user = User.builder()
                 .userId("pobi")
                 .password("password")
@@ -31,10 +33,14 @@ public class AnnotationHandlerMappingTest {
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
         request.setParameter("userId", user.getUserId());
+
         MockHttpServletResponse response = new MockHttpServletResponse();
+
+        /* when */
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
 
+        /* then */
         assertThat(request.getAttribute("user")).isEqualTo(user);
     }
 
