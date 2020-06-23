@@ -36,22 +36,18 @@ public class ControllerAnnotationHandler {
     }
 
     private static void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
-        List<Method> methods = Arrays.stream(requestMapping.annotationType().getDeclaredMethods())
-                .filter(method -> method.getName().equals("method"))
-                .collect(Collectors.toList());
 
-        for (final Method method : methods) {
-            if (Objects.isNull(method.getDefaultValue())) {
+            if (requestMapping.method().equals(RequestMethod.ALL)) {
                 Arrays.stream(RequestMethod.values())
                         .forEach(requestMethod -> {
-                            AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
-                            logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
+                            if (!requestMethod.equals(RequestMethod.ALL)) {
+                                AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
+                                logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
+                            }
                         });
-                continue;
             }
             final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
             AnnotationHandlerMapping.handlerExecutions.put(handlerKey, handlerExecution);
             logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMapping.method(), requestMapping.value(), handlerExecution);
-        }
     }
 }
