@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.db.DataBase;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -20,16 +21,26 @@ public class AnnotationHandlerMappingTest {
 
     @Test
     public void create_find() throws Exception {
-        User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
+        /* given */
+        User user = User.builder()
+                .userId("pobi")
+                .password("password")
+                .name("포비")
+                .email("pobi@nextstep.camp")
+                .build();
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
         request.setParameter("userId", user.getUserId());
+
         MockHttpServletResponse response = new MockHttpServletResponse();
+
+        /* when */
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
 
+        /* then */
         assertThat(request.getAttribute("user")).isEqualTo(user);
     }
 
@@ -40,6 +51,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
+
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
     }

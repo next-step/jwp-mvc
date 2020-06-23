@@ -19,8 +19,13 @@ public class UpdateUserController implements Controller {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
+        User updateUser = User.builder()
+                .userId(req.getParameter("userId"))
+                .password(req.getParameter("password"))
+                .name(req.getParameter("name"))
+                .email(req.getParameter("email"))
+                .build();
+
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return "redirect:/";
