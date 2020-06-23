@@ -14,7 +14,7 @@ import java.util.Set;
 public class AnnotationHandlerMapping {
     private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    static final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -26,9 +26,7 @@ public class AnnotationHandlerMapping {
             Reflections reflections = new Reflections(
                     new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage((String) o)));
 
-            AnnotationHandler controllerAnnotationHandler = new ControllerAnnotationHandler(reflections);
-            controllerAnnotationHandler.init();
-            handlerExecutions.putAll(controllerAnnotationHandler.getExecutionMap());
+            ControllerAnnotationHandler.apply(reflections);
         }
     }
 

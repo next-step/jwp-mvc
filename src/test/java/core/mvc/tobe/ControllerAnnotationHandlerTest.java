@@ -11,7 +11,6 @@ class ControllerAnnotationHandlerTest {
     void name() {
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage("core.mvc.tobe")));
-        ControllerAnnotationHandler controllerAnnotationHandler = new ControllerAnnotationHandler(reflections);
-        controllerAnnotationHandler.init();
+        ControllerAnnotationHandler.apply(reflections);
     }
 }
