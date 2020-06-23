@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,25 +39,20 @@ public class Junit4TestRunner {
     }
 
     @Test
+    @DisplayName("내부")
     public void run1() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
 
         Class<MyTest> annoClazz = MyTest.class;
-        String annotationName = annoClazz.getName();
-
 
         Method[] methods = clazz.getDeclaredMethods();
         Arrays.stream(methods)
                 .forEach(m -> {
                     logger.debug("name: {}", m.getName());
 
-                    Annotation[] annotations = m.getAnnotations();
+                    Annotations annotations = new Annotations(m.getAnnotations());
 
-                    boolean hasMyTestAnnotation = Arrays.stream(annotations)
-                            .filter(a -> annotationName.equals(a.annotationType().getName()))
-                            .findFirst().isPresent();
-
-                    if (hasMyTestAnnotation) {
+                    if (annotations.hasAnnotation(annoClazz)) {
                         try {
                             m.invoke(clazz.newInstance());
                         } catch (Exception ex) {

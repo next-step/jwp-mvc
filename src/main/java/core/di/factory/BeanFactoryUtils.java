@@ -6,12 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
-import static org.reflections.ReflectionUtils.getAllConstructors;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections8.ReflectionUtils.getAllConstructors;
+import static org.reflections8.ReflectionUtils.withAnnotation;
 
 public class BeanFactoryUtils {
     private static final Logger logger = LoggerFactory.getLogger(BeanFactoryUtils.class);
@@ -55,21 +53,4 @@ public class BeanFactoryUtils {
         throw new IllegalStateException(injectedClazz + "인터페이스를 구현하는 Bean이 존재하지 않는다.");
     }
 
-    public static Object createInstance(Class<?> clazz, Set<Class<?>> preInstanticateBeans) {
-        List<Object> objects = new ArrayList<>();
-        try {
-            Constructor constructor = BeanFactoryUtils.getInjectedConstructor(clazz);
-            Class conClass = BeanFactoryUtils.findConcreteClass(clazz, preInstanticateBeans);
-            if (constructor == null) return conClass.newInstance();
-            for (Class param : constructor.getParameterTypes()) {
-                Object obj = createInstance(param, preInstanticateBeans);
-                objects.add(obj);
-            }
-
-            return constructor.newInstance(objects.toArray());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
 }

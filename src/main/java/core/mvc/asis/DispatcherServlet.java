@@ -1,5 +1,10 @@
 package core.mvc.asis;
 
+import core.mvc.JspView;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.RequestHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +22,17 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private RequestHandlerMapping rm;
+
+    private RequestHandlerMapping ahm;
 
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
-        rm.initMapping();
+        rm.initialize();
+
+        ahm = new AnnotationHandlerMapping("next.controller");
+        ahm.initialize();
     }
 
     @Override
@@ -30,12 +40,29 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Controller controller = (Controller) rm.getHandler(req);
+
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            if (controller != null) {
+                String viewName = controller.execute(req, resp);
+                ModelAndView mav = new ModelAndView(new JspView(viewName));
+                render(mav, req, resp);
+            } else {
+                HandlerExecution handler = (HandlerExecution) ahm.getHandler(req);
+                render(handler.handle(req, resp), req, resp);
+            }
         } catch (Throwable e) {
-            logger.error("Exception : {}", e);
+            logger.error("Exception: {}", e);
+            throw new ServletException(e.getMessage());
+        }
+
+    }
+
+    private void render(ModelAndView mav, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        try {
+            mav.getView().render(mav.getModel(), request, response);
+        } catch (Throwable e) {
+            logger.error("Exception: {}", e);
             throw new ServletException(e.getMessage());
         }
     }
