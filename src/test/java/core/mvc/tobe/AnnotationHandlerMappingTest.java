@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,5 +60,30 @@ public class AnnotationHandlerMappingTest {
 
         assertEquals(modelAndView.getObject("userId"),"kjs4395");
         assertEquals(modelAndView.getObject("password"), "password");
+    }
+
+    @Test
+    public void noArgsTest() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        HandlerExecution execution = handlerMapping.getHandler(request);
+
+        ModelAndView modelAndView = execution.handle(request, response);
+    }
+
+    @Test
+    public void primitiveTypeTest() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        request.addParameter("id", "333");
+        request.addParameter("age", "29");
+
+        HandlerExecution execution = handlerMapping.getHandler(request);
+
+        ModelAndView modelAndView = execution.handle(request, response);
+
+        assertEquals(modelAndView.getObject("id"), (long) 333);
+        assertEquals(modelAndView.getObject("age"), 29);
     }
 }
