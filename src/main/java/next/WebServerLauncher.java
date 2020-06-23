@@ -1,5 +1,6 @@
 package next;
 
+import core.mvc.tobe.AnnotationHandlerMapping;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ public class WebServerLauncher {
         logger.info("configuring app with basedir: {}", new File("./" + webappDirLocation).getAbsolutePath());
 
         tomcat.start();
+        new AnnotationHandlerMapping("core.mvc.tobe").initialize();
         tomcat.getServer().await();
     }
 }

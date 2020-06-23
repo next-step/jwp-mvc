@@ -4,11 +4,18 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ControllerAnnotationHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ControllerAnnotationHandler.class);
 
     public static void apply(final Reflections reflections) {
         final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Controller.class);
@@ -29,15 +36,22 @@ public class ControllerAnnotationHandler {
     }
 
     private static void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
-        final Method[] declaredMethods = requestMapping.annotationType().getDeclaredMethods();
-        for (final Method method : declaredMethods) {
-            if (Objects.nonNull(method.getDefaultValue())) {
+        List<Method> methods = Arrays.stream(requestMapping.annotationType().getDeclaredMethods())
+                .filter(method -> method.getName().equals("method"))
+                .collect(Collectors.toList());
+
+        for (final Method method : methods) {
+            if (Objects.isNull(method.getDefaultValue())) {
                 Arrays.stream(RequestMethod.values())
-                        .forEach(requestMethod -> AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution));
+                        .forEach(requestMethod -> {
+                            AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
+                            logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
+                        });
                 continue;
             }
             final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
             AnnotationHandlerMapping.handlerExecutions.put(handlerKey, handlerExecution);
+            logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMapping.method(), requestMapping.value(), handlerExecution);
         }
     }
 }
