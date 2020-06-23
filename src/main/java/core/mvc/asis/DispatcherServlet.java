@@ -6,6 +6,7 @@ import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import java.io.IOException;
 import java.util.Optional;
+import javassist.NotFoundException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -38,38 +39,31 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        HandlerExecution execution = am.getHandler(req);
-        if (execution != null) {
-            handle(execution, req, resp);
-            return;
-        }
-
-        Controller controller = rm.findController(requestUri);
-        handle(controller, req, resp);
-    }
-
-    private void handle(Controller controller, HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException {
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    private void handle(HandlerExecution execution , HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException {
-        try {
-            ModelAndView modelAndView = execution.handle(req, resp);
-            Optional.ofNullable(modelAndView.getView()).orElse(EMPTY_VIEW)
-                .render(modelAndView.getModel(), req, resp);
+            ModelAndView mav = handle(req, resp);
+            mav.getView().render(mav.getModel(), req, resp);
         } catch (Exception e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException();
+            throw new ServletException(e.getMessage(), e);
         }
     }
+
+    private ModelAndView handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Object handler = getHandler(req);
+
+        if (handler instanceof Controller) {
+            return ((Controller)handler).execute(req, resp);
+        } else if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution)handler).handle(req, resp);
+        } else {
+            throw new ServletException("not registered");
+        }
+    }
+
+    private Object getHandler(HttpServletRequest req) {
+        return Optional.ofNullable((Object)rm.getHandler(req))
+            .orElseGet(()->am.getHandler(req));
+    }
+
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
