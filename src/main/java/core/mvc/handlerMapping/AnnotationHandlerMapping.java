@@ -6,6 +6,7 @@ import core.mvc.handler.HandlerExecution;
 import core.mvc.handler.HandlerExecutions;
 import core.mvc.handler.HandlerKey;
 import core.mvc.scanner.ControllerScanner;
+import core.mvc.scanner.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -23,8 +24,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        final ControllerScanner scanner = new ControllerScanner(basePackage);
-        final Set<Class<?>> scannedClasses = scanner.getControllers();
+        final Scanner scanner = new ControllerScanner();
+        scanner.scan(basePackage);
+        final Set<Class<?>> scannedClasses = scanner.getScannedClasses();
 
         for (Class<?> clazz : scannedClasses) {
             final Object instance = scanner.getInstance(clazz);
