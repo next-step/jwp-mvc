@@ -86,4 +86,25 @@ public class AnnotationHandlerMappingTest {
         assertEquals(modelAndView.getObject("id"), (long) 333);
         assertEquals(modelAndView.getObject("age"), 29);
     }
+
+    @Test
+    public void objectParameterInvokeTest() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+/*
+        TestUser testUser = new TestUser("kjs4395", "1234", 29);
+
+        request.setAttribute("testUser", testUser);
+*/
+        //request.addParameter("testUser", testUser);
+        request.addParameter("userId", "kjs4395");
+        request.addParameter("password","1234");
+        request.addParameter("age","29");
+        HandlerExecution execution = handlerMapping.getHandler(request);
+
+        ModelAndView modelAndView = execution.handle(request, response);
+        TestUser testUser = (TestUser) modelAndView.getObject("testUser");
+
+        assertEquals(testUser.getPassword(),"1234");
+    }
 }

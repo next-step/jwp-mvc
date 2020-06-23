@@ -24,7 +24,7 @@ public class TestUserController {
     public ModelAndView testNoArgMethod() {
         logger.debug("test no Args");
         return new ModelAndView();
-    }*/
+    }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_int_long(long id, int age) {
@@ -33,9 +33,9 @@ public class TestUserController {
         mav.addObject("id", id);
         mav.addObject("age", age);
         return mav;
-    }
+    }*/
 
- /*   @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_javabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
@@ -44,7 +44,7 @@ public class TestUserController {
     }
 
 
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+ /*   @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public ModelAndView show_pathvariable(@PathVariable long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
