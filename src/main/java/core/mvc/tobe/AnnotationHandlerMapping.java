@@ -5,6 +5,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import core.mvc.tobe.exception.HandlerMappingInitializeFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
@@ -29,26 +30,30 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    public void initialize() throws ReflectiveOperationException {
-        log.debug("handler mapping initialize");
-        Reflections reflections = new Reflections(basePackage);
+    public void initialize() {
+        try {
+            log.debug("handler mapping initialize");
+            Reflections reflections = new Reflections(basePackage);
 
-        Set<Class<?>> classes = reflections.getTypesAnnotatedWith(HANDLER_CLASS_ANNOTATION, true);
-        for (Class<?> clazz : classes) {
-            log.debug("handler class={}", clazz);
+            Set<Class<?>> classes = reflections.getTypesAnnotatedWith(HANDLER_CLASS_ANNOTATION, true);
+            for (Class<?> clazz : classes) {
+                log.debug("handler class={}", clazz);
 
-            Object instance = clazz.getDeclaredConstructor().newInstance();
+                Object instance = clazz.getDeclaredConstructor().newInstance();
 
-            List<Method> handlerMethods = findHandlerMethods(clazz);
-            for (Method handlerMethod : handlerMethods) {
-                log.debug("handler method={}", handlerMethod);
+                List<Method> handlerMethods = findHandlerMethods(clazz);
+                for (Method handlerMethod : handlerMethods) {
+                    log.debug("handler method={}", handlerMethod);
 
-                HandlerKey handlerKey = createHandlerKeyFrom(handlerMethod);
-                handlerExecutions.put(handlerKey,
-                        (request, response) -> (ModelAndView) handlerMethod.invoke(instance, request, response));
+                    HandlerKey handlerKey = createHandlerKeyFrom(handlerMethod);
+                    handlerExecutions.put(handlerKey,
+                            (request, response) -> (ModelAndView) handlerMethod.invoke(instance, request, response));
+                }
             }
+            log.debug("handler mapping initialization is over");
+        } catch (ReflectiveOperationException e) {
+            throw new HandlerMappingInitializeFailedException();
         }
-        log.debug("handler mapping initialization is over");
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
