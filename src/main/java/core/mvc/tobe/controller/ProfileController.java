@@ -21,6 +21,6 @@ public class ProfileController {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
         request.setAttribute("user", user);
-        return new ModelAndView(new JspView("/user/profile.jsp"));
+        return new ModelAndView(new JspView("/user/profile"));
     }
 }

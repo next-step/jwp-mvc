@@ -23,6 +23,6 @@ public class UpdateFormUserController {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
         request.setAttribute("user", user);
-        return new ModelAndView(new JspView("/user/updateForm.jsp"));
+        return new ModelAndView(new JspView("/user/updateForm"));
     }
 }

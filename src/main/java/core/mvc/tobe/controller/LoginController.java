@@ -25,7 +25,7 @@ public class LoginController {
 
         if (Objects.isNull(user)) {
             request.setAttribute("loginFailed", true);
-            return new ModelAndView(new JspView("/user/login.jsp"));
+            return new ModelAndView(new JspView("/user/login"));
         }
 
         if (user.matchPassword(password)) {
@@ -34,7 +34,7 @@ public class LoginController {
             return new ModelAndView(new JspView("redirect:/"));
         } else {
             request.setAttribute("loginFailed", true);
-            return new ModelAndView(new JspView("/user/login.jsp"));
+            return new ModelAndView(new JspView("/user/login"));
         }
     }
 }

@@ -16,7 +16,7 @@ public class HomeController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView home(HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("home.jsp"));
+        return new ModelAndView(new JspView("home"));
     }
 
 }

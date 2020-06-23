@@ -8,10 +8,11 @@ import java.util.Map;
 public class JspView implements View {
 
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String DEFAULT_EXTENSION_POSTFIX = ".jsp";
 
     private String viewName;
 
-    public JspView(final String viewName) {
+    public JspView(String viewName) {
         this.viewName = viewName;
     }
 
@@ -21,7 +22,7 @@ public class JspView implements View {
             response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;
         }
-        RequestDispatcher dispatcher = request.getRequestDispatcher(viewName);
+        RequestDispatcher dispatcher = request.getRequestDispatcher(viewName + DEFAULT_EXTENSION_POSTFIX);
         dispatcher.forward(request, response);
     }
 }

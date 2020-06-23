@@ -20,6 +20,6 @@ public class ListUserController {
             return new ModelAndView(new JspView("redirect:/users/loginForm"));
         }
         request.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("/user/list.jsp"));
+        return new ModelAndView(new JspView("/user/list"));
     }
 }

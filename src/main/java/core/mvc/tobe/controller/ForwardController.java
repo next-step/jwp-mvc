@@ -13,11 +13,11 @@ public class ForwardController {
 
     @RequestMapping(value = "/users/form")
     public ModelAndView userForm(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView(new JspView("redirect:/user/form.jsp"));
+        return new ModelAndView(new JspView("redirect:/user/form"));
     }
 
     @RequestMapping(value = "/users/loginForm")
     public ModelAndView userLoginForm(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView(new JspView("/user/login.jsp"));
+        return new ModelAndView(new JspView("/user/login"));
     }
 }
