@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
-import static org.reflections.ReflectionUtils.getAllConstructors;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections8.ReflectionUtils.getAllConstructors;
+import static org.reflections8.ReflectionUtils.withAnnotation;
 
 public class BeanFactoryUtils {
     private static final Logger logger = LoggerFactory.getLogger(BeanFactoryUtils.class);
