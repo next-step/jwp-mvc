@@ -6,16 +6,14 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.exception.HandlerMappingInitializeFailedException;
+import core.utils.ComponentScanner;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class AnnotationHandlerMapping {
@@ -33,15 +31,15 @@ public class AnnotationHandlerMapping {
     public void initialize() {
         try {
             log.debug("handler mapping initialize");
-            Reflections reflections = new Reflections(basePackage);
+            ComponentScanner componentScanner = new ComponentScanner(basePackage);
 
-            Set<Class<?>> classes = reflections.getTypesAnnotatedWith(HANDLER_CLASS_ANNOTATION, true);
+            Set<Class<?>> classes = componentScanner.scanClassesBy(HANDLER_CLASS_ANNOTATION);
             for (Class<?> clazz : classes) {
                 log.debug("handler class={}", clazz);
 
                 Object instance = clazz.getDeclaredConstructor().newInstance();
 
-                List<Method> handlerMethods = findHandlerMethods(clazz);
+                List<Method> handlerMethods = componentScanner.scanMethodsBy(clazz, HANDLER_METHOD_ANNOTATION);
                 for (Method handlerMethod : handlerMethods) {
                     log.debug("handler method={}", handlerMethod);
 
@@ -61,13 +59,6 @@ public class AnnotationHandlerMapping {
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
 
         return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
-    }
-
-    private List<Method> findHandlerMethods(Class<?> clazz) {
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-        return Arrays.stream(declaredMethods)
-                .filter(method -> method.isAnnotationPresent(HANDLER_METHOD_ANNOTATION))
-                .collect(Collectors.toList());
     }
 
     private HandlerKey createHandlerKeyFrom(Method handlerMethod) {
