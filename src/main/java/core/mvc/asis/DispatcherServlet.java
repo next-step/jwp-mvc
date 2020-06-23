@@ -19,15 +19,16 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String CONTROLLER_PACKAGE = "next.controller";
 
-    private RequestMapping rm;
+    private LegacyHandlerMapping legacyHandlerMapping;
     private AnnotationHandlerMapping handlerMapping;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
-        handlerMapping = new AnnotationHandlerMapping("next.controller");
+        legacyHandlerMapping = new LegacyHandlerMapping();
+        legacyHandlerMapping.initMapping();
+        handlerMapping = new AnnotationHandlerMapping(CONTROLLER_PACKAGE);
         handlerMapping.initialize();
     }
 
@@ -36,31 +37,31 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Controller controller = legacyHandlerMapping.getHandler(req);
         try {
-            if (controller == null) {
-                HandlerExecution execution = handlerMapping.getHandler(req);
-                ModelAndView modelAndView = execution.handle(req, resp);
-                modelAndView.getView().render(modelAndView.getModel(), req, resp);
+            if (controller != null) {
+                render(req, resp, controller.execute(req, resp));
                 return;
             }
-
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            HandlerExecution execution = handlerMapping.getHandler(req);
+            render(req, resp, execution.handle(req, resp));
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+    private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView modelAndView) throws Exception {
+        modelAndView.getView().render(modelAndView.getModel(), req, resp);
+    }
+
+    private void render(HttpServletRequest req, HttpServletResponse resp, String view) throws Exception {
+        if (view.startsWith(DEFAULT_REDIRECT_PREFIX)) {
+            resp.sendRedirect(view.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;
         }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
+        RequestDispatcher rd = req.getRequestDispatcher(view);
         rd.forward(req, resp);
     }
 }
