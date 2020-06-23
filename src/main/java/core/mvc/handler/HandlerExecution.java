@@ -2,7 +2,7 @@ package core.mvc.handler;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.support.MethodParameter;
+import core.mvc.support.*;
 import core.mvc.ModelAndView;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -42,39 +42,14 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final Object[] methodArguments = createMethodArguments(request, response);
+        HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite();
+        handlerMethodArgumentResolverComposite.addResolver(new ServletRequestResolver(request));
+        handlerMethodArgumentResolverComposite.addResolver(new ServletResponseResolver(response));
+        handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
+
+        final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request);
         return (ModelAndView) method.invoke(instance, methodArguments);
     }
-
-    private Object[] createMethodArguments(HttpServletRequest request, HttpServletResponse response) {
-
-        return methodParameters.stream()
-                .map(p -> parseValue(p, request, response))
-                .toArray();
-    }
-
-    private Object parseValue(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
-        if (parameter.isSameClass(HttpServletRequest.class)) {
-            return request;
-        }
-
-        if (parameter.isSameClass(HttpServletResponse.class)) {
-            return response;
-        }
-
-        final Object parameterValue = request.getParameter(parameter.getName());
-
-        if (parameter.isSameClass(int.class)) {
-            return Integer.valueOf((int) parameterValue);
-        }
-
-        if (parameter.isSameClass(long.class)) {
-            return Long.valueOf((long) parameterValue);
-        }
-
-        return parameterValue;
-    }
-
 
     public List<HandlerKey> createHandlerKeys() {
         final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);

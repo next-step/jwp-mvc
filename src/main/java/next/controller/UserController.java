@@ -31,10 +31,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView create(@RequestParam("userId") String asd, @RequestParam String password, @RequestParam String name, @RequestParam String email) {
+    public ModelAndView create(@RequestParam String userId, @RequestParam String password, @RequestParam String name, @RequestParam String email) {
         logger.debug("users create");
 
-        final User user = new User(asd, password, name, email);
+        final User user = new User(userId, password, name, email);
 
         logger.debug("{}", user);
 
