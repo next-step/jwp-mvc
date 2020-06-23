@@ -2,23 +2,20 @@ package next.controller;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestParam;
 import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
-import next.controller.UserSessionUtils;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
 public class AuthController {
 
     @RequestMapping("/users/login")
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
-        final String userId = request.getParameter("userId");
-        final String password = request.getParameter("password");
+    public ModelAndView login(HttpServletRequest request, @RequestParam String userId, @RequestParam String password) {
 
         final User user = DataBase.findUserById(userId);
 
@@ -38,7 +35,7 @@ public class AuthController {
     }
 
     @RequestMapping("/users/logout")
-    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView logout(HttpServletRequest request) {
         final HttpSession session = request.getSession();
 
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
