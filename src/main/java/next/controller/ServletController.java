@@ -5,10 +5,9 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
-import core.mvc.view.DummyView;
 import core.mvc.view.JspView;
+import core.mvc.view.RedirectView;
 import core.mvc.view.View;
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -37,98 +36,98 @@ public class ServletController {
     private static final Logger logger = LoggerFactory.getLogger(ServletController.class);
 
     @RequestMapping(value = "/")
-    public ModelAndView home(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView home(HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("users", DataBase.findAll());
-        return createModelAndViewWithViewName(HOME_CONTROLLER_VIEW, response);
+        return createModelAndViewWithViewName(HOME_CONTROLLER_VIEW);
     }
 
     @RequestMapping(value = "/index.html")
-    public ModelAndView homeIndex(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView homeIndex(HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("users", DataBase.findAll());
-        return createModelAndViewWithViewName(HOME_CONTROLLER_VIEW, response);
+        return createModelAndViewWithViewName(HOME_CONTROLLER_VIEW);
     }
 
     @RequestMapping(value = "/users/form")
-    public ModelAndView forwardForm(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        return createModelAndViewWithViewName(FORM_FORWARD_VIEW, response);
+    public ModelAndView forwardForm(HttpServletRequest request, HttpServletResponse response) {
+        return createModelAndViewWithViewName(FORM_FORWARD_VIEW);
     }
 
     @RequestMapping(value = "/users/loginForm")
-    public ModelAndView forwardLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        View view = getViewWithViewName(LOGIN_FORWARD_VIEW, response);
+    public ModelAndView forwardLogin(HttpServletRequest request, HttpServletResponse response) {
+        View view = getViewWithViewName(LOGIN_FORWARD_VIEW);
         return new ModelAndView(view);
     }
 
     @RequestMapping(value = "/users")
-    public ModelAndView listUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView listUser(HttpServletRequest request, HttpServletResponse response) {
         if (!UserSessionUtils.isLogined(request.getSession())) {
-            return createModelAndViewWithViewName(REDIRECT_LOGIN_FORM, response);
+            return createModelAndViewWithViewName(REDIRECT_LOGIN_FORM);
         }
 
         request.setAttribute("users", DataBase.findAll());
-        return createModelAndViewWithViewName(USER_LIST_VIEW, response);
+        return createModelAndViewWithViewName(USER_LIST_VIEW);
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView loginUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView loginUser(HttpServletRequest request, HttpServletResponse response) {
         String userId = request.getParameter("userId");
         String password = request.getParameter("password");
         User user = DataBase.findUserById(userId);
         if (user == null) {
             request.setAttribute("loginFailed", true);
-            return createModelAndViewWithViewName(LOGIN_FORWARD_VIEW, response);
+            return createModelAndViewWithViewName(LOGIN_FORWARD_VIEW);
         }
         if (user.matchPassword(password)) {
             HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return createModelAndViewWithViewName(REDIRECT_HOME, response);
+            return createModelAndViewWithViewName(REDIRECT_HOME);
         } else {
             request.setAttribute("loginFailed", true);
-            return createModelAndViewWithViewName(LOGIN_FORWARD_VIEW, response);
+            return createModelAndViewWithViewName(LOGIN_FORWARD_VIEW);
         }
     }
 
     @RequestMapping(value = "/users/profile")
-    public ModelAndView profileUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView profileUser(HttpServletRequest request, HttpServletResponse response) {
         String userId = request.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException(CANNOT_FIND_USER);
         }
         request.setAttribute("user", user);
-        return createModelAndViewWithViewName(PROFILE_VIEW, response);
+        return createModelAndViewWithViewName(PROFILE_VIEW);
     }
 
     @RequestMapping(value = "/users/logout")
-    public ModelAndView logoutUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView logoutUser(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return createModelAndViewWithViewName(REDIRECT_HOME, response);
+        return createModelAndViewWithViewName(REDIRECT_HOME);
     }
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
             request.getParameter("email"));
         logger.debug("User : {}", user);
 
         DataBase.addUser(user);
-        return createModelAndViewWithViewName(REDIRECT_HOME, response);
+        return createModelAndViewWithViewName(REDIRECT_HOME);
     }
 
     @RequestMapping(value = "/users/updateForm")
-    public ModelAndView updateFormUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView updateFormUser(HttpServletRequest request, HttpServletResponse response) {
         String userId = request.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException(ILLEGAL_ATTEMPT);
         }
         request.setAttribute("user", user);
-        return createModelAndViewWithViewName(UPDATE_USER_FORM_VIEW, response);
+        return createModelAndViewWithViewName(UPDATE_USER_FORM_VIEW);
     }
 
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)
-    public ModelAndView updateUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView updateUser(HttpServletRequest request, HttpServletResponse response) {
         User user = DataBase.findUserById(request.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException(ILLEGAL_ATTEMPT);
@@ -138,18 +137,17 @@ public class ServletController {
             request.getParameter("email"));
         logger.debug("Update User : {}", updateUser);
         user.update(updateUser);
-        return createModelAndViewWithViewName(REDIRECT_HOME, response);
+        return createModelAndViewWithViewName(REDIRECT_HOME);
     }
 
-    private ModelAndView createModelAndViewWithViewName(String viewName, HttpServletResponse response) throws IOException {
-        View view = getViewWithViewName(viewName, response);
+    private ModelAndView createModelAndViewWithViewName(String viewName) {
+        View view = getViewWithViewName(viewName);
         return new ModelAndView(view);
     }
 
-    private View getViewWithViewName(String viewName, HttpServletResponse response) throws IOException {
+    private View getViewWithViewName(String viewName) {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return DummyView.INSTANCE;
+            return new RedirectView(viewName);
         }
         return new JspView(viewName);
     }
