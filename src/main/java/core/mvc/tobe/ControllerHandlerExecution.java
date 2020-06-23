@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class ControllerHandlerExecution extends HandlerExecution{
+public class ControllerHandlerExecution implements HandlerExecution{
 
     private Class clazz;
     private Method method;
@@ -19,6 +19,6 @@ public class ControllerHandlerExecution extends HandlerExecution{
     @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         method.invoke(clazz.newInstance(), request, response);
-        return super.handle(request, response);
+        return null;
     }
 }

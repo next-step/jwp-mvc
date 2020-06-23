@@ -22,12 +22,9 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        for (final Object o : basePackage) {
-            Reflections reflections = new Reflections(
-                    new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage((String) o)));
-
-            ControllerAnnotationHandler.apply(reflections);
-        }
+        Reflections reflections = new Reflections(basePackage);
+        reflections.getTypesAnnotatedWith(Controller.class, true);
+        ControllerAnnotationHandler.apply(reflections);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
