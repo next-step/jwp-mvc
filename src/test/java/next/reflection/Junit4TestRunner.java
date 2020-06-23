@@ -17,10 +17,8 @@ public class Junit4TestRunner {
             .forEach(method -> {
                 try {
                     method.invoke(junit4Test);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                } catch (IllegalAccessException| InvocationTargetException e) {
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             });
     }
