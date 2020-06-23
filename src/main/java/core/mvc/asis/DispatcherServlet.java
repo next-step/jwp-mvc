@@ -1,35 +1,33 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final String CONTROLLER_PACKAGE = "next.controller";
 
-    private LegacyHandlerMapping legacyHandlerMapping;
-    private AnnotationHandlerMapping handlerMapping;
+    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
-    public void init() throws ServletException {
-        legacyHandlerMapping = new LegacyHandlerMapping();
-        legacyHandlerMapping.initMapping();
-        handlerMapping = new AnnotationHandlerMapping(CONTROLLER_PACKAGE);
-        handlerMapping.initialize();
+    public void init() {
+        handlerMappings.add(new LegacyHandlerMapping());
+        handlerMappings.add(new AnnotationHandlerMapping(CONTROLLER_PACKAGE));
     }
 
     @Override
@@ -37,31 +35,31 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = legacyHandlerMapping.getHandler(req);
+        ModelAndView mav;
         try {
-            if (controller != null) {
-                render(req, resp, controller.execute(req, resp));
-                return;
+            Object handler = getHandler(req);
+            if (handler instanceof Controller) {
+                mav = ((Controller) handler).execute(req, resp);
+            } else if (handler instanceof HandlerExecution) {
+                mav = ((HandlerExecution) handler).handle(req, resp);
+            } else {
+                throw new IllegalArgumentException("잘못된 요청입니다.");
             }
-            HandlerExecution execution = handlerMapping.getHandler(req);
-            render(req, resp, execution.handle(req, resp));
+            mav.getView().render(mav.getModel(), req, resp);
         } catch (Throwable e) {
-            logger.error("Exception : {}", e);
+            logger.error("Exception : ", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView modelAndView) throws Exception {
-        modelAndView.getView().render(modelAndView.getModel(), req, resp);
-    }
-
-    private void render(HttpServletRequest req, HttpServletResponse resp, String view) throws Exception {
-        if (view.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(view.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private Object getHandler(HttpServletRequest req) {
+        for (HandlerMapping mapping : handlerMappings) {
+            Object handler = mapping.getHandler(req);
+            if (handler != null) {
+                return handler;
+            }
         }
-
-        RequestDispatcher rd = req.getRequestDispatcher(view);
-        rd.forward(req, resp);
+        return null;
     }
+
 }
