@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import org.reflections.ReflectionUtils;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
 
@@ -24,13 +23,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public void initialize() {
         Set<Class<?>> annotatedTypedClazz = AnnotatedTypeScanner.getAnnotatedTypedClazz(Controller.class, basePackage);
         for (Class<?> clazz : annotatedTypedClazz) {
-            Set<Method> methods = getAnnotatedTypedMethods(clazz);
+            Set<Method> methods = AnnotatedTypeScanner.getAnnotatedTypedMethods(clazz, RequestMapping.class);
             methods.forEach(method -> fillHandlerMap(clazz, method));
         }
-    }
-
-    private Set<Method> getAnnotatedTypedMethods(Class<?> clazz) {
-        return ReflectionUtils.getMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
     }
 
     private void fillHandlerMap(Class<?> clazz, Method method) {

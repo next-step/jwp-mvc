@@ -2,8 +2,10 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -27,6 +29,10 @@ public class AnnotatedTypeScanner {
         return new Reflections(basePackage,
             new SubTypesScanner(false),
             new TypeAnnotationsScanner()).getTypesAnnotatedWith(annotation);
+    }
+
+    public static Set<Method> getAnnotatedTypedMethods(Class<?> clazz, Class<? extends Annotation> annotationClass) {
+        return ReflectionUtils.getMethods(clazz, ReflectionUtils.withAnnotation(annotationClass));
     }
 
     public static Object getClazzObject(Class<?> clazz) {
