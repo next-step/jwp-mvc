@@ -45,6 +45,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         final String requestUri = request.getRequestURI();
         final RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
