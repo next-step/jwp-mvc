@@ -1,8 +1,7 @@
 package core.mvc;
 
-import core.annotation.web.PathVariable;
-import core.exception.CoreException;
-import core.exception.CoreExceptionStatus;
+import core.mvc.args.ArgsResolver;
+import core.mvc.args.ArgsResolvers;
 import lombok.Getter;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -27,52 +26,24 @@ public class MethodParameters {
         }
     }
 
-    public Object[] getArgs(HttpServletRequest request, HttpServletResponse response, RequestParameters requestParameters, PathVariables pathVariables) {
+    public Object[] getArgs(HttpServletRequest request, HttpServletResponse response, String path) {
+        RequestParameters requestParameters = new RequestParameters(request);
+        PathVariables pathVariables = new PathVariables(path, request.getRequestURI());
+        ArgsResolvers argsResolvers = new ArgsResolvers(pathVariables, request, response, requestParameters);
+
         List<Object> args = new ArrayList<>();
-
         for (Map.Entry<String, Parameter> parameterEntry : parameters.entrySet()) {
+            Optional<ArgsResolver> optionalArgsResolver = argsResolvers.getArgsResolver(parameterEntry);
+            if (optionalArgsResolver.isPresent()) {
+                ArgsResolver resolver = optionalArgsResolver.get();
+                args.add(resolver.getArgs(parameterEntry));
+                continue;
+            }
+
             String name = parameterEntry.getKey();
-            Parameter parameter = parameterEntry.getValue();
-
-            if (parameter.isAnnotationPresent(PathVariable.class)) {
-                Object arg = getPathVariableObject(parameter, name, pathVariables);
-                args.add(arg);
-                continue;
-            }
-
-            if (parameter.getType().equals(HttpServletRequest.class)) {
-                args.add(request);
-                continue;
-            }
-
-            if (parameter.getType().equals(HttpServletResponse.class)) {
-                args.add(response);
-                continue;
-            }
-
-            Object requestParameter = requestParameters.getParameter(name);
-            if (Objects.isNull(requestParameter)) {
-                args.add(requestParameters.getBodyObject(parameter.getType()));
-                continue;
-            }
-
-            args.add(requestParameter);
+            args.add(requestParameters.getParameter(name));
         }
 
         return args.toArray();
-    }
-
-    private Object getPathVariableObject(Parameter parameter, String parameterName, PathVariables pathVariables) {
-        PathVariable requestMapping = parameter.getAnnotation(PathVariable.class);
-        if (!requestMapping.value().isEmpty()) {
-            parameterName = requestMapping.value();
-        }
-
-        Object arg = pathVariables.get(parameterName, parameter.getType());
-        if (requestMapping.required() && Objects.isNull(arg)) {
-            throw new CoreException(CoreExceptionStatus.INVALID_PATH_VARIABLE);
-        }
-
-        return arg;
     }
 }
