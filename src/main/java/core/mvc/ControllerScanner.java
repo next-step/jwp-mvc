@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import org.reflections.Reflections;
 
-import javax.servlet.ServletException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -23,15 +22,13 @@ public class ControllerScanner {
     }
 
     private Object newInstance(Class<?> controllerClass) {
-        Object instance = null;
         try {
             Constructor<?> constructor = controllerClass.getDeclaredConstructor();
             constructor.setAccessible(true);
-            instance = constructor.newInstance();
+            return constructor.newInstance();
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        return instance;
     }
 
     public Set<Class<?>> getControllers() {
