@@ -4,7 +4,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestParam;
 import core.db.DataBase;
-import core.mvc.JspView;
+import core.mvc.view.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
 

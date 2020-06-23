@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.handler;
 
 import com.google.common.collect.Maps;
 

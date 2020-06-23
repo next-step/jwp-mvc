@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.scanner;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;

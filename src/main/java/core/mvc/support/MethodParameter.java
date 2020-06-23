@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.support;
 
 import core.annotation.web.RequestParam;
 
