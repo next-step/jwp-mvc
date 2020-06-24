@@ -25,10 +25,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @SuppressWarnings("unchecked")
     public void initialize() {
-        ControllerScanner controllerScanner = new ControllerScanner();
         try {
-            controllerScanner.initiateControllers(basePackage);
-            Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+            Map<Class<?>, Object> controllers = ControllerScanner.getControllers(basePackage);
             for (Class<?> clazz : controllers.keySet()) {
                 Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
                 putHandlerExecutions(controllers.get(clazz), methods);
@@ -45,7 +43,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return handlerExecutions.keySet().stream()
                 .filter(h -> h.isMatchKey(requestUri, requestMethod))
                 .findFirst()
-                .map(key -> handlerExecutions.get(key))
+                .map(handlerExecutions::get)
                 .orElseThrow(() -> new IllegalArgumentException("Handler를 찾을 수 없습니다."));
     }
 

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ProfileController implements Controller {
     @Override
-    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (user == null) {

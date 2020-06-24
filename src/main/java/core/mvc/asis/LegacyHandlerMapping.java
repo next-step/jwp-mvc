@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import next.controller.asis.LogoutController;
 import next.controller.asis.ProfileController;
 import org.slf4j.Logger;
@@ -32,7 +33,17 @@ public class LegacyHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public Controller getHandler(HttpServletRequest request) {
-        return mappings.get(request.getRequestURI());
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        Controller controller = mappings.get(request.getRequestURI());
+        if (controller == null) {
+            return null;
+        }
+        try {
+            Class<?> clazz = controller.getClass();
+            return new HandlerExecution(clazz.newInstance(), clazz.getMethods()[0]);
+        } catch (InstantiationException | IllegalAccessException e) {
+            logger.error(e.getMessage());
+        }
+        return null;
     }
 }

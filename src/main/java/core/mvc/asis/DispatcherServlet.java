@@ -1,6 +1,6 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerMapping;
+import core.mvc.HandlerMappings;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -22,10 +20,11 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String CONTROLLER_PACKAGE = "next.controller";
 
-    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private HandlerMappings handlerMappings;
 
     @Override
     public void init() {
+        handlerMappings = new HandlerMappings();
         handlerMappings.add(new LegacyHandlerMapping());
         handlerMappings.add(new AnnotationHandlerMapping(CONTROLLER_PACKAGE));
     }
@@ -35,31 +34,14 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        ModelAndView mav;
         try {
-            Object handler = getHandler(req);
-            if (handler instanceof Controller) {
-                mav = ((Controller) handler).execute(req, resp);
-            } else if (handler instanceof HandlerExecution) {
-                mav = ((HandlerExecution) handler).handle(req, resp);
-            } else {
-                throw new IllegalArgumentException("잘못된 요청입니다.");
-            }
-            mav.getView().render(mav.getModel(), req, resp);
+            HandlerExecution handler = handlerMappings.getHandler(req);
+            ModelAndView modelAndView = handler.handle(req, resp);
+            modelAndView.render(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : ", e);
             throw new ServletException(e.getMessage());
         }
-    }
-
-    private Object getHandler(HttpServletRequest req) {
-        for (HandlerMapping mapping : handlerMappings) {
-            Object handler = mapping.getHandler(req);
-            if (handler != null) {
-                return handler;
-            }
-        }
-        return null;
     }
 
 }
