@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 public class OriginalParameterBinding implements HandlerMethodHelper {
 
     @Override
-    public Object bindingProcess(Class<?> type, String name, HttpServletRequest request) {
+    public Object bindingProcess(Class<?> type, String name, PathPattern pathPattern,HttpServletRequest request) {
         String requestValue = request.getParameter(name);
 
         if(type.isPrimitive()) {

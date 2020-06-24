@@ -1,5 +1,7 @@
 package core.mvc.tobe;
 
+import org.springframework.web.util.pattern.PathPattern;
+
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -14,7 +16,7 @@ import java.util.List;
 public class ObjectParameterHelper implements HandlerMethodHelper {
 
     @Override
-    public Object bindingProcess(Class<?> type, String name, HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Object bindingProcess(Class<?> type, String name, PathPattern pathPattern, HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Field[] fields = type.getDeclaredFields();
         List<Class<?>> argumentTypes = new ArrayList<>();
         List<Object> values = new ArrayList<>();
