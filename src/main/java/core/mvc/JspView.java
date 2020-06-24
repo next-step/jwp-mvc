@@ -6,16 +6,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public class JspView implements View {
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private final String viewName;
+    private final boolean isRedirect;
 
-    private final String pathName;
-
-    public JspView(String pathName) {
-        this.pathName = pathName;
+    public JspView(final String pathName) {
+        boolean isRedirect = pathName.startsWith(DEFAULT_REDIRECT_PREFIX);
+        this.viewName = isRedirect ? pathName.substring(DEFAULT_REDIRECT_PREFIX.length()) : pathName;
+        this.isRedirect = isRedirect;
     }
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        RequestDispatcher rd = request.getRequestDispatcher(pathName);
+        if (isRedirect) {
+            response.sendRedirect(viewName);
+            return;
+        }
+        RequestDispatcher rd = request.getRequestDispatcher(viewName);
         rd.forward(request, response);
     }
 
