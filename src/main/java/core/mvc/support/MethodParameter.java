@@ -36,10 +36,6 @@ public class MethodParameter {
                 .orElse(null);
     }
 
-    public boolean isEmptyAnnotation() {
-        return annotations.isEmpty();
-    }
-
     public boolean isAnnotationType(Class<?> clazz) {
         return annotations.stream()
                 .anyMatch(a -> a.annotationType().equals(clazz));
