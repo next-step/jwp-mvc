@@ -24,4 +24,9 @@ public class DataBase {
     public static Collection<User> findAll() {
         return users.values();
     }
+
+    //테스트에서만 쓰이는 용도
+    public static void clear() {
+        users.clear();
+    }
 }
