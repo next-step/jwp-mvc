@@ -46,6 +46,7 @@ public class HandlerExecution {
         handlerMethodArgumentResolverComposite.addResolver(new ServletRequestResolver(request));
         handlerMethodArgumentResolverComposite.addResolver(new ServletResponseResolver(response));
         handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
+        handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
 
         final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request);
         return (ModelAndView) method.invoke(instance, methodArguments);

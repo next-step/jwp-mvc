@@ -20,6 +20,10 @@ public class MethodParameter {
         return type.equals(clazz);
     }
 
+    public Class<?> getType() {
+        return type;
+    }
+
     public boolean anyMatchClass(Class<?>... classes) {
         return Arrays.stream(classes)
                 .anyMatch(this::matchClass);

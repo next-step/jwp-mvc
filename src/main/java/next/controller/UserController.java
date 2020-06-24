@@ -1,13 +1,11 @@
 package next.controller;
 
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
-import core.annotation.web.RequestParam;
+import core.annotation.web.*;
 import core.db.DataBase;
 import core.mvc.view.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
+import next.model.dto.UserCreateRequestDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +29,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView create(@RequestParam String userId, @RequestParam String password, @RequestParam String name, @RequestParam String email) {
+    public ModelAndView create(@ModelAttribute UserCreateRequestDto userDto) {
         logger.debug("users create");
 
-        final User user = new User(userId, password, name, email);
-
-        logger.debug("{}", user);
-
+        final User user = userDto.toEntity();
         DataBase.addUser(user);
         return new ModelAndView(new JspView("redirect:/"));
     }
