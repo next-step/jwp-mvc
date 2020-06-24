@@ -1,6 +1,5 @@
 package core.mvc.tobe;
 
-import com.sun.management.VMOption;
 import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +10,9 @@ import org.springframework.util.ClassUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import java.util.stream.Stream;
 
 public class HandlerExecution {
     private static final Logger logger = LoggerFactory.getLogger(HandlerExecution.class);
@@ -29,6 +26,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InstantiationException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+
 
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] bindObjects = new Object[parameterTypes.length];
@@ -46,6 +44,7 @@ public class HandlerExecution {
 
             ObjectParameterHelper objectParameterHelper = new ObjectParameterHelper();
             bindObjects[i] = objectParameterHelper.bindingProcess(parameterType, names[i], request);
+
         }
         return (ModelAndView) method.invoke(clazz.newInstance(),bindObjects);
     }
