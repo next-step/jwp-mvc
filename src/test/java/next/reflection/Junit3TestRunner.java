@@ -10,7 +10,7 @@ public class Junit3TestRunner {
         final Class<Junit3Test> clazz = Junit3Test.class;
         final Method[] methods = clazz.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.getName().contains("test")) {
+            if (method.getName().startsWith("test")) {
                 method.invoke(clazz.newInstance());
             }
         }
