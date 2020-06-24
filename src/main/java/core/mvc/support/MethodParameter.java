@@ -22,10 +22,7 @@ public class MethodParameter {
 
     public boolean anyMatchClass(Class<?>... classes) {
         return Arrays.stream(classes)
-                .map(this::matchClass)
-                .filter(Boolean::booleanValue)
-                .findFirst()
-                .orElse(false);
+                .anyMatch(this::matchClass);
     }
 
     public String getName() {
