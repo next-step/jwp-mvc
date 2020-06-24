@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Slf4j
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Class<Controller> HANDLER_CLASS_ANNOTATION = Controller.class;
     private static final Class<RequestMapping> HANDLER_METHOD_ANNOTATION = RequestMapping.class;
@@ -28,6 +28,7 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
         try {
             log.debug("handler mapping initialize");
@@ -54,15 +55,29 @@ public class AnnotationHandlerMapping {
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+    @Override
+    public boolean supports(HttpServletRequest request) {
+        HandlerKey handlerKey = createHandlerKeyFrom(request);
 
-        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
+        return handlerExecutions.keySet().contains(handlerKey);
+    }
+
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        HandlerKey handlerKey = createHandlerKeyFrom(request);
+
+        return handlerExecutions.get(handlerKey);
     }
 
     private HandlerKey createHandlerKeyFrom(Method handlerMethod) {
         RequestMapping annotation = handlerMethod.getAnnotation(HANDLER_METHOD_ANNOTATION);
         return new HandlerKey(annotation.value(), annotation.method());
+    }
+
+    private HandlerKey createHandlerKeyFrom(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+
+        return new HandlerKey(requestUri, requestMethod);
     }
 }

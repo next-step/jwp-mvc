@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMappings;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;
@@ -18,11 +19,11 @@ public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private final HandlerMapping handlerMapping = new HandlerMapping();
+    private final HandlerMappings handlerMappings = new HandlerMappings();
 
     @Override
     public void init() {
-        handlerMapping.init();
+        handlerMappings.init();
     }
 
     @Override
@@ -30,7 +31,7 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = request.getRequestURI();
         log.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        HandlerExecution handler = handlerMapping.getHandler(request);
+        HandlerExecution handler = handlerMappings.getHandler(request);
         if (handler == null) {
             log.error("404 Not Found : URI = {}", requestUri);
             response.setStatus(SC_NOT_FOUND);
