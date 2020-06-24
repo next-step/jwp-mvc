@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
 import org.junit.jupiter.api.Test;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -39,6 +40,30 @@ public class HandlerMethodArgumentResolverTest {
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("userId")).isEqualTo(userId);
         assertThat(mav.getObject("password")).isEqualTo(password);
+    }
+
+    @Test
+    void int_long() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        String id = "1";
+        String age = "30";
+        request.addParameter("id", id);
+        request.addParameter("age", age);
+
+        Class clazz = TestUserController.class;
+        Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
+        String[] parameterNames = nameDiscoverer.getParameterNames(method);
+
+        Object[] values = new Object[parameterNames.length];
+        for (int i = 0; i < parameterNames.length; i++) {
+            String parameterName = parameterNames[i];
+            logger.debug("parameter : {}", parameterName);
+            values[i] = request.getParameter(parameterName);
+        }
+
+        ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), Long.parseLong(values[0].toString()), Integer.parseInt(values[1].toString()));
+        assertThat(mav.getObject("id")).isEqualTo(Long.parseLong(id));
+        assertThat(mav.getObject("age")).isEqualTo(Integer.parseInt(age));
     }
 
     private Method getMethod(String name, Method[] methods) {

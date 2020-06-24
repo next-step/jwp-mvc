@@ -1,11 +1,14 @@
 package core.mvc.tobe;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
+import next.view.UserCreateView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,14 +29,18 @@ public class MyController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(
-                request.getParameter("userId"),
-                request.getParameter("password"),
-                request.getParameter("name"),
-                request.getParameter("email"));
+    public ModelAndView save(UserCreateView userCreateView) {
+        User user = userCreateView.toUser();
         logger.debug("User : {}", user);
         DataBase.addUser(user);
         return null;
+    }
+
+    @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
+    public ModelAndView findUser(@PathVariable String userId) throws Exception {
+        User user = DataBase.findUserById(userId);
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/profile.jsp"));
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 }

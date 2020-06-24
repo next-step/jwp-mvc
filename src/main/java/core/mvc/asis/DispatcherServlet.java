@@ -31,15 +31,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        mapping = new AnnotationHandlerMapping(CONTROLLER_PATH);
-        mapping.initialize();
-
-        // TODO 추후 삭제
-        rm = new LegacyHandlerMapping();
-        rm.initMapping();
-
-        handlerMappings.add(mapping);
-        handlerMappings.add(rm);
+        handlerMappings.add(new LegacyHandlerMapping());
+        handlerMappings.add(new AnnotationHandlerMapping(CONTROLLER_PATH));
     }
 
     @Override

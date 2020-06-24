@@ -1,7 +1,9 @@
 package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
-import next.controller.asis.*;
+import next.controller.asis.LogoutController;
+import next.controller.asis.UpdateFormUserController;
+import next.controller.asis.UpdateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +15,8 @@ public class LegacyHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
-    void initMapping() {
-        mappings.put("/users/profile", new ProfileController());
+    public LegacyHandlerMapping() {
         mappings.put("/users/logout", new LogoutController());
-        mappings.put("/users/create", new CreateUserController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
 
@@ -24,14 +24,6 @@ public class LegacyHandlerMapping implements HandlerMapping {
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });
-    }
-
-    public Controller findController(String url) {
-        return mappings.get(url);
-    }
-
-    void put(String url, Controller controller) {
-        mappings.put(url, controller);
     }
 
     @Override
