@@ -35,7 +35,7 @@ public class HandlerExecution {
         List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
-            result.add(new MethodParameter(names[i], types[i], parameterAnnotations[i].length == 0 ? null : parameterAnnotations[i][0]));
+            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i])));
         }
 
         return Collections.unmodifiableList(result);

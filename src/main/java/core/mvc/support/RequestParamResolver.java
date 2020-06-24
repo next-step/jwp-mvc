@@ -40,7 +40,7 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
     }
 
     private String fetchParameterName(MethodParameter parameter) {
-        final RequestParam requestParam = (RequestParam) parameter.getAnnotation();
+        final RequestParam requestParam = (RequestParam) parameter.getAnnotation(RequestParam.class);
         if (requestParam != null && !"".equals(requestParam.value())) {
             return requestParam.value();
         }

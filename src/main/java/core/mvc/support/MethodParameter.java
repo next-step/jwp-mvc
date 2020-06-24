@@ -2,16 +2,18 @@ package core.mvc.support;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MethodParameter {
     private final String name;
     private final Class<?> type;
-    private final Annotation annotation;
+    private final List<Annotation> annotations;
 
-    public MethodParameter(String name, Class<?> type, Annotation annotation) {
+    public MethodParameter(String name, Class<?> type, List<Annotation> annotation) {
         this.name = name;
         this.type = type;
-        this.annotation = annotation;
+        this.annotations = Collections.unmodifiableList(annotation);
     }
 
     public boolean matchClass(Class<?> clazz) {
@@ -30,16 +32,20 @@ public class MethodParameter {
         return name;
     }
 
-    public Annotation getAnnotation() {
-        return annotation;
+    public Annotation getAnnotation(Class<?> clazz) {
+        return annotations.stream()
+                .filter(a -> a.annotationType().equals(clazz))
+                .findFirst()
+                .orElse(null);
     }
 
     public boolean isEmptyAnnotation() {
-        return annotation == null;
+        return annotations.isEmpty();
     }
 
     public boolean isAnnotationType(Class<?> clazz) {
-        return annotation.annotationType().equals(clazz);
+        return annotations.stream()
+                .anyMatch(a -> a.annotationType().equals(clazz));
     }
 
 }
