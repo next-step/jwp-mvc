@@ -103,4 +103,16 @@ public class AnnotationHandlerMappingTest {
         assertEquals(testUser.getPassword(),"1234");
 
     }
+
+    @Test
+    public void pathVariableTest() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        HandlerExecution execution = handlerMapping.getHandler(request);
+
+        ModelAndView modelAndView = execution.handle(request, response);
+
+        assertEquals(modelAndView.getObject("id"),(long)1);
+    }
 }

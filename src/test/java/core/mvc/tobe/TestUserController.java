@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
@@ -35,20 +36,20 @@ public class TestUserController {
         return mav;
     }*/
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_javabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
         mav.addObject("testUser", testUser);
         return mav;
-    }
+    }*/
 
 
- /*   @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public ModelAndView show_pathvariable(@PathVariable long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
         return mav;
-    }*/
+    }
 }
