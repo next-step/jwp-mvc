@@ -1,15 +1,19 @@
-package core.mvc.tobe;
+package core.mvc.tobe.controller;
 
-import core.db.DataBase;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.lang.reflect.InvocationTargetException;
 
-public class AnnotationHandlerMappingTest {
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+class UpdateUserControllerTest {
+
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
@@ -19,18 +23,15 @@ public class AnnotationHandlerMappingTest {
     }
 
     @Test
-    public void create_find() throws Exception {
+    void updateUser() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
         createUser(user);
-        assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
-
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/profile");
-        request.setParameter("userId", user.getUserId());
+        MockHttpServletRequest request = new MockHttpServletRequest("PATCH", "/users/update");
+        request.setParameter("userId", "seongju");
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        assertThatExceptionOfType(InvocationTargetException.class).isThrownBy(() -> execution.handle(request, response));
 
-        assertThat(request.getAttribute("user")).isEqualTo(user);
     }
 
     private void createUser(User user) throws Exception {
