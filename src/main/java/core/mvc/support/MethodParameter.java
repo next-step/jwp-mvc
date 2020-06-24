@@ -1,13 +1,12 @@
 package core.mvc.support;
 
-import core.annotation.web.RequestParam;
-
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 public class MethodParameter {
-    private String name;
-    private Class<?> type;
-    private Annotation annotation;
+    private final String name;
+    private final Class<?> type;
+    private final Annotation annotation;
 
     public MethodParameter(String name, Class<?> type, Annotation annotation) {
         this.name = name;
@@ -15,18 +14,32 @@ public class MethodParameter {
         this.annotation = annotation;
     }
 
-    public boolean isSameClass(Class<?> clazz) {
+    public boolean matchClass(Class<?> clazz) {
         return type.equals(clazz);
     }
 
+    public boolean anyMatchClass(Class<?>... classes) {
+        return Arrays.stream(classes)
+                .map(this::matchClass)
+                .filter(Boolean::booleanValue)
+                .findFirst()
+                .orElse(false);
+    }
+
     public String getName() {
-        if (annotation.annotationType().equals(RequestParam.class)) {
-            String annotationValue = ((RequestParam) annotation).value();
-            if (!"".equals(annotationValue)) {
-                return annotationValue;
-            }
-        }
         return name;
+    }
+
+    public Annotation getAnnotation() {
+        return annotation;
+    }
+
+    public boolean isEmptyAnnotation() {
+        return annotation == null;
+    }
+
+    public boolean isAnnotationType(Class<?> clazz) {
+        return annotation.annotationType().equals(clazz);
     }
 
 }

@@ -13,7 +13,7 @@ public class ServletResponseResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportParameter(MethodParameter parameter) {
-        boolean isResponse = parameter.isSameClass(HttpServletResponse.class);
+        final boolean isResponse = parameter.matchClass(HttpServletResponse.class);
         return isResponse;
     }
 

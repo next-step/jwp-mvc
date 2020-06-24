@@ -1,28 +1,49 @@
 package core.mvc.support;
 
+import core.annotation.web.RequestParam;
+
 import javax.servlet.http.HttpServletRequest;
 
 public class RequestParamResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportParameter(MethodParameter parameter) {
-        return parameter.isSameClass(String.class) ||
-                parameter.isSameClass(int.class) ||
-                parameter.isSameClass(long.class);
+        if (!isSupportableType(parameter)) {
+            return false;
+        }
+
+        if (!parameter.isEmptyAnnotation() && !parameter.isAnnotationType(RequestParam.class)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isSupportableType(MethodParameter parameter) {
+        return parameter.anyMatchClass(String.class, int.class, long.class);
     }
 
     @Override
     public Object resolve(MethodParameter parameter, HttpServletRequest request) {
-        Object value = request.getParameter(parameter.getName());
+        final String parameterName = fetchParameterName(parameter);
+        final Object parameterValue = request.getParameter(parameterName);
 
-        if (parameter.isSameClass(int.class)) {
-            return Integer.valueOf((int)value);
+        if (parameter.matchClass(int.class)) {
+            return Integer.valueOf((int) parameterValue);
         }
 
-        if (parameter.isSameClass(long.class)) {
-            return Long.valueOf((long)value);
+        if (parameter.matchClass(long.class)) {
+            return Long.valueOf((long) parameterValue);
         }
 
-        return value;
+        return parameterValue;
+    }
+
+    private String fetchParameterName(MethodParameter parameter) {
+        final RequestParam requestParam = (RequestParam) parameter.getAnnotation();
+        if (requestParam != null && !"".equals(requestParam.value())) {
+            return requestParam.value();
+        }
+        return parameter.getName();
     }
 }
