@@ -12,7 +12,7 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
             return false;
         }
 
-        if (!parameter.isAnnotationType(RequestParam.class)) {
+        if (!parameter.isEmptyAnnotation() && !parameter.hasAnnotationType(RequestParam.class)) {
             return false;
         }
 
