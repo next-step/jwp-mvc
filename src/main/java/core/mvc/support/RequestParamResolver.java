@@ -28,6 +28,10 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
         final String parameterName = fetchParameterName(parameter);
         final Object parameterValue = request.getParameter(parameterName);
 
+        if (parameterValue == null) {
+            validateNullable(parameterName, parameter);
+        }
+
         if (parameter.matchClass(int.class)) {
             return Integer.valueOf((int) parameterValue);
         }
@@ -37,6 +41,15 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
         }
 
         return parameterValue;
+    }
+
+    private void validateNullable(String parameterName, MethodParameter parameter) {
+        final RequestParam requestParam = (RequestParam) parameter.getAnnotation(RequestParam.class);
+        final boolean isNullable = !requestParam.required();
+
+        if (!isNullable) {
+            throw new RuntimeException("파라미터(" + parameterName + ")의 값이 비어있습니다.");
+        }
     }
 
     private String fetchParameterName(MethodParameter parameter) {
