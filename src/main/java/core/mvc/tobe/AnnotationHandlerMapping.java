@@ -28,7 +28,6 @@ public class AnnotationHandlerMapping implements RequestHandlerMapping {
         Reflections reflections = new Reflections(basePackage);
 
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class, true);
-
         controllers.stream()
                 .forEach(c -> {
                     handlerExecutions.putAll(makeRequestMappingHandlerMap(c));
