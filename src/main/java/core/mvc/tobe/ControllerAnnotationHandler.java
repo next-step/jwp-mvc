@@ -36,7 +36,6 @@ public class ControllerAnnotationHandler {
     }
 
     private static void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
-
             if (requestMapping.method().equals(RequestMethod.ALL)) {
                 Arrays.stream(RequestMethod.values())
                         .forEach(requestMethod -> {
@@ -45,6 +44,7 @@ public class ControllerAnnotationHandler {
                                 logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
                             }
                         });
+                return;
             }
             final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
             AnnotationHandlerMapping.handlerExecutions.put(handlerKey, handlerExecution);
