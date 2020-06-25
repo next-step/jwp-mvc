@@ -2,38 +2,49 @@ package next.reflection;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+    static Stream<Arguments> keyAndValue() {
+        return Stream.of(
+                Arguments.of("name", "jinwoo"),
+                Arguments.of("age", 30)
+        );
+    }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("private 필드에 직접 값을 할당하여 테스트를 진행")
-    public void privateFieldAccess() throws Exception {
+    @MethodSource(value = "keyAndValue")
+    public void privateFieldAccess(final String fieldName, final Object fieldValue) throws Exception {
         final Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
 
         final Student student = new Student();
-        final Field name = clazz.getDeclaredField("name");
+        final Field name = clazz.getDeclaredField(fieldName);
         name.setAccessible(true);
-        name.set(student, "jinwoo");
+        name.set(student, fieldValue);
 
-        final Field age = clazz.getDeclaredField("age");
-        age.setAccessible(true);
-        age.set(student, 30);
-
-        assertThat(student.getName()).isEqualTo("jinwoo");
-        assertThat(student.getAge()).isEqualTo(30);
+        final String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        final Method getterMethod = clazz.getDeclaredMethod(methodName);
+        final Object result = getterMethod.invoke(student);
+        assertThat(result).isEqualTo(fieldValue);
     }
 
     @Test
