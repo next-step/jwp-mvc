@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
+    @DisplayName("private 필드에 직접 값을 할당하여 테스트를 진행")
     public void privateFieldAccess() throws Exception {
         final Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
