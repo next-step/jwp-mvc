@@ -1,17 +1,16 @@
 package core.mvc.tobe;
 
-import org.springframework.web.util.pattern.PathPattern;
-
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Created By kjs4395 on 2020-06-24
- *
+ * <p>
  * 메소드 invoke 를 하기 위해 request에서 적절한 값을 찾아내는 과정
  */
 public interface HandlerMethodHelper {
 
-    public Object bindingProcess(Class<?> type, String name, PathPattern pathPattern,HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException;
+    boolean support(ParameterInfo parameterInfo);
+
+    Object bindingProcess(ParameterInfo parameterInfo, HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException;
 }

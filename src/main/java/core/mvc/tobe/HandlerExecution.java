@@ -6,12 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.util.ClassUtils;
 import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,35 +27,18 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InstantiationException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
-
+        ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] bindObjects = new Object[parameterTypes.length];
-        ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
         String[] names = nameDiscoverer.getParameterNames(method);
         PathPattern pathPattern = PathPatternUtil.getPathPattern(method.getDeclaredAnnotation(RequestMapping.class).value());
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        for(int i=0; i<parameterTypes.length; i++) {
-            Class<?> parameterType = parameterTypes[i];
-
-            if(parameterAnnotations[i].length >0) {
-                //annotaion이 존재한다는 소리
-                AnnotationParameterHelper annotationParameterHelper = new AnnotationParameterHelper();
-                bindObjects[i] =annotationParameterHelper.bindingProcess(parameterType, names[i], pathPattern, request);
-                continue;
-            }
-
-            if(ClassUtils.isPrimitiveOrWrapper(parameterType)) {
-                OriginalParameterBinding originalParameterBinding = new OriginalParameterBinding();
-                bindObjects[i] = originalParameterBinding.bindingProcess(parameterType, names[i],pathPattern, request);
-                continue;
-            }  //object 라고 간주
-
-            ObjectParameterHelper objectParameterHelper = new ObjectParameterHelper();
-            bindObjects[i] = objectParameterHelper.bindingProcess(parameterType, names[i],pathPattern, request);
-
+        for (int i = 0; i < parameterTypes.length; i++) {
+            ParameterInfo parameterInfo = new ParameterInfo(parameterTypes[i], names[i], pathPattern, parameterAnnotations[i]);
+            bindObjects[i] = Helpers.executeHelper(parameterInfo, request);
         }
-        return (ModelAndView) method.invoke(clazz.newInstance(),bindObjects);
+        return (ModelAndView) method.invoke(clazz.newInstance(), bindObjects);
     }
 
 }

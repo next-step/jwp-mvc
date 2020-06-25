@@ -1,11 +1,8 @@
 package core.mvc.tobe;
 
-import org.springframework.web.util.pattern.PathPattern;
-
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +13,20 @@ import java.util.List;
 public class ObjectParameterHelper implements HandlerMethodHelper {
 
     @Override
-    public Object bindingProcess(Class<?> type, String name, PathPattern pathPattern, HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Field[] fields = type.getDeclaredFields();
+    public boolean support(ParameterInfo parameterInfo) {
+        return !parameterInfo.isOriginalType() && !parameterInfo.isAnnotated();
+    }
+
+    @Override
+    public Object bindingProcess(ParameterInfo parameterInfo, HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Field[] fields = parameterInfo.getType().getDeclaredFields();
         List<Class<?>> argumentTypes = new ArrayList<>();
         List<Object> values = new ArrayList<>();
 
-        for(Field field : fields) {
+        for (Field field : fields) {
             String parameterValue = request.getParameter(field.getName());
 
-            if(parameterValue == null) {
+            if (parameterValue == null) {
                 continue;
             }
             argumentTypes.add(field.getType());
@@ -34,7 +36,7 @@ public class ObjectParameterHelper implements HandlerMethodHelper {
         Class[] classes = new Class[argumentTypes.size()];
         classes = argumentTypes.toArray(classes);
 
-        Constructor constructor = type.getConstructor(classes);
+        Constructor constructor = parameterInfo.getType().getConstructor(classes);
         return constructor.newInstance(values.toArray());
     }
 }
