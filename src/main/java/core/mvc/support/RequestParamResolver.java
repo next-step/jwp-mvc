@@ -26,18 +26,18 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolve(MethodParameter parameter, HttpServletRequest request) {
         final String parameterName = fetchParameterName(parameter);
-        final Object parameterValue = request.getParameter(parameterName);
+        final String parameterValue = request.getParameter(parameterName);
 
         if (parameterValue == null) {
             validateNullable(parameterName, parameter);
         }
 
         if (parameter.matchClass(int.class)) {
-            return Integer.valueOf((int) parameterValue);
+            return Integer.parseInt(parameterValue);
         }
 
         if (parameter.matchClass(long.class)) {
-            return Long.valueOf((long) parameterValue);
+            return Long.parseLong(parameterValue);
         }
 
         return parameterValue;
