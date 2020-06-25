@@ -8,6 +8,7 @@ import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class MethodInfo {
     public Object[] bindingParameters(HttpServletRequest request) {
         return this.parameters
                 .stream()
-                .map(parameter -> Helpers.executeHelper(parameter,request))
+                .map(parameter ->Helpers.executeHelper(parameter,request))
                 .toArray();
     }
 }
