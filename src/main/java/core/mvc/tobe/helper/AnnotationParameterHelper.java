@@ -1,7 +1,8 @@
-package core.mvc.tobe;
+package core.mvc.tobe.helper;
+
+import core.mvc.tobe.ParameterInfo;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public class AnnotationParameterHelper implements HandlerMethodHelper {
@@ -11,7 +12,7 @@ public class AnnotationParameterHelper implements HandlerMethodHelper {
     }
 
     @Override
-    public Object bindingProcess(ParameterInfo parameterInfo, HttpServletRequest request) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Object bindingProcess(ParameterInfo parameterInfo, HttpServletRequest request)  {
         Map<String, String> values = parameterInfo.getUrlVariables(request);
 
         String value = values.get(parameterInfo.getValueName());
