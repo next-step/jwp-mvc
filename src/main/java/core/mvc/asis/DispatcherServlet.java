@@ -4,7 +4,7 @@ import core.mvc.ControllerExecutor;
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.requestAdapter.HandlerAdapters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +42,7 @@ public class DispatcherServlet extends HttpServlet {
         Object executor = ControllerExecutor.findExecutor(requestMappings, req);
 
         try {
-            if (executor instanceof Controller) {
-                modelAndView = new ModelAndView(((Controller) executor).execute(req, resp));
-            }
-
-            if (executor instanceof HandlerExecution) {
-                modelAndView = ((HandlerExecution) executor).handle(req, resp);
-            }
-
+            HandlerAdapters.executeHandler(req, resp, executor);
             this.viewRender(modelAndView, req, resp);
         } catch (Exception e) {
             throw new ServletException("Displatcher servlet throw Exception", e);
