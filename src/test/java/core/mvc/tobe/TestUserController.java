@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
-/*    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_string(String userId, String password) {
         logger.debug("userId: {}, password: {}", userId, password);
         ModelAndView mav = new ModelAndView();
@@ -20,14 +20,14 @@ public class TestUserController {
         mav.addObject("password", password);
         return mav;
     }
-
+/*
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ModelAndView testNoArgMethod() {
         logger.debug("test no Args");
         return new ModelAndView();
-    }
+    }*/
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+/*    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_int_long(long id, int age) {
         logger.debug("id: {}, age: {}", id, age);
         ModelAndView mav = new ModelAndView();
@@ -36,7 +36,7 @@ public class TestUserController {
         return mav;
     }*/
 
-    /*@RequestMapping(value = "/users", method = RequestMethod.POST)
+  /*  @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_javabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
@@ -45,11 +45,11 @@ public class TestUserController {
     }*/
 
 
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+/*    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public ModelAndView show_pathvariable(@PathVariable long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
         return mav;
-    }
+    }*/
 }

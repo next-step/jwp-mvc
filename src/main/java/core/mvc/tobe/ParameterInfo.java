@@ -47,7 +47,12 @@ public class ParameterInfo {
     }
 
     public boolean isOriginalType() {
-        return ClassUtils.isPrimitiveOrWrapper(this.type);
+
+        if(ClassUtils.isPrimitiveOrWrapper(this.type)) {
+            return true;
+        }
+
+        return String.class.getName().equalsIgnoreCase(type.getName());
     }
 
     public boolean isAnnotated() {
