@@ -25,16 +25,16 @@ public class LoginController {
         if (canUserLogin(user, password)) {
             HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return ModelAndView.withRedirectView("/");
+            return new ModelAndView("redirect:/");
         }
 
         request.setAttribute("loginFailed", true);
-        return ModelAndView.withJspView("/user/login");
+        return new ModelAndView("/user/login.jsp");
     }
 
     @RequestMapping(value = "/users/loginForm", method = GET)
     public ModelAndView forwardLoginForm(HttpServletRequest request, HttpServletResponse response) {
-        return ModelAndView.withJspView("/user/login");
+        return new ModelAndView("/user/login.jsp");
     }
 
     private boolean canUserLogin(User user, String password) {

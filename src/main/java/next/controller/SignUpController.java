@@ -14,6 +14,6 @@ public class SignUpController {
 
     @RequestMapping(value = "/users/form", method = GET)
     public ModelAndView getSignUpForm(HttpServletRequest request, HttpServletResponse response) {
-        return ModelAndView.withJspView("/user/form");
+        return new ModelAndView("/user/form.jsp");
     }
 }
