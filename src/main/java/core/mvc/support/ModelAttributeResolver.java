@@ -50,13 +50,30 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
             for (Field field : fields) {
                 final String fieldName = field.getName();
                 field.setAccessible(true);
-                field.set(instance, request.getParameter(fieldName));
+
+                final String parameterValueStr = request.getParameter(fieldName);
+                final Object parameterValue = parseType(parameterValueStr, field);
+
+                field.set(instance, parameterValue);
             }
             return instance;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             throw new RuntimeException("리플렉션 예외");
         }
+    }
+
+    private Object parseType(String parameterValueStr, Field field) {
+        Class<?> fieldType = field.getType();
+
+        if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
+            return Integer.parseInt(parameterValueStr);
+        }
+
+        if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
+            return Integer.parseInt(parameterValueStr);
+        }
+        return parameterValueStr;
     }
 
     private String fetchParameterName(MethodParameter parameter) {
