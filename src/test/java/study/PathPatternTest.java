@@ -1,4 +1,4 @@
-package core.mvc.support;
+package study;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.server.PathContainer;

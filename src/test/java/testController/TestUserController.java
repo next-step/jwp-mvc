@@ -50,4 +50,13 @@ public class TestUserController {
         mav.addObject("id", id);
         return mav;
     }
+
+    @RequestMapping(value = "/users/wrong/{id}", method = RequestMethod.GET)
+    public ModelAndView userId(@PathVariable long notId) {
+        logger.debug("userId: {}", notId);
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("id", notId);
+        return mav;
+    }
 }

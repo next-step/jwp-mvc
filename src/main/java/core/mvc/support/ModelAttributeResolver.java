@@ -1,6 +1,7 @@
 package core.mvc.support;
 
 import core.annotation.web.ModelAttribute;
+import core.mvc.support.exception.FailedNewInstanceException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,38 +36,42 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
     }
 
     private Object createParameterValue(MethodParameter parameter, HttpServletRequest request) {
+        final Class<?> clazz = parameter.getType();
+        Object instance = newInstance(clazz);
+
         final ModelAttribute modelAttribute = (ModelAttribute) parameter.getAnnotation(ModelAttribute.class);
+        if (modelAttribute != null && !modelAttribute.binding()) {
+            return instance;
+        }
+
+        final Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            final String fieldName = field.getName();
+            final String parameterValueStr = request.getParameter(fieldName);
+            final Object parameterValue = parseType(parameterValueStr, field);
+
+            try {
+                field.setAccessible(true);
+                field.set(instance, parameterValue);
+            } catch (IllegalAccessException e) {
+                // ignore. Does not happen.
+            }
+        }
+        return instance;
+    }
+
+    private Object newInstance(Class<?> clazz) {
         try {
-            final Class<?> clazz = parameter.getType();
             final Constructor c = clazz.getDeclaredConstructor();
             c.setAccessible(true);
-
-            final Object instance = c.newInstance();
-
-            if (modelAttribute != null && !modelAttribute.binding()) {
-                return instance;
-            }
-
-            final Field[] fields = clazz.getDeclaredFields();
-
-            for (Field field : fields) {
-                final String fieldName = field.getName();
-                field.setAccessible(true);
-
-                final String parameterValueStr = request.getParameter(fieldName);
-                final Object parameterValue = parseType(parameterValueStr, field);
-
-                field.set(instance, parameterValue);
-            }
-            return instance;
+            return c.newInstance();
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            throw new RuntimeException("리플렉션 예외");
+            throw new FailedNewInstanceException(clazz, e);
         }
     }
 
     private Object parseType(String parameterValueStr, Field field) {
-        Class<?> fieldType = field.getType();
+        final Class<?> fieldType = field.getType();
 
         if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
             return Integer.parseInt(parameterValueStr);
@@ -78,11 +83,4 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
         return parameterValueStr;
     }
 
-    private String fetchParameterName(MethodParameter parameter) {
-        final ModelAttribute modelAttribute = (ModelAttribute) parameter.getAnnotation(ModelAttribute.class);
-        if (modelAttribute != null && !"".equals(modelAttribute.value())) {
-            return modelAttribute.value();
-        }
-        return parameter.getName();
-    }
 }

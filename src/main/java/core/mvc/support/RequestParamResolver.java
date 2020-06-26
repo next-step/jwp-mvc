@@ -1,6 +1,7 @@
 package core.mvc.support;
 
 import core.annotation.web.RequestParam;
+import core.mvc.support.exception.MissingRequestParamException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +50,7 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
         final boolean isNullable = !requestParam.required();
 
         if (!isNullable) {
-            throw new RuntimeException("파라미터(" + parameterName + ")의 값이 비어있습니다.");
+            throw new MissingRequestParamException(parameterName);
         }
     }
 

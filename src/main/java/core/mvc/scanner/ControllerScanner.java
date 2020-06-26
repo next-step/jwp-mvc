@@ -2,6 +2,7 @@ package core.mvc.scanner;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
+import core.mvc.support.exception.FailedNewInstanceException;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Constructor;
@@ -26,11 +27,11 @@ public class ControllerScanner implements Scanner {
 
     private Object newInstance(Class<?> controllerClass) {
         try {
-            Constructor<?> constructor = controllerClass.getDeclaredConstructor();
+            final Constructor<?> constructor = controllerClass.getDeclaredConstructor();
             constructor.setAccessible(true);
             return constructor.newInstance();
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new FailedNewInstanceException(controllerClass, e);
         }
     }
 

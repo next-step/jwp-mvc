@@ -3,6 +3,7 @@ package core.mvc.support;
 import core.mvc.ModelAndView;
 import core.mvc.handler.HandlerExecution;
 import core.mvc.handlerMapping.AnnotationHandlerMapping;
+import core.mvc.support.exception.MissingPathPatternException;
 import core.mvc.tobe.TestUser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +13,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class PathPatternTest2 {
+public class PathVariableResolverTest {
 
     private static final String BASE_PACKAGE = "testController";
     private static AnnotationHandlerMapping ahm;
@@ -106,7 +108,7 @@ public class PathPatternTest2 {
     }
 
     @Test
-    @DisplayName("핸들러의 파라미터에 @PathVariable 이 존재할 경우 path에서 지정한 패턴에 일치하는 값을 받아올 수 있")
+    @DisplayName("핸들러의 파라미터에 @PathVariable 이 존재할 경우 path에서 지정한 패턴에 일치하는 값을 받아올 수 있다")
     public void pathParam() throws Exception {
         // given
         final long id = 37;
@@ -123,6 +125,26 @@ public class PathPatternTest2 {
         // then
         assertThat(mav).isNotNull();
         assertThat(mav.getModel().get("id")).isEqualTo(id);
+    }
+
+    @Test
+    @DisplayName("핸들러의 파라미터에 @PathVariable 변수 이름이 PathPattern에 존재하지 않는 경우 에러를 반환한다")
+    public void pathParamError() {
+        // given
+        final long id = 37;
+        request.setRequestURI("/users/wrong/" + id);
+        request.setMethod("GET");
+
+        final HandlerExecution handler = ahm.getHandler(request);
+
+        handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
+
+        // when
+        final Throwable thrown = catchThrowable(() -> handler.handle(request, response, handlerMethodArgumentResolverComposite));
+
+        // then
+        assertThat(thrown).isInstanceOf(MissingPathPatternException.class)
+                .hasMessageContaining("url 에서 'notId'를 가져올 수 없음");
     }
 
 }

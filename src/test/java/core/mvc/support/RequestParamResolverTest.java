@@ -2,7 +2,9 @@ package core.mvc.support;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestParam;
+import core.mvc.support.exception.MissingRequestParamException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ConvertWith;
@@ -99,7 +101,8 @@ class RequestParamResolverTest {
                 .toArray());
 
         // then
-        assertThat(thrown).isInstanceOf(RuntimeException.class);
+        assertThat(thrown).isInstanceOf(MissingRequestParamException.class)
+                .hasMessageContaining("파라미터(username)의 값이 비어있습니다.");
     }
 }
 

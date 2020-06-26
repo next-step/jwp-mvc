@@ -44,7 +44,7 @@ public class UserController {
         final User user = DataBase.findUserById(userId);
 
         if (user == null) {
-            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+            throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
 
         request.setAttribute("user", user);
