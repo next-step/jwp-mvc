@@ -1,23 +1,23 @@
 package core.mvc.support;
 
 import core.annotation.web.ModelAttribute;
+import core.annotation.web.RequestMapping;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
-import testUtils.NullableConverter;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class ModelAttributeParamResolverTest {
 
@@ -62,10 +62,14 @@ public class ModelAttributeParamResolverTest {
         Class<?>[] types = method.getParameterTypes();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
+        PathPatternParser pp = new PathPatternParser();
+        pp.setMatchOptionalTrailingSeparator(true);
+        PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
+
         List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
-            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i])));
+            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
         }
 
         return Collections.unmodifiableList(result);

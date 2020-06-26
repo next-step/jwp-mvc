@@ -1,5 +1,6 @@
 package core.mvc.support;
 
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestParam;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 import testUtils.NullableConverter;
 
 import java.lang.annotation.Annotation;
@@ -62,10 +65,14 @@ class RequestParamResolverTest {
         Class<?>[] types = method.getParameterTypes();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
+        PathPatternParser pp = new PathPatternParser();
+        pp.setMatchOptionalTrailingSeparator(true);
+        PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
+
         List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
-            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i])));
+            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
         }
 
         return Collections.unmodifiableList(result);

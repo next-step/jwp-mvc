@@ -2,16 +2,21 @@ package core.mvc.handler;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.support.*;
 import core.mvc.ModelAndView;
+import core.mvc.support.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class HandlerExecution {
@@ -32,10 +37,14 @@ public class HandlerExecution {
         Class<?>[] types = method.getParameterTypes();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
+        PathPatternParser pp = new PathPatternParser();
+        pp.setMatchOptionalTrailingSeparator(true);
+        PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
+
         List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
-            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i])));
+            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
         }
 
         return Collections.unmodifiableList(result);
@@ -47,6 +56,7 @@ public class HandlerExecution {
         handlerMethodArgumentResolverComposite.addResolver(new ServletResponseResolver(response));
         handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
         handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
+        handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
 
         final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request);
         return (ModelAndView) method.invoke(instance, methodArguments);

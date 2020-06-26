@@ -1,19 +1,22 @@
 package core.mvc.support;
 
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MethodParameter {
     private final String name;
     private final Class<?> type;
     private final List<Annotation> annotations;
+    private final PathPattern pathPattern;
 
-    public MethodParameter(String name, Class<?> type, List<Annotation> annotation) {
+    public MethodParameter(String name, Class<?> type, List<Annotation> annotation, PathPattern pathPattern) {
         this.name = name;
         this.type = type;
         this.annotations = Collections.unmodifiableList(annotation);
+        this.pathPattern = pathPattern;
     }
 
     public boolean matchClass(Class<?> clazz) {
@@ -22,6 +25,11 @@ public class MethodParameter {
 
     public Class<?> getType() {
         return type;
+    }
+
+    public Optional<String> getPathVariable(String path, String name) {
+        final Map<String, String> variables = pathPattern.matchAndExtract(PathContainer.parsePath(path)).getUriVariables();
+        return Optional.ofNullable(variables.get(name));
     }
 
     public boolean anyMatchClass(Class<?>... classes) {
