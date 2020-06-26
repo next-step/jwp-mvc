@@ -10,19 +10,10 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportParameter(MethodParameter parameter) {
-        if (!isSupportableType(parameter)) {
-            return false;
+        if (parameter.anyMatchClass(String.class, int.class, long.class)) {
+            return true;
         }
-
-        if (!parameter.isEmptyAnnotation() && !parameter.hasAnnotationType(RequestParam.class)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean isSupportableType(MethodParameter parameter) {
-        return parameter.anyMatchClass(String.class, int.class, long.class);
+        return false;
     }
 
     @Override

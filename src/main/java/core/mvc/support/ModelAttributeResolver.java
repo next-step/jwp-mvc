@@ -13,16 +13,10 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportParameter(MethodParameter parameter) {
-        if (!isSupportableType(parameter)) {
+        if (parameter.anyMatchClass(String.class, int.class, long.class)) {
             return false;
         }
         return true;
-    }
-
-    private boolean isSupportableType(MethodParameter parameter) {
-        final Class<?> parameterType = parameter.getType();
-        return !parameterType.isPrimitive();
-
     }
 
     @Override
