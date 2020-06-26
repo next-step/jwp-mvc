@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
@@ -29,7 +30,17 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
+        String requestURI = req.getRequestURI();
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestURI);
+
+        try {
+            if (requestURI.startsWith(DEFAULT_REDIRECT_PREFIX)) {
+                resp.sendRedirect(requestURI);
+                return;
+            }
+        } catch (Throwable ex) {
+            throw new ServletException(ex);
+        }
 
         ModelAndView modelAndView = mappers.mapperHandling(req, resp);
         render(modelAndView, req, resp);
@@ -39,6 +50,7 @@ public class DispatcherServlet extends HttpServlet {
     private void render(ModelAndView mav, HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
             mav.getView().render(mav.getModel(), request, response);
+
         } catch (Throwable e) {
             logger.error("Exception: {}", e);
             throw new ServletException(e.getMessage());
