@@ -26,15 +26,6 @@ public class RequestHandlerMappers {
         mappers.add(mapper);
     }
 
-    public Object getHandler(final HttpServletRequest request) throws ServletException {
-        return
-                mappers.stream()
-                        .map(m -> m.getHandler(request))
-                        .filter(m -> m != null)
-                        .findFirst()
-                        .orElseThrow(() -> new ServletException("handler does not exists"));
-    }
-
     public ModelAndView mapperHandling(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
         try {
             Object handler = getHandler(request);
@@ -50,4 +41,14 @@ public class RequestHandlerMappers {
             throw new ServletException(e.getMessage());
         }
     }
+
+    private Object getHandler(final HttpServletRequest request) throws ServletException {
+        return
+                mappers.stream()
+                        .map(m -> m.getHandler(request))
+                        .filter(m -> m != null)
+                        .findFirst()
+                        .orElseThrow(() -> new ServletException("handler does not exists"));
+    }
+
 }
