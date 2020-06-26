@@ -2,8 +2,11 @@ package core.mvc.support;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestParam;
+import core.mvc.ModelAndView;
 import core.mvc.support.exception.MissingRequestParamException;
+import core.mvc.tobe.TestUser;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,11 +29,20 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 class RequestParamResolverTest {
 
-    static HandlerMethodArgumentResolver resolver;
+    private static HandlerMethodArgumentResolver resolver;
+
+    private MockHttpServletRequest request;
+    private MockHttpServletResponse response;
 
     @BeforeAll
     static void setUp() {
         resolver = new RequestParamResolver();
+    }
+
+    @BeforeEach
+    void setUpEach() {
+        request = new MockHttpServletRequest();
+        response = new MockHttpServletResponse();
     }
 
     @ParameterizedTest
@@ -40,13 +52,12 @@ class RequestParamResolverTest {
             "requestParamWithValue:username:bactoria:bactoria",
             "requestParamNotRequired:xx:xx:null"
     }, delimiter = ':')
+    @DisplayName("RequestParam이 정상적으로 동작한다")
     void all(String methodName, String paramName, String paramValue, @ConvertWith(NullableConverter.class) String expected) throws NoSuchMethodException {
         // given
         final Map<String, String> params = new HashMap<>();
         params.put(paramName, paramValue);
 
-        final MockHttpServletResponse response = new MockHttpServletResponse();
-        final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
 
         final List<MethodParameter> methodParameters = createMethodParameters(methodName);
@@ -61,35 +72,13 @@ class RequestParamResolverTest {
         assertThat(result[0]).isEqualTo(expected);
     }
 
-    private List<MethodParameter> createMethodParameters(String methodName) throws NoSuchMethodException {
-        final Method method = RequestParamResolverTestController.class.getDeclaredMethod(methodName, String.class);
-        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-
-        String[] names = nameDiscoverer.getParameterNames(method);
-        Class<?>[] types = method.getParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
-
-        List result = new ArrayList<>();
-
-        for (int i = 0; i < names.length; i++) {
-            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
-        }
-
-        return Collections.unmodifiableList(result);
-    }
-
     @Test
+    @DisplayName("Required=true 인 @RequestParam 의 경우 request에 매칭되는 파라미터가 없을 경우 에러를 반환한다")
     void notExistRequired() throws NoSuchMethodException {
         // given
         final String methodName = "requestParamWithValue";
         final Map<String, String> params = new HashMap<>();
 
-        final MockHttpServletResponse response = new MockHttpServletResponse();
-        final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
 
         final List<MethodParameter> methodParameters = createMethodParameters(methodName);
@@ -104,28 +93,49 @@ class RequestParamResolverTest {
         assertThat(thrown).isInstanceOf(MissingRequestParamException.class)
                 .hasMessageContaining("파라미터(username)의 값이 비어있습니다.");
     }
+
+    private List<MethodParameter> createMethodParameters(String methodName) throws NoSuchMethodException {
+        final Method method = RequestParamResolverTestController.class.getDeclaredMethod(methodName, String.class);
+        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+
+        final String[] names = nameDiscoverer.getParameterNames(method);
+        final Class<?>[] types = method.getParameterTypes();
+        final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+
+        final PathPatternParser pp = new PathPatternParser();
+        pp.setMatchOptionalTrailingSeparator(true);
+        final PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
+
+        List result = new ArrayList<>();
+
+        for (int i = 0; i < names.length; i++) {
+            result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
+        }
+
+        return Collections.unmodifiableList(result);
+    }
+
 }
 
 class RequestParamResolverTestController {
 
     @RequestMapping("/none")
-    String none(String name) {
-        return name;
+    ModelAndView none(String name) {
+        return null;
     }
 
     @RequestMapping("/requestParam")
-    String requestParam(@RequestParam String name) {
-        return name;
+    ModelAndView requestParam(@RequestParam String name) {
+        return null;
     }
 
     @RequestMapping("/requestParamWithValue")
-    String requestParamWithValue(@RequestParam("username") String name) {
-        return name;
+    ModelAndView requestParamWithValue(@RequestParam("username") String name) {
+        return null;
     }
 
     @RequestMapping("/requestParamNotRequired")
-    String requestParamNotRequired(@RequestParam(value = "username", required = false) String name) {
-        return name;
+    ModelAndView requestParamNotRequired(@RequestParam(value = "username", required = false) String name) {
+        return null;
     }
-
 }

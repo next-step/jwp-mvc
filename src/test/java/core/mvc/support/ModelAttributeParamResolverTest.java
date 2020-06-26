@@ -37,6 +37,7 @@ public class ModelAttributeParamResolverTest {
             "skipAnnotation:name:email:name:email",
             "withAnnotation:name:email:name:email",
     }, delimiter = ':')
+    @DisplayName("핸들러의 파라미터가 객체타입일 경우 ModelAttribute를 명시여부와 관련 없이 정상적으로 매핑된다")
     void all(String methodName, String nameValue, String emailValue, String expectedName, String expectedEmail) throws NoSuchMethodException {
         // given
         final Map<String, String> params = new HashMap<>();
@@ -83,7 +84,7 @@ public class ModelAttributeParamResolverTest {
     }
 
     @Test
-    @DisplayName("입력받지 못한 필드는 null이 주입된다")
+    @DisplayName("객체 타입의 파라미터의 필드 중 입력 받지 못한 필드가 존재할 경우 null이 주입된다")
     void fieldNull() throws NoSuchMethodException {
         // given
         final String nameValue = "name";
@@ -108,7 +109,7 @@ public class ModelAttributeParamResolverTest {
     }
 
     @Test
-    @DisplayName("binding이 false인 경우에는 필드가 비어있는 객체가 주입된다")
+    @DisplayName("binding=false인 @ModelAttribute 를 가진 파라미터의 경우 모든 필드가 null인 객체가 주입된다")
     void bindingFalse() throws NoSuchMethodException {
         // given
         final String methodName = "withAnnotationNoBinding";
