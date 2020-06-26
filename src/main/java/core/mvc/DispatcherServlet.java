@@ -5,6 +5,7 @@ import core.mvc.handlerMapping.AnnotationHandlerMapping;
 import core.mvc.handlerMapping.HandlerMapping;
 import core.mvc.support.*;
 import core.mvc.support.exception.HandlerNotFoundException;
+import core.mvc.view.JspView;
 import core.mvc.view.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +48,13 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
         try {
-            final Object handler = getHandler(req);
-            final ModelAndView mav = handle(handler, req, resp, handlerMethodArgumentResolverComposite);
+            ModelAndView mav = null;
+            try {
+                final Object handler = getHandler(req);
+                mav = handle(handler, req, resp, handlerMethodArgumentResolverComposite);
+            } catch (HandlerNotFoundException handlerNotFoundException) {
+                mav = new ModelAndView(new JspView("/error/page404.jsp"));
+            }
             render(mav, req, resp);
         } catch (Exception e) {
             logger.error("Exception is: ", e);
@@ -58,7 +64,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws Exception {
         if (handler instanceof HandlerExecution) {
-                return ((HandlerExecution) handler).handle(req, resp, handlerMethodArgumentResolverComposite);
+            return ((HandlerExecution) handler).handle(req, resp, handlerMethodArgumentResolverComposite);
         }
         throw new ServletException("handler not Found");
     }
