@@ -36,21 +36,17 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
-
-        final Object handler = getHandler(req);
-        final ModelAndView mav = handle(handler, req, resp);
-        render(mav, req, resp);
-    }
-
-    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
-            if (handler instanceof HandlerExecution) {
-                return ((HandlerExecution) handler).handle(req, resp);
-            }
-            throw new ServletException("handler not found");
+            final Object handler = getHandler(req);
+            final ModelAndView mav = handle(handler, req, resp);
+            render(mav, req, resp);
         } catch (Exception e) {
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        return ((HandlerExecution) handler).handle(req, resp);
     }
 
     private Object getHandler(HttpServletRequest req) throws ServletException {
@@ -61,15 +57,11 @@ public class DispatcherServlet extends HttpServlet {
                 .orElseThrow(ServletException::new);
     }
 
-    private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         final Map<String, Object> model = mav.getModel();
         final View view = mav.getView();
 
-        try {
-            view.render(model, req, resp);
-        } catch (Exception e) {
-            throw new ServletException(e.getMessage());
-        }
+        view.render(model, req, resp);
     }
 
 }

@@ -31,23 +31,31 @@ public class HandlerExecution {
     }
 
     private List<MethodParameter> createMethodParameters(Method method) {
-        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        final String[] names = createParameterNames();
+        final Class<?>[] types = method.getParameterTypes();
+        final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        final PathPattern pathPattern = createPathPattern();
 
-        String[] names = nameDiscoverer.getParameterNames(method);
-        Class<?>[] types = method.getParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
-
-        List result = new ArrayList<>();
+        final List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
             result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
         }
 
         return Collections.unmodifiableList(result);
+    }
+
+    private String[] createParameterNames() {
+        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        return nameDiscoverer.getParameterNames(method);
+    }
+
+    private PathPattern createPathPattern() {
+        final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        final PathPatternParser pp = new PathPatternParser();
+        pp.setMatchOptionalTrailingSeparator(true);
+
+        return pp.parse(requestMapping.value());
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
