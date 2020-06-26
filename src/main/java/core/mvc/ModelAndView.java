@@ -1,8 +1,7 @@
 package core.mvc;
 
-import core.mvc.view.JspView;
-import core.mvc.view.RedirectView;
 import core.mvc.view.View;
+import core.mvc.view.ViewResolvers;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +15,8 @@ import java.util.Map;
 @NoArgsConstructor
 public class ModelAndView {
 
+    private static final ViewResolvers VIEW_RESOLVERS = new ViewResolvers();
+
     private View view;
     private Map<String, Object> model = new HashMap<>();
 
@@ -23,12 +24,8 @@ public class ModelAndView {
         this.view = view;
     }
 
-    public static ModelAndView withJspView(String viewName) {
-        return new ModelAndView(new JspView(viewName));
-    }
-
-    public static ModelAndView withRedirectView(String location) {
-        return new ModelAndView(new RedirectView(location));
+    public ModelAndView(String viewName) {
+        this.view = VIEW_RESOLVERS.resolve(viewName);
     }
 
     public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {

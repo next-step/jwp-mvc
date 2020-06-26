@@ -1,24 +1,25 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMapping;
 import lombok.extern.slf4j.Slf4j;
 import next.controller.CreateUserController;
-import next.controller.HomeController;
 import next.controller.ListUserController;
-import next.controller.LoginController;
-import next.controller.LogoutController;
 import next.controller.ProfileController;
 import next.controller.UpdateFormUserController;
 import next.controller.UpdateUserController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-public class RequestMapping {
+public class RequestMapping implements HandlerMapping {
 
     private Map<String, Controller> mappings = new HashMap<>();
 
-    void initMapping() {
+    @Override
+    public void initialize() {
 //        mappings.put("/", new HomeController());
 //        mappings.put("/users/form", new ForwardController("/user/form.jsp"));
 //        mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
@@ -34,6 +35,18 @@ public class RequestMapping {
         mappings.keySet().forEach(path -> {
             log.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });
+    }
+
+    @Override
+    public boolean supports(HttpServletRequest request) {
+        return this.mappings.containsKey(request.getRequestURI());
+    }
+
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        Controller controller = findController(request.getRequestURI());
+
+        return new ControllerAdapter(controller);
     }
 
     public Controller findController(String url) {

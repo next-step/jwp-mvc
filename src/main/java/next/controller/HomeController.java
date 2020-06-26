@@ -17,6 +17,6 @@ public class HomeController {
     public ModelAndView getMainPage(HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("users", DataBase.findAll());
 
-        return ModelAndView.withJspView("home");
+        return new ModelAndView("home.jsp");
     }
 }

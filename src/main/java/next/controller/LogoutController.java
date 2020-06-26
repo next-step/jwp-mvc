@@ -18,6 +18,6 @@ public class LogoutController {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
 
-        return ModelAndView.withRedirectView("/");
+        return new ModelAndView("redirect:/");
     }
 }
