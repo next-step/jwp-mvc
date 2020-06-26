@@ -16,11 +16,6 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
         if (!isSupportableType(parameter)) {
             return false;
         }
-
-        if (!parameter.isEmptyAnnotation() && !parameter.hasAnnotationType(ModelAttribute.class)) {
-            return false;
-        }
-
         return true;
     }
 
@@ -37,7 +32,7 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
 
     private Object createParameterValue(MethodParameter parameter, HttpServletRequest request) {
         final Class<?> clazz = parameter.getType();
-        Object instance = newInstance(clazz);
+        final Object instance = newInstance(clazz);
 
         final ModelAttribute modelAttribute = (ModelAttribute) parameter.getAnnotation(ModelAttribute.class);
         if (modelAttribute != null && !modelAttribute.binding()) {
