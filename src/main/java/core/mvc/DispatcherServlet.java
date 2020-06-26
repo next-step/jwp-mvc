@@ -4,6 +4,7 @@ import core.mvc.handler.HandlerExecution;
 import core.mvc.handlerMapping.AnnotationHandlerMapping;
 import core.mvc.handlerMapping.HandlerMapping;
 import core.mvc.support.*;
+import core.mvc.support.exception.HandlerNotFoundException;
 import core.mvc.view.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +52,13 @@ public class DispatcherServlet extends HttpServlet {
             render(mav, req, resp);
         } catch (Exception e) {
             logger.error("Exception is: ", e);
-            throw new ServletException(e.getCause());
+            throw new ServletException(e.getMessage());
         }
     }
 
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws Exception {
         if (handler instanceof HandlerExecution) {
-            return ((HandlerExecution) handler).handle(req, resp, handlerMethodArgumentResolverComposite);
+                return ((HandlerExecution) handler).handle(req, resp, handlerMethodArgumentResolverComposite);
         }
         throw new ServletException("handler not Found");
     }
@@ -67,7 +68,7 @@ public class DispatcherServlet extends HttpServlet {
                 .map(hm -> hm.getHandler(req))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseThrow(ServletException::new);
+                .orElseThrow(() -> new HandlerNotFoundException(req.getRequestURI(), req.getMethod()));
     }
 
     private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws Exception {

@@ -3,7 +3,8 @@ package core.mvc.handler;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
-import core.mvc.support.*;
+import core.mvc.support.HandlerMethodArgumentResolverComposite;
+import core.mvc.support.MethodParameter;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.util.pattern.PathPattern;
@@ -12,6 +13,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,9 +61,17 @@ public class HandlerExecution {
         return pp.parse(requestMapping.value());
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws Exception {
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws IllegalAccessException {
         final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request, response);
-        return (ModelAndView) method.invoke(instance, methodArguments);
+        try {
+            return (ModelAndView) method.invoke(instance, methodArguments);
+        } catch (InvocationTargetException e) {
+            Throwable targetException = e.getTargetException();
+            if (targetException instanceof RuntimeException) {
+                throw (RuntimeException) e.getTargetException();
+            }
+            throw new RuntimeException("invoke failed");
+        }
     }
 
     public List<HandlerKey> createHandlerKeys() {
