@@ -1,8 +1,6 @@
 package core.mvc.tobe;
 
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
-import core.mvc.asis.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +28,10 @@ public class RequestHandlerMappers {
         try {
             Object handler = getHandler(request);
             logger.debug("handler: {}", handler);
-            if (handler instanceof Controller) {
-                String viewName = ((Controller) handler).execute(request, response);
-                return new ModelAndView(new JspView(viewName));
-            }
 
-            return ((HandlerExecution) handler).handle(request, response);
+            HandlerCommand handlerCommand = HandlerCommandFactory.create(handler, request, response);
+            return handlerCommand.execute(handler);
+
         } catch (Throwable e) {
             logger.error("Exception: {}", e);
             throw new ServletException(e.getMessage());
