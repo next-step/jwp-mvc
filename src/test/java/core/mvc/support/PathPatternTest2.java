@@ -20,6 +20,7 @@ public class PathPatternTest2 {
 
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
+    private HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite;
 
     @BeforeAll
     static void setUp() {
@@ -31,6 +32,7 @@ public class PathPatternTest2 {
     void setUpEach() {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
+        handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite();
     }
 
     @Test
@@ -44,8 +46,10 @@ public class PathPatternTest2 {
 
         final HandlerExecution handler = ahm.getHandler(request);
 
+        handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
+
         // when
-        final ModelAndView mav = handler.handle(request, response);
+        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
 
         // then
         assertThat(mav).isNotNull();
@@ -64,8 +68,10 @@ public class PathPatternTest2 {
 
         final HandlerExecution handler = ahm.getHandler(request);
 
+        handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
+
         // when
-        final ModelAndView mav = handler.handle(request, response);
+        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
 
         // then
         assertThat(mav).isNotNull();
@@ -89,8 +95,10 @@ public class PathPatternTest2 {
         request.setMethod("POST");
         final HandlerExecution handler = ahm.getHandler(request);
 
+        handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
+
         // when
-        final ModelAndView mav = handler.handle(request, response);
+        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
 
         // then
         assertThat(mav).isNotNull();
@@ -107,8 +115,10 @@ public class PathPatternTest2 {
 
         final HandlerExecution handler = ahm.getHandler(request);
 
+        handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
+
         // when
-        final ModelAndView mav = handler.handle(request, response);
+        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
 
         // then
         assertThat(mav).isNotNull();

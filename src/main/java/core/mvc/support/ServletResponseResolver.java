@@ -5,11 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ServletResponseResolver implements HandlerMethodArgumentResolver {
 
-    private final HttpServletResponse response;
-
-    public ServletResponseResolver(HttpServletResponse response) {
-        this.response = response;
-    }
+    public ServletResponseResolver() {}
 
     @Override
     public boolean supportParameter(MethodParameter parameter) {
@@ -18,7 +14,7 @@ public class ServletResponseResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolve(MethodParameter parameter, HttpServletRequest request) {
+    public Object resolve(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
         return response;
     }
 }

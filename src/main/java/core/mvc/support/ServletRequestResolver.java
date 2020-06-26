@@ -1,13 +1,11 @@
 package core.mvc.support;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class ServletRequestResolver implements HandlerMethodArgumentResolver {
 
-    private final HttpServletRequest request;
-
-    public ServletRequestResolver(HttpServletRequest request) {
-        this.request = request;
+    public ServletRequestResolver() {
     }
 
     @Override
@@ -17,7 +15,7 @@ public class ServletRequestResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolve(MethodParameter parameter, HttpServletRequest request) {
+    public Object resolve(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
         return request;
     }
 }

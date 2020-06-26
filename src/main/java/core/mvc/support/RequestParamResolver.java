@@ -3,6 +3,7 @@ package core.mvc.support;
 import core.annotation.web.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class RequestParamResolver implements HandlerMethodArgumentResolver {
 
@@ -24,7 +25,7 @@ public class RequestParamResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolve(MethodParameter parameter, HttpServletRequest request) {
+    public Object resolve(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
         final String parameterName = fetchParameterName(parameter);
         final String parameterValue = request.getParameter(parameterName);
 

@@ -2,6 +2,7 @@ package core.mvc.support;
 
 import core.annotation.web.ModelAttribute;
 import core.annotation.web.RequestMapping;
+import core.mvc.handler.HandlerExecution;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
@@ -22,10 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelAttributeParamResolverTest {
 
     static ModelAttributeResolver resolver;
+    static ModelAttributeResolverTestController controller;
 
     @BeforeAll
     static void setUp() {
         resolver = new ModelAttributeResolver();
+        controller = new ModelAttributeResolverTestController();
     }
 
     @ParameterizedTest
@@ -39,14 +43,17 @@ public class ModelAttributeParamResolverTest {
         params.put("name", nameValue);
         params.put("email", emailValue);
 
+        final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
+
+        Method method = controller.getClass().getDeclaredMethod(methodName, RequestDto.class);
 
         final List<MethodParameter> methodParameters = createMethodParameters(methodName);
         final MethodParameter methodParameter = methodParameters.get(0);
 
         // when
-        final RequestDto result = (RequestDto) resolver.resolve(methodParameter, request);
+        final RequestDto result = (RequestDto) resolver.resolve(methodParameter, request, response);
 
         // then
         assertThat(result).isNotNull();
@@ -58,11 +65,11 @@ public class ModelAttributeParamResolverTest {
         final Method method = ModelAttributeResolverTestController.class.getDeclaredMethod(methodName, RequestDto.class);
         final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-        String[] names = nameDiscoverer.getParameterNames(method);
-        Class<?>[] types = method.getParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        final String[] names = nameDiscoverer.getParameterNames(method);
+        final Class<?>[] types = method.getParameterTypes();
+        final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-        PathPatternParser pp = new PathPatternParser();
+        final PathPatternParser pp = new PathPatternParser();
         pp.setMatchOptionalTrailingSeparator(true);
         PathPattern pathPattern = pp.parse(method.getAnnotation(RequestMapping.class).value());
 
@@ -84,6 +91,7 @@ public class ModelAttributeParamResolverTest {
         final Map<String, String> params = new HashMap<>();
         params.put("name", nameValue);
 
+        final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
 
@@ -91,7 +99,7 @@ public class ModelAttributeParamResolverTest {
         final MethodParameter methodParameter = methodParameters.get(0);
 
         // when
-        final RequestDto result = (RequestDto) resolver.resolve(methodParameter, request);
+        final RequestDto result = (RequestDto) resolver.resolve(methodParameter, request, response);
 
         // then
         assertThat(result).isNotNull();
@@ -108,6 +116,7 @@ public class ModelAttributeParamResolverTest {
         params.put("name", "name");
         params.put("email", "email");
 
+        final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
 
@@ -115,7 +124,7 @@ public class ModelAttributeParamResolverTest {
         final MethodParameter methodParameter = methodParameters.get(0);
 
         // when
-        final RequestDto result = (RequestDto) resolver.resolve(methodParameter, request);
+        final RequestDto result = (RequestDto) resolver.resolve(methodParameter, request, response);
 
         // then
         assertThat(result).isNotNull();
@@ -127,14 +136,17 @@ public class ModelAttributeParamResolverTest {
 
 class ModelAttributeResolverTestController {
 
+    @RequestMapping("/skip")
     RequestDto skipAnnotation(RequestDto requestDto) {
         return requestDto;
     }
 
+    @RequestMapping("/with")
     RequestDto withAnnotation(@ModelAttribute RequestDto requestDto) {
         return requestDto;
     }
 
+    @RequestMapping("/noBind")
     RequestDto withAnnotationNoBinding(@ModelAttribute(binding = false) RequestDto requestDto) {
         return requestDto;
     }

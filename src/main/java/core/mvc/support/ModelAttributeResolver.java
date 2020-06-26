@@ -3,6 +3,7 @@ package core.mvc.support;
 import core.annotation.web.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -29,7 +30,7 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolve(MethodParameter parameter, HttpServletRequest request) {
+    public Object resolve(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
         return createParameterValue(parameter, request);
     }
 
@@ -47,6 +48,7 @@ public class ModelAttributeResolver implements HandlerMethodArgumentResolver {
             }
 
             final Field[] fields = clazz.getDeclaredFields();
+
             for (Field field : fields) {
                 final String fieldName = field.getName();
                 field.setAccessible(true);

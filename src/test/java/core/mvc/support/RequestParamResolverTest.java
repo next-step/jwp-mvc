@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 import testUtils.NullableConverter;
@@ -42,6 +43,7 @@ class RequestParamResolverTest {
         final Map<String, String> params = new HashMap<>();
         params.put(paramName, paramValue);
 
+        final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
 
@@ -50,7 +52,7 @@ class RequestParamResolverTest {
         // when
         final Object[] result = methodParameters.stream()
                 .filter(p -> resolver.supportParameter(p))
-                .map(p -> resolver.resolve(p, request))
+                .map(p -> resolver.resolve(p, request, response))
                 .toArray();
 
         // then
@@ -84,6 +86,7 @@ class RequestParamResolverTest {
         final String methodName = "requestParamWithValue";
         final Map<String, String> params = new HashMap<>();
 
+        final MockHttpServletResponse response = new MockHttpServletResponse();
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameters(params);
 
@@ -92,7 +95,7 @@ class RequestParamResolverTest {
         // when
         Throwable thrown = catchThrowable(() -> methodParameters.stream()
                 .filter(p -> resolver.supportParameter(p))
-                .map(p -> resolver.resolve(p, request))
+                .map(p -> resolver.resolve(p, request, response))
                 .toArray());
 
         // then
@@ -102,18 +105,22 @@ class RequestParamResolverTest {
 
 class RequestParamResolverTestController {
 
+    @RequestMapping("/none")
     String none(String name) {
         return name;
     }
 
+    @RequestMapping("/requestParam")
     String requestParam(@RequestParam String name) {
         return name;
     }
 
+    @RequestMapping("/requestParamWithValue")
     String requestParamWithValue(@RequestParam("username") String name) {
         return name;
     }
 
+    @RequestMapping("/requestParamNotRequired")
     String requestParamNotRequired(@RequestParam(value = "username", required = false) String name) {
         return name;
     }

@@ -3,6 +3,7 @@ package core.mvc.support;
 import core.annotation.web.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class PathVariableResolver implements HandlerMethodArgumentResolver {
 
@@ -12,7 +13,7 @@ public class PathVariableResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolve(MethodParameter parameter, HttpServletRequest request) {
+    public Object resolve(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
         final String requestUri = request.getRequestURI();
         final String parameterName = parameter.getName();
 

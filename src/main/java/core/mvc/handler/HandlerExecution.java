@@ -39,6 +39,7 @@ public class HandlerExecution {
         final List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
+
             result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
         }
 
@@ -58,15 +59,8 @@ public class HandlerExecution {
         return pp.parse(requestMapping.value());
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite();
-        handlerMethodArgumentResolverComposite.addResolver(new ServletRequestResolver(request));
-        handlerMethodArgumentResolverComposite.addResolver(new ServletResponseResolver(response));
-        handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
-        handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
-        handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
-
-        final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request);
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws Exception {
+        final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request, response);
         return (ModelAndView) method.invoke(instance, methodArguments);
     }
 

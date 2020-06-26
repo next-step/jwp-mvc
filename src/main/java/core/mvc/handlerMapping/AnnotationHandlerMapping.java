@@ -7,6 +7,7 @@ import core.mvc.handler.HandlerExecutions;
 import core.mvc.handler.HandlerKey;
 import core.mvc.scanner.ControllerScanner;
 import core.mvc.scanner.Scanner;
+import core.mvc.support.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
     private HandlerExecutions handlerExecutions = new HandlerExecutions();
+    private HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite;
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -37,6 +39,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 handlerExecutions.add(handlerExecution);
             }
         }
+
+        handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite();
+        handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
+        handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
+        handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
+
     }
 
     private List<Method> convertHandlers(Class<?> clazz) {
