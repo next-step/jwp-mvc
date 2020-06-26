@@ -41,7 +41,6 @@ public class HandlerExecution {
         final List result = new ArrayList<>();
 
         for (int i = 0; i < names.length; i++) {
-
             result.add(new MethodParameter(names[i], types[i], Arrays.asList(parameterAnnotations[i]), pathPattern));
         }
 
