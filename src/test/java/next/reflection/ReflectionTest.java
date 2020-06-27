@@ -1,16 +1,26 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,5 +95,22 @@ public class ReflectionTest {
         assertThat(question.getWriter()).isEqualTo("crystal");
         assertThat(question.getTitle()).isEqualTo("hi");
         assertThat(question.getContents()).isEqualTo("everyone!");
+    }
+
+    @DisplayName("core.di.factory.example 패키지에 대한 컴포넌트 스캔 수행")
+    @Test
+    void test_componentScan() {
+        // given
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        List<Class<? extends Annotation>> targets = Arrays.asList(Controller.class, Service.class, Repository.class);
+        // when
+        Set<Class<?>> resultOfScan = targets.stream()
+                .map(reflections::getTypesAnnotatedWith)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+        // then
+        assertThat(resultOfScan).hasSize(4);
+        resultOfScan.forEach(component -> logger.debug(component.toString()));
     }
 }
