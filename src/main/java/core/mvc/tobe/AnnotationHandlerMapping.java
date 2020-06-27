@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 
 public class AnnotationHandlerMapping {
 
@@ -30,7 +30,7 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections =  new Reflections(basePackage);
+        Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         handlerExecutions = controllers.stream()
                 .map(this::initializeMethodsOf)
@@ -38,6 +38,8 @@ public class AnnotationHandlerMapping {
                 .collect(toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue));
+
+        handlerExecutions.keySet().forEach(handlerKey -> log.info(handlerKey.toString()));
     }
 
     private Map<HandlerKey, HandlerExecution> initializeMethodsOf(Class<?> controller) {
