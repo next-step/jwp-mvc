@@ -1,14 +1,17 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -40,5 +43,26 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @DisplayName("private 필드인 name과 age에 값 할당")
+    @Test
+    void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        // given
+        Class<Student> studentClass = Student.class;
+
+        Student student = new Student();
+
+        Field name = studentClass.getDeclaredField("name");
+        Field age = studentClass.getDeclaredField("age");
+
+        name.setAccessible(true);
+        age.setAccessible(true);
+        // when
+        name.set(student, "crystal");
+        age.set(student, 26);
+        // then
+        assertThat(student.getName()).isEqualTo("crystal");
+        assertThat(student.getAge()).isEqualTo(26);
     }
 }
