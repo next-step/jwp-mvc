@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.controller;
 
 import core.annotation.web.Controller;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class ControllerScanner {
     private final Reflections reflections;
     private final Map<Class, Object> controllers = new HashMap<>();
 
-    ControllerScanner(String... basePackage) {
+    public ControllerScanner(String... basePackage) {
         this.reflections = new Reflections(
             basePackage,
             new MethodAnnotationsScanner(),
@@ -26,7 +26,7 @@ public class ControllerScanner {
         initialize();
     }
 
-    List<Object> getControllers() {
+    public List<Object> getControllers() {
         return new ArrayList<>(this.controllers.values());
     }
 

@@ -1,12 +1,10 @@
 package core.mvc.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-import core.mvc.tobe.TestUserController;
+import core.mvc.TestUserController;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

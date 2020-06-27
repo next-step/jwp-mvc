@@ -3,8 +3,8 @@ package core.mvc.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import core.mvc.tobe.TestUser;
-import core.mvc.tobe.TestUserController;
+import core.mvc.TestUser;
+import core.mvc.TestUserController;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;

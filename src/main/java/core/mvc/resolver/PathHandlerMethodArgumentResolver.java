@@ -10,7 +10,7 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern.PathMatchInfo;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-public class PathHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
+class PathHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final PathPatternParser pp;
     private final ParameterNameDiscoverer nameDiscoverer;
@@ -29,7 +29,8 @@ public class PathHandlerMethodArgumentResolver implements HandlerMethodArgumentR
     }
 
     @Override
-    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    public Object resolve(MethodParameter methodParameter, String mappingUrl,
+        HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         if (!supportsParameter(methodParameter)) {
             throw new RuntimeException("unSupports Parameter");
         }
