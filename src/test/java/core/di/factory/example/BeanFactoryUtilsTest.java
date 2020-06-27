@@ -9,7 +9,7 @@ import core.di.factory.BeanFactoryUtils;
 import core.di.factory.PreInstanticateBeans;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.reflections.Reflections;
+import org.reflections8.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

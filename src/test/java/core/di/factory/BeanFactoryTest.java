@@ -8,7 +8,7 @@ import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.reflections.Reflections;
+import org.reflections8.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -6,16 +6,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public class JspView implements View {
+    private final String viewName;
 
-    private final String pathName;
-
-    public JspView(String pathName) {
-        this.pathName = pathName;
+    public JspView(final String pathName) {
+        this.viewName = pathName;
     }
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        RequestDispatcher rd = request.getRequestDispatcher(pathName);
+        RequestDispatcher rd = request.getRequestDispatcher(viewName);
         rd.forward(request, response);
     }
 }

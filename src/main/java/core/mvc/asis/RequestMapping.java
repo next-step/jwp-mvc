@@ -44,6 +44,4 @@ public class RequestMapping implements RequestHandlerMapping {
     void put(String url, Controller controller) {
         mappings.put(url, controller);
     }
-
-
 }
