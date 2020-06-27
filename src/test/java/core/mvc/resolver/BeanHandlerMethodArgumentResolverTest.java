@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 class BeanHandlerMethodArgumentResolverTest {
 
@@ -41,7 +42,7 @@ class BeanHandlerMethodArgumentResolverTest {
             10
         );
 
-        assertThat(beanHandlerMethodArgumentResolver.resolve(beanMethod, "/users", request))
+        assertThat(beanHandlerMethodArgumentResolver.resolve(beanMethod, "/users", request, new MockHttpServletResponse()))
             .isEqualTo(expect);
     }
 

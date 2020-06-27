@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 class PathHandlerMethodArgumentResolverTest {
 
@@ -24,7 +25,7 @@ class PathHandlerMethodArgumentResolverTest {
         request.setRequestURI("/users/1");
 
         Method method = getMethod("show_pathvariable", TestUserController.class.getDeclaredMethods());
-        assertThat(handlerMethodArgumentResolver.resolve(new MethodParameter(method,0), "/users/{id}", request)).isEqualTo(1L);
+        assertThat(handlerMethodArgumentResolver.resolve(new MethodParameter(method,0), "/users/{id}", request, new MockHttpServletResponse())).isEqualTo(1L);
     }
 
     private Method getMethod(String name, Method[] methods) {

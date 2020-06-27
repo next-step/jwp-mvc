@@ -1,6 +1,7 @@
 package core.mvc.resolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class ParameterHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -10,7 +11,7 @@ public class ParameterHandlerMethodArgumentResolver implements HandlerMethodArgu
     }
 
     @Override
-    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest) {
+    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         if (!supportsParameter(methodParameter)) {
             throw new IllegalArgumentException("unSupports Parameter");
         }

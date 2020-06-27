@@ -3,6 +3,7 @@ package core.mvc.resolver;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class BeanHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -12,10 +13,11 @@ public class BeanHandlerMethodArgumentResolver implements HandlerMethodArgumentR
     }
 
     @Override
-    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest) {
+    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         if(!supportsParameter(methodParameter)){
             throw new IllegalArgumentException("unSupports Parameter");
         }
+
 
         Parameter parameter = methodParameter.toParameter();
         Object bean = createBean(parameter);

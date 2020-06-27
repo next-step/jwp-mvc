@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 class ParameterHandlerMethodArgumentResolverTest {
 
@@ -27,7 +28,7 @@ class ParameterHandlerMethodArgumentResolverTest {
         request.addParameter("password", "pp");
 
         Method method = getMethod("create_string", TestUserController.class.getDeclaredMethods());
-        assertThat(handlerMethodArgumentResolver.resolve(new MethodParameter(method,0), "/users", request)).isEqualTo("test");
+        assertThat(handlerMethodArgumentResolver.resolve(new MethodParameter(method,0), "/users", request, new MockHttpServletResponse())).isEqualTo("test");
     }
 
     private Method getMethod(String name, Method[] methods) {

@@ -3,6 +3,7 @@ package core.mvc.resolver;
 import core.annotation.web.PathVariable;
 import java.lang.reflect.Parameter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.http.server.PathContainer;
@@ -28,7 +29,7 @@ public class PathHandlerMethodArgumentResolver implements HandlerMethodArgumentR
     }
 
     @Override
-    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest) {
+    public Object resolve(MethodParameter methodParameter, String mappingUrl, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         if (!supportsParameter(methodParameter)) {
             throw new RuntimeException("unSupports Parameter");
         }

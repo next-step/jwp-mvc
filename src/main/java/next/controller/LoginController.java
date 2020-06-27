@@ -16,12 +16,12 @@ import next.model.User;
 public class LoginController {
 
     @RequestMapping("/form")
-    public ModelAndView form(HttpServletRequest req, HttpServletResponse resp){
+    public ModelAndView form(){
         return new ModelAndView(new JspView("/user/form.jsp"));
     }
 
     @RequestMapping("/loginForm")
-    public ModelAndView loginForm(HttpServletRequest req, HttpServletResponse resp){
+    public ModelAndView loginForm(){
         return new ModelAndView(new JspView("/user/login.jsp"));
     }
 
