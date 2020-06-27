@@ -11,10 +11,6 @@ public class JspViewResolver implements ViewResolver {
 
     @Override
     public View resolve(String viewName) {
-        if (!support(viewName)) {
-            return null;
-        }
-
         return new JspView(viewName);
     }
 }

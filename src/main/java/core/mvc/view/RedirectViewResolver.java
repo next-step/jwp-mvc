@@ -11,10 +11,6 @@ public class RedirectViewResolver implements ViewResolver {
 
     @Override
     public View resolve(String viewName) {
-        if (!support(viewName)) {
-            return null;
-        }
-
         String location = viewName.substring(DEFAULT_REDIRECT_PREFIX.length());
         return new RedirectView(location);
     }
