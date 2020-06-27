@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 
@@ -64,5 +65,25 @@ public class ReflectionTest {
         // then
         assertThat(student.getName()).isEqualTo("crystal");
         assertThat(student.getAge()).isEqualTo(26);
+    }
+
+    @DisplayName("인자 3개를 가진 Question 생성자의 인스턴스 생성")
+    @Test
+    void create_instance_by_nonDefaultConstructor() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        // given
+        Class<Question> questionClass = Question.class;
+
+        Constructor<?>[] declaredConstructors = questionClass.getDeclaredConstructors();
+
+        Constructor<?> constructorWith3Parameters = Arrays.stream(declaredConstructors)
+                .filter(constructor -> constructor.getParameterCount() == 3)
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
+        // when
+        Question question = (Question) constructorWith3Parameters.newInstance("crystal", "hi", "everyone!");
+        // then
+        assertThat(question.getWriter()).isEqualTo("crystal");
+        assertThat(question.getTitle()).isEqualTo("hi");
+        assertThat(question.getContents()).isEqualTo("everyone!");
     }
 }
