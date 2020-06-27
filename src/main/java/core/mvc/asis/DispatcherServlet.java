@@ -3,6 +3,8 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMappings;
+import core.mvc.view.View;
+import core.mvc.view.ViewResolvers;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;
@@ -20,6 +22,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final HandlerMappings handlerMappings = new HandlerMappings();
+    private final ViewResolvers viewResolvers = new ViewResolvers();
 
     @Override
     public void init() {
@@ -40,7 +43,14 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             ModelAndView modelAndView = handler.handle(request, response);
-            modelAndView.render(request, response);
+            String viewName = modelAndView.getViewName();
+            View view = (viewName != null) ? viewResolvers.resolve(viewName) : modelAndView.getView();
+
+            if (view == null) {
+                throw new IllegalStateException("View Does Not Exist.");
+            }
+
+            view.render(modelAndView.getModel(), request, response);
         } catch (Exception e) {
             log.error("Exception : {}", e.getMessage());
             throw new ServletException(e.getMessage());
