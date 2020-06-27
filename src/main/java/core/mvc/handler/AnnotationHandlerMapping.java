@@ -1,15 +1,19 @@
-package core.mvc.tobe;
+package core.mvc.handler;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.HandlerMapping;
+import core.mvc.controller.ControllerScanner;
 import core.mvc.ModelAndView;
+import core.mvc.resolver.HandlerMethodArgumentResolver;
+import core.mvc.resolver.HandlerMethodArgumentResolverComposite;
+import core.mvc.resolver.MethodParameter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -19,11 +23,17 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private final ControllerScanner controllerScanner;
+    private final HandlerMethodArgumentResolver HandlerMethodArgumentResolver;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(String... basePackage) {
+    public AnnotationHandlerMapping(HandlerMethodArgumentResolver handlerMethodArgumentResolver ,String... basePackage) {
         this.controllerScanner = new ControllerScanner(basePackage);
+        this.HandlerMethodArgumentResolver = handlerMethodArgumentResolver;
+    }
+
+    public AnnotationHandlerMapping(String... basePackage) {
+        this(HandlerMethodArgumentResolverComposite.newInstance(), basePackage);
     }
 
     public void initialize() {
@@ -46,7 +56,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Controller controller = controllerBean.getClass().getAnnotation(Controller.class);
         String url = controller.value() + requestMapping.value();
         HandlerKey handlerKey = new HandlerKey(url, requestMapping.method());
-        handlerExecutions.put(handlerKey, (request, response) -> (ModelAndView) method.invoke(controllerBean, request, response));
+        handlerExecutions.put(handlerKey, (request, response) -> {
+            Object[] args = IntStream.range(0, method.getParameterCount())
+                .mapToObj(value -> HandlerMethodArgumentResolver.resolve(new MethodParameter(method, value), url, request, response))
+                .toArray();
+
+            return (ModelAndView) method.invoke(controllerBean, args);
+        });
     }
 
 }

@@ -1,9 +1,10 @@
-package core.mvc.tobe;
+package core.mvc;
 
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,12 @@ public class TestUserController {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ModelAndView httpServlet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        ModelAndView mav = new ModelAndView();
         return mav;
     }
 }
