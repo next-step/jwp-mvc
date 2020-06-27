@@ -13,6 +13,9 @@ public class JspView implements View {
     private String viewName;
 
     public JspView(String viewName) {
+        if (viewName.matches(".*.jsp")) {
+            viewName = viewName.substring(0, viewName.length() - 4);
+        }
         this.viewName = viewName;
     }
 
