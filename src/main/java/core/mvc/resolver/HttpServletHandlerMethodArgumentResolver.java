@@ -3,6 +3,7 @@ package core.mvc.resolver;
 import java.lang.reflect.Parameter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class HttpServletHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver{
 
@@ -14,6 +15,10 @@ public class HttpServletHandlerMethodArgumentResolver implements HandlerMethodAr
         }
 
         if(parameter.getType().isAssignableFrom(HttpServletResponse.class)){
+            return true;
+        }
+
+        if(parameter.getType().isAssignableFrom(HttpSession.class)){
             return true;
         }
 
@@ -31,9 +36,12 @@ public class HttpServletHandlerMethodArgumentResolver implements HandlerMethodAr
             return httpRequest;
         }
 
-
         if(parameter.getType().isAssignableFrom(HttpServletResponse.class)){
             return httpResponse;
+        }
+
+        if(parameter.getType().isAssignableFrom(HttpSession.class)){
+            return httpRequest.getSession();
         }
 
         throw new IllegalArgumentException("unSupports Parameter");
