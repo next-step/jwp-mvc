@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.annotation.web.Controller;
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -7,10 +8,11 @@ import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Controller
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users-string", method = RequestMethod.POST)
     public ModelAndView create_string(String userId, String password) {
         logger.debug("userId: {}, password: {}", userId, password);
         ModelAndView mav = new ModelAndView();
@@ -19,7 +21,7 @@ public class TestUserController {
         return mav;
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users-int", method = RequestMethod.POST)
     public ModelAndView create_int_long(long id, int age) {
         logger.debug("id: {}, age: {}", id, age);
         ModelAndView mav = new ModelAndView();

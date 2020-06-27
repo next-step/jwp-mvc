@@ -10,14 +10,24 @@ public class HandlerExecution {
 
     private Object instance;
     private Method method;
+    private ArgumentResolvers argumentResolvers;
 
     public HandlerExecution(Object instance, Method method) {
         this.instance = instance;
         this.method = method;
+        initialize();
+    }
+
+    private void initialize() {
+        argumentResolvers = new ArgumentResolvers();
+        argumentResolvers.add(new RequestParameterArgumentResolver());
+        argumentResolvers.add(new PathVariableResolver());
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Object modelAndView = method.invoke(instance, request, response);
+        HandlerMethodArgumentResolver argumentResolver = argumentResolvers.getResolver(method);
+        Object[] resolveObject = argumentResolver.resolve(method, request, response);
+        Object modelAndView = method.invoke(instance, resolveObject);
         return (ModelAndView) modelAndView;
     }
 }
