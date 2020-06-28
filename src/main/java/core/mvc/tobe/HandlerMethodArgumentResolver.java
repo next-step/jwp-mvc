@@ -2,11 +2,10 @@ package core.mvc.tobe;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
 
 public interface HandlerMethodArgumentResolver {
 
-    boolean support(Method method);
+    boolean support(MethodParameter methodParameter);
 
-    Object[] resolve(Method method, HttpServletRequest request, HttpServletResponse response);
+    Object resolve(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response);
 }
