@@ -7,4 +7,17 @@
 
 
 
+ Controller 메소드 인자 매핑
+ -
  
+ `MethodArgumentResolver` 인터페이스 만들기
+ 아래와 같은 구현체 구현
+ - String, Long or Primitive Type 일 때
+ - PathVariable 어노테이션이 있을 때
+ - Model(Domain Object) 일 때
+ 
+구현할 때
+ - reflection 의 Parameter 에서 인자 이름을 구할 수 있다.
+ - 타입을 가져올 수 있다.
+ - primitive type 은 따로 비교한다.
+ - PathVariable 은 PathPattern 을 사용한다.
