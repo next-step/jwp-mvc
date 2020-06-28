@@ -22,23 +22,22 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private ManualRequestMapping rm;
     private AnnotationHandlerMapping ahm;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        rm = new ManualRequestMapping();
+        rm.initialize();
         ahm = new AnnotationHandlerMapping("next.controller");
         ahm.initialize();
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        Controller controller = rm.findController(requestUri);
+        Controller controller = (Controller) rm.getHandler(req);
         if (Objects.isNull(controller)) {
             HandlerExecution handlerExecution = ahm.getHandler(req);
             try {

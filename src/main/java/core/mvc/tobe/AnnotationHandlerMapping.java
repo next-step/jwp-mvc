@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
