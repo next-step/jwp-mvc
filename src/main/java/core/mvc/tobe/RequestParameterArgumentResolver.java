@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 import static core.mvc.tobe.ParameterUtils.decideParameter;
-import static core.mvc.tobe.ParameterUtils.isPathVariable;
-import static core.mvc.tobe.ParameterUtils.isRequestType;
+import static core.mvc.tobe.ParameterUtils.isPrimitive;
+import static core.mvc.tobe.ParameterUtils.isString;
 
 public class RequestParameterArgumentResolver implements HandlerMethodArgumentResolver {
     private static final Logger logger = LoggerFactory.getLogger(RequestParameterArgumentResolver.class);
@@ -19,7 +19,7 @@ public class RequestParameterArgumentResolver implements HandlerMethodArgumentRe
 
     @Override
     public boolean support(Method method) {
-        return isRequestType(method) && !isPathVariable(method);
+        return isPrimitive(method) || isString(method);
     }
 
     @Override

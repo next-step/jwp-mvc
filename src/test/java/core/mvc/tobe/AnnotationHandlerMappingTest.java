@@ -2,11 +2,9 @@ package core.mvc.tobe;
 
 import core.db.DataBase;
 import core.mvc.ModelAndView;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import next.model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -36,7 +34,7 @@ public class AnnotationHandlerMappingTest {
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
 
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users-list");
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
@@ -139,7 +137,7 @@ public class AnnotationHandlerMappingTest {
     }
 
     private void createUser(User user) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users-create");
         request.setParameter("userId", user.getUserId());
         request.setParameter("password", user.getPassword());
         request.setParameter("name", user.getName());

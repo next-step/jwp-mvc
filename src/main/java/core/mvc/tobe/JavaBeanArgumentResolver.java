@@ -7,14 +7,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static core.mvc.tobe.ParameterUtils.isRequestType;
+import static core.mvc.tobe.ParameterUtils.isHttpRequestType;
+import static core.mvc.tobe.ParameterUtils.isPrimitive;
 
 public class JavaBeanArgumentResolver implements HandlerMethodArgumentResolver {
     private static final int FIRST_CONSTRUCTOR_INDEX = 0;
 
     @Override
     public boolean support(Method method) {
-        return !isRequestType(method);
+        return !isPrimitive(method) && !isHttpRequestType(method);
     }
 
     @Override
