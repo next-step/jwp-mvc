@@ -1,5 +1,6 @@
 package core.mvc;
 
+import core.mvc.view.JspView;
 import core.mvc.view.View;
 
 import java.util.Collections;
@@ -15,6 +16,10 @@ public class ModelAndView {
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public void setView(String viewName) {
+        this.view = new JspView(viewName);
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {

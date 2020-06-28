@@ -20,6 +20,8 @@ public class ListUserController {
         }
 
         req.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("/user/list.jsp"));
+        ModelAndView mav = new ModelAndView();
+        mav.setView("/user/list.jsp");
+        return mav;
     }
 }
