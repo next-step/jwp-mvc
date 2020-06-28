@@ -17,16 +17,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static core.mvc.tobe.ParameterUtils.decideParameter;
+import static core.mvc.tobe.ParameterUtils.isPathVariable;
 import static core.mvc.tobe.ParameterUtils.parsePath;
 import static core.mvc.tobe.ParameterUtils.toPathContainer;
 
 public class PathVariableResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean support(Method method) {
-        return Arrays.stream(method.getParameters())
-                .flatMap(p -> Arrays.stream(p.getAnnotations()))
-                .anyMatch(a -> a.annotationType().equals(PathVariable.class));
-
+        return isPathVariable(method);
     }
 
     @Override

@@ -7,6 +7,9 @@ public class TestUser {
     private String password;
     private int age;
 
+    public TestUser() {
+    }
+
     public TestUser(String userId, String password, int age) {
         this.userId = userId;
         this.password = password;
@@ -23,6 +26,18 @@ public class TestUser {
 
     public int getAge() {
         return age;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 
     @Override

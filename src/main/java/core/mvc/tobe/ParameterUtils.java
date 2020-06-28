@@ -1,8 +1,15 @@
 package core.mvc.tobe;
 
+import core.annotation.web.PathVariable;
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
 
 public class ParameterUtils {
 
@@ -28,5 +35,48 @@ public class ParameterUtils {
             return null;
         }
         return PathContainer.parsePath(path);
+    }
+
+    public static boolean isPathVariable(Method method) {
+        return Arrays.stream(method.getParameters())
+                .flatMap(p -> Arrays.stream(p.getAnnotations()))
+                .anyMatch(a -> a.annotationType().equals(PathVariable.class));
+    }
+
+    public static boolean isRequestType(Method method) {
+
+        return isPrimitive(method) ||
+                Arrays.stream(method.getParameters())
+                        .map(Parameter::getType)
+                        .anyMatch(ParameterUtils::isRequestParameterTye);
+    }
+
+    private static boolean isPrimitive(Method method) {
+        return Arrays.stream(method.getParameters())
+                .map(Parameter::getType)
+                .allMatch(Class::isPrimitive);
+    }
+
+    public static boolean isRequestParameterTye(Class<?> parameterType) {
+        Object parameter = null;
+        try {
+            parameter = parameterType.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        if (parameter instanceof String) {
+            return true;
+        }
+
+        if (parameter instanceof HttpServletRequest) {
+            return true;
+        }
+
+        if (parameter instanceof HttpServletResponse) {
+            return true;
+        }
+
+        return false;
     }
 }

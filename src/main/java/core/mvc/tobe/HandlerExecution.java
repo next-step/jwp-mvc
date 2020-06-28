@@ -22,6 +22,7 @@ public class HandlerExecution {
         argumentResolvers = new ArgumentResolvers();
         argumentResolvers.add(new RequestParameterArgumentResolver());
         argumentResolvers.add(new PathVariableResolver());
+        argumentResolvers.add(new JavaBeanArgumentResolver());
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
