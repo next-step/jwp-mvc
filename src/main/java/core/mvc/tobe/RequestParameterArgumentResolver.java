@@ -9,6 +9,9 @@ import org.springframework.core.ParameterNameDiscoverer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+
+import static core.mvc.tobe.ParameterUtils.decideParameter;
 
 public class RequestParameterArgumentResolver implements HandlerMethodArgumentResolver {
     private static final Logger logger = LoggerFactory.getLogger(RequestParameterArgumentResolver.class);
@@ -16,7 +19,9 @@ public class RequestParameterArgumentResolver implements HandlerMethodArgumentRe
 
     @Override
     public boolean support(Method method) {
-        return !method.isAnnotationPresent(PathVariable.class);
+        return Arrays.stream(method.getParameters())
+                .flatMap(p -> Arrays.stream(p.getAnnotations()))
+                .noneMatch(a -> a.annotationType().equals(PathVariable.class));
     }
 
     @Override
@@ -34,14 +39,4 @@ public class RequestParameterArgumentResolver implements HandlerMethodArgumentRe
         return values;
     }
 
-    private Object decideParameter(String parameter, Class<?> parameterType) {
-        if (parameterType.equals(int.class)) {
-            return Integer.parseInt(parameter);
-        }
-        if (parameterType.equals(long.class)) {
-            return Long.parseLong(parameter);
-        }
-
-        return parameter;
-    }
 }

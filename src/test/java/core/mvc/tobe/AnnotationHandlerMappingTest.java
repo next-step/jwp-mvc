@@ -125,6 +125,17 @@ public class AnnotationHandlerMappingTest {
         assertThat(modelAndView.getObject("testUser")).isEqualTo(testUser);
     }
 
+    @DisplayName("pathVariable 메소드를 요청한다.")
+    @Test
+    void usersPathVariable() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecution execution = handlerMapping.getHandler(request);
+        ModelAndView modelAndView = execution.handle(request, response);
+
+        assertThat(modelAndView.getObject("id")).isEqualTo(1L);
+    }
+
     private void createUser(User user) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
         request.setParameter("userId", user.getUserId());

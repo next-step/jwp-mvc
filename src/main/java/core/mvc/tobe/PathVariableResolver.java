@@ -9,33 +9,41 @@ import org.springframework.web.util.pattern.PathPatternParser;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static core.mvc.tobe.ParameterUtils.decideParameter;
+import static core.mvc.tobe.ParameterUtils.parsePath;
+import static core.mvc.tobe.ParameterUtils.toPathContainer;
 
 public class PathVariableResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean support(Method method) {
-        return method.isAnnotationPresent(PathVariable.class);
+        return Arrays.stream(method.getParameters())
+                .flatMap(p -> Arrays.stream(p.getAnnotations()))
+                .anyMatch(a -> a.annotationType().equals(PathVariable.class));
+
     }
 
     @Override
     public Object[] resolve(Method method, HttpServletRequest request, HttpServletResponse response) {
         RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        Map<String, String> variables = parse(annotation.value())
+        Map<String, String> variables = parsePath(annotation.value())
                 .matchAndExtract(toPathContainer(request.getRequestURI())).getUriVariables();
+        List<String> variableValues = new ArrayList<>(variables.values());
 
-        return variables.values().toArray();
-    }
-
-    private PathPattern parse(String path) {
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        return pp.parse(path);
-    }
-
-    private PathContainer toPathContainer(String path) {
-        if (path == null) {
-            return null;
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        Object[] values = new Object[variables.size()];
+        for (int i = 0; i < variableValues.size(); i++) {
+            Class<?> parameterType = parameterTypes[i];
+            values[i] = decideParameter(variableValues.get(i), parameterType);
         }
-        return PathContainer.parsePath(path);
+        return values;
     }
+
+
 }
