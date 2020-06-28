@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.Handler;
 import core.mvc.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class ManualRequestMapping implements HandlerMapping {
     }
 
     @Override
-    public Object getHandler(HttpServletRequest request) {
+    public Handler getHandler(HttpServletRequest request) {
         String uri = request.getRequestURI();
         return mappings.get(uri);
     }

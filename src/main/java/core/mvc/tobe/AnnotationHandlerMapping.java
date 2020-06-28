@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.Handler;
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import org.reflections.Reflections;
@@ -65,7 +66,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return (request, response) -> (ModelAndView) method.invoke(instance, request, response);
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    @Override
+    public Handler getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
