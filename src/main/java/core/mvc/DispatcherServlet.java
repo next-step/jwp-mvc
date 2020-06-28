@@ -25,7 +25,7 @@ public class DispatcherServlet extends HttpServlet {
     private LegacyHandlerMapping legacyHandlerMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
 
-    private List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private HandlerMappings handlerMappings = new HandlerMappings();
 
     @Override
     public void init() {
@@ -60,9 +60,7 @@ public class DispatcherServlet extends HttpServlet {
     private Object getHandler(final HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         Controller controller = legacyHandlerMapping.findController(requestUri);
-        if (controller != null) {
-            return legacyHandlerMapping.getHandler(request);
-        }
-        return annotationHandlerMapping.getHandler(request);
+        return handlerMappings.getHandlerMapping(controller)
+                .getHandler(request);
     }
 }
