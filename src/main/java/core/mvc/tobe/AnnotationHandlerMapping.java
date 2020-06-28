@@ -7,7 +7,6 @@ import core.annotation.web.RequestMethod;
 import core.mvc.Handler;
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +31,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> controllers = ComponentScanner.scan(Controller.class, basePackage);
         handlerExecutions = controllers.stream()
                 .map(this::initializeMethodsOf)
                 .flatMap(map -> map.entrySet().stream())
