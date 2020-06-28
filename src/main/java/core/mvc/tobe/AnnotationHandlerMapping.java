@@ -1,41 +1,51 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.WebApplication;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.exception.HandlerMappingInitializeFailedException;
 import core.utils.ComponentScanner;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @Slf4j
+@NoArgsConstructor
 public class AnnotationHandlerMapping implements HandlerMapping {
 
+    private static final Class<WebApplication> WEB_APPLICATION_ANNOTATION = WebApplication.class;
     private static final Class<Controller> HANDLER_CLASS_ANNOTATION = Controller.class;
     private static final Class<RequestMapping> HANDLER_METHOD_ANNOTATION = RequestMapping.class;
 
-    private Object[] basePackage;
+    private Object[] basePackages = {};
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
+    public AnnotationHandlerMapping(Object... basePackages) {
+        this.basePackages = basePackages;
     }
 
     @Override
     public void initialize() {
+        if (basePackages.length == 0) {
+            initializeBasePackages();
+        }
+
         try {
             log.debug("handler mapping initialize");
-            ComponentScanner componentScanner = new ComponentScanner(basePackage);
+            ComponentScanner componentScanner = new ComponentScanner(basePackages);
 
-            Set<Class<?>> classes = componentScanner.scanClassesBy(HANDLER_CLASS_ANNOTATION);
-            for (Class<?> clazz : classes) {
+            Set<Class<?>> handlerClasses = componentScanner.scanClassesBy(HANDLER_CLASS_ANNOTATION);
+            for (Class<?> clazz : handlerClasses) {
                 log.debug("handler class={}", clazz);
 
                 Object instance = clazz.getDeclaredConstructor().newInstance();
@@ -67,6 +77,25 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         HandlerKey handlerKey = createHandlerKeyFrom(request);
 
         return handlerExecutions.get(handlerKey);
+    }
+
+    private void initializeBasePackages() {
+        Reflections reflections = new Reflections("");
+        this.basePackages = reflections.getTypesAnnotatedWith(WEB_APPLICATION_ANNOTATION)
+                .stream()
+                .map(this::findBasePackages)
+                .flatMap(Arrays::stream)
+                .toArray();
+
+        if (this.basePackages.length == 0) {
+            throw new IllegalStateException("Base packages not initialized");
+        }
+    }
+
+    private String[] findBasePackages(Class<?> clazz) {
+        String[] packages = clazz.getAnnotation(WEB_APPLICATION_ANNOTATION).basePackages();
+
+        return packages.length == 0 ? new String[]{clazz.getPackage().getName()} : packages;
     }
 
     private HandlerKey createHandlerKeyFrom(Method handlerMethod) {

@@ -8,9 +8,10 @@ import java.util.List;
 
 public class HandlerMappings {
 
-    private static final Object[] ANNOTATION_BASE_PACKAGE = {"next"};
-
-    private final List<HandlerMapping> mappings = Arrays.asList(new RequestMapping(), new AnnotationHandlerMapping(ANNOTATION_BASE_PACKAGE));
+    private final List<HandlerMapping> mappings = Arrays.asList(
+            new RequestMapping(),
+            new AnnotationHandlerMapping()
+    );
 
     public void init() {
         for (HandlerMapping mapping : mappings) {
