@@ -34,17 +34,21 @@ public class ControllerAnnotationHandler {
 
     private static void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
         if (requestMapping.method().equals(RequestMethod.ALL)) {
-            Arrays.stream(RequestMethod.values())
-                    .forEach(requestMethod -> {
-                        if (!requestMethod.equals(RequestMethod.ALL)) {
-                            AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
-                            logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
-                        }
-                    });
+            applyExecutionByAllMethod(requestMapping, handlerExecution);
             return;
         }
         final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
         AnnotationHandlerMapping.handlerExecutions.put(handlerKey, handlerExecution);
         logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMapping.method(), requestMapping.value(), handlerExecution);
+    }
+
+    private static void applyExecutionByAllMethod(RequestMapping requestMapping, HandlerExecution handlerExecution) {
+        Arrays.stream(RequestMethod.values())
+                .forEach(requestMethod -> {
+                    if (!requestMethod.equals(RequestMethod.ALL)) {
+                        AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
+                        logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
+                    }
+                });
     }
 }
