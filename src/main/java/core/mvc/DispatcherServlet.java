@@ -42,22 +42,16 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
         try {
-            Object handler = getHandler(req);
-            if (handler instanceof Controller) {
-                ModelAndView modelAndView = new ModelAndView(new JspView(((Controller)handler).execute(req, resp)));
-                modelAndView.render(req, resp);
-            } else if (handler instanceof HandlerExecution) {
-                ModelAndView modelAndView = ((HandlerExecution)handler).handle(req, resp);
-                modelAndView.render(req, resp);
-            } else {
-                throw new ServletException("not found mapping");
-            }
+            HandlerExecution handlerExecution = getHandler(req);
+            ModelAndView modelAndView = handlerExecution.handle(req, resp);
+            modelAndView.render(req, resp);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private Object getHandler(final HttpServletRequest request) {
+    private HandlerExecution getHandler(final HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         Controller controller = legacyHandlerMapping.findController(requestUri);
         return handlerMappings.getHandlerMapping(controller)
