@@ -37,8 +37,10 @@ public class RequestMapping implements RequestHandlerMapping {
     public HandlerCommand getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         Controller controller = mappings.get(requestUri);
-
-        return new RequestHandlerAdapter(controller);
+        if (controller != null) {
+            return new RequestHandlerAdapter(controller);
+        }
+        return null;
     }
 
     public Controller findController(String url) {

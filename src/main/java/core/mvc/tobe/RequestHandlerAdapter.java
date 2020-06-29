@@ -17,10 +17,6 @@ public class RequestHandlerAdapter implements HandlerCommand {
 
     @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (controller == null) {
-            return null;
-        }
-
         String viewName = controller.execute(request, response);
 
         return new ModelAndView(ViewFactory.create(viewName));

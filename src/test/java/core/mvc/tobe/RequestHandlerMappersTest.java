@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
 import core.mvc.asis.RequestMapping;
@@ -17,7 +18,6 @@ public class RequestHandlerMappersTest {
     MockHttpServletRequest request;
     MockHttpServletResponse response;
     RequestHandlerMappers handlerMappers;
-
     @BeforeAll
     void initData() {
         response = new MockHttpServletResponse();
@@ -41,6 +41,7 @@ public class RequestHandlerMappersTest {
         request = new MockHttpServletRequest("GET", "/users/test");
         ModelAndView modelAndView = handlerMappers.mapperHandling(request, response);
 
-        assertThat(modelAndView).isEqualTo(null);
+        assertThat(modelAndView).isNotEqualTo(null);
+        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new JspView("test.jsp"));
     }
 }
