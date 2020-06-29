@@ -20,6 +20,14 @@ public class ArgumentResolvers {
             new BasicTypeArgumentResolver(clazz, method);
             return;
         }
+        classResolverByInterface(clazz, method);
+    }
+
+    private static void classResolverByInterface(Class clazz, Method method) {
+        if (isInterface(method)) {
+            new ServletArgumentResolver(clazz, method);
+            return;
+        }
         new BeanTypeArgumentResolver(clazz, method);
     }
 
@@ -32,6 +40,11 @@ public class ArgumentResolvers {
     private static boolean isDefaultClass(Method method) {
         return Arrays.stream(method.getParameterTypes())
                 .anyMatch(m -> m.isInstance(String.class) || m.isPrimitive());
+    }
+
+    private static boolean isInterface(Method method) {
+        return Arrays.stream(method.getParameterTypes())
+                .anyMatch(Class::isInterface);
     }
 
 }
