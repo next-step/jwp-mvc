@@ -14,12 +14,9 @@ import java.util.Set;
 public class ControllerAnnotationHandler {
     private static final Logger logger = LoggerFactory.getLogger(ControllerAnnotationHandler.class);
 
-    private static ArgumentResolvers argumentResolvers;
-
     public static void apply(final Reflections reflections) {
         final Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Controller.class);
         for (final Class<?> clazz : annotated) {
-            argumentResolvers = new ArgumentResolvers(clazz);
             initByRequestMappingMethod(clazz);
         }
     }
@@ -29,7 +26,7 @@ public class ControllerAnnotationHandler {
         for (final Method method : allMethods) {
             final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
             if (Objects.nonNull(requestMapping)) {
-                argumentResolvers.add(method);
+                ArgumentResolvers.initialize(clazz, method);
             }
         }
     }
