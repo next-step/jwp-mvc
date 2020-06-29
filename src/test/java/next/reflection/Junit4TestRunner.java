@@ -3,6 +3,7 @@ package next.reflection;
 import org.junit.jupiter.api.Test;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -20,8 +21,8 @@ public class Junit4TestRunner {
                 .forEach(myTestMethod -> {
                     try {
                         myTestMethod.invoke(junit4TestInstance);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException("unable to call method.", e);
                     }
                 });
 

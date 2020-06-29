@@ -58,13 +58,11 @@ public class AnnotationHandlerMapping {
     }
 
     private Object getNewInstance(Class<?> clazz) {
-        Object controller = null;
         try {
-            controller = clazz.newInstance();
+            return clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new RuntimeException("unable to load controller.", e);
         }
-        return controller;
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
