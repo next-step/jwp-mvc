@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-public class HandlerExecution {
+public class HandlerExecution implements HandlerCommand {
 
     private Object object;
     private final Method method;
@@ -17,6 +17,7 @@ public class HandlerExecution {
         this.method = method;
     }
 
+    @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             return (ModelAndView) method.invoke(object, request, response);

@@ -18,8 +18,8 @@ public class RequestHandlerCommandTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Controller controller = new ListUserController();
-        HandlerCommand handlerCommand = new RequestHandlerCommand(request, response);
-        ModelAndView modelAndView = handlerCommand.execute(controller);
+        HandlerCommand handlerCommand = new RequestHandlerAdapter(controller);
+        ModelAndView modelAndView = handlerCommand.handle(request, response);
 
         assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("redirect:/users/loginForm"));
     }

@@ -5,5 +5,5 @@ import javax.servlet.http.HttpServletRequest;
 public interface RequestHandlerMapping {
     void initialize();
 
-    Object getHandler(HttpServletRequest request);
+    HandlerCommand getHandler(HttpServletRequest request);
 }

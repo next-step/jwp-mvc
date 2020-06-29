@@ -26,19 +26,16 @@ public class RequestHandlerMappers {
 
     public ModelAndView mapperHandling(final HttpServletRequest request, final HttpServletResponse response) throws ServletException {
         try {
-            Object handler = getHandler(request);
-            logger.debug("handler: {}", handler);
+            HandlerCommand handler = getHandler(request);
 
-            HandlerCommand handlerCommand = HandlerCommandFactory.create(handler, request, response);
-            return handlerCommand.execute(handler);
-
+            return handler.handle(request, response);
         } catch (Throwable e) {
             logger.error("Exception: {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private Object getHandler(final HttpServletRequest request) throws ServletException {
+    private HandlerCommand getHandler(final HttpServletRequest request) throws ServletException {
         return
                 mappers.stream()
                         .map(m -> m.getHandler(request))
