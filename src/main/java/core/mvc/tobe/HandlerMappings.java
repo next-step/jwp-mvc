@@ -19,10 +19,10 @@ public class HandlerMappings {
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public HandlerMethod getHandlerMethod(HttpServletRequest request) {
         return mappings.stream()
                 .filter(handlerMapping -> handlerMapping.supports(request))
-                .map(handlerMapping -> handlerMapping.getHandler(request))
+                .map(handlerMapping -> handlerMapping.getHandlerMethod(request))
                 .findFirst()
                 .orElse(null);
     }

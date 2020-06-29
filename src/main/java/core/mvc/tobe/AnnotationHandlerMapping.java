@@ -5,7 +5,6 @@ import core.annotation.WebApplication;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.ModelAndView;
 import core.mvc.tobe.exception.HandlerMappingInitializeFailedException;
 import core.utils.ComponentScanner;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Class<RequestMapping> HANDLER_METHOD_ANNOTATION = RequestMapping.class;
 
     private Object[] basePackages = {};
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private Map<HandlerKey, HandlerMethod> handlerMethods = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackages) {
         this.basePackages = basePackages;
@@ -36,12 +35,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public void initialize() {
+        log.debug("handler mapping initialize");
         if (basePackages.length == 0) {
             initializeBasePackages();
         }
 
         try {
-            log.debug("handler mapping initialize");
             ComponentScanner componentScanner = new ComponentScanner(basePackages);
 
             Set<Class<?>> handlerClasses = componentScanner.scanClassesBy(HANDLER_CLASS_ANNOTATION);
@@ -51,12 +50,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 Object instance = clazz.getDeclaredConstructor().newInstance();
 
                 List<Method> handlerMethods = componentScanner.scanMethodsBy(clazz, HANDLER_METHOD_ANNOTATION);
-                for (Method handlerMethod : handlerMethods) {
-                    log.debug("handler method={}", handlerMethod);
+                for (Method method : handlerMethods) {
+                    log.debug("handler method={}", method);
 
-                    HandlerKey handlerKey = createHandlerKeyFrom(handlerMethod);
-                    handlerExecutions.put(handlerKey,
-                            (request, response) -> (ModelAndView) handlerMethod.invoke(instance, request, response));
+                    HandlerKey handlerKey = createHandlerKeyFrom(method);
+                    HandlerMethod handlerMethod = new HandlerMethod(method, instance);
+                    this.handlerMethods.put(handlerKey, handlerMethod);
                 }
             }
             log.debug("handler mapping initialization is over");
@@ -69,17 +68,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public boolean supports(HttpServletRequest request) {
         HandlerKey handlerKey = createHandlerKeyFrom(request);
 
-        return handlerExecutions.keySet().contains(handlerKey);
+        return handlerMethods.containsKey(handlerKey);
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public HandlerMethod getHandlerMethod(HttpServletRequest request) {
         HandlerKey handlerKey = createHandlerKeyFrom(request);
 
-        return handlerExecutions.get(handlerKey);
+        return handlerMethods.get(handlerKey);
     }
 
     private void initializeBasePackages() {
+        // TODO: 2020/06/29 어떤 basePackage 기준으로 특정 annotation이나 interface 클래스 찾아주는 util
+        // TODO: 2020/06/29 ArgumentResolver 찾을 때도 사용 가능
         Reflections reflections = new Reflections("");
         this.basePackages = reflections.getTypesAnnotatedWith(WEB_APPLICATION_ANNOTATION)
                 .stream()

@@ -1,7 +1,7 @@
 package core.mvc.asis;
 
-import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.HandlerMethod;
 import lombok.extern.slf4j.Slf4j;
 import next.controller.CreateUserController;
 import next.controller.ListUserController;
@@ -10,6 +10,8 @@ import next.controller.UpdateFormUserController;
 import next.controller.UpdateUserController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,10 +45,15 @@ public class RequestMapping implements HandlerMapping {
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        Controller controller = findController(request.getRequestURI());
+    public HandlerMethod getHandlerMethod(HttpServletRequest request) {
+        try {
+            Controller controller = findController(request.getRequestURI());
+            Method method = controller.getClass().getMethod("execute", HttpServletRequest.class, HttpServletResponse.class);
 
-        return new ControllerAdapter(controller);
+            return new HandlerMethod(method);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("No such method on interface Controller", e);
+        }
     }
 
     public Controller findController(String url) {
