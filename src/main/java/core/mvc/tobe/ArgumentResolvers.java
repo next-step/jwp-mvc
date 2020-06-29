@@ -12,13 +12,26 @@ public class ArgumentResolvers {
             new PathVariableArgumentResolver(clazz, method);
             return;
         }
-        new BasicTypeArgumentResolver(clazz, method);
+        classResolver(clazz, method);
+    }
+
+    private static void classResolver(Class clazz, Method method) {
+        if (isDefaultClass(method)) {
+            new BasicTypeArgumentResolver(clazz, method);
+            return;
+        }
+        new BeanTypeArgumentResolver(clazz, method);
     }
 
     private static boolean isPathVariable(Method method) {
         return Arrays.stream(method.getParameterAnnotations())
                 .flatMap(Arrays::stream)
                 .anyMatch(annotation1 -> annotation1 instanceof PathVariable);
+    }
+
+    private static boolean isDefaultClass(Method method) {
+        return Arrays.stream(method.getParameterTypes())
+                .anyMatch(m -> m.isInstance(String.class) || m.isPrimitive());
     }
 
 }
