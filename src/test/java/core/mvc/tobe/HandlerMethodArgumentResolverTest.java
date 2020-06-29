@@ -12,6 +12,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
@@ -117,8 +120,43 @@ public class HandlerMethodArgumentResolverTest {
                 assertThat(mav.getObject("id")).isEqualTo(1L);
             }
         }
+    }
 
+    @Test
+    void object() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setParameter("userId", "123");
+        request.setParameter("password", "556");
+        request.setParameter("age", "177");
+        Class clazz = TestUserController.class;
 
+        Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
+
+        for (final Class<?> object : method.getParameterTypes()) {
+            final Field[] declaredFields = object.getDeclaredFields();
+            Object[] values = new Object[declaredFields.length];
+            for (int i = 0; i < declaredFields.length; i++) {
+                String value = request.getParameter(declaredFields[i].getName());
+                values[i] = value;
+                if (declaredFields[i].getType().equals(int.class)) {
+                    values[i] = Integer.parseInt(value);
+                }
+
+                if (declaredFields[i].getType().equals(long.class)) {
+                    values[i] = Long.parseLong(value);
+                }
+            }
+
+            Constructor<?> declaredConstructor = Arrays.stream(object.getConstructors())
+                    .max((o1, o2) -> Math.max(o1.getParameterCount(), o2.getParameterCount()))
+                    .get();
+
+            declaredConstructor.setAccessible(true);
+            TestUser user = (TestUser) declaredConstructor.newInstance(values);
+            assertThat(user.getAge()).isEqualTo(177);
+            assertThat(user.getUserId()).isEqualTo("123");
+            assertThat(user.getPassword()).isEqualTo("556");
+        }
     }
 
     private Method getMethod(String name, Method[] methods) {
