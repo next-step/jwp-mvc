@@ -2,7 +2,7 @@ package core.mvc;
 
 import core.mvc.handler.HandlerExecution;
 import core.mvc.handlerMapping.AnnotationHandlerMapping;
-import core.mvc.handlerMapping.HandlerMapping;
+import core.mvc.handlerMapping.HandlerMappings;
 import core.mvc.support.*;
 import core.mvc.support.exception.HandlerNotFoundException;
 import core.mvc.view.JspView;
@@ -15,10 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -26,7 +23,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String BASE_PACKAGE = "next.controller";
 
-    private List<HandlerMapping> handlerMappings;
+    private HandlerMappings handlerMappings;
     private HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite;
 
     @Override
@@ -34,7 +31,8 @@ public class DispatcherServlet extends HttpServlet {
         final AnnotationHandlerMapping ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
         ahm.initialize();
 
-        handlerMappings = Arrays.asList(ahm);
+        handlerMappings = new HandlerMappings();
+        handlerMappings.add(ahm);
 
         handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite();
         handlerMethodArgumentResolverComposite.addResolver(new ServletRequestResolver());
@@ -69,12 +67,8 @@ public class DispatcherServlet extends HttpServlet {
         throw new ServletException("handler not Found");
     }
 
-    private Object getHandler(HttpServletRequest req) throws ServletException {
-        return handlerMappings.stream()
-                .map(hm -> hm.getHandler(req))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(() -> new HandlerNotFoundException(req.getRequestURI(), req.getMethod()));
+    private Object getHandler(HttpServletRequest req) {
+        return handlerMappings.getHandler(req);
     }
 
     private void render(ModelAndView mav, HttpServletRequest req, HttpServletResponse resp) throws Exception {
