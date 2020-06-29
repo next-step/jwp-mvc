@@ -6,8 +6,6 @@ import core.mvc.handler.HandlerExecution;
 import core.mvc.handler.HandlerExecutions;
 import core.mvc.handler.HandlerKey;
 import core.mvc.scanner.ControllerScanner;
-import core.mvc.scanner.Scanner;
-import core.mvc.support.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -29,8 +27,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public void initialize() {
         final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-        final Scanner scanner = new ControllerScanner();
+        final ControllerScanner scanner = new ControllerScanner();
         scanner.scan(basePackage);
+
         final Set<Class<?>> scannedClasses = scanner.getScannedClasses();
 
         for (Class<?> clazz : scannedClasses) {
