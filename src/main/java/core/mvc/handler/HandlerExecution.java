@@ -25,6 +25,7 @@ public class HandlerExecution {
     private final Object instance;
     private final Method method;
     private final List<MethodParameter> methodParameters;
+    private HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite;
 
     public HandlerExecution(Object instance, Method method, ParameterNameDiscoverer nameDiscoverer) {
         this.instance = instance;
@@ -59,7 +60,11 @@ public class HandlerExecution {
         return pp.parse(requestMapping.value());
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws IllegalAccessException {
+    public void setHandlerMethodArgumentResolverComposite(HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) {
+        this.handlerMethodArgumentResolverComposite = handlerMethodArgumentResolverComposite;
+    }
+
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException {
         final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request, response);
         try {
             return (ModelAndView) method.invoke(instance, methodArguments);

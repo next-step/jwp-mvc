@@ -46,12 +46,13 @@ public class PathVariableResolverTest {
         request.setParameter("password", "test");
         request.setMethod("POST");
 
-        final HandlerExecution handler = ahm.getHandler(request);
-
         handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
 
+        final HandlerExecution handler = ahm.getHandler(request);
+        handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
+
         // when
-        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
+        final ModelAndView mav = handler.handle(request, response);
 
         // then
         assertThat(mav).isNotNull();
@@ -68,12 +69,13 @@ public class PathVariableResolverTest {
         request.setParameter("age", "30");
         request.setMethod("POST");
 
-        final HandlerExecution handler = ahm.getHandler(request);
-
         handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
 
+        final HandlerExecution handler = ahm.getHandler(request);
+        handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
+
         // when
-        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
+        final ModelAndView mav = handler.handle(request, response);
 
         // then
         assertThat(mav).isNotNull();
@@ -95,12 +97,14 @@ public class PathVariableResolverTest {
         request.setParameter("password", password);
         request.setParameter("age", String.valueOf(age));
         request.setMethod("POST");
-        final HandlerExecution handler = ahm.getHandler(request);
 
         handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
 
+        final HandlerExecution handler = ahm.getHandler(request);
+        handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
+
         // when
-        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
+        final ModelAndView mav = handler.handle(request, response);
 
         // then
         assertThat(mav).isNotNull();
@@ -115,12 +119,13 @@ public class PathVariableResolverTest {
         request.setRequestURI("/users/" + id);
         request.setMethod("GET");
 
-        final HandlerExecution handler = ahm.getHandler(request);
-
         handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
 
+        final HandlerExecution handler = ahm.getHandler(request);
+        handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
+
         // when
-        final ModelAndView mav = handler.handle(request, response, handlerMethodArgumentResolverComposite);
+        final ModelAndView mav = handler.handle(request, response);
 
         // then
         assertThat(mav).isNotNull();
@@ -135,12 +140,13 @@ public class PathVariableResolverTest {
         request.setRequestURI("/users/wrong/" + id);
         request.setMethod("GET");
 
-        final HandlerExecution handler = ahm.getHandler(request);
-
         handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
 
+        final HandlerExecution handler = ahm.getHandler(request);
+        handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
+
         // when
-        final Throwable thrown = catchThrowable(() -> handler.handle(request, response, handlerMethodArgumentResolverComposite));
+        final Throwable thrown = catchThrowable(() -> handler.handle(request, response));
 
         // then
         assertThat(thrown).isInstanceOf(MissingPathPatternException.class)

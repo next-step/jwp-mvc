@@ -20,7 +20,8 @@ public class HandlerAdapter {
     }
 
     public ModelAndView handle(HandlerExecution handler, HttpServletRequest req, HttpServletResponse resp) throws IllegalAccessException {
-        return handler.handle(req, resp, handlerMethodArgumentResolverComposite);
+        handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
+        return handler.handle(req, resp);
     }
 
 }
