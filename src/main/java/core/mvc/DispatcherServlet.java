@@ -3,7 +3,6 @@ package core.mvc;
 import core.mvc.handler.HandlerExecution;
 import core.mvc.handlerMapping.AnnotationHandlerMapping;
 import core.mvc.handlerMapping.HandlerMappings;
-import core.mvc.support.*;
 import core.mvc.support.exception.HandlerNotFoundException;
 import core.mvc.view.JspView;
 import core.mvc.view.View;
@@ -24,7 +23,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final String BASE_PACKAGE = "next.controller";
 
     private HandlerMappings handlerMappings;
-    private HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite;
+    private HandlerAdapter handlerAdapter;
 
     @Override
     public void init() {
@@ -34,12 +33,7 @@ public class DispatcherServlet extends HttpServlet {
         handlerMappings = new HandlerMappings();
         handlerMappings.add(ahm);
 
-        handlerMethodArgumentResolverComposite = new HandlerMethodArgumentResolverComposite();
-        handlerMethodArgumentResolverComposite.addResolver(new ServletRequestResolver());
-        handlerMethodArgumentResolverComposite.addResolver(new ServletResponseResolver());
-        handlerMethodArgumentResolverComposite.addResolver(new RequestParamResolver());
-        handlerMethodArgumentResolverComposite.addResolver(new ModelAttributeResolver());
-        handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
+        handlerAdapter = new HandlerAdapter();
     }
 
     @Override
@@ -49,7 +43,7 @@ public class DispatcherServlet extends HttpServlet {
             ModelAndView mav = null;
             try {
                 final Object handler = getHandler(req);
-                mav = handle(handler, req, resp, handlerMethodArgumentResolverComposite);
+                mav = handle(handler, req, resp);
             } catch (HandlerNotFoundException handlerNotFoundException) {
                 mav = new ModelAndView(new JspView("/error/page404.jsp"));
             }
@@ -60,9 +54,9 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp, HandlerMethodArgumentResolverComposite handlerMethodArgumentResolverComposite) throws Exception {
+    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (handler instanceof HandlerExecution) {
-            return ((HandlerExecution) handler).handle(req, resp, handlerMethodArgumentResolverComposite);
+            return handlerAdapter.handle((HandlerExecution) handler, req, resp);
         }
         throw new ServletException("handler not Found");
     }

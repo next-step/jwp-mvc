@@ -50,7 +50,7 @@ public class HandlerExecution {
     private String[] createParameterNames(ParameterNameDiscoverer nameDiscoverer) {
         return nameDiscoverer.getParameterNames(method);
     }
-    
+
     private PathPattern createPathPattern() {
         final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         final PathPatternParser pp = new PathPatternParser();
