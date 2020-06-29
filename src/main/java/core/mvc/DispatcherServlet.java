@@ -39,18 +39,22 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
+
         try {
-            ModelAndView mav = null;
-            try {
-                final Object handler = getHandler(req);
-                mav = handle(handler, req, resp);
-            } catch (HandlerNotFoundException handlerNotFoundException) {
-                mav = new ModelAndView(new JspView("/error/page404.jsp"));
-            }
+            ModelAndView mav = dispatch(req, resp);
             render(mav, req, resp);
         } catch (Exception e) {
             logger.error("Exception is: ", e);
             throw new ServletException(e.getMessage());
+        }
+    }
+
+    private ModelAndView dispatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        try {
+            final Object handler = getHandler(req);
+            return handle(handler, req, resp);
+        } catch (HandlerNotFoundException handlerNotFoundException) {
+            return new ModelAndView(new JspView("/error/page404.jsp"));
         }
     }
 
