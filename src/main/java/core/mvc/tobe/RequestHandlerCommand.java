@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.ViewFactory;
 import core.mvc.asis.Controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +20,7 @@ public class RequestHandlerCommand implements HandlerCommand {
     @Override
     public ModelAndView execute(Object handler) throws Exception {
         String viewName = ((Controller) handler).execute(request, response);
-        return new ModelAndView(new JspView(viewName));
+        return new ModelAndView(ViewFactory.create(viewName));
+
     }
 }
