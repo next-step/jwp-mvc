@@ -26,14 +26,14 @@ public class HandlerExecution {
     private final Method method;
     private final List<MethodParameter> methodParameters;
 
-    public HandlerExecution(Object instance, Method method) {
+    public HandlerExecution(Object instance, Method method, ParameterNameDiscoverer nameDiscoverer) {
         this.instance = instance;
         this.method = method;
-        this.methodParameters = createMethodParameters(method);
+        this.methodParameters = createMethodParameters(method, nameDiscoverer);
     }
 
-    private List<MethodParameter> createMethodParameters(Method method) {
-        final String[] names = createParameterNames();
+    private List<MethodParameter> createMethodParameters(Method method, ParameterNameDiscoverer nameDiscoverer) {
+        final String[] names = createParameterNames(nameDiscoverer);
         final Class<?>[] types = method.getParameterTypes();
         final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         final PathPattern pathPattern = createPathPattern();
@@ -47,11 +47,10 @@ public class HandlerExecution {
         return Collections.unmodifiableList(result);
     }
 
-    private String[] createParameterNames() {
-        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+    private String[] createParameterNames(ParameterNameDiscoverer nameDiscoverer) {
         return nameDiscoverer.getParameterNames(method);
     }
-
+    
     private PathPattern createPathPattern() {
         final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         final PathPatternParser pp = new PathPatternParser();

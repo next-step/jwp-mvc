@@ -8,6 +8,8 @@ import core.mvc.handler.HandlerKey;
 import core.mvc.scanner.ControllerScanner;
 import core.mvc.scanner.Scanner;
 import core.mvc.support.*;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -25,6 +27,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
+        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+
         final Scanner scanner = new ControllerScanner();
         scanner.scan(basePackage);
         final Set<Class<?>> scannedClasses = scanner.getScannedClasses();
@@ -34,7 +38,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
             final List<Method> handlers = convertHandlers(clazz);
 
             for (Method handler : handlers) {
-                HandlerExecution handlerExecution = new HandlerExecution(instance, handler);
+                HandlerExecution handlerExecution = new HandlerExecution(instance, handler, nameDiscoverer);
                 handlerExecutions.add(handlerExecution);
             }
         }
