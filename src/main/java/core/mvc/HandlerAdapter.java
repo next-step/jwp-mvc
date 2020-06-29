@@ -19,7 +19,7 @@ public class HandlerAdapter {
         handlerMethodArgumentResolverComposite.addResolver(new PathVariableResolver());
     }
 
-    public ModelAndView handle(HandlerExecution handler, HttpServletRequest req, HttpServletResponse resp) throws IllegalAccessException {
+    public ModelAndView handle(HandlerExecution handler, HttpServletRequest req, HttpServletResponse resp) {
         handler.setHandlerMethodArgumentResolverComposite(handlerMethodArgumentResolverComposite);
         return handler.handle(req, resp);
     }

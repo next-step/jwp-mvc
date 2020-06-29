@@ -5,7 +5,6 @@ import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 import core.mvc.support.HandlerMethodArgumentResolverComposite;
 import core.mvc.support.MethodParameter;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
@@ -64,16 +63,25 @@ public class HandlerExecution {
         this.handlerMethodArgumentResolverComposite = handlerMethodArgumentResolverComposite;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException {
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
         final Object[] methodArguments = handlerMethodArgumentResolverComposite.resolveParameters(methodParameters, request, response);
+        return invoke(method, instance, methodArguments);
+    }
+
+    private ModelAndView invoke(Method method, Object instance, Object[] methodArguments) {
         try {
+            method.setAccessible(true);
             return (ModelAndView) method.invoke(instance, methodArguments);
         } catch (InvocationTargetException e) {
-            Throwable targetException = e.getTargetException();
+            final Throwable targetException = e.getTargetException();
             if (targetException instanceof RuntimeException) {
-                throw (RuntimeException) e.getTargetException();
+                throw (RuntimeException) targetException;
             }
             throw new RuntimeException("invoke failed");
+        } catch (IllegalAccessException e) {
+            // ignore :: This is not happen.
+            e.printStackTrace();
+            return null;
         }
     }
 

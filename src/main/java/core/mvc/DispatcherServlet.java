@@ -54,7 +54,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         if (handler instanceof HandlerExecution) {
             return handlerAdapter.handle((HandlerExecution) handler, req, resp);
         }
