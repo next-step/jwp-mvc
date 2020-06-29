@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.HandlerMapping;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 
@@ -31,28 +32,39 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Set<Class<?>> controllerClasses = this.reflections.getTypesAnnotatedWith(Controller.class, true);
+        Set<Class<?>> controllerClasses = this.reflections.getTypesAnnotatedWith(Controller.class);
 
         for (Class<?> clazz : controllerClasses) {
 
-            Object controller = null;
-            try {
-                controller = clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            Object controller = getNewInstance(clazz);
 
-            Set<Method> methodsAnnotatedWithRequestMapping = Arrays.stream(clazz.getDeclaredMethods())
-                    .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                    .collect(Collectors.toSet());
+            Set<Method> methods = getMethodsAnnotatedWithRequestMapping(clazz);
 
-            for (Method method : methodsAnnotatedWithRequestMapping) {
-                RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-                HandlerKey handlerKey = new HandlerKey(annotation.value(), annotation.method());
-
-                handlerExecutions.put(handlerKey, new HandlerExecution(method, controller));
-            }
+            methods.forEach(method -> registerHandlerExecution(method, controller));
         }
+    }
+
+    private void registerHandlerExecution(Method method, Object controller) {
+        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+        HandlerKey handlerKey = new HandlerKey(annotation.value(), annotation.method());
+
+        handlerExecutions.put(handlerKey, new HandlerExecution(method, controller));
+    }
+
+    private Set<Method> getMethodsAnnotatedWithRequestMapping(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                .collect(Collectors.toSet());
+    }
+
+    private Object getNewInstance(Class<?> clazz) {
+        Object controller = null;
+        try {
+            controller = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return controller;
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
