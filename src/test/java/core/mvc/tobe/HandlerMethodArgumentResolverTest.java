@@ -156,6 +156,8 @@ public class HandlerMethodArgumentResolverTest {
             assertThat(user.getAge()).isEqualTo(177);
             assertThat(user.getUserId()).isEqualTo("123");
             assertThat(user.getPassword()).isEqualTo("556");
+            ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), user);
+            assertThat(modelAndView.getObject("testUser")).isInstanceOf(TestUser.class);
         }
     }
 
