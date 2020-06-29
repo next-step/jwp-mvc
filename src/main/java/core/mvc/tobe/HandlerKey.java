@@ -1,9 +1,15 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.util.Arrays;
 import java.util.Objects;
+
+import static core.mvc.tobe.ParameterUtils.parsePath;
+import static core.mvc.tobe.ParameterUtils.toPathContainer;
 
 public class HandlerKey {
     private String url;
@@ -19,7 +25,8 @@ public class HandlerKey {
     }
 
     private boolean equalsUrl(String url) {
-        return url.equals(this.url);
+        PathPattern pp = parsePath(this.url);
+        return url.equals(this.url) || pp.matches(toPathContainer(url));
     }
 
     private boolean contains(RequestMethod requestMethod) {
