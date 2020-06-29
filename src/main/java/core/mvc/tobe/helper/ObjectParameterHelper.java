@@ -37,7 +37,7 @@ public class ObjectParameterHelper implements HandlerMethodHelper {
                 continue;
             }
             argumentTypes.add(field.getType());
-            values.add(PrimitiveTypeUtil.castPrimitiveType(field.getType(), parameterValue));
+            values.add(PrimitiveTypeUtil.getValue(field.getType(), parameterValue));
         }
 
         Class[] classes = new Class[argumentTypes.size()];

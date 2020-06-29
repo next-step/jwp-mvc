@@ -1,36 +1,35 @@
 package core.mvc.tobe;
 
+import core.mvc.tobe.PrimitiveType.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Created By kjs4395 on 2020-06-24
  */
 public class PrimitiveTypeUtil {
-    public static Object castPrimitiveType(Class<?> clazz, String value) {
-        if (clazz.equals(int.class)) {
-            return Integer.parseInt(value);
-        }
 
-        if (clazz.equals(byte.class)) {
-            return Byte.parseByte(value);
-        }
+    public static List<TypeChecker> typeCheckers = new ArrayList<>();
 
-        if (clazz.equals(short.class)) {
-            return Short.parseShort(value);
-        }
+    static {
+        typeCheckers.add(new BooleanTypeChecker());
+        typeCheckers.add(new ByteTypeChecker());
+        typeCheckers.add(new DoubleTypeChecker());
+        typeCheckers.add(new FloatTypeChecker());
+        typeCheckers.add(new IntegerTypeChecker());
+        typeCheckers.add(new LongTypeChecker());
+        typeCheckers.add(new ShortTypeChecker());
+    }
 
-        if (clazz.equals(long.class)) {
-            return Long.parseLong(value);
-        }
+    public static Object getValue(Class<?> clazz, String value) {
+        Optional<TypeChecker> typeCheckerOptional = typeCheckers.stream()
+                .filter(typeChecker -> typeChecker.isSupportType(clazz))
+                .findFirst();
 
-        if (clazz.equals(float.class)) {
-            return Float.parseFloat(value);
-        }
-
-        if (clazz.equals(double.class)) {
-            return Double.parseDouble(value);
-        }
-
-        if (clazz.equals(boolean.class)) {
-            return Boolean.parseBoolean(value);
+        if (typeCheckerOptional.isPresent()) {
+            return typeCheckerOptional.get().parseType(value);
         }
 
         return value;
