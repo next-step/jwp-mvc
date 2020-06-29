@@ -1,6 +1,7 @@
-package core.mvc;
+package core.mvc.handler;
 
 import core.annotation.web.RequestMethod;
+import utils.PathPatternParserUtil;
 
 public class HandlerKey {
     private final String url;
@@ -9,6 +10,13 @@ public class HandlerKey {
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
+    }
+
+    public boolean match(HandlerKey handlerKey) {
+        if (requestMethod != handlerKey.requestMethod) {
+            return false;
+        }
+        return PathPatternParserUtil.match(url, handlerKey.url);
     }
 
     @Override

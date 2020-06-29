@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.handlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 

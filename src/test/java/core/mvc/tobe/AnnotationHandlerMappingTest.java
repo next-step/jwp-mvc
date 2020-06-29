@@ -1,8 +1,13 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
-import core.mvc.AnnotationHandlerMapping;
-import core.mvc.HandlerExecution;
+import core.mvc.DispatcherServlet;
+import core.mvc.handlerMapping.AnnotationHandlerMapping;
+import core.mvc.handler.HandlerExecution;
+import core.mvc.support.HandlerMethodArgumentResolverComposite;
+import core.mvc.support.ModelAttributeResolver;
+import core.mvc.support.RequestParamResolver;
+import core.mvc.support.ServletRequestResolver;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,37 +17,38 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnnotationHandlerMappingTest {
-    private AnnotationHandlerMapping handlerMapping;
+    private DispatcherServlet dispatcherServlet;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
+        dispatcherServlet = new DispatcherServlet();
+        dispatcherServlet.init();
     }
 
     @Test
     public void create_find() throws Exception {
-        User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
+        // given
+        final User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
 
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
+        final MockHttpServletResponse response = new MockHttpServletResponse();
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/profile");
         request.setParameter("userId", user.getUserId());
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+
+        dispatcherServlet.service(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
     }
 
     private void createUser(User user) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        final MockHttpServletResponse response = new MockHttpServletResponse();
+        final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/create");
         request.setParameter("userId", user.getUserId());
         request.setParameter("password", user.getPassword());
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+
+        dispatcherServlet.service(request, response);
     }
 }

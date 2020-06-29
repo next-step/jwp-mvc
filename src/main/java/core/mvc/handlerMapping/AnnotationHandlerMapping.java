@@ -1,7 +1,13 @@
-package core.mvc;
+package core.mvc.handlerMapping;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.handler.HandlerExecution;
+import core.mvc.handler.HandlerExecutions;
+import core.mvc.handler.HandlerKey;
+import core.mvc.scanner.ControllerScanner;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -19,15 +25,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        final ControllerScanner scanner = new ControllerScanner(basePackage);
-        final Set<Class<?>> scannedClasses = scanner.getControllers();
+        final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+
+        final ControllerScanner scanner = new ControllerScanner();
+        scanner.scan(basePackage);
+
+        final Set<Class<?>> scannedClasses = scanner.getScannedClasses();
 
         for (Class<?> clazz : scannedClasses) {
             final Object instance = scanner.getInstance(clazz);
             final List<Method> handlers = convertHandlers(clazz);
 
             for (Method handler : handlers) {
-                HandlerExecution handlerExecution = new HandlerExecution(instance, handler);
+                HandlerExecution handlerExecution = new HandlerExecution(instance, handler, nameDiscoverer);
                 handlerExecutions.add(handlerExecution);
             }
         }
@@ -39,6 +49,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         final String requestUri = request.getRequestURI();
         final RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());

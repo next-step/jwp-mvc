@@ -1,10 +1,10 @@
-package core.mvc;
+package core.mvc.scanner;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
+import core.mvc.support.exception.FailedNewInstanceException;
 import org.reflections.Reflections;
 
-import javax.servlet.ServletException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Set;
 public class ControllerScanner {
     private final Map<Class<?>, Object> classInstances = Maps.newHashMap();
 
-    public ControllerScanner(Object[] basePackage) {
+    public void scan(Object[] basePackage) {
         final Reflections reflections = new Reflections(basePackage);
         final Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class, true);
 
@@ -23,18 +23,16 @@ public class ControllerScanner {
     }
 
     private Object newInstance(Class<?> controllerClass) {
-        Object instance = null;
         try {
-            Constructor<?> constructor = controllerClass.getDeclaredConstructor();
+            final Constructor<?> constructor = controllerClass.getDeclaredConstructor();
             constructor.setAccessible(true);
-            instance = constructor.newInstance();
+            return constructor.newInstance();
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new FailedNewInstanceException(controllerClass, e);
         }
-        return instance;
     }
 
-    public Set<Class<?>> getControllers() {
+    public Set<Class<?>> getScannedClasses() {
         return classInstances.keySet();
     }
 

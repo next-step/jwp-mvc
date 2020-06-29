@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.handler;
 
 import com.google.common.collect.Maps;
 
@@ -17,7 +17,12 @@ public class HandlerExecutions {
     }
 
     public HandlerExecution get(HandlerKey handlerKey) {
-        return handlerExecutions.get(handlerKey);
+        final HandlerKey processableKey = handlerExecutions.keySet().stream()
+                .filter(key -> key.match(handlerKey))
+                .findFirst()
+                .orElse(null);
+
+        return handlerExecutions.get(processableKey);
     }
 
 }

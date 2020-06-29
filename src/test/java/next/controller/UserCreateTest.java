@@ -20,7 +20,7 @@ public class UserCreateTest {
         formData.add("name", "bactoria");
         formData.add("email", "bactoria@test.com");
 
-        final ResponseEntity<String> response = Request.submitForm("/users/create   ", formData);
+        final ResponseEntity<String> response = Request.submitForm("/users/create", formData);
 
         final String expectedLocation = "/";
 
