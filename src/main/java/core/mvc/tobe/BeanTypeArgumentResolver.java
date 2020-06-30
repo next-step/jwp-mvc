@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class BeanTypeArgumentResolver extends AbstractArgumentResolver {
+public class BeanTypeArgumentResolver extends ArgumentResolver {
 
     private Class clazz;
     private Method method;

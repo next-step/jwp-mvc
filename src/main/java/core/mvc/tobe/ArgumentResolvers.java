@@ -1,48 +1,54 @@
 package core.mvc.tobe;
 
 import core.annotation.web.PathVariable;
+import core.annotation.web.RequestMapping;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class ArgumentResolvers {
 
-    public static void initialize(Class clazz, Method method) {
-        if (isPathVariable(method)) {
-            new PathVariableArgumentResolver(clazz, method);
-            return;
-        }
-        classResolver(clazz, method);
+    private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+
+    private Class clazz;
+    private Method method;
+
+    public ArgumentResolvers(final Class clazz, final Method method) {
+        this.clazz = clazz;
+        this.method = method;
     }
 
-    private static void classResolver(Class clazz, Method method) {
-        if (isDefaultClass(method)) {
-            new BasicTypeArgumentResolver(clazz, method);
-            return;
+    public Object[] getParameterValues(final HttpServletRequest request) {
+        final RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+        String[] parameterNames = nameDiscoverer.getParameterNames(method);
+        Object[] values = new Object[parameterNames.length];
+
+        for (int i = 0; i < parameterNames.length; i++) {
+            String parameterName = parameterNames[i];
+
+            final Class<?>[] parameterTypes = method.getParameterTypes();
+            for (final Class<?> parameterType : parameterTypes) {
+                values[i] = new BasicTypeArgumentResolver(parameterType).getParameterValue(request.getParameter(parameterName));
+            }
         }
-        classResolverByInterface(clazz, method);
+        return values;
     }
 
-    private static void classResolverByInterface(Class clazz, Method method) {
-        if (isInterface(method)) {
-            new ServletArgumentResolver(clazz, method);
-            return;
-        }
-        new BeanTypeArgumentResolver(clazz, method);
-    }
 
-    private static boolean isPathVariable(Method method) {
+    private boolean isPathVariable() {
         return Arrays.stream(method.getParameterAnnotations())
                 .flatMap(Arrays::stream)
-                .anyMatch(annotation1 -> annotation1 instanceof PathVariable);
+                .anyMatch(annotation -> annotation instanceof PathVariable);
     }
 
-    private static boolean isDefaultClass(Method method) {
-        return Arrays.stream(method.getParameterTypes())
-                .anyMatch(m -> m.isInstance(String.class) || m.isPrimitive());
+    private boolean isDefaultClass() {
+        return clazz.isInstance(String.class) || clazz.isPrimitive();
     }
 
-    private static boolean isInterface(Method method) {
+    private boolean isInterface() {
         return Arrays.stream(method.getParameterTypes())
                 .anyMatch(Class::isInterface);
     }

@@ -2,17 +2,13 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-public class AbstractArgumentResolver implements HandlerExecution {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractArgumentResolver.class);
+public interface ArgumentResolver {
 
     public void applyExecution(Method method, HandlerExecution handlerExecution) {
         final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
@@ -23,7 +19,6 @@ public class AbstractArgumentResolver implements HandlerExecution {
         }
         final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
         AnnotationHandlerMapping.handlerExecutions.put(handlerKey, handlerExecution);
-        logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMapping.method(), requestMapping.value(), handlerExecution);
     }
 
     private void applyExecutionByAllMethod(RequestMapping requestMapping, HandlerExecution handlerExecution) {
@@ -31,13 +26,7 @@ public class AbstractArgumentResolver implements HandlerExecution {
                 .forEach(requestMethod -> {
                     if (!requestMethod.equals(RequestMethod.ALL)) {
                         AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
-                        logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
                     }
                 });
-    }
-
-    @Override
-    public ModelAndView handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        return null;
     }
 }

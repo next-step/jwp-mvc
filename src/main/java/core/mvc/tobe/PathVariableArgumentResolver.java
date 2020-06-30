@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 
-public class PathVariableArgumentResolver extends AbstractArgumentResolver {
+public class PathVariableArgumentResolver {
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     private Class clazz;

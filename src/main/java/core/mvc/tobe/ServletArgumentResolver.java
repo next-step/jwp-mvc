@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class ServletArgumentResolver extends AbstractArgumentResolver{
+public class ServletArgumentResolver extends ArgumentResolver {
 
     private Class clazz;
     private Method method;
