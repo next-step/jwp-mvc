@@ -1,15 +1,29 @@
 package next.controller;
 
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.asis.Controller;
+import core.mvc.ModelAndView;
+import core.mvc.view.JspView;
+import org.slf4j.Logger;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class HomeController implements Controller {
-    @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+import static org.slf4j.LoggerFactory.getLogger;
+
+@Controller
+public class HomeController {
+
+    private static final Logger log = getLogger(HomeController.class);
+
+    @RequestMapping(value = "/")
+    public ModelAndView show(HttpServletRequest req, HttpServletResponse resp) {
+
         req.setAttribute("users", DataBase.findAll());
-        return "home.jsp";
+
+        ModelAndView mav = new ModelAndView(new JspView("home"));
+        return mav;
     }
 }

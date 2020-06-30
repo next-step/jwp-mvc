@@ -1,7 +1,14 @@
 package core.mvc.asis;
 
+import com.google.common.collect.Lists;
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.view.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,19 +17,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private static final long serialVersionUID = 1L;
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    public static final String CONTROLLER_PACKAGE = "next.controller";
+
+    private List<HandlerMapping> mappings = Lists.newArrayList();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        mappings.add(new RequestMapping());
+        mappings.add(new AnnotationHandlerMapping(CONTROLLER_PACKAGE));
     }
 
     @Override
@@ -30,14 +40,32 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            Object handler = getHandler(req);
+            handle(req, resp, handler);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private void handle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+        if (handler instanceof Controller) {
+            String viewName = ((Controller) handler).execute(req, resp);
+            move(viewName, req, resp);
+        } else {
+            ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
+            View view = mav.getView();
+            view.render(mav.getModel(), req, resp);
+        }
+    }
+
+    private Object getHandler(HttpServletRequest req) {
+        for (HandlerMapping mapping : mappings) {
+            Object handler = mapping.getHandler(req);
+            if (handler != null) return handler;
+        }
+        throw new RuntimeException("no mapping found.");
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
