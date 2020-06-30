@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = getLogger(AnnotationHandlerMapping.class);
 
     private final Object[] basePackage;
@@ -29,6 +29,8 @@ public class AnnotationHandlerMapping {
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
         this.reflections = new Reflections(basePackage);
+
+        this.initialize();
     }
 
     public void initialize() {
@@ -46,9 +48,13 @@ public class AnnotationHandlerMapping {
 
     private void registerHandlerExecution(Method method, Object controller) {
         RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        HandlerKey handlerKey = new HandlerKey(annotation.value(), annotation.method());
+        String path = annotation.value();
+        RequestMethod httpMethod = annotation.method();
+        HandlerKey handlerKey = new HandlerKey(path, httpMethod);
 
         handlerExecutions.put(handlerKey, new HandlerExecution(method, controller));
+
+        logger.info("@ Path: {}, Controller: {}", path, controller.getClass());
     }
 
     private Set<Method> getMethodsAnnotatedWithRequestMapping(Class<?> clazz) {
@@ -65,6 +71,7 @@ public class AnnotationHandlerMapping {
         }
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
