@@ -6,6 +6,7 @@ import core.mvc.ModelAndView;
 import core.mvc.exception.RequestMismatchException;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.view.View;
+import core.mvc.view.ViewResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,8 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             ModelAndView mav = handler.execute(req, resp);
-            View view = mav.getView();
+            String viewName = mav.getViewName();
+            View view = ViewResolver.resolve(viewName);
             view.render(mav.getModel(), req, resp);
         } catch (Exception e) {
             logger.error("Exception : {}", e.getMessage());
