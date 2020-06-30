@@ -3,6 +3,7 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.argumentresolver.ArgumentResolvers;
 import core.mvc.argumentresolver.MethodParameter;
+import core.mvc.scanner.WebApplicationScanner;
 import core.mvc.tobe.HandlerMappings;
 import core.mvc.tobe.HandlerMethod;
 import core.mvc.view.View;
@@ -27,14 +28,21 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+    private final WebApplicationScanner webApplicationScanner = new WebApplicationScanner();
     private final ArgumentResolvers argumentResolvers = new ArgumentResolvers();
     private final HandlerMappings handlerMappings = new HandlerMappings();
     private final ViewResolvers viewResolvers = new ViewResolvers();
 
     @Override
     public void init() {
-        argumentResolvers.init();
-        handlerMappings.init();
+        try {
+            webApplicationScanner.init();
+
+            argumentResolvers.init(webApplicationScanner);
+            handlerMappings.init(webApplicationScanner);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot initialize dispatcherServlet.");
+        }
     }
 
     @Override

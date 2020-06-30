@@ -1,19 +1,23 @@
 package core.mvc.tobe;
 
 import core.mvc.asis.RequestMapping;
+import core.mvc.scanner.WebApplicationScanner;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class HandlerMappings {
 
-    private final List<HandlerMapping> mappings = Arrays.asList(
-            new RequestMapping(),
-            new AnnotationHandlerMapping()
-    );
+    private final List<HandlerMapping> mappings = new ArrayList<>();
 
-    public void init() {
+    public void init(WebApplicationScanner webApplicationScanner) {
+        mappings.addAll(Arrays.asList(
+                new RequestMapping(),
+                new AnnotationHandlerMapping(webApplicationScanner)
+        ));
+
         for (HandlerMapping mapping : mappings) {
             mapping.initialize();
         }

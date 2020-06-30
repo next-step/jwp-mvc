@@ -7,7 +7,6 @@ import core.mvc.ModelAndView;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static core.annotation.web.RequestMethod.GET;
@@ -17,11 +16,9 @@ import static core.annotation.web.RequestMethod.POST;
 public class LoginController {
 
     @RequestMapping(value = "/users/login", method = POST)
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
-        String password = request.getParameter("password");
-
+    public ModelAndView login(String userId, String password, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
+
         if (canUserLogin(user, password)) {
             HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
@@ -33,7 +30,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/users/loginForm", method = GET)
-    public ModelAndView forwardLoginForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView forwardLoginForm() {
         return new ModelAndView("/user/login.jsp");
     }
 

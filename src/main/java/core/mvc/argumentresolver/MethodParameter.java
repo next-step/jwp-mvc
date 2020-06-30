@@ -16,4 +16,8 @@ public class MethodParameter {
     public boolean isAssignableFrom(Class<?> clazz) {
         return parameterType.isAssignableFrom(clazz);
     }
+
+    public boolean matchParameterName(String parameterName) {
+        return this.parameterName.equals(parameterName);
+    }
 }
