@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.tobe.view;
 
 public class ViewFactory {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";

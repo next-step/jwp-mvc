@@ -1,9 +1,9 @@
 package core.mvc.tobe;
 
-import core.mvc.JspView;
-import core.mvc.RedirectView;
-import core.mvc.View;
-import core.mvc.ViewFactory;
+import core.mvc.tobe.view.JspView;
+import core.mvc.tobe.view.RedirectView;
+import core.mvc.tobe.view.View;
+import core.mvc.tobe.view.ViewFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

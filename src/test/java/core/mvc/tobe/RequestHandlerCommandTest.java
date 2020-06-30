@@ -1,8 +1,8 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
-import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
+import core.mvc.tobe.view.RedirectView;
 import next.controller.ListUserController;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

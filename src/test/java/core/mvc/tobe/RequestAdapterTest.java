@@ -1,9 +1,9 @@
 package core.mvc.tobe;
 
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
-import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
+import core.mvc.tobe.view.JspView;
+import core.mvc.tobe.view.RedirectView;
 import next.controller.ListUserController;
 import next.controller.LoginController;
 import org.junit.jupiter.api.Test;

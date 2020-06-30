@@ -1,8 +1,8 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
-import core.mvc.ViewFactory;
 import core.mvc.asis.Controller;
+import core.mvc.tobe.view.ViewFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

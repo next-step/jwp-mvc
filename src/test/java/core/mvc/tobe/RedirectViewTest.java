@@ -1,6 +1,6 @@
 package core.mvc.tobe;
 
-import core.mvc.RedirectView;
+import core.mvc.tobe.view.RedirectView;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
