@@ -13,6 +13,9 @@ public class Answer {
 
     private long questionId;
 
+    public Answer() {
+    }
+
     public Answer(String writer, String contents, long questionId) {
         this(0, writer, contents, new Date(), questionId);
     }
@@ -66,9 +69,7 @@ public class Answer {
         if (getClass() != obj.getClass())
             return false;
         Answer other = (Answer) obj;
-        if (answerId != other.answerId)
-            return false;
-        return true;
+        return answerId == other.answerId;
     }
 
     @Override

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class JspView implements View {
 
-    private static final String ILLEGAL_JSP_VIEW_NAME = "유효하지 않은 JST view name 입니다.";
+    private static final String ILLEGAL_JSP_VIEW_NAME = "유효하지 않은 view name 입니다.: ";
     private final String viewName;
 
     public JspView(String viewName) {
@@ -19,8 +19,8 @@ public class JspView implements View {
     }
 
     private String validate(String viewName) {
-        String name = Args.notNull(viewName, ILLEGAL_JSP_VIEW_NAME);
-        Args.check(name.endsWith(".jsp"), ILLEGAL_JSP_VIEW_NAME);
+        String name = Args.notNull(viewName, ILLEGAL_JSP_VIEW_NAME + viewName);
+        Args.check(name.endsWith(".jsp"), ILLEGAL_JSP_VIEW_NAME + viewName);
         return name;
     }
 
