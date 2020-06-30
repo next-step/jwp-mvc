@@ -15,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -36,22 +37,32 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
-        Handler handler = handlerMappings.stream()
+        try {
+            Handler handler = getHandler(req);
+            ModelAndView mav = handler.execute(req, resp);
+            render(req, resp, mav);
+        } catch (RequestMismatchException e) {
+            logger.error("404 Not Found");
+            resp.sendError(404);
+        } catch (Exception e) {
+            logger.error("Exception : {}", e.getMessage());
+            resp.sendError(400);
+        }
+    }
+
+    private Handler getHandler(HttpServletRequest req) {
+        return handlerMappings.stream()
                 .map(handlerMapping -> handlerMapping.getHandler(req))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(RequestMismatchException::new);
+    }
 
-        try {
-            ModelAndView mav = handler.execute(req, resp);
-            String viewName = mav.getViewName();
-            View view = ViewResolver.resolve(viewName);
-            view.render(mav.getModel(), req, resp);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e.getMessage());
-            throw new ServletException(e);
-        }
+    private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView mav) throws Exception {
+        String viewName = mav.getViewName();
+        View view = ViewResolver.resolve(viewName);
+        view.render(mav.getModel(), req, resp);
     }
 }
