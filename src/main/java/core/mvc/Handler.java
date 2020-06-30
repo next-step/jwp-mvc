@@ -1,12 +1,10 @@
-package core.mvc.tobe;
-
-import core.mvc.Handler;
-import core.mvc.ModelAndView;
+package core.mvc;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @FunctionalInterface
-public interface HandlerExecution extends Handler {
+public interface Handler {
+
     ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }

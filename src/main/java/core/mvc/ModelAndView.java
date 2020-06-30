@@ -1,20 +1,16 @@
 package core.mvc;
 
-import core.mvc.view.View;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
-    private View view;
+
+    private String viewName;
     private Map<String, Object> model = new HashMap<String, Object>();
 
-    public ModelAndView() {
-    }
-
-    public ModelAndView(View view) {
-        this.view = view;
+    public void setView(String viewName) {
+        this.viewName = viewName;
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
@@ -30,7 +26,7 @@ public class ModelAndView {
         return Collections.unmodifiableMap(model);
     }
 
-    public View getView() {
-        return view;
+    public String getViewName() {
+        return viewName;
     }
 }

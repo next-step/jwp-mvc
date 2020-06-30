@@ -4,8 +4,9 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.Handler;
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
@@ -30,8 +31,7 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> controllers = ControllerScanner.scan(Controller.class, basePackage);
         handlerExecutions = controllers.stream()
                 .map(this::initializeMethodsOf)
                 .flatMap(map -> map.entrySet().stream())
@@ -64,7 +64,8 @@ public class AnnotationHandlerMapping {
         return (request, response) -> (ModelAndView) method.invoke(instance, request, response);
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    @Override
+    public Handler getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));

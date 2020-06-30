@@ -23,6 +23,6 @@ public class QnaController {
 
     @RequestMapping("/questions")
     public ModelAndView list(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return new ModelAndView(new MockView());
+        return new ModelAndView();
     }
 }
