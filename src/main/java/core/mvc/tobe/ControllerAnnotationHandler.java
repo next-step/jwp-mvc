@@ -2,12 +2,14 @@ package core.mvc.tobe;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,8 +28,25 @@ public class ControllerAnnotationHandler {
         for (final Method method : allMethods) {
             final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
             if (Objects.nonNull(requestMapping)) {
-                ArgumentResolvers.initialize(clazz, method);
+                final ControllerHandlerExecution execution = new ControllerHandlerExecution(clazz, method);
+                applyExecution(requestMapping, execution);
             }
         }
+    }
+
+    private static void applyExecution(RequestMapping requestMapping, HandlerExecution handlerExecution) {
+        if (requestMapping.method().equals(RequestMethod.ALL)) {
+            Arrays.stream(RequestMethod.values())
+                    .forEach(requestMethod -> {
+                        if (!requestMethod.equals(RequestMethod.ALL)) {
+                            AnnotationHandlerMapping.handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), handlerExecution);
+                            logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMethod, requestMapping.value(), handlerExecution);
+                        }
+                    });
+            return;
+        }
+        final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
+        AnnotationHandlerMapping.handlerExecutions.put(handlerKey, handlerExecution);
+        logger.info("Mapping Info - method : {}, value : {}, Execution : {}", requestMapping.method(), requestMapping.value(), handlerExecution);
     }
 }
