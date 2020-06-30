@@ -1,6 +1,6 @@
 package core.mvc.tobe;
 
-import core.mvc.tobe.helper.Helpers;
+import core.mvc.tobe.helper.HandlerMethodHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -19,10 +19,10 @@ public class MethodInfo {
         }
     }
 
-    public Object[] bindingParameters(HttpServletRequest request) {
+    public Object[] bindingParameters(HttpServletRequest request, List<HandlerMethodHelper> methodHelpers) {
         return this.parameters
                 .stream()
-                .map(parameter ->Helpers.executeHelper(parameter,request))
+                .map(parameter -> parameter.invokeParameterBind(request,methodHelpers))
                 .toArray();
     }
 }

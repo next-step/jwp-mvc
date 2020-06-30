@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created By kjs4395 on 2020-06-25
  */
-public class HadlerExecutionAdapter implements HandlerAdapter {
+public class HandlerExecutionAdapter implements HandlerAdapter {
     @Override
     public boolean isSupport(Object executor) {
         return executor instanceof HandlerExecution;

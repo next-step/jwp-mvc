@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created By kjs4395 on 2020-06-24
  */
-public class OriginalParameterBinding implements HandlerMethodHelper {
+public class OriginalParameterHelper implements HandlerMethodHelper {
 
     @Override
     public boolean support(ParameterInfo parameterInfo) {

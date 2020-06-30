@@ -16,7 +16,7 @@ public class HandlerAdapters {
 
     static {
         HANDLERS.add(new RequestMappingAdapter());
-        HANDLERS.add(new HadlerExecutionAdapter());
+        HANDLERS.add(new HandlerExecutionAdapter());
     }
 
     public static ModelAndView executeHandler(HttpServletRequest req, HttpServletResponse resp, Object executor) throws Exception {

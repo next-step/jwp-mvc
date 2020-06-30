@@ -1,6 +1,8 @@
 package core.mvc.tobe;
 
+import com.github.jknack.handlebars.helper.MethodHelper;
 import core.annotation.web.RequestMapping;
+import core.mvc.tobe.helper.HandlerMethodHelper;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -8,6 +10,7 @@ import org.springframework.web.util.pattern.PathPattern;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,5 +65,14 @@ public class ParameterInfo {
 
     public boolean isAnnotated() {
         return isAnnotated;
+    }
+
+    public Object invokeParameterBind(HttpServletRequest request, List<HandlerMethodHelper> methodHelpers) {
+        return methodHelpers
+                .stream()
+                .filter(methodHelper -> methodHelper.support(this))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new)
+                .bindingProcess(this, request);
     }
 }
