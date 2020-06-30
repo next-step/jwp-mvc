@@ -5,6 +5,9 @@ public class TestUser {
     private String password;
     private int age;
 
+    public TestUser() {
+    }
+
     public TestUser(String userId, String password, int age) {
         this.userId = userId;
         this.password = password;
@@ -21,6 +24,34 @@ public class TestUser {
 
     public int getAge() {
         return age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TestUser testUser = (TestUser) o;
+
+        if (age != testUser.age) {
+            return false;
+        }
+        if (userId != null ? !userId.equals(testUser.userId) : testUser.userId != null) {
+            return false;
+        }
+        return password != null ? password.equals(testUser.password) : testUser.password == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userId != null ? userId.hashCode() : 0;
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + age;
+        return result;
     }
 
     @Override

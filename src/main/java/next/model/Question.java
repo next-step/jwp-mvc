@@ -15,6 +15,9 @@ public class Question {
 
     private int countOfComment;
 
+    public Question() {
+    }
+
     public Question(String writer, String title, String contents) {
         this(0, writer, title, contents, new Date(), 0);
     }
@@ -80,8 +83,6 @@ public class Question {
         if (getClass() != obj.getClass())
             return false;
         Question other = (Question) obj;
-        if (questionId != other.questionId)
-            return false;
-        return true;
+        return questionId == other.questionId;
     }
 }

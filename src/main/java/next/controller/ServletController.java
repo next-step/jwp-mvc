@@ -9,7 +9,6 @@ import core.mvc.view.JspView;
 import core.mvc.view.RedirectView;
 import core.mvc.view.View;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import next.model.User;
 import org.slf4j.Logger;
@@ -36,30 +35,30 @@ public class ServletController {
     private static final Logger logger = LoggerFactory.getLogger(ServletController.class);
 
     @RequestMapping(value = "/")
-    public ModelAndView home(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView home(HttpServletRequest request) {
         request.setAttribute("users", DataBase.findAll());
         return createModelAndViewWithViewName(HOME_CONTROLLER_VIEW);
     }
 
     @RequestMapping(value = "/index.html")
-    public ModelAndView homeIndex(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView homeIndex(HttpServletRequest request) {
         request.setAttribute("users", DataBase.findAll());
         return createModelAndViewWithViewName(HOME_CONTROLLER_VIEW);
     }
 
     @RequestMapping(value = "/users/form")
-    public ModelAndView forwardForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView forwardForm() {
         return createModelAndViewWithViewName(FORM_FORWARD_VIEW);
     }
 
     @RequestMapping(value = "/users/loginForm")
-    public ModelAndView forwardLogin(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView forwardLogin() {
         View view = getViewWithViewName(LOGIN_FORWARD_VIEW);
         return new ModelAndView(view);
     }
 
     @RequestMapping(value = "/users")
-    public ModelAndView listUser(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView listUser(HttpServletRequest request) {
         if (!UserSessionUtils.isLogined(request.getSession())) {
             return createModelAndViewWithViewName(REDIRECT_LOGIN_FORM);
         }
@@ -69,9 +68,7 @@ public class ServletController {
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView loginUser(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
-        String password = request.getParameter("password");
+    public ModelAndView loginUser(HttpServletRequest request, String userId, String password) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             request.setAttribute("loginFailed", true);
@@ -88,8 +85,7 @@ public class ServletController {
     }
 
     @RequestMapping(value = "/users/profile")
-    public ModelAndView profileUser(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView profileUser(HttpServletRequest request, String userId) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException(CANNOT_FIND_USER);
@@ -99,16 +95,14 @@ public class ServletController {
     }
 
     @RequestMapping(value = "/users/logout")
-    public ModelAndView logoutUser(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView logoutUser(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return createModelAndViewWithViewName(REDIRECT_HOME);
     }
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
-            request.getParameter("email"));
+    public ModelAndView createUser(User user) {
         logger.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -116,8 +110,7 @@ public class ServletController {
     }
 
     @RequestMapping(value = "/users/updateForm")
-    public ModelAndView updateFormUser(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView updateFormUser(HttpServletRequest request, String userId) {
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException(ILLEGAL_ATTEMPT);
@@ -127,14 +120,12 @@ public class ServletController {
     }
 
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)
-    public ModelAndView updateUser(HttpServletRequest request, HttpServletResponse response) {
-        User user = DataBase.findUserById(request.getParameter("userId"));
+    public ModelAndView updateUser(HttpServletRequest request, User updateUser) {
+        User user = DataBase.findUserById(updateUser.getUserId());
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException(ILLEGAL_ATTEMPT);
         }
 
-        User updateUser = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
-            request.getParameter("email"));
         logger.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return createModelAndViewWithViewName(REDIRECT_HOME);
