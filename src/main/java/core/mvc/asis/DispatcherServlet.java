@@ -33,15 +33,6 @@ public class DispatcherServlet extends HttpServlet {
         String requestURI = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestURI);
 
-        try {
-            if (requestURI.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-                resp.sendRedirect(requestURI);
-                return;
-            }
-        } catch (Throwable ex) {
-            throw new ServletException(ex);
-        }
-
         ModelAndView modelAndView = mappers.mapperHandling(req, resp);
         render(modelAndView, req, resp);
 

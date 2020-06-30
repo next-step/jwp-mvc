@@ -4,6 +4,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import next.model.User;
 import org.slf4j.Logger;
@@ -35,5 +36,10 @@ public class MyController {
         logger.debug("User : {}", user);
         DataBase.addUser(user);
         return null;
+    }
+
+    @RequestMapping(value = "/users/test", method = RequestMethod.GET)
+    public ModelAndView viewTest(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(new JspView("test.jsp"));
     }
 }

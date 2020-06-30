@@ -1,5 +1,7 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.HandlerCommand;
+import core.mvc.tobe.RequestHandlerAdapter;
 import core.mvc.tobe.RequestHandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
@@ -32,9 +34,13 @@ public class RequestMapping implements RequestHandlerMapping {
     }
 
     @Override
-    public Controller getHandler(HttpServletRequest request) {
+    public HandlerCommand getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
-        return mappings.get(requestUri);
+        Controller controller = mappings.get(requestUri);
+        if (controller != null) {
+            return new RequestHandlerAdapter(controller);
+        }
+        return null;
     }
 
     public Controller findController(String url) {
