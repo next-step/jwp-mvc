@@ -31,7 +31,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        Set<Class<?>> controllers = ComponentScanner.scan(Controller.class, basePackage);
+        Set<Class<?>> controllers = ControllerScanner.scan(Controller.class, basePackage);
         handlerExecutions = controllers.stream()
                 .map(this::initializeMethodsOf)
                 .flatMap(map -> map.entrySet().stream())
