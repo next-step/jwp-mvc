@@ -1,7 +1,5 @@
 package core.mvc.asis;
 
-import com.google.common.collect.Lists;
-import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -27,12 +24,11 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     public static final String CONTROLLER_PACKAGE = "next.controller";
 
-    private List<HandlerMapping> mappings = Lists.newArrayList();
+    private HandlerMappings handlerMappings;
 
     @Override
     public void init() throws ServletException {
-        mappings.add(new RequestMapping());
-        mappings.add(new AnnotationHandlerMapping(CONTROLLER_PACKAGE));
+        handlerMappings = new HandlerMappings(new RequestMapping(), new AnnotationHandlerMapping(CONTROLLER_PACKAGE));
     }
 
     @Override
@@ -41,7 +37,7 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            Object handler = getHandler(req);
+            Object handler = handlerMappings.getHandler(req);
             handle(req, resp, handler);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
@@ -58,14 +54,6 @@ public class DispatcherServlet extends HttpServlet {
             View view = mav.getView();
             view.render(mav.getModel(), req, resp);
         }
-    }
-
-    private Object getHandler(HttpServletRequest req) {
-        for (HandlerMapping mapping : mappings) {
-            Object handler = mapping.getHandler(req);
-            if (handler != null) return handler;
-        }
-        throw new RuntimeException("no mapping found.");
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
