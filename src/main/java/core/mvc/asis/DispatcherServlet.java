@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
@@ -78,15 +79,15 @@ public class DispatcherServlet extends HttpServlet {
     private MethodParameter[] getMethodParametersFrom(HandlerMethod handlerMethod) {
         Method method = handlerMethod.getMethod();
 
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        Parameter[] parameters = method.getParameters();
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
 
-        MethodParameter[] methodParameters = new MethodParameter[parameterTypes.length];
+        MethodParameter[] methodParameters = new MethodParameter[parameters.length];
         for (int i = 0; i < methodParameters.length; i++) {
-            Class<?> parameterType = parameterTypes[i];
-            String parameterName = parameterNames[i];
-
-            methodParameters[i] = new MethodParameter(parameterType, parameterName);
+            methodParameters[i] = MethodParameter.builder()
+                    .parameter(parameters[i])
+                    .parameterName(parameterNames[i])
+                    .build();
         }
 
         return methodParameters;
