@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
+import java.util.Date;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -64,6 +66,31 @@ public class ReflectionTest {
 
             logger.debug(clazz.getName());
             logger.debug("name : {}, age : {}", student.getName(), student.getAge());
+        } catch (Exception e) {
+            logger.error("error", e);
+        }
+    }
+
+    @Test
+    public void callConstructorWithParameter() {
+        Class<Question> clazz = Question.class;
+        long questionId = 100L;
+        String writer = "형근";
+        String title = "스프링";
+        String contents = "잘 알고 싶다.";
+        Date createdDate = new Date();
+        int countOfComment = 2;
+
+        try {
+            Constructor[] constructors = clazz.getDeclaredConstructors();
+            for (Constructor constructor : constructors) {
+                Parameter[] parameters = constructor.getParameters();
+                if (parameters.length == 3) {
+                    logger.debug("Question {}", constructor.newInstance(writer, title, contents));
+                } else if (parameters.length == 6) {
+                    logger.debug("Question {}", constructor.newInstance(questionId, writer, title, contents, createdDate, countOfComment));
+                }
+            }
         } catch (Exception e) {
             logger.error("error", e);
         }
