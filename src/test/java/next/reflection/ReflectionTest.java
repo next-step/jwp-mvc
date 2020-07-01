@@ -6,7 +6,10 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,5 +78,27 @@ public class ReflectionTest {
         logger.debug("Student name : " + student.getName());
         logger.debug("Student age : " + student.getAge());
         logger.debug("Student toString : " + student.toString());
+    }
+
+    @Test
+    void parameterConstructor() {
+        Class<Question> clazz = Question.class;
+        Arrays.stream(clazz.getDeclaredConstructors())
+                .forEach(s -> {
+                    try {
+                        if (s.getParameterCount() == 0)
+                            logger.debug("Question Constructor 0 parameter : " + s.newInstance());
+                        else if (s.getParameterCount() == 3)
+                            logger.debug("Question Constructor 3 parameter : " + s.newInstance("rabbitfoot1", "question3", "parameter3").toString());
+                        else if (s.getParameterCount() == 6)
+                            logger.debug("Question Constructor 6 parameter : " + s.newInstance(1, "rabbitfoot2", "question6", "parameter6", new Date(System.currentTimeMillis() - 36000), 1).toString());
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 }
