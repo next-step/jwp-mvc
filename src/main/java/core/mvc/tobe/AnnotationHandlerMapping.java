@@ -1,11 +1,9 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 
 
@@ -22,24 +20,26 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = getLogger(AnnotationHandlerMapping.class);
 
     private final Object[] basePackage;
-    private final Reflections reflections;
+    private final ControllerScanner controllerScanner;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
-        this.reflections = new Reflections(basePackage);
+        this.controllerScanner = new ControllerScanner(this.basePackage);
 
         this.initialize();
     }
 
     public void initialize() {
-        Set<Class<?>> controllerClasses = this.reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> controllerClasses = this.controllerScanner.scan();
 
         for (Class<?> clazz : controllerClasses) {
-            Object controller = getNewInstance(clazz);
-            Set<Method> methods = getMethodsAnnotatedWithRequestMapping(clazz);
-            methods.forEach(method -> registerHandlerExecution(method, controller));
+            Set<Method> methods = this.controllerScanner.getMethodsWithRequestMapping(clazz);
+            methods.forEach(method -> {
+                Object controller = this.controllerScanner.get(clazz);
+                registerHandlerExecution(method, controller);
+            });
         }
     }
 
@@ -52,20 +52,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         handlerExecutions.put(handlerKey, new HandlerExecution(method, controller));
 
         logger.info("@ Path: {}, Controller: {}", path, controller.getClass());
-    }
-
-    private Set<Method> getMethodsAnnotatedWithRequestMapping(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toSet());
-    }
-
-    private Object getNewInstance(Class<?> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("unable to load controller.", e);
-        }
     }
 
     @Override
