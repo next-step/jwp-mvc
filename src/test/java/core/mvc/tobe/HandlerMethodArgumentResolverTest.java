@@ -52,6 +52,19 @@ public class HandlerMethodArgumentResolverTest {
         assertThat(Integer.parseInt(modelAge)).isEqualTo(age);
     }
 
+    @Test
+    public void usersPostObject() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        TestUser testUser = new TestUser("test", "pass", 30);
+
+        request.addParameter("userId", testUser.getUserId());
+        request.addParameter("password", testUser.getPassword());
+        request.addParameter("age", Integer.toString(testUser.getAge()));
+
+        ModelAndView modelAndView = executeMethod(request);
+        assertThat(modelAndView.getObject("testUser")).isEqualToComparingFieldByField(testUser);
+    }
+
 
     private ModelAndView executeMethod(HttpServletRequest request) throws Exception {
         Class clazz = TestUserController.class;
