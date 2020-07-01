@@ -10,10 +10,9 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,19 +70,27 @@ public class HandlerMethodArgumentResolverTest {
 
         Method method = getMethod(request.getRequestURI(), clazz.getDeclaredMethods(), request.getParameterMap().keySet());
 
+        logger.debug("{}", method);
         logger.debug("{}", request.getParameterMap().keySet());
 
-        Arrays.stream(clazz.getDeclaredMethods())
-                .filter(m -> "/users".equals(m.getAnnotation(RequestMapping.class).value()))
-                .forEach(m -> {
-                    logger.debug("{}", m.getName());
-
-                    String[] parameterNames = nameDiscoverer.getParameterNames(m);
-                    Arrays.stream(parameterNames).forEach(p -> {
-                        logger.debug("{}, {}", p, request.getParameterMap().containsKey(p));
-                    });
-                    logger.debug("========\n");
-                });
+//
+//
+//        Arrays.stream(clazz.getDeclaredMethods())
+//                .filter(m -> "/users".equals(m.getAnnotation(RequestMapping.class).value()))
+//                .forEach(m -> {
+//                    logger.debug("{}", m.getName());
+//
+//                    Arrays.stream(m.getParameters()).forEach(t -> {
+//                        logger.debug("{}", t.getType());
+//                    });
+//                    logger.debug("-----------");
+//
+//                    String[] parameterNames = nameDiscoverer.getParameterNames(m);
+//                    Arrays.stream(parameterNames).forEach(p -> {
+//                        logger.debug("{}, {}", p, request.getParameterMap().containsKey(p));
+//                    });
+//                    logger.debug("========\n");
+//                });
 
         Object[] values = getParameters(request, method);
 
@@ -91,12 +98,67 @@ public class HandlerMethodArgumentResolverTest {
     }
 
     private Method getMethod(String name, Method[] methods, Set<String> parameterNames) {
-        return Arrays.stream(methods)
-                .filter(m -> name.equals(m.getAnnotation(RequestMapping.class).value()))
+        List<Method> requestMethods =
+                Arrays.stream(methods)
+                        .filter(m -> name.equals(getRequestMappingAnnotationValue(m)))
+                        .collect(Collectors.toList());
+
+        Method method = requestMethods.stream()
                 .filter(m -> isMatchParameters(m, parameterNames))
                 .findFirst()
-                .get();
+                .orElse(null);
+
+        logger.debug("find method - {}", method);
+        if (method == null) {
+            return requestMethods.stream()
+                    .filter(m -> isMatchParametersObject(m, parameterNames))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("method does not exists"));
+        }
+        return method;
     }
+
+    private String getRequestMappingAnnotationValue(Method method) {
+        Class<RequestMapping> requestMappingClass = RequestMapping.class;
+
+        return method.getAnnotation(requestMappingClass).value();
+    }
+
+    @Test
+    public void isMatchParametersObject() {
+        Class clazz = TestUserController.class;
+
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        TestUser testUser = new TestUser("test", "pass", 30);
+
+        request.addParameter("userId", testUser.getUserId());
+        request.addParameter("password", testUser.getPassword());
+        request.addParameter("age", Integer.toString(testUser.getAge()));
+
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(m -> "/users".equals(getRequestMappingAnnotationValue(m)))
+                .forEach(m -> isMatchParametersObject(m, request.getParameterMap().keySet()));
+
+    }
+
+    private boolean isMatchParametersObject(final Method method, Set<String> requestParameterNames) {
+        return Arrays.stream(method.getParameters())
+                .filter(p -> isMatchParameterObject(p.getType(), requestParameterNames))
+                .collect(Collectors.toList())
+                .size() > 0;
+    }
+
+    private boolean isMatchParameterObject(final Class<?> type, Set<String> requestParameterNames) {
+        Field[] fields = type.getDeclaredFields();
+
+        int matchingCount = Arrays.stream(fields)
+                .filter(f -> requestParameterNames.contains(f.getName()))
+                .collect(Collectors.toList()).size();
+
+        logger.debug("{}, {}, {}", matchingCount, requestParameterNames.size(), matchingCount == requestParameterNames.size());
+        return matchingCount == requestParameterNames.size();
+    }
+
 
     private boolean isMatchParameters(Method method, Set<String> requestParameterNames) {
         String[] methodParameterNames = nameDiscoverer.getParameterNames(method);
@@ -104,7 +166,8 @@ public class HandlerMethodArgumentResolverTest {
                 .filter(p -> requestParameterNames.contains(p))
                 .collect(Collectors.toList()).size();
 
-        return matchingCount == methodParameterNames.length;
+        logger.debug("{}, {}, {}", matchingCount, requestParameterNames.size(), matchingCount == requestParameterNames.size());
+        return matchingCount == requestParameterNames.size();
     }
 
     private Object[] getParameters(HttpServletRequest request, Method method) {
@@ -113,13 +176,16 @@ public class HandlerMethodArgumentResolverTest {
         Object[] values = new Object[parameterNames.length];
         for (int i = 0; i < parameterNames.length; i++) {
             String parameterName = parameterNames[i];
-            logger.debug("parameter : {}", parameterName);
-
             String parameterValue = request.getParameter(parameterName);
             Class<?> parameterType = method.getParameterTypes()[i];
 
-            values[i] = getParameterValue(parameterValue, parameterType);
+            logger.debug("parameter : {}, {}", parameterName, parameterType);
 
+            if (parameterType == TestUser.class) {
+                values[i] = getParameterObject(parameterValue, parameterType);
+            } else {
+                values[i] = getParameterValue(parameterValue, parameterType);
+            }
             logger.debug("= : {}", values[i]);
         }
 
@@ -136,5 +202,10 @@ public class HandlerMethodArgumentResolverTest {
         }
 
         return parameterValue;
+    }
+
+    private Object getParameterObject(String parameterValue, Class<?> parameterType) {
+        TestUser testUser = new TestUser("test", "pass", 30);
+        return testUser;
     }
 }
