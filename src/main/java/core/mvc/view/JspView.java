@@ -18,9 +18,7 @@ public class JspView implements View {
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         RequestDispatcher rd = request.getRequestDispatcher(combinePath(viewName));
-
         mergeAttribute(model, request);
-
         rd.forward(request, response);
     }
 

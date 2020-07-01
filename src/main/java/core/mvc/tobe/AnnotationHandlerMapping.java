@@ -37,11 +37,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Set<Class<?>> controllerClasses = this.reflections.getTypesAnnotatedWith(Controller.class);
 
         for (Class<?> clazz : controllerClasses) {
-
             Object controller = getNewInstance(clazz);
-
             Set<Method> methods = getMethodsAnnotatedWithRequestMapping(clazz);
-
             methods.forEach(method -> registerHandlerExecution(method, controller));
         }
     }
