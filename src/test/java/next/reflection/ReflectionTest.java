@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,5 +58,22 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws Exception{
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+        Field nameField = clazz.getDeclaredField("name");
+        nameField.setAccessible(true);
+        Field ageField = clazz.getDeclaredField("age");
+        ageField.setAccessible(true);
+
+        Student student = new Student();
+        nameField.set(student, "rabbitfoot");
+        ageField.set(student, 20);
+        logger.debug("Student name : " + student.getName());
+        logger.debug("Student age : " + student.getAge());
+        logger.debug("Student toString : " + student.toString());
     }
 }
