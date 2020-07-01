@@ -1,14 +1,17 @@
 package core.mvc.tobe;
 
-public class BasicTypeArgumentResolver {
+import javax.servlet.http.HttpServletRequest;
 
-    private Class parameterType;
+public class BasicTypeArgumentResolver implements ArgumentResolver {
 
-    public BasicTypeArgumentResolver(final Class parameterType) {
-        this.parameterType = parameterType;
+    @Override
+    public boolean equalsTo(final Class parameterType) {
+        return parameterType.isInstance(String.class) || parameterType.isPrimitive();
     }
 
-    public Object getParameterValue(String parameterValue) {
+    @Override
+    public Object getParameterValue(final HttpServletRequest request, final Class parameterType, final String parameterName) throws Exception {
+        String parameterValue = request.getParameter(parameterName);
         if (parameterType.equals(int.class)) {
             return Integer.parseInt(parameterValue);
         }
