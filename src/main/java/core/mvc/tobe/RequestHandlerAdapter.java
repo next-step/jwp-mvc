@@ -2,7 +2,9 @@ package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
 import core.mvc.asis.Controller;
-import core.mvc.tobe.view.ViewFactory;
+import core.mvc.tobe.resolver.StringPathViewResolver;
+import core.mvc.tobe.resolver.ViewResolver;
+import core.mvc.tobe.view.View;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +21,8 @@ public class RequestHandlerAdapter implements HandlerCommand {
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String viewName = controller.execute(request, response);
 
-        return new ModelAndView(ViewFactory.create(viewName));
+        ViewResolver viewResolver = new StringPathViewResolver();
+        View view = viewResolver.resolveViewName(viewName);
+        return new ModelAndView(view);
     }
 }
