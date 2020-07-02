@@ -10,7 +10,7 @@ public class BeanTypeArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean equalsTo(final Class parameterType) {
-        return !parameterType.equals(String.class) && !parameterType.isPrimitive() || !parameterType.isInterface();
+        return !parameterType.equals(String.class) && !parameterType.isPrimitive() && !parameterType.isInterface();
     }
 
     @Override

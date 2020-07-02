@@ -6,11 +6,11 @@ import javax.servlet.http.HttpServletResponse;
 public class ServletResponseArgumentResolver implements ArgumentResolver {
     @Override
     public boolean equalsTo(final Class parameterType) {
-        return false;
+        return parameterType.isInterface() && parameterType.equals(HttpServletResponse.class);
     }
 
     @Override
     public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, final String parameterName) throws Exception {
-        return null;
+        return response;
     }
 }

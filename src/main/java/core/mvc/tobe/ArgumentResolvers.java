@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,8 @@ public class ArgumentResolvers {
         argumentResolvers = new ArrayList<>();
         argumentResolvers.add(new BasicTypeArgumentResolver());
         argumentResolvers.add(new BeanTypeArgumentResolver());
+        argumentResolvers.add(new ServletRequestArgumentResolver());
+        argumentResolvers.add(new ServletResponseArgumentResolver());
     }
 
     private static ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
@@ -28,30 +32,40 @@ public class ArgumentResolvers {
     public static Object[] getParameterValues(final Method method, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
+        Class<?>[] parameterTypes = method.getParameterTypes();
 
         for (int i = 0; i < parameterNames.length; i++) {
             String parameterName = parameterNames[i];
-            final Class<?>[] parameterTypes = method.getParameterTypes();
-            for (final Class<?> parameterType : parameterTypes) {
+            final Class<?> type = parameterTypes[i];
+
+            if (isPathVariable(method)) {
                 final RequestMapping annotation = method.getAnnotation(RequestMapping.class);
                 PathPattern pp = parse(annotation.value());
+                System.out.println(pp.matches(toPathContainer(request.getRequestURI())));
                 if (pp.matches(toPathContainer(request.getRequestURI()))) {
                     final Map<String, String> uriVariables = pp.matchAndExtract(toPathContainer(request.getRequestURI()))
                             .getUriVariables();
-                    values[i] = getValueByPathVariable(parameterType, uriVariables.get(parameterName));
+                    values[i] = getValueByPathVariable(type, uriVariables.get(parameterName));
                     continue;
                 }
-
-                final ArgumentResolver argumentResolver = argumentResolvers.stream()
-                        .filter(resolver -> resolver.equalsTo(parameterType))
-                        .findAny()
-                        .orElseThrow(() -> new IllegalArgumentException("요청한 파라미터 타입을 찾을 수 없습니다."));
-                values[i] = argumentResolver.getParameterValue(request, response, parameterType, parameterName);
             }
+
+            final ArgumentResolver argumentResolver = argumentResolvers.stream()
+                    .filter(resolver -> resolver.equalsTo(type))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("요청한 파라미터 타입을 찾을 수 없습니다."));
+            values[i] = argumentResolver.getParameterValue(request, response, type, parameterName);
         }
+
+
         return values;
     }
 
+    private static boolean isPathVariable(Method method) {
+        return Arrays.stream(method.getParameterAnnotations())
+                .flatMap(Arrays::stream)
+                .anyMatch(annotation -> annotation instanceof PathVariable);
+    }
 
     private static PathPattern parse(String path) {
         PathPatternParser pp = new PathPatternParser();

@@ -4,6 +4,7 @@ import next.dao.UserDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ class ArgumentResolversTest {
     @Test
     void beanType() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
         request.setParameter("userId", "ju");
         request.setParameter("password", "123");
         request.setParameter("age", "29");
@@ -29,19 +31,20 @@ class ArgumentResolversTest {
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
 
 
-        final Object[] parameterValues = argumentResolvers.getParameterValues(method, request);
+        final Object[] parameterValues = argumentResolvers.getParameterValues(method, request, response);
         System.out.println(Arrays.toString(parameterValues));
     }
 
     @Test
     void pathType() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
         request.setRequestURI("/users/1");
 
         Class clazz = TestUserController.class;
         Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
 
-        final Object[] parameterValues = argumentResolvers.getParameterValues(method, request);
+        final Object[] parameterValues = argumentResolvers.getParameterValues(method, request, response);
         System.out.println(Arrays.toString(parameterValues));
     }
 
