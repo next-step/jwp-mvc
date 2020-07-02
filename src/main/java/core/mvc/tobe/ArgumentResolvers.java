@@ -41,7 +41,6 @@ public class ArgumentResolvers {
             if (isPathVariable(method)) {
                 final RequestMapping annotation = method.getAnnotation(RequestMapping.class);
                 PathPattern pp = parse(annotation.value());
-                System.out.println(pp.matches(toPathContainer(request.getRequestURI())));
                 if (pp.matches(toPathContainer(request.getRequestURI()))) {
                     final Map<String, String> uriVariables = pp.matchAndExtract(toPathContainer(request.getRequestURI()))
                             .getUriVariables();
