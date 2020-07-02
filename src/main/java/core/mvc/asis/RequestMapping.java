@@ -47,17 +47,18 @@ public class RequestMapping implements HandlerMapping {
     @Override
     public HandlerMethod getHandlerMethod(HttpServletRequest request) {
         try {
-            Controller controller = findController(request.getRequestURI());
+            String requestUri = request.getRequestURI();
+            Controller controller = findController(requestUri);
             Method method = controller.getClass().getMethod("execute", HttpServletRequest.class, HttpServletResponse.class);
 
-            return new HandlerMethod(method);
+            return new HandlerMethod(method, requestUri);
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("No such method on interface Controller", e);
         }
     }
 
-    public Controller findController(String url) {
-        return mappings.get(url);
+    public Controller findController(String uri) {
+        return mappings.get(uri);
     }
 
     void put(String url, Controller controller) {

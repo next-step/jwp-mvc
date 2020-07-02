@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static core.mvc.utils.UriPathPatternParser.match;
+
 @Slf4j
 public class AnnotationHandlerMapping implements HandlerMapping {
 
@@ -43,7 +45,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                     log.debug("handler method={}", method);
 
                     HandlerKey handlerKey = createHandlerKeyFrom(method);
-                    HandlerMethod handlerMethod = new HandlerMethod(method, instance);
+                    HandlerMethod handlerMethod = new HandlerMethod(method, handlerKey.getRequestMappingUri(), instance);
                     this.handlerMethods.put(handlerKey, handlerMethod);
                 }
             }
@@ -76,6 +78,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         String requestUri = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
 
-        return new HandlerKey(requestUri, requestMethod);
+        return this.handlerMethods.keySet().stream()
+                .filter(key -> match(key.getRequestMappingUri(), requestUri))
+                .findFirst()
+                .orElseGet(() -> new HandlerKey(requestUri, requestMethod));
     }
 }

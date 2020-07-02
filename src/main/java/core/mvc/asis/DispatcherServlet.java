@@ -2,23 +2,18 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.argumentresolver.ArgumentResolvers;
-import core.mvc.argumentresolver.MethodParameter;
 import core.mvc.scanner.WebApplicationScanner;
 import core.mvc.tobe.HandlerMappings;
 import core.mvc.tobe.HandlerMethod;
 import core.mvc.view.View;
 import core.mvc.view.ViewResolvers;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
@@ -28,7 +23,6 @@ public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
     private final WebApplicationScanner webApplicationScanner = new WebApplicationScanner();
     private final ArgumentResolvers argumentResolvers = new ArgumentResolvers();
     private final HandlerMappings handlerMappings = new HandlerMappings();
@@ -59,9 +53,7 @@ public class DispatcherServlet extends HttpServlet {
         }
 
         try {
-            MethodParameter[] methodParameters = getMethodParametersFrom(handlerMethod);
-            Object[] arguments = argumentResolvers.resolve(methodParameters, request, response);
-
+            Object[] arguments = argumentResolvers.resolve(handlerMethod, request, response);
             ModelAndView modelAndView = handlerMethod.handle(arguments);
 
             View view = resolveView(modelAndView);
@@ -74,23 +66,6 @@ public class DispatcherServlet extends HttpServlet {
             log.error("Exception : {}", e.getMessage());
             throw new ServletException(e.getMessage());
         }
-    }
-
-    private MethodParameter[] getMethodParametersFrom(HandlerMethod handlerMethod) {
-        Method method = handlerMethod.getMethod();
-
-        Parameter[] parameters = method.getParameters();
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-
-        MethodParameter[] methodParameters = new MethodParameter[parameters.length];
-        for (int i = 0; i < methodParameters.length; i++) {
-            methodParameters[i] = MethodParameter.builder()
-                    .parameter(parameters[i])
-                    .parameterName(parameterNames[i])
-                    .build();
-        }
-
-        return methodParameters;
     }
 
     private View resolveView(ModelAndView modelAndView) {
