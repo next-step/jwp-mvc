@@ -6,7 +6,7 @@ public class BasicTypeArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean equalsTo(final Class parameterType) {
-        return parameterType.isInstance(String.class) || parameterType.isPrimitive();
+        return parameterType.equals(String.class) || parameterType.isPrimitive();
     }
 
     @Override
