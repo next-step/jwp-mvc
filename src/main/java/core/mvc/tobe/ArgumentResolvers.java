@@ -22,9 +22,9 @@ public class ArgumentResolvers {
         argumentResolvers.add(new BeanTypeArgumentResolver());
     }
 
-    private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+    private static ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    public Object[] getParameterValues(final Method method, final HttpServletRequest request) throws Exception {
+    public static Object[] getParameterValues(final Method method, final HttpServletRequest request) throws Exception {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
 
@@ -52,20 +52,20 @@ public class ArgumentResolvers {
     }
 
 
-    private PathPattern parse(String path) {
+    private static PathPattern parse(String path) {
         PathPatternParser pp = new PathPatternParser();
         pp.setMatchOptionalTrailingSeparator(true);
         return pp.parse(path);
     }
 
-    private PathContainer toPathContainer(String path) {
+    private static PathContainer toPathContainer(String path) {
         if (path == null) {
             return null;
         }
         return PathContainer.parsePath(path);
     }
 
-    private Object getValueByPathVariable(Class parameterType, String value) {
+    private static Object getValueByPathVariable(Class parameterType, String value) {
         if (parameterType.equals(int.class)) {
             return Integer.parseInt(value);
         }

@@ -17,7 +17,7 @@ public class ControllerHandlerExecution implements HandlerExecution {
 
     @Override
     public ModelAndView handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        method.invoke(clazz.newInstance());
-        return null;
+        final Object[] values = ArgumentResolvers.getParameterValues(method, request);
+        return (ModelAndView) method.invoke(clazz.newInstance(), values);
     }
 }
