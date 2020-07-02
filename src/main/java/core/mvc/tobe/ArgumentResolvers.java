@@ -8,6 +8,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ArgumentResolvers {
 
     private static ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    public static Object[] getParameterValues(final Method method, final HttpServletRequest request) throws Exception {
+    public static Object[] getParameterValues(final Method method, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
 
@@ -45,7 +46,7 @@ public class ArgumentResolvers {
                         .filter(resolver -> resolver.equalsTo(parameterType))
                         .findAny()
                         .orElseThrow(() -> new IllegalArgumentException("요청한 파라미터 타입을 찾을 수 없습니다."));
-                values[i] = argumentResolver.getParameterValue(request, parameterType, parameterName);
+                values[i] = argumentResolver.getParameterValue(request, response, parameterType, parameterName);
             }
         }
         return values;

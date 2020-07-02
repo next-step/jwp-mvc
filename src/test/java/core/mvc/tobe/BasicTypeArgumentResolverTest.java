@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,6 +11,7 @@ class BasicTypeArgumentResolverTest {
     @Test
     void string() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
         String userId = "javajigi";
         String password = "password";
         request.addParameter("userId", userId);
@@ -17,7 +19,7 @@ class BasicTypeArgumentResolverTest {
 
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
         boolean sameType = basicTypeArgumentResolver.equalsTo(String.class);
-        Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, String.class, "userId");
+        Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, response, String.class, "userId");
         assertThat(sameType).isTrue();
         assertThat(userIdActual).isEqualTo(userId);
     }
@@ -25,6 +27,7 @@ class BasicTypeArgumentResolverTest {
     @Test
     void intAndLong() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         long id = 1L;
         int age = 29;
@@ -33,7 +36,7 @@ class BasicTypeArgumentResolverTest {
 
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
         boolean sameType = basicTypeArgumentResolver.equalsTo(long.class);
-        Object idActual = basicTypeArgumentResolver.getParameterValue(request, long.class, "id");
+        Object idActual = basicTypeArgumentResolver.getParameterValue(request, response, long.class, "id");
 
         assertThat(sameType).isTrue();
         assertThat(idActual).isEqualTo(id);

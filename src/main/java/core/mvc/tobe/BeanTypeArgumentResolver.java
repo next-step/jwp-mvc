@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -13,7 +14,7 @@ public class BeanTypeArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object getParameterValue(final HttpServletRequest request, final Class parameterType, final String parameterName) throws Exception{
+    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, final String parameterName) throws Exception{
         final Field[] declaredFields = parameterType.getDeclaredFields();
         Object[] values = new Object[declaredFields.length];
         for (int i = 0; i < declaredFields.length; i++) {

@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class BasicTypeArgumentResolver implements ArgumentResolver {
 
@@ -10,7 +11,7 @@ public class BasicTypeArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object getParameterValue(final HttpServletRequest request, final Class parameterType, final String parameterName) throws Exception {
+    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, final String parameterName) throws Exception {
         String parameterValue = request.getParameter(parameterName);
         if (parameterType.equals(int.class)) {
             return Integer.parseInt(parameterValue);
