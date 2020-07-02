@@ -1,6 +1,7 @@
 package core.mvc.argumentresolver;
 
 import core.annotation.web.PathVariable;
+import core.mvc.argumentresolver.converter.ParameterTypeConverters;
 import core.mvc.scanner.WebApplicationScanner;
 import core.mvc.tobe.HandlerMethod;
 import core.mvc.utils.UriPathPatternParser;
@@ -32,6 +33,7 @@ public class ArgumentResolvers {
     private final List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
     private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
     private final PathPatternParser pathPatternParser = new PathPatternParser();
+    private final ParameterTypeConverters parameterTypeConverters = new ParameterTypeConverters();
 
     public void init(WebApplicationScanner webApplicationScanner) throws ReflectiveOperationException {
         log.debug("argumentResolvers initialize.");
@@ -105,16 +107,6 @@ public class ArgumentResolvers {
         Map<String, String> uriVariables = UriPathPatternParser.getUriVariables(methodParameter.getRequestMappingUri(), requestUri);
         String argument = uriVariables.get(methodParameter.getParameterName());
 
-        return convertTypeOfArgument(argument, methodParameter.getParameterType());
-    }
-
-    private Object convertTypeOfArgument(String argument, Class<?> parameterType) {
-        if (parameterType.equals(int.class)) {
-            return Integer.parseInt(argument);
-        }
-        if (parameterType.equals(long.class)) {
-            return Long.parseLong(argument);
-        }
-        return argument;
+        return parameterTypeConverters.convert(argument, methodParameter.getParameterType());
     }
 }

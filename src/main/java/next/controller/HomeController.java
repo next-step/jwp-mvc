@@ -22,11 +22,11 @@ public class HomeController {
         return new ModelAndView("home.jsp");
     }
 
-    @RequestMapping(value = "/{id}", method = GET)
-    public ModelAndView getMainPage(@PathVariable long id, HttpServletRequest request) {
-        log.info("id={}", id);
+    @RequestMapping(value = "/{id}/users/{order}", method = GET)
+    public ModelAndView testPathVariable(@PathVariable long id, @PathVariable Long order, HttpServletRequest request) {
+        log.info("id={}, order={}", id, order);
         request.setAttribute("users", DataBase.findAll());
 
-        return new ModelAndView("home.jsp");
+        return new ModelAndView("redirect:/");
     }
 }
