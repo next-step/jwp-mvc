@@ -1,8 +1,12 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.argumentresolver.ArgumentResolvers;
+import core.mvc.scanner.WebApplicationScanner;
 import core.mvc.tobe.HandlerMappings;
+import core.mvc.tobe.HandlerMethod;
+import core.mvc.view.View;
+import core.mvc.view.ViewResolvers;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;
@@ -19,11 +23,21 @@ public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    private final WebApplicationScanner webApplicationScanner = new WebApplicationScanner();
+    private final ArgumentResolvers argumentResolvers = new ArgumentResolvers();
     private final HandlerMappings handlerMappings = new HandlerMappings();
+    private final ViewResolvers viewResolvers = new ViewResolvers();
 
     @Override
     public void init() {
-        handlerMappings.init();
+        try {
+            webApplicationScanner.init();
+
+            argumentResolvers.init(webApplicationScanner);
+            handlerMappings.init(webApplicationScanner);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot initialize dispatcherServlet.");
+        }
     }
 
     @Override
@@ -31,19 +45,31 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = request.getRequestURI();
         log.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        HandlerExecution handler = handlerMappings.getHandler(request);
-        if (handler == null) {
+        HandlerMethod handlerMethod = handlerMappings.getHandlerMethod(request);
+        if (handlerMethod == null) {
             log.error("404 Not Found : URI = {}", requestUri);
             response.setStatus(SC_NOT_FOUND);
             return;
         }
 
         try {
-            ModelAndView modelAndView = handler.handle(request, response);
-            modelAndView.render(request, response);
+            Object[] arguments = argumentResolvers.resolve(handlerMethod, request, response);
+            ModelAndView modelAndView = handlerMethod.handle(arguments);
+
+            View view = resolveView(modelAndView);
+            if (view == null) {
+                throw new IllegalStateException("View Does Not Exist.");
+            }
+
+            view.render(modelAndView.getModel(), request, response);
         } catch (Exception e) {
             log.error("Exception : {}", e.getMessage());
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private View resolveView(ModelAndView modelAndView) {
+        String viewName = modelAndView.getViewName();
+        return (viewName != null) ? viewResolvers.resolve(viewName) : modelAndView.getView();
     }
 }

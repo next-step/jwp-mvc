@@ -1,9 +1,9 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
+import core.mvc.scanner.WebApplicationScanner;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -15,7 +15,9 @@ public class AnnotationHandlerMappingTest {
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        WebApplicationScanner webApplicationScanner = new WebApplicationScanner("core.mvc.tobe");
+
+        handlerMapping = new AnnotationHandlerMapping(webApplicationScanner);
         handlerMapping.initialize();
     }
 
@@ -37,8 +39,8 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         /* when */
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        HandlerMethod handlerMethod = handlerMapping.getHandlerMethod(request);
+        handlerMethod.handle(request, response);
 
         /* then */
         assertThat(request.getAttribute("user")).isEqualTo(user);
@@ -52,7 +54,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        HandlerMethod handlerMethod = handlerMapping.getHandlerMethod(request);
+        handlerMethod.handle(request, response);
     }
 }

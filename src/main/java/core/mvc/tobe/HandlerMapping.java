@@ -8,5 +8,5 @@ public interface HandlerMapping {
 
     boolean supports(HttpServletRequest request);
 
-    HandlerExecution getHandler(HttpServletRequest request);
+    HandlerMethod getHandlerMethod(HttpServletRequest request);
 }
