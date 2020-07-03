@@ -1,6 +1,12 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +16,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -94,5 +105,20 @@ public class ReflectionTest {
         } catch (Exception e) {
             logger.error("error", e);
         }
+    }
+
+    @Test
+    public void getClassInCludeMvcAnnotation() {
+        List<Class> clazzList = Arrays.asList(Controller.class, Service.class, Repository.class);
+        Set<Class<?>> clazzs = clazzList.stream()
+                .flatMap(clazz -> getTypesAnnotatedWith(clazz).stream())
+                .collect(Collectors.toSet());
+        logger.debug("clazzs : {}", clazzs);
+    }
+
+    public Set<Class<?>> getTypesAnnotatedWith(Class clazz) {
+        Reflections reflections = new Reflections("core.di.factory.example",
+                new TypeAnnotationsScanner(), new SubTypesScanner());
+        return reflections.getTypesAnnotatedWith(clazz);
     }
 }
