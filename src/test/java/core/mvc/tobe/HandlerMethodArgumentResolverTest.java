@@ -116,7 +116,22 @@ public class HandlerMethodArgumentResolverTest {
         assertThat(modelAndView.getObject("testUser")).isEqualToComparingFieldByField(testUser);
     }
 
-    public Object[] getMethodExecuteParameter(HttpServletRequest request, Method method) {
+    @Test
+    public void usersPostPathVariable() throws Exception {
+        int id = 1;
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/" + id);
+
+        Class clazz = TestUserController.class;
+        Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
+
+        Object[] values = getMethodExecuteParameter(request, method);
+
+        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
+
+        assertThat(modelAndView.getObject("id")).isEqualTo(id);
+    }
+
+    private Object[] getMethodExecuteParameter(HttpServletRequest request, Method method) {
 
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
