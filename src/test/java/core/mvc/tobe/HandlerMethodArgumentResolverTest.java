@@ -1,6 +1,9 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.resolver.HandlerMethodArgumentResolver;
+import core.mvc.tobe.resolver.JavaBeanArguementResolver;
+import core.mvc.tobe.resolver.RequestParameterArgumentResolver;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +12,9 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -125,11 +126,14 @@ public class HandlerMethodArgumentResolverTest {
             Class<?> parameterType = parameter.getType();
 
             Object value = null;
-            if (parameterType.isPrimitive() || parameterType == String.class) {
-                value = getRequestParameter(request, parameterName, parameterType);
+            HandlerMethodArgumentResolver resolver = new RequestParameterArgumentResolver();
+            HandlerMethodArgumentResolver resolver2 = new JavaBeanArguementResolver();
+
+            if (resolver.isSupport(parameterType)) {
+                value = resolver.resolve(request, parameterName, parameterType);
             }
-            if (parameterType.getConstructors().length > 0 && parameterType != String.class) {
-                value = getJavaBean(request, parameterName, parameterType);
+            if (resolver2.isSupport(parameterType)) {
+                value = resolver2.resolve(request, parameterName, parameterType);
             }
 
 
@@ -137,52 +141,6 @@ public class HandlerMethodArgumentResolverTest {
         }
 
         return values;
-    }
-
-    public Object getRequestParameter(HttpServletRequest request, String parameterName, Class<?> parameterType) {
-        String parameterValue = request.getParameter(parameterName);
-        Object value = parameterValue;
-        if (parameterType.equals(int.class)) {
-            value = Integer.parseInt(parameterValue);
-        }
-        if (parameterType.equals(long.class)) {
-            value = Long.parseLong(parameterValue);
-        }
-        return value;
-    }
-
-    public Object getJavaBean(HttpServletRequest request, String parameterName, Class<?> parameterType) {
-
-            Constructor constructor = parameterType.getConstructors()[0];
-
-            Parameter[] parameters = constructor.getParameters();
-            String[] constructorParameterNames = nameDiscoverer.getParameterNames(constructor);
-            Object[] constructorValues = new Object[parameters.length];
-
-            for (int j = 0; j < parameters.length; j++) {
-                Class<?> constructorParameterType = parameters[j].getType();
-
-
-                String constructorParameterName = constructorParameterNames[j];
-
-                String value = request.getParameter(constructorParameterName);
-                constructorValues[j] = value;
-                if (constructorParameterType.equals(int.class)) {
-                    constructorValues[j] = Integer.parseInt(value);
-                }
-                if (constructorParameterType.equals(long.class)) {
-                    constructorValues[j] = Long.parseLong(value);
-                }
-
-                logger.debug("constructor : {}, {}, {}", constructorParameterName, constructorParameterType, constructorValues[j]);
-            }
-
-        try {
-            Object obj = constructor.newInstance(constructorValues);
-            return obj;
-        } catch (Throwable ex) {
-            throw new NoSuchElementException("constructor 가 없습니다.");
-        }
     }
 
 }

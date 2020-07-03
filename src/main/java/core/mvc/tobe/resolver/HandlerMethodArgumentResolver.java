@@ -1,8 +1,10 @@
 package core.mvc.tobe.resolver;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface HandlerMethodArgumentResolver {
 
-    boolean isSupport();
+    boolean isSupport(Class<?> parameterType);
 
-    Object resolve();
+    Object resolve(HttpServletRequest request, String parameterName, Class<?> parameterType);
 }
