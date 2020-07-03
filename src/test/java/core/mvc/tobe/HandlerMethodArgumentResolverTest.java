@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,7 +69,7 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
 
-        Object[] values = getRequestParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(modelAndView.getObject("userId")).isEqualTo(userId);
@@ -86,7 +87,7 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
 
-        Object[] values = getRequestParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
@@ -108,15 +109,14 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
 
-        Object[] values = getJavaBean(request, method);
+        Object[] values = getMethodExecuteParameter(request, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
         assertThat(modelAndView.getObject("testUser")).isEqualToComparingFieldByField(testUser);
     }
 
-
-    public Object[] getRequestParameter(HttpServletRequest request, Method method) {
+    public Object[] getMethodExecuteParameter(HttpServletRequest request, Method method) {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
         for (int i = 0; i < parameterNames.length; i++) {
@@ -124,28 +124,34 @@ public class HandlerMethodArgumentResolverTest {
             String parameterName = parameterNames[i];
             Class<?> parameterType = parameter.getType();
 
-            logger.debug("parameter : {}", parameterName);
+            Object value = null;
+            if (parameterType.isPrimitive() || parameterType == String.class) {
+                value = getRequestParameter(request, parameterName, parameterType);
+            }
+            if (parameterType.getConstructors().length > 0 && parameterType != String.class) {
+                value = getJavaBean(request, parameterName, parameterType);
+            }
 
-            String value = request.getParameter(parameterName);
+
             values[i] = value;
-            if (parameterType.equals(int.class)) {
-                values[i] = Integer.parseInt(value);
-            }
-            if (parameterType.equals(long.class)) {
-                values[i] = Long.parseLong(value);
-            }
         }
 
         return values;
     }
 
-    public Object[] getJavaBean(HttpServletRequest request, Method method) throws Exception {
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        Object[] values = new Object[parameterNames.length];
-        for (int i = 0; i < parameterNames.length; i++) {
-            Parameter parameter = method.getParameters()[i];
-            String parameterName = parameterNames[i];
-            Class<?> parameterType = parameter.getType();
+    public Object getRequestParameter(HttpServletRequest request, String parameterName, Class<?> parameterType) {
+        String parameterValue = request.getParameter(parameterName);
+        Object value = parameterValue;
+        if (parameterType.equals(int.class)) {
+            value = Integer.parseInt(parameterValue);
+        }
+        if (parameterType.equals(long.class)) {
+            value = Long.parseLong(parameterValue);
+        }
+        return value;
+    }
+
+    public Object getJavaBean(HttpServletRequest request, String parameterName, Class<?> parameterType) {
 
             Constructor constructor = parameterType.getConstructors()[0];
 
@@ -171,12 +177,12 @@ public class HandlerMethodArgumentResolverTest {
                 logger.debug("constructor : {}, {}, {}", constructorParameterName, constructorParameterType, constructorValues[j]);
             }
 
+        try {
             Object obj = constructor.newInstance(constructorValues);
-            logger.debug("obj : {}", obj);
-            values[i] = obj;
+            return obj;
+        } catch (Throwable ex) {
+            throw new NoSuchElementException("constructor 가 없습니다.");
         }
-
-        return values;
     }
 
 }
