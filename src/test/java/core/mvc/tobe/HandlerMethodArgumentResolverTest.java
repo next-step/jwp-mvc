@@ -8,6 +8,7 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -32,11 +33,15 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
+
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
         for (int i = 0; i < parameterNames.length; i++) {
+            Parameter parameter = method.getParameters()[i];
             String parameterName = parameterNames[i];
+
             logger.debug("parameter : {}", parameterName);
+
             values[i] = request.getParameter(parameterName);
         }
 
@@ -62,16 +67,8 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        Object[] values = new Object[parameterNames.length];
-        for (int i = 0; i < parameterNames.length; i++) {
-            Parameter parameter = method.getParameters()[i];
-            String parameterName = parameterNames[i];
 
-            logger.debug("parameter : {}", parameterName);
-
-            values[i] = request.getParameter(parameterName);
-        }
+        Object[] values = getRequestParameter(request, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(modelAndView.getObject("userId")).isEqualTo(userId);
@@ -88,26 +85,8 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        logger.debug("{}, {}", parameterNames, parameterNames.length);
 
-        Object[] values = new Object[parameterNames.length];
-        for (int i = 0; i < parameterNames.length; i++) {
-            Parameter parameter = method.getParameters()[i];
-            String parameterName = parameterNames[i];
-            logger.debug("parameter : {}", parameterName);
-
-            Class<?> parameterType = parameter.getType();
-
-            String value = Objects.toString(request.getParameter(parameterName));
-            if (parameterType.equals(int.class)) {
-                values[i] = Integer.parseInt(value);
-            }
-            if (parameterType.equals(long.class)) {
-                values[i] = Long.parseLong(value);
-            }
-
-        }
+        Object[] values = getRequestParameter(request, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
@@ -128,23 +107,52 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
+
+        Object[] values = getJavaBean(request, method);
+
+        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
+
+        assertThat(modelAndView.getObject("testUser")).isEqualToComparingFieldByField(testUser);
+    }
+
+
+    public Object[] getRequestParameter(HttpServletRequest request, Method method) {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
         for (int i = 0; i < parameterNames.length; i++) {
             Parameter parameter = method.getParameters()[i];
             String parameterName = parameterNames[i];
-            logger.debug("parameter : {}", parameterName);
-
             Class<?> parameterType = parameter.getType();
 
-            logger.debug("constructor length : {}", parameterType.getConstructors().length);
+            logger.debug("parameter : {}", parameterName);
+
+            String value = request.getParameter(parameterName);
+            values[i] = value;
+            if (parameterType.equals(int.class)) {
+                values[i] = Integer.parseInt(value);
+            }
+            if (parameterType.equals(long.class)) {
+                values[i] = Long.parseLong(value);
+            }
+        }
+
+        return values;
+    }
+
+    public Object[] getJavaBean(HttpServletRequest request, Method method) throws Exception {
+        String[] parameterNames = nameDiscoverer.getParameterNames(method);
+        Object[] values = new Object[parameterNames.length];
+        for (int i = 0; i < parameterNames.length; i++) {
+            Parameter parameter = method.getParameters()[i];
+            String parameterName = parameterNames[i];
+            Class<?> parameterType = parameter.getType();
+
             Constructor constructor = parameterType.getConstructors()[0];
 
             Parameter[] parameters = constructor.getParameters();
             String[] constructorParameterNames = nameDiscoverer.getParameterNames(constructor);
             Object[] constructorValues = new Object[parameters.length];
 
-            logger.debug("requestParam : {}", request.getParameterMap());
             for (int j = 0; j < parameters.length; j++) {
                 Class<?> constructorParameterType = parameters[j].getType();
 
@@ -166,12 +174,9 @@ public class HandlerMethodArgumentResolverTest {
             Object obj = constructor.newInstance(constructorValues);
             logger.debug("obj : {}", obj);
             values[i] = obj;
-
         }
-        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
-        assertThat(modelAndView.getObject("testUser")).isEqualToComparingFieldByField(testUser);
+        return values;
     }
-
 
 }
