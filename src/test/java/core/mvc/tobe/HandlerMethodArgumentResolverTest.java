@@ -14,7 +14,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +120,10 @@ public class HandlerMethodArgumentResolverTest {
     }
 
     public Object[] getMethodExecuteParameter(HttpServletRequest request, Method method) {
+        List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
+        resolvers.add(new RequestParameterArgumentResolver());
+        resolvers.add(new JavaBeanArguementResolver());
+
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
         for (int i = 0; i < parameterNames.length; i++) {
@@ -125,17 +131,12 @@ public class HandlerMethodArgumentResolverTest {
             String parameterName = parameterNames[i];
             Class<?> parameterType = parameter.getType();
 
-            Object value = null;
-            HandlerMethodArgumentResolver resolver = new RequestParameterArgumentResolver();
-            HandlerMethodArgumentResolver resolver2 = new JavaBeanArguementResolver();
+            HandlerMethodArgumentResolver resolver = resolvers.stream()
+                    .filter(r -> r.isSupport(parameterType))
+                    .findFirst()
+                    .orElse(null);
 
-            if (resolver.isSupport(parameterType)) {
-                value = resolver.resolve(request, parameterName, parameterType);
-            }
-            if (resolver2.isSupport(parameterType)) {
-                value = resolver2.resolve(request, parameterName, parameterType);
-            }
-
+            Object value = resolver.resolve(request, parameterName, parameterType);
 
             values[i] = value;
         }
