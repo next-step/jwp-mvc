@@ -4,6 +4,7 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.NoSuchElementException;
@@ -18,7 +19,7 @@ public class JavaBeanArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolve(HttpServletRequest request, MethodParameter methodParameter) {
+    public Object resolve(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
         Constructor constructor = methodParameter.getParameterType().getConstructors()[0];
 
         Parameter[] parameters = constructor.getParameters();

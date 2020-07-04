@@ -3,6 +3,7 @@ package core.mvc.tobe.resolver.argument;
 import core.mvc.tobe.utils.PathPatternUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public class PathVariableArgumentResolver implements HandlerMethodArgumentResolver {
@@ -12,7 +13,7 @@ public class PathVariableArgumentResolver implements HandlerMethodArgumentResolv
     }
 
     @Override
-    public Object resolve(HttpServletRequest request, MethodParameter methodParameter) {
+    public Object resolve(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
         String requestUri = request.getRequestURI();
         String uri = methodParameter.getMethodRequestMappingValue();
         Map<String, String> variables = PathPatternUtils.parse(uri)

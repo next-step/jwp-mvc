@@ -3,6 +3,8 @@ package core.mvc.tobe.resolver.argument;
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -35,6 +37,10 @@ public class MethodParameter {
         return parameter.isAnnotationPresent(PathVariable.class);
     }
 
+    public boolean isResponseParameterArgument() {
+        return parameterType == HttpServletRequest.class || parameterType == HttpServletResponse.class;
+    }
+
     public Object getParameterTypeValue(String parameterValue, Class<?> parameterType) {
         Object value = parameterValue;
         if (parameterType.equals(int.class)) {
@@ -62,4 +68,16 @@ public class MethodParameter {
     public String getMethodRequestMappingValue() {
         return method.getAnnotation(RequestMapping.class).value();
     }
+
+
+    @Override
+    public String toString() {
+        return "MethodParameter{" +
+                "method=" + method +
+                ", parameterName='" + parameterName + '\'' +
+                ", parameterType=" + parameterType +
+                ", parameter=" + parameter +
+                '}';
+    }
+
 }

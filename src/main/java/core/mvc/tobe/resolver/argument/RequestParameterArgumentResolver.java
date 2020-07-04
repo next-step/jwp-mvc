@@ -1,6 +1,7 @@
 package core.mvc.tobe.resolver.argument;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class RequestParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -10,7 +11,7 @@ public class RequestParameterArgumentResolver implements HandlerMethodArgumentRe
     }
 
     @Override
-    public Object resolve(HttpServletRequest request, MethodParameter methodParameter) {
+    public Object resolve(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
         String parameterValue = request.getParameter(methodParameter.getParameterName());
         Object value = methodParameter.getParameterTypeValue(parameterValue);
 

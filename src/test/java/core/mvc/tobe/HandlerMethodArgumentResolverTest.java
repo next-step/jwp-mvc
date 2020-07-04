@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -62,6 +64,7 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersPostString() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletResponse response = new MockHttpServletResponse();
         String userId = "test";
         String password = "password";
         request.addParameter("userId", userId);
@@ -70,7 +73,7 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, response, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(modelAndView.getObject("userId")).isEqualTo(userId);
@@ -80,6 +83,7 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersPostPrimitive() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletResponse response = new MockHttpServletResponse();
         long id = 1;
         int age = 30;
         request.addParameter("id", Long.toString(id));
@@ -88,7 +92,7 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, response, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
@@ -101,6 +105,7 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersPostObject() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletResponse response = new MockHttpServletResponse();
         TestUser testUser = new TestUser("test", "pass", 30);
 
         request.addParameter("userId", testUser.getUserId());
@@ -110,7 +115,7 @@ public class HandlerMethodArgumentResolverTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, response, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
@@ -121,11 +126,11 @@ public class HandlerMethodArgumentResolverTest {
     public void usersPostPathVariable() throws Exception {
         long id = 3;
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/" + id);
-
+        MockHttpServletResponse response = new MockHttpServletResponse();
         Class clazz = TestUserController.class;
         Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, response, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
@@ -135,17 +140,17 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersGet() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/");
-
+        MockHttpServletResponse response = new MockHttpServletResponse();
         Class clazz = MyController.class;
         Method method = getMethod("findUserId", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, method);
+        Object[] values = getMethodExecuteParameter(request, response, method);
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
     }
 
-    private Object[] getMethodExecuteParameter(HttpServletRequest request, Method method) {
+    private Object[] getMethodExecuteParameter(HttpServletRequest request, HttpServletResponse response, Method method) {
 
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
@@ -154,10 +159,10 @@ public class HandlerMethodArgumentResolverTest {
             String parameterName = parameterNames[i];
 
             MethodParameter methodParameter = new MethodParameter(method, parameterName, parameter);
-
+            logger.debug("{}", methodParameter);
             HandlerMethodArgumentResolver resolver = ArgumentResolvers.getResolver(methodParameter);
 
-            Object value = resolver.resolve(request, methodParameter);
+            Object value = resolver.resolve(request, response, methodParameter);
 
             values[i] = value;
         }

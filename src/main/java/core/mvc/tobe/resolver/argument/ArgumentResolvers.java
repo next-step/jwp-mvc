@@ -11,6 +11,7 @@ public class ArgumentResolvers {
         resolvers.add(new PathVariableArgumentResolver());
         resolvers.add(new RequestParameterArgumentResolver());
         resolvers.add(new JavaBeanArgumentResolver());
+        resolvers.add(new ResponseParameterArgumentResolver());
     }
 
     public static HandlerMethodArgumentResolver getResolver(MethodParameter methodParameter) {
