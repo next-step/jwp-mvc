@@ -132,6 +132,19 @@ public class HandlerMethodArgumentResolverTest {
         assertThat(modelAndView.getObject("id")).isEqualTo(id);
     }
 
+    @Test
+    public void usersGet() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/");
+
+        Class clazz = MyController.class;
+        Method method = getMethod("findUserId", clazz.getDeclaredMethods());
+
+        Object[] values = getMethodExecuteParameter(request, method);
+
+        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
+
+    }
+
     private Object[] getMethodExecuteParameter(HttpServletRequest request, Method method) {
 
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
