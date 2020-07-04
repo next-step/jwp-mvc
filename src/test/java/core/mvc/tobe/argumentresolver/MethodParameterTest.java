@@ -17,13 +17,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MethodParameterTest {
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    @DisplayName("메소드를 주면, 해당 메소드의 Parameters 배열(Object[]) 반환")
+    @DisplayName("메소드에서 파라미터 추출 - String 타입")
     @Test
-    void construct() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    void getParametersWhenString() throws IllegalAccessException, InstantiationException, InvocationTargetException {
         //given
         String userId = "javajigi";
         String password = "password";
         MockHttpServletRequest request = createRequest(userId, password);
+        Class clazz = TestUserController.class;
+        Method method = getMethod(clazz);
+
+        //when
+        Object[] values = MethodParameter.getParameters(request, method);
+        ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
+
+        //then
+        assertThat(values).hasSize(2);
+        assertThat(values).contains(userId);
+        assertThat(values).contains(password);
+    }
+
+    @DisplayName("메소드에서 파라미터 추출 - Primitive 타입")
+    @Test
+    void getParametersWhenPrimitive() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        //given
+        long userId = 1L;
+        int password = 12345;
+        MockHttpServletRequest request = createRequest(String.valueOf(userId), String.valueOf(password));
         Class clazz = TestUserController.class;
         Method method = getMethod(clazz);
 
