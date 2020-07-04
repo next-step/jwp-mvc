@@ -18,9 +18,9 @@ class BeanTypeArgumentResolverTest {
         request.setParameter("age", "29");
 
         BeanTypeArgumentResolver beanTypeArgumentResolver = new BeanTypeArgumentResolver();
-        boolean sameType = beanTypeArgumentResolver.equalsTo(String.class);
-        boolean same = beanTypeArgumentResolver.equalsTo(TestUser.class);
-        final Object value = beanTypeArgumentResolver.getParameterValue(request, response, TestUser.class, "");
+        boolean sameType = beanTypeArgumentResolver.equalsTo(String.class, null);
+        boolean same = beanTypeArgumentResolver.equalsTo(TestUser.class, null);
+        final Object value = beanTypeArgumentResolver.getParameterValue(request, response, TestUser.class, "", null);
 
         assertThat(sameType).isFalse();
         assertThat(same).isTrue();

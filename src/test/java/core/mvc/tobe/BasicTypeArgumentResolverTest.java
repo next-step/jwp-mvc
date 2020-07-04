@@ -18,8 +18,8 @@ class BasicTypeArgumentResolverTest {
         request.addParameter("password", password);
 
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
-        boolean sameType = basicTypeArgumentResolver.equalsTo(String.class);
-        Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, response, String.class, "userId");
+        boolean sameType = basicTypeArgumentResolver.equalsTo(String.class, null);
+        Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, response, String.class, "userId", null);
         assertThat(sameType).isTrue();
         assertThat(userIdActual).isEqualTo(userId);
     }
@@ -35,8 +35,8 @@ class BasicTypeArgumentResolverTest {
         request.setParameter("age", String.valueOf(age));
 
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
-        boolean sameType = basicTypeArgumentResolver.equalsTo(long.class);
-        Object idActual = basicTypeArgumentResolver.getParameterValue(request, response, long.class, "id");
+        boolean sameType = basicTypeArgumentResolver.equalsTo(long.class, null);
+        Object idActual = basicTypeArgumentResolver.getParameterValue(request, response, long.class, "id", null);
 
         assertThat(sameType).isTrue();
         assertThat(idActual).isEqualTo(id);
