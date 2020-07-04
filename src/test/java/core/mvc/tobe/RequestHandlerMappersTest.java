@@ -33,7 +33,7 @@ public class RequestHandlerMappersTest {
         ModelAndView modelAndView = handlerMappers.mapperHandling(request, response);
 
         assertThat(modelAndView).isNotEqualTo(null);
-        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("redirect:/users/loginForm"));
+        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("/users/loginForm"));
     }
 
     @Test

@@ -22,7 +22,7 @@ public class RedirectViewTest {
 
         redirectView.render(null, request, response);
 
-        assertThat(response.getRedirectedUrl()).isEqualTo("/user");
+        assertThat(response.getRedirectedUrl()).isEqualTo(pathName);
         assertThat(response.getForwardedUrl()).isEqualTo(null);
     }
 }

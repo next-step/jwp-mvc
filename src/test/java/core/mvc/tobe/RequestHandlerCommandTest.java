@@ -21,6 +21,6 @@ public class RequestHandlerCommandTest {
         HandlerCommand handlerCommand = new RequestHandlerAdapter(controller);
         ModelAndView modelAndView = handlerCommand.handle(request, response);
 
-        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("redirect:/users/loginForm"));
+        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("/users/loginForm"));
     }
 }
