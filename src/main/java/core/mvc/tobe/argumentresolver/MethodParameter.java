@@ -1,5 +1,6 @@
 package core.mvc.tobe.argumentresolver;
 
+import core.annotation.web.PathVariable;
 import core.mvc.tobe.argumentresolver.util.ParameterNameUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,16 @@ public class MethodParameter {
 
     public boolean isIntegerType() {
         return type.equals(int.class) || type.equals(long.class);
+    }
+
+    public boolean hasPathVariable(){
+        PathVariable[] pathVariables = this.type.getDeclaredAnnotationsByType(PathVariable.class);
+
+        if(pathVariables.length == 0){
+            return false;
+        }
+
+        return true;
     }
 
     private Class<?> findType(Method method, int index) {
