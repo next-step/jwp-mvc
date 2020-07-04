@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.NoSuchElementException;
 
-public class JavaBeanArguementResolver implements HandlerMethodArgumentResolver {
+public class JavaBeanArgumentResolver implements HandlerMethodArgumentResolver {
 
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
@@ -33,6 +33,10 @@ public class JavaBeanArguementResolver implements HandlerMethodArgumentResolver 
             constructorValues[j] = methodParameter.getParameterTypeValue(constructorParameterValue, constructorParameterType);
         }
 
+        return createInstance(constructor, constructorValues);
+    }
+
+    private Object createInstance(Constructor constructor, Object[] constructorValues) {
         try {
             Object obj = constructor.newInstance(constructorValues);
             return obj;

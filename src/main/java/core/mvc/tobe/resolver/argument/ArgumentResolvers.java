@@ -10,7 +10,7 @@ public class ArgumentResolvers {
     static {
         resolvers.add(new PathVariableArgumentResolver());
         resolvers.add(new RequestParameterArgumentResolver());
-        resolvers.add(new JavaBeanArguementResolver());
+        resolvers.add(new JavaBeanArgumentResolver());
     }
 
     public static HandlerMethodArgumentResolver getResolver(MethodParameter methodParameter) {
