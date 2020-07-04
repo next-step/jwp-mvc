@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import com.google.common.collect.Lists;
 import core.mvc.HandlerMapping;
+import core.mvc.exception.NoHandlerFoundException;
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,11 +17,11 @@ public class HandlerMappings {
         this.mappings.addAll(Arrays.asList(handlerMappings));
     }
 
-    public Object getHandler(HttpServletRequest req) {
+    public Object getHandler(HttpServletRequest req) throws NoHandlerFoundException {
         for (HandlerMapping mapping : mappings) {
             Object handler = mapping.getHandler(req);
             if (handler != null) return handler;
         }
-        return null;
+        throw new NoHandlerFoundException();
     }
 }

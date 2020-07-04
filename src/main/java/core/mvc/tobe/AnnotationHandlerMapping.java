@@ -4,15 +4,14 @@ import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
+import core.mvc.exception.ReflectionsException;
 import org.slf4j.Logger;
 
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -24,14 +23,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
+    public AnnotationHandlerMapping(Object... basePackage) throws ReflectionsException {
         this.basePackage = basePackage;
         this.controllerScanner = new ControllerScanner(this.basePackage);
 
         this.initialize();
     }
 
-    public void initialize() {
+    public void initialize() throws ReflectionsException {
         Set<Class<?>> controllerClasses = this.controllerScanner.scan();
 
         for (Class<?> clazz : controllerClasses) {

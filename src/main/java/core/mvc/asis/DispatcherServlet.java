@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.exception.DefaultExceptionResolver;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.view.View;
 import org.slf4j.Logger;
@@ -35,11 +36,10 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             Object handler = handlerMappings.getHandler(req);
-            if(handler == null) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no mapping found.");
-                return;
-            }
             handle(req, resp, handler);
+        } catch (ServletException e) {
+            DefaultExceptionResolver er = DefaultExceptionResolver.from(e);
+            er.resolveException(e, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());

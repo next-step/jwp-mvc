@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.mvc.exception.ReflectionsException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,30 +17,34 @@ class ControllerScannerTest {
     @Test
     void test_scanController() {
         // given
-        ControllerScanner sc = new ControllerScanner("core.mvc.tobe");
-        // when
-        Set<Class<?>> controllers = sc.scan();
-        // then
-        assertThat(controllers).hasSize(1);
-        assertThat(controllers.contains(MyController.class)).isTrue();
+        try {
+            ControllerScanner sc = new ControllerScanner("core.mvc.tobe");
+            // when
+            Set<Class<?>> controllers = sc.scan();
+            // then
+            assertThat(controllers).hasSize(1);
+            assertThat(controllers.contains(MyController.class)).isTrue();
+        } catch (ReflectionsException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @DisplayName("@RequestMapping 어노테이션이 붙은 메소드 스캐닝")
     @Test
     void test_scanMethodsWithRequestMapping() {
         // given
+        try {
         ControllerScanner sc = new ControllerScanner("core.mvc.tobe");
         sc.scan();
 
         Class<MyController> clazz = MyController.class;
-        try {
             Method findUserId = clazz.getDeclaredMethod("findUserId", HttpServletRequest.class, HttpServletResponse.class);
             Method save = clazz.getDeclaredMethod("save", HttpServletRequest.class, HttpServletResponse.class);
             // when
             Set<Method> methodsWithRequestMapping = sc.getMethodsWithRequestMapping(clazz);
             // then
             assertThat(methodsWithRequestMapping).containsExactlyInAnyOrder(findUserId, save);
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | ReflectionsException e) {
             throw new RuntimeException(e);
         }
     }

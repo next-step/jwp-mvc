@@ -2,8 +2,11 @@ package core.mvc.asis;
 
 
 import core.mvc.ModelAndView;
+import core.mvc.exception.NoHandlerFoundException;
 import core.mvc.tobe.HandlerExecution;
 
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -33,10 +36,10 @@ public enum HandlerAdapter {
 
     abstract ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception;
 
-    public static HandlerAdapter of(Object instance) {
+    public static HandlerAdapter of(Object instance) throws ServletException {
         return Arrays.stream(HandlerAdapter.values())
                 .filter(handlerAdapter -> handlerAdapter.isKindOf.test(instance))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("unsupported handler type"));
+                .orElseThrow(() -> new NoHandlerFoundException());
     }
 }

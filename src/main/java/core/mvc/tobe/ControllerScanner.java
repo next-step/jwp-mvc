@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.mvc.exception.ReflectionsException;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -24,18 +25,18 @@ public class ControllerScanner {
         this.reflections = new Reflections(basePackage);
     }
 
-    public Set<Class<?>> scan() {
+    public Set<Class<?>> scan() throws ReflectionsException {
         Set<Class<?>> controllerClasses = this.reflections.getTypesAnnotatedWith(Controller.class);
         save(controllerClasses);
         return controllerClasses;
     }
 
-    private void save(Set<Class<?>> controllerClasses) {
+    private void save(Set<Class<?>> controllerClasses) throws ReflectionsException {
         for (Class<?> clazz : controllerClasses) {
             try {
                 controllers.put(clazz, clazz.newInstance());
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException("unable to load controller.", e);
+                throw new ReflectionsException("unable to load controller.", e);
             }
         }
     }
