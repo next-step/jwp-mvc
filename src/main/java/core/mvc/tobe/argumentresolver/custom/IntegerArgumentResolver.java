@@ -10,7 +10,7 @@ public class IntegerArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
         Class<?> type = methodParameter.getType();
-        return type.equals(short.class) || type.equals(int.class) || type.equals(long.class);
+        return type.equals(int.class) || type.equals(long.class);
     }
 
     @Override
