@@ -21,6 +21,6 @@ public class HandlerMappings {
             Object handler = mapping.getHandler(req);
             if (handler != null) return handler;
         }
-        throw new RuntimeException("no mapping found.");
+        return null;
     }
 }

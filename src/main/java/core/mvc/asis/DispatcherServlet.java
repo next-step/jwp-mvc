@@ -35,6 +35,10 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             Object handler = handlerMappings.getHandler(req);
+            if(handler == null) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no mapping found.");
+                return;
+            }
             handle(req, resp, handler);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
