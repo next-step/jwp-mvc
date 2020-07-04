@@ -27,18 +27,10 @@ public class JavaBeanArguementResolver implements HandlerMethodArgumentResolver 
 
         for (int j = 0; j < parameters.length; j++) {
             Class<?> constructorParameterType = parameters[j].getType();
-
-
             String constructorParameterName = constructorParameterNames[j];
+            String constructorParameterValue = request.getParameter(constructorParameterName);
 
-            String value = request.getParameter(constructorParameterName);
-            constructorValues[j] = value;
-            if (constructorParameterType.equals(int.class)) {
-                constructorValues[j] = Integer.parseInt(value);
-            }
-            if (constructorParameterType.equals(long.class)) {
-                constructorValues[j] = Long.parseLong(value);
-            }
+            constructorValues[j] = methodParameter.getParameterTypeValue(constructorParameterValue, constructorParameterType);
         }
 
         try {

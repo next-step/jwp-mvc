@@ -35,7 +35,7 @@ public class MethodParameter {
         return parameter.isAnnotationPresent(PathVariable.class);
     }
 
-    public Object getParameterTypeValue(String parameterValue) {
+    public Object getParameterTypeValue(String parameterValue, Class<?> parameterType) {
         Object value = parameterValue;
         if (parameterType.equals(int.class)) {
             value = Integer.parseInt(parameterValue);
@@ -45,6 +45,10 @@ public class MethodParameter {
         }
 
         return value;
+    }
+
+    public Object getParameterTypeValue(String parameterValue) {
+        return getParameterTypeValue(parameterValue, parameterType);
     }
 
     public String getParameterName() {
