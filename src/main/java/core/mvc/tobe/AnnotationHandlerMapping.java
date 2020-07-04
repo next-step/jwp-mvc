@@ -6,12 +6,10 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.Handler;
 import core.mvc.HandlerMapping;
-import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +46,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(toMap(
                         HandlerKey::from,
-                        method -> createHandlerExecution(method, instance)));
+                        method -> new HandlerExecution(method, instance)));
     }
 
     private Object createInstance(Class<?> controller) {
@@ -60,9 +58,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
     }
 
-    private HandlerExecution createHandlerExecution(Method method, Object instance) {
-        return (request, response) -> (ModelAndView) method.invoke(instance, request, response);
-    }
 
     @Override
     public Handler getHandler(HttpServletRequest request) {

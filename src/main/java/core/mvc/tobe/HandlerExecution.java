@@ -5,8 +5,20 @@ import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
-@FunctionalInterface
-public interface HandlerExecution extends Handler {
-    ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception;
+public class HandlerExecution implements Handler {
+
+    private Method method;
+    private Object instance;
+
+    public HandlerExecution(Method method, Object instance) {
+        this.method = method;
+        this.instance = instance;
+    }
+
+    @Override
+    public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return (ModelAndView) method.invoke(instance, request, response);
+    }
 }
