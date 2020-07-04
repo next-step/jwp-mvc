@@ -1,4 +1,4 @@
-package core.mvc.tobe.resolver;
+package core.mvc.tobe.resolver.view;
 
 import core.mvc.tobe.view.JspView;
 import core.mvc.tobe.view.RedirectView;

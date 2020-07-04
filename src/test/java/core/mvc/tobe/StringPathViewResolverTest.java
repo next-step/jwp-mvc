@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
-import core.mvc.tobe.resolver.StringPathViewResolver;
-import core.mvc.tobe.resolver.ViewResolver;
+import core.mvc.tobe.resolver.view.StringPathViewResolver;
+import core.mvc.tobe.resolver.view.ViewResolver;
 import core.mvc.tobe.view.JspView;
 import core.mvc.tobe.view.RedirectView;
 import core.mvc.tobe.view.View;

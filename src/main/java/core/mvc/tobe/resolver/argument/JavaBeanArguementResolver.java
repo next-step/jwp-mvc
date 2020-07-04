@@ -1,4 +1,4 @@
-package core.mvc.tobe.resolver;
+package core.mvc.tobe.resolver.argument;
 
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
