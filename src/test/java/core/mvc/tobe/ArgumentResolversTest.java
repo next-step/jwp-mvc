@@ -30,7 +30,6 @@ class ArgumentResolversTest {
         Class clazz = TestUserController.class;
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
 
-
         final Object[] parameterValues = argumentResolvers.getParameterValues(method, request, response);
         System.out.println(Arrays.toString(parameterValues));
     }
@@ -45,7 +44,7 @@ class ArgumentResolversTest {
         Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
 
         final Object[] parameterValues = argumentResolvers.getParameterValues(method, request, response);
-        System.out.println(Arrays.toString(parameterValues));
+        assertThat(parameterValues).contains(1L);
     }
 
     @Test
