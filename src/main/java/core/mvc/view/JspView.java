@@ -27,6 +27,9 @@ public class JspView implements View {
     }
 
     private String combinePath(String viewName) {
+        if(viewName.endsWith(prefix)) {
+            return viewName;
+        }
         return suffix + viewName + prefix;
     }
 }

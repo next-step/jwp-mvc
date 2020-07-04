@@ -23,7 +23,7 @@ public class HomeController {
 
         req.setAttribute("users", DataBase.findAll());
 
-        ModelAndView mav = new ModelAndView(new JspView("home"));
+        ModelAndView mav = new ModelAndView("/home.jsp");
         return mav;
     }
 }
