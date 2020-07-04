@@ -1,5 +1,9 @@
 package core.mvc.tobe.argumentresolver;
 
+import core.mvc.tobe.argumentresolver.util.ParameterNameUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -20,6 +24,14 @@ public class MethodParameter {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isHttpServletRequest(){
+        return this.type.equals(HttpServletRequest.class);
+    }
+
+    public boolean isHttpServletResponse(){
+        return this.type.equals(HttpServletResponse.class);
     }
 
     public boolean isJavaBeanType() {

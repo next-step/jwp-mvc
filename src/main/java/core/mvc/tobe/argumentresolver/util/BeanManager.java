@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class BeanManager {
     private static final int NO_ARGS = 0;
 
-    public static Object createWithNoArgs(MethodParameter methodParameter) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public static Object createBeanWithNoArgs(MethodParameter methodParameter) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<?>[] constructors = methodParameter.getType().getConstructors();
         return getDefaultConstructor(constructors).newInstance();
     }
