@@ -29,12 +29,17 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView modelAndView = getModelAndView(request, response);
+        ModelAndView modelAndView = null;
+        try {
+            modelAndView = getModelAndView(request, response);
+        } catch (InstantiationException e) {
+
+        }
         modelAndView.getView()
                 .render(modelAndView.getModel(), request, response);
     }
 
-    public ModelAndView getModelAndView(HttpServletRequest request, HttpServletResponse response){
+    public ModelAndView getModelAndView(HttpServletRequest request, HttpServletResponse response) throws InstantiationException {
         HandlerExecution handlerExecution = HandlerMappings.findHandler(request);
         return handlerExecution.handle(request, response);
     }

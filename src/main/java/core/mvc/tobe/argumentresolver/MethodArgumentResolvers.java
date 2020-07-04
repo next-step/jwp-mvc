@@ -15,4 +15,11 @@ public class MethodArgumentResolvers {
         resolvers.add(new StringArgumentResolver());
         resolvers.add(new BeanArgumentResolver());
     }
+
+    public static MethodArgumentResolver findResolver(MethodParameter methodParameter){
+        return resolvers.stream()
+                .filter(methodArgumentResolver -> methodArgumentResolver.support(methodParameter))
+                .findFirst()
+                .orElseThrow(IllegalAccessError::new);
+    }
 }
