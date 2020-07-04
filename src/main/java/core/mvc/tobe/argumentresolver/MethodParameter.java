@@ -1,22 +1,32 @@
 package core.mvc.tobe.argumentresolver;
 
-import core.annotation.web.PathVariable;
-import core.mvc.tobe.argumentresolver.util.ParameterNameUtils;
+import core.annotation.web.RequestMapping;
+import core.mvc.tobe.argumentresolver.util.ParameterNameUtil;
+import core.mvc.tobe.argumentresolver.util.PathVariableUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Map;
 
 public class MethodParameter {
     private Class<?> type;
     private String name;
     private Parameter parameter;
+    private Method method;
+    private String requestURI;
 
     public MethodParameter(Method method, int index) {
         this.type = findType(method, index);
         this.name = findName(method, index);
         this.parameter = method.getParameters()[index];
+        this.method = method;
+    }
+
+    public MethodParameter(Method method, int index, String requestURI) {
+        this(method, index);
+        this.requestURI = requestURI;
     }
 
     public Class<?> getType() {
@@ -27,11 +37,11 @@ public class MethodParameter {
         return name;
     }
 
-    public boolean isHttpServletRequest(){
+    public boolean isHttpServletRequest() {
         return this.type.equals(HttpServletRequest.class);
     }
 
-    public boolean isHttpServletResponse(){
+    public boolean isHttpServletResponse() {
         return this.type.equals(HttpServletResponse.class);
     }
 
@@ -47,14 +57,15 @@ public class MethodParameter {
         return type.equals(int.class) || type.equals(long.class);
     }
 
-    public boolean hasPathVariable(){
-        PathVariable[] pathVariables = this.type.getDeclaredAnnotationsByType(PathVariable.class);
+    public boolean hasPathVariable() {
+        RequestMapping declaredAnnotation = this.method.getDeclaredAnnotation(RequestMapping.class);
+        String path = declaredAnnotation.value();
 
-        if(pathVariables.length == 0){
-            return false;
-        }
+        return PathVariableUtil.hasPathVariable(path, requestURI);
+    }
 
-        return true;
+    public String getPath() {
+        return this.method.getAnnotation(RequestMapping.class).value();
     }
 
     private Class<?> findType(Method method, int index) {
@@ -63,7 +74,7 @@ public class MethodParameter {
     }
 
     private String findName(Method method, int index) {
-        return ParameterNameUtils.getName(method, index);
+        return ParameterNameUtil.getName(method, index);
     }
 
     private boolean isPrimitiveType() {

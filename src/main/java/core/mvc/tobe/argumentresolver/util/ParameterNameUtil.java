@@ -5,7 +5,7 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 import java.lang.reflect.Method;
 
-public class ParameterNameUtils {
+public class ParameterNameUtil {
     private static final ParameterNameDiscoverer NAME_DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
 
     public static final String getName(Method method, int index){

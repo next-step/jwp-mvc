@@ -2,12 +2,14 @@ package core.mvc.tobe.argumentresolver;
 
 import core.mvc.tobe.TestUserController;
 import core.mvc.tobe.argumentresolver.custom.PathVariableArgumentResolver;
-import core.mvc.tobe.argumentresolver.custom.StringArgumentResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -25,7 +27,7 @@ public class PathVariableArgumentResolverTest {
 
         //when, then
         for (int i = 0; i < length; i++) {
-            MethodParameter methodParameter = new MethodParameter(method, i);
+            MethodParameter methodParameter = new MethodParameter(method, i, createRequest().getRequestURI());
             assertThat(pathVariableArgumentResolver.support(methodParameter)).isTrue();
         }
     }
@@ -42,12 +44,34 @@ public class PathVariableArgumentResolverTest {
 
         //when, then
         for (int i = 0; i < length; i++) {
-            MethodParameter methodParameter = new MethodParameter(method, i);
+            MethodParameter methodParameter = new MethodParameter(method, i, createRequest().getRequestURI());
             assertThat(pathVariableArgumentResolver.support(methodParameter)).isFalse();
         }
     }
 
+    @DisplayName("@PathVariable")
+    @Test
+    void resolve() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+        //given
+        Class clazz = TestUserController.class;
+        Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
+        PathVariableArgumentResolver pathVariableArgumentResolver = new PathVariableArgumentResolver();
+        MockHttpServletRequest request = createRequest();
 
+        //when
+        MethodParameter methodParameter = new MethodParameter(method, 0, request.getRequestURI());
+        Object resolve = pathVariableArgumentResolver.resolve(methodParameter, request, new MockHttpServletResponse());
+
+        //then
+        assertThat(resolve).isEqualTo(1L);
+
+    }
+
+    private MockHttpServletRequest createRequest() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/users/" + Long.valueOf(1));
+        return request;
+    }
 
 
     private Method getMethod(String name, Method[] methods) {

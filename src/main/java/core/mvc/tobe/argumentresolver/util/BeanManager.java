@@ -24,7 +24,7 @@ public class BeanManager {
             String parameter = request.getParameter(declaredField.getName());
             Class<?> type = declaredField.getType();
 
-            declaredField.set(targetBean, ParameterUtil.parseWithType(parameter, type));
+            declaredField.set(targetBean, PrimitiveParameterUtil.parseWithType(parameter, type));
         }
         return targetBean;
     }

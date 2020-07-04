@@ -1,6 +1,6 @@
 package core.mvc.tobe.argumentresolver.util;
 
-public class ParameterUtil {
+public class PrimitiveParameterUtil {
     public static Object parseWithType(String parameter, Class<?> clazz){
         if (isPrimitiveInt(clazz)) {
             return Integer.parseInt(parameter);
