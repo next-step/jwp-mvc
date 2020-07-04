@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BasicTypeArgumentResolverTest {
@@ -17,9 +20,13 @@ class BasicTypeArgumentResolverTest {
         request.addParameter("userId", userId);
         request.addParameter("password", password);
 
+        Class clazz = TestUserController.class;
+        Method method = getMethod("create_string", clazz.getDeclaredMethods());
+
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
-        boolean sameType = basicTypeArgumentResolver.equalsTo(String.class, null);
-        Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, response, String.class, "userId", null);
+        boolean sameType = basicTypeArgumentResolver.equalsTo(String.class, method);
+
+        Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, response, new ResolverParameter(method, String.class, "userId"));
         assertThat(sameType).isTrue();
         assertThat(userIdActual).isEqualTo(userId);
     }
@@ -34,13 +41,24 @@ class BasicTypeArgumentResolverTest {
         request.setParameter("id", String.valueOf(id));
         request.setParameter("age", String.valueOf(age));
 
+        Class clazz = TestUserController.class;
+        Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
+
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
-        boolean sameType = basicTypeArgumentResolver.equalsTo(long.class, null);
-        Object idActual = basicTypeArgumentResolver.getParameterValue(request, response, long.class, "id", null);
+        boolean sameType = basicTypeArgumentResolver.equalsTo(long.class, method);
+
+        Object idActual = basicTypeArgumentResolver.getParameterValue(request, response, new ResolverParameter(method, long.class, "id"));
 
         assertThat(sameType).isTrue();
         assertThat(idActual).isEqualTo(id);
 
+    }
+
+    private Method getMethod(String name, Method[] methods) {
+        return Arrays.stream(methods)
+                .filter(method -> method.getName().equals(name))
+                .findFirst()
+                .get();
     }
 
 }

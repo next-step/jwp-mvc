@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ParameterNameDiscovererTest {
+public class ResolverParameterNameDiscovererTest {
     @Test
     @DisplayName("메소드 인자 이름을 정상적으로 가져오는지 확인")
     void parametername() {

@@ -18,11 +18,14 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, final String parameterName, final Method method) throws Exception {
+    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final ResolverParameter resolverParameter) throws Exception {
+        Method method = resolverParameter.getMethod();
+        Class parameterType = resolverParameter.getType();
         final RequestMapping annotation = method.getAnnotation(RequestMapping.class);
         final String value = getValues(request.getRequestURI(), annotation.value()).stream()
                 .findFirst()
                 .orElseThrow(IllegalAccessError::new);
+
         return getValueByPathVariable(parameterType, value);
     }
 

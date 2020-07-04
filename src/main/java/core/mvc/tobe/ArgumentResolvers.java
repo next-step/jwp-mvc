@@ -35,7 +35,7 @@ public class ArgumentResolvers {
                     .filter(resolver -> resolver.equalsTo(type, method))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("요청한 파라미터 타입을 찾을 수 없습니다."));
-            values[i] = argumentResolver.getParameterValue(request, response, type, parameterName, method);
+            values[i] = argumentResolver.getParameterValue(request, response, new ResolverParameter(method, type, parameterName));
         }
 
         return values;

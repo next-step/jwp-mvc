@@ -15,8 +15,10 @@ public class BasicTypeArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, final String parameterName, Method method) throws Exception {
-        String parameterValue = request.getParameter(parameterName);
+    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final ResolverParameter resolverParameter) throws Exception {
+        Class parameterType = resolverParameter.getType();
+        String parameterValue = request.getParameter(resolverParameter.getParameterName());
+
         if (parameterType.equals(int.class)) {
             return Integer.parseInt(parameterValue);
         }

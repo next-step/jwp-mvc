@@ -8,5 +8,5 @@ import java.lang.reflect.Method;
 public interface ArgumentResolver {
     boolean equalsTo(Class parameterType, Method method);
 
-    Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, String parameterName, Method method) throws Exception;
+    Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final ResolverParameter resolverParameter) throws Exception;
 }

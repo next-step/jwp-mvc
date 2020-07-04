@@ -18,7 +18,8 @@ public class BeanTypeArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final Class parameterType, final String parameterName, Method method) throws Exception {
+    public Object getParameterValue(final HttpServletRequest request, final HttpServletResponse response, final ResolverParameter resolverParameter) throws Exception {
+        Class parameterType = resolverParameter.getType();
         final Field[] declaredFields = parameterType.getDeclaredFields();
         Object[] values = new Object[declaredFields.length];
         for (int i = 0; i < declaredFields.length; i++) {
