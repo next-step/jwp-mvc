@@ -1,23 +1,17 @@
 package core.mvc.tobe.argumentresolver;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public class MethodParameter {
     private Class<?> type;
     private String name;
+    private Parameter parameter;
 
     public MethodParameter(Method method, int index) {
         this.type = findType(method, index);
         this.name = findName(method, index);
-    }
-
-    private Class<?> findType(Method method, int index) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        return parameterTypes[index];
-    }
-
-    private String findName(Method method, int index) {
-        return ParameterNameUtils.getName(method, index);
+        this.parameter = method.getParameters()[index];
     }
 
     public Class<?> getType() {
@@ -28,7 +22,7 @@ public class MethodParameter {
         return name;
     }
 
-    public boolean isJavaBean() {
+    public boolean isJavaBeanType() {
         return (isPrimitiveType() == false) && (isStringType() == false);
     }
 
@@ -36,8 +30,17 @@ public class MethodParameter {
         return this.type.equals(String.class);
     }
 
-    public boolean isIntegerType(){
+    public boolean isIntegerType() {
         return type.equals(int.class) || type.equals(long.class);
+    }
+
+    private Class<?> findType(Method method, int index) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        return parameterTypes[index];
+    }
+
+    private String findName(Method method, int index) {
+        return ParameterNameUtils.getName(method, index);
     }
 
     private boolean isPrimitiveType() {
