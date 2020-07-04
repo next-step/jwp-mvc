@@ -1,20 +1,30 @@
 package core.mvc.tobe.argumentresolver;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.function.BiFunction;
 
-public enum MethodParameter {
-    PARAMETER((request, method) -> MethodParameterUtils.getParameters(request, method));
+public class MethodParameter {
+    private Class<?> type;
+    private String name;
 
-    private BiFunction<HttpServletRequest, Method, Object[]> expression;
-
-    MethodParameter(BiFunction<HttpServletRequest, Method, Object[]> expression) {
-        this.expression = expression;
+    public MethodParameter(Method method, int index) {
+        this.type = findType(method, index);
+        this.name = findName(method, index);
     }
 
-    public static Object[] getParameters(HttpServletRequest request, Method method){
-        return PARAMETER.expression
-                .apply(request, method);
+    private Class<?> findType(Method method, int index) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        return parameterTypes[index];
+    }
+
+    private String findName(Method method, int index) {
+        return ParameterNameUtils.getName(method, index);
+    }
+
+    public Class<?> getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
     }
 }

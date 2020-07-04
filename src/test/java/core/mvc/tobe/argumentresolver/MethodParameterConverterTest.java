@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MethodParameterTest {
+public class MethodParameterConverterTest {
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     @DisplayName("메소드에서 파라미터 추출 - String 타입")
@@ -28,7 +28,7 @@ public class MethodParameterTest {
         Method method = getMethod(clazz);
 
         //when
-        Object[] values = MethodParameter.getParameters(request, method);
+        Object[] values = MethodParameterConverter.getParameters(request, method);
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
         //then
@@ -48,8 +48,7 @@ public class MethodParameterTest {
         Method method = getMethod(clazz);
 
         //when
-        Object[] values = MethodParameter.getParameters(request, method);
-        ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        Object[] values = MethodParameterConverter.getParameters(request, method);
 
         //then
         assertThat(values).hasSize(2);
@@ -57,7 +56,7 @@ public class MethodParameterTest {
         assertThat(values).contains(password);
     }
 
-    private Method getMethod(Class clazz){
+    private Method getMethod(Class clazz) {
         return findMethod("create_string", clazz.getDeclaredMethods());
     }
 
@@ -68,7 +67,7 @@ public class MethodParameterTest {
                 .get();
     }
 
-    private MockHttpServletRequest createRequest(String parameter1, String parameter2){
+    private MockHttpServletRequest createRequest(String parameter1, String parameter2) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("userId", parameter1);
         request.addParameter("password", parameter2);

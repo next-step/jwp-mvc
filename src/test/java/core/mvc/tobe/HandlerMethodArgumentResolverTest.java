@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.argumentresolver.MethodParameter;
+import core.mvc.tobe.argumentresolver.MethodParameterConverter;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
-        Object[] values = MethodParameter.getParameters(request, method);
+        Object[] values = MethodParameterConverter.getParameters(request, method);
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("userId")).isEqualTo(userId);
