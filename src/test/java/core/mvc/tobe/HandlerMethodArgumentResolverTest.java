@@ -1,5 +1,7 @@
 package core.mvc.tobe;
 
+import core.annotation.web.PathVariable;
+import core.annotation.web.RequestMapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.resolver.ArgumentResolvers;
 import core.mvc.tobe.resolver.HandlerMethodArgumentResolver;
@@ -118,13 +120,43 @@ public class HandlerMethodArgumentResolverTest {
 
     @Test
     public void usersPostPathVariable() throws Exception {
-        int id = 1;
+        long id = 3;
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/" + id);
 
         Class clazz = TestUserController.class;
         Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, method);
+//        Object[] values = getMethodExecuteParameter(request, method);
+        String[] parameterNames = nameDiscoverer.getParameterNames(method);
+        Object[] values = new Object[parameterNames.length];
+        for (int i = 0; i < parameterNames.length; i++) {
+            Parameter parameter = method.getParameters()[i];
+            String parameterName = parameterNames[i];
+            Class<?> parameterType = parameter.getType();
+
+            logger.debug("{} {}", parameterName, parameter.isAnnotationPresent(PathVariable.class));
+
+            String uri = method.getAnnotation(RequestMapping.class).value();
+            int startIndex = uri.indexOf("{" + parameterName + "}");
+            int endIndex = request.getRequestURI().indexOf("/", startIndex);
+
+            logger.debug("{} {}", startIndex, endIndex);
+            String str = request.getRequestURI().substring(startIndex);
+            if (endIndex >= 0) {
+                str = request.getRequestURI().substring(startIndex, endIndex);
+            }
+
+            Object value = str;
+            if (parameterType == int.class) {
+                value = Integer.parseInt(str);
+            }
+            if (parameterType == long.class) {
+                value = Long.parseLong(str);
+            }
+
+            logger.debug("{} {}", str, value);
+            values[i] = value;
+        }
 
         ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
 
