@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 public class ServletRequestArgumentResolver implements ArgumentResolver{
 
     @Override
-    public boolean equalsTo(final Class parameterType, final Method method) {
+    public boolean support(final Class parameterType, final Method method) {
         return parameterType.isInterface() && parameterType.equals(HttpServletRequest.class);
     }
 

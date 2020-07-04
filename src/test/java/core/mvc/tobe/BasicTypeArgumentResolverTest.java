@@ -24,7 +24,7 @@ class BasicTypeArgumentResolverTest {
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
 
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
-        boolean sameType = basicTypeArgumentResolver.equalsTo(String.class, method);
+        boolean sameType = basicTypeArgumentResolver.support(String.class, method);
 
         Object userIdActual = basicTypeArgumentResolver.getParameterValue(request, response, new ResolverParameter(method, String.class, "userId"));
         assertThat(sameType).isTrue();
@@ -45,7 +45,7 @@ class BasicTypeArgumentResolverTest {
         Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
 
         BasicTypeArgumentResolver basicTypeArgumentResolver = new BasicTypeArgumentResolver();
-        boolean sameType = basicTypeArgumentResolver.equalsTo(long.class, method);
+        boolean sameType = basicTypeArgumentResolver.support(long.class, method);
 
         Object idActual = basicTypeArgumentResolver.getParameterValue(request, response, new ResolverParameter(method, long.class, "id"));
 

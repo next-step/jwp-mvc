@@ -32,7 +32,7 @@ public class ArgumentResolvers {
             final Class<?> type = parameterTypes[i];
 
             final ArgumentResolver argumentResolver = argumentResolvers.stream()
-                    .filter(resolver -> resolver.equalsTo(type, method))
+                    .filter(resolver -> resolver.support(type, method))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("요청한 파라미터 타입을 찾을 수 없습니다."));
             values[i] = argumentResolver.getParameterValue(request, response, new ResolverParameter(method, type, parameterName));

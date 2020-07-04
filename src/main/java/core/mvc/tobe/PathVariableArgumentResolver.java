@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class PathVariableArgumentResolver implements ArgumentResolver {
 
     @Override
-    public boolean equalsTo(final Class parameterType, final Method method) {
+    public boolean support(final Class parameterType, final Method method) {
         return isPathVariable(method);
     }
 

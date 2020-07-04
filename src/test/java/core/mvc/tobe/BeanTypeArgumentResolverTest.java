@@ -24,8 +24,8 @@ class BeanTypeArgumentResolverTest {
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
 
         BeanTypeArgumentResolver beanTypeArgumentResolver = new BeanTypeArgumentResolver();
-        boolean sameType = beanTypeArgumentResolver.equalsTo(String.class, method);
-        boolean same = beanTypeArgumentResolver.equalsTo(TestUser.class, method);
+        boolean sameType = beanTypeArgumentResolver.support(String.class, method);
+        boolean same = beanTypeArgumentResolver.support(TestUser.class, method);
         final Object value = beanTypeArgumentResolver.getParameterValue(request, response, new ResolverParameter(method, TestUser.class, null));
 
         assertThat(sameType).isFalse();
