@@ -1,6 +1,5 @@
 package core.mvc.tobe.resolver.argument;
 
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -14,9 +13,9 @@ public class ArgumentResolvers {
         resolvers.add(new JavaBeanArguementResolver());
     }
 
-    public static HandlerMethodArgumentResolver getResolver(Class<?> parameterType, Parameter parameter) {
+    public static HandlerMethodArgumentResolver getResolver(MethodParameter methodParameter) {
         return resolvers.stream()
-                .filter(r -> r.isSupport(parameterType, parameter))
+                .filter(r -> r.isSupport(methodParameter))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("resolver가 없습니다."));
     }

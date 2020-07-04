@@ -5,7 +5,6 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.NoSuchElementException;
 
@@ -14,13 +13,13 @@ public class JavaBeanArguementResolver implements HandlerMethodArgumentResolver 
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     @Override
-    public boolean isSupport(Class<?> parameterType, Parameter parameter) {
-        return parameterType.getConstructors().length > 0 && parameterType != String.class;
+    public boolean isSupport(MethodParameter methodParameter) {
+        return methodParameter.isJavaBeanArgument();
     }
 
     @Override
-    public Object resolve(HttpServletRequest request, Method method, String parameterName, Class<?> parameterType) {
-        Constructor constructor = parameterType.getConstructors()[0];
+    public Object resolve(HttpServletRequest request, MethodParameter methodParameter) {
+        Constructor constructor = methodParameter.getParameterType().getConstructors()[0];
 
         Parameter[] parameters = constructor.getParameters();
         String[] constructorParameterNames = nameDiscoverer.getParameterNames(constructor);

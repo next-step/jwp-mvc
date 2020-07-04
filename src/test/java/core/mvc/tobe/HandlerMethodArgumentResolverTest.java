@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.resolver.argument.ArgumentResolvers;
 import core.mvc.tobe.resolver.argument.HandlerMethodArgumentResolver;
+import core.mvc.tobe.resolver.argument.MethodParameter;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,11 +139,12 @@ public class HandlerMethodArgumentResolverTest {
         for (int i = 0; i < parameterNames.length; i++) {
             Parameter parameter = method.getParameters()[i];
             String parameterName = parameterNames[i];
-            Class<?> parameterType = parameter.getType();
 
-            HandlerMethodArgumentResolver resolver = ArgumentResolvers.getResolver(parameterType, parameter);
+            MethodParameter methodParameter = new MethodParameter(method, parameterName, parameter);
 
-            Object value = resolver.resolve(request, method, parameterName, parameterType);
+            HandlerMethodArgumentResolver resolver = ArgumentResolvers.getResolver(methodParameter);
+
+            Object value = resolver.resolve(request, methodParameter);
 
             values[i] = value;
         }
