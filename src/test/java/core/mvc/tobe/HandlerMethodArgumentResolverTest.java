@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.argumentresolver.MethodParameter;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +29,7 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        Object[] values = new Object[parameterNames.length];
-        for (int i = 0; i < parameterNames.length; i++) {
-            String parameterName = parameterNames[i];
-            logger.debug("parameter : {}", parameterName);
-            values[i] = request.getParameter(parameterName);
-        }
+        Object[] values = MethodParameter.getParameters(request, method);
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("userId")).isEqualTo(userId);

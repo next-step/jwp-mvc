@@ -1,7 +1,5 @@
 package core.mvc.tobe.handlermapping;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
 import core.annotation.web.Controller;
 import core.mvc.tobe.handler.HandlerExecution;
 import core.mvc.tobe.handler.HandlerExecutions;
@@ -12,11 +10,8 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 
