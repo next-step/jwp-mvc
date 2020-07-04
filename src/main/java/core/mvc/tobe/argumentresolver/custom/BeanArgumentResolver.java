@@ -6,14 +6,14 @@ import core.mvc.tobe.argumentresolver.MethodParameter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class StringArgumentResolver implements MethodArgumentResolver {
+public class BeanArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        return methodParameter.isStringType();
+        return methodParameter.isJavaBean();
     }
 
     @Override
     public Object resolve(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
-        return request.getParameter(methodParameter.getName());
+        return null;
     }
 }

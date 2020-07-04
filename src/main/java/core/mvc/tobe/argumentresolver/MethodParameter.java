@@ -27,4 +27,20 @@ public class MethodParameter {
     public String getName() {
         return name;
     }
+
+    public boolean isJavaBean() {
+        return (isPrimitiveType() == false) && (isStringType() == false);
+    }
+
+    public boolean isStringType() {
+        return this.type.equals(String.class);
+    }
+
+    public boolean isIntegerType(){
+        return type.equals(int.class) || type.equals(long.class);
+    }
+
+    private boolean isPrimitiveType() {
+        return this.type.isPrimitive();
+    }
 }

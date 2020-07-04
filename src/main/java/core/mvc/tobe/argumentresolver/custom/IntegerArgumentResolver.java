@@ -9,8 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 public class IntegerArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        Class<?> type = methodParameter.getType();
-        return type.equals(int.class) || type.equals(long.class);
+        return methodParameter.isIntegerType();
     }
 
     @Override
@@ -18,22 +17,22 @@ public class IntegerArgumentResolver implements MethodArgumentResolver {
         Class<?> type = methodParameter.getType();
         String parameter = request.getParameter(methodParameter.getName());
 
-        if(isPrimitiveInt(type)){
+        if (isPrimitiveInt(type)) {
             return Integer.parseInt(parameter);
         }
 
-        if(isPrimitiveLong(type)){
+        if (isPrimitiveLong(type)) {
             return Long.valueOf(parameter).longValue();
         }
 
         return null;
     }
 
-    private boolean isPrimitiveInt(Class clazz){
+    private boolean isPrimitiveInt(Class clazz) {
         return int.class.equals(clazz);
     }
 
-    private boolean isPrimitiveLong(Class clazz){
+    private boolean isPrimitiveLong(Class clazz) {
         return long.class.equals(clazz);
     }
 }
