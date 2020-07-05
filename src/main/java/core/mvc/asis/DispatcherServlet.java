@@ -2,8 +2,6 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.handler.HandlerExecution;
-import core.mvc.tobe.handler.HandlerExecutions;
-import core.mvc.tobe.handlermapping.HandlerMapping;
 import core.mvc.tobe.handlermapping.HandlerMappings;
 import core.mvc.tobe.handlermapping.custom.AnnotationHandlerMapping;
 import core.mvc.tobe.handlermapping.custom.UrlHandlerMapping;
@@ -25,21 +23,17 @@ public class DispatcherServlet extends HttpServlet {
         HandlerMappings.addHandlerMapping(new UrlHandlerMapping());
         HandlerMappings.addHandlerMapping(new AnnotationHandlerMapping(BASE_PACKAGE_FOR_COMPONENT_SCAN));
         HandlerMappings.initialize();
+        logger.info("DispatcherServlet initialization has completed!");
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView modelAndView = null;
-        try {
-            modelAndView = getModelAndView(request, response);
-        } catch (InstantiationException e) {
-
-        }
+        ModelAndView modelAndView = getModelAndView(request, response);
         modelAndView.getView()
                 .render(modelAndView.getModel(), request, response);
     }
 
-    public ModelAndView getModelAndView(HttpServletRequest request, HttpServletResponse response) throws InstantiationException {
+    public ModelAndView getModelAndView(HttpServletRequest request, HttpServletResponse response) {
         HandlerExecution handlerExecution = HandlerMappings.findHandler(request);
         return handlerExecution.handle(request, response);
     }

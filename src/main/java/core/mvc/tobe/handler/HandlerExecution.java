@@ -24,7 +24,7 @@ public class HandlerExecution {
         this.controller = newInstance;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws InstantiationException {
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
         Optional<Method> targetMethod = findTargetMethod(request);
 
         if (targetMethod.isPresent()) {
@@ -64,9 +64,7 @@ public class HandlerExecution {
         return providedMethod.equals(requestMethod);
     }
 
-    private ModelAndView callMethodUsingReflection(Method method,
-                                                   HttpServletRequest request,
-                                                   HttpServletResponse response) throws InstantiationException {
+    private ModelAndView callMethodUsingReflection(Method method, HttpServletRequest request, HttpServletResponse response) {
         try {
             Object[] parameters = ParameterUtil.getMethodParameters(method, request, response);
             return (ModelAndView) method.invoke(controller, parameters);
