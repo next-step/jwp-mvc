@@ -21,11 +21,11 @@ public class TargetBeanTest {
         Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
         MockHttpServletRequest request = createRequest();
 
-        //when(create)
+        //when
         MethodParameter methodParameter = new MethodParameter(method, 0);
         TestUser targetBean = (TestUser) TargetBean.createWithNoArgs(methodParameter);
 
-        //then(create)
+        //then
         assertThat(targetBean.getAge()).isEqualTo(0);
         assertThat(targetBean.getUserId()).isNull();
         assertThat(targetBean.getPassword()).isNull();
