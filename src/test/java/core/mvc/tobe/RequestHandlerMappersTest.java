@@ -1,9 +1,9 @@
 package core.mvc.tobe;
 
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
-import core.mvc.RedirectView;
 import core.mvc.asis.RequestMapping;
+import core.mvc.tobe.view.JspView;
+import core.mvc.tobe.view.RedirectView;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,7 +33,7 @@ public class RequestHandlerMappersTest {
         ModelAndView modelAndView = handlerMappers.mapperHandling(request, response);
 
         assertThat(modelAndView).isNotEqualTo(null);
-        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("redirect:/users/loginForm"));
+        assertThat(modelAndView.getView()).isEqualToComparingFieldByField(new RedirectView("/users/loginForm"));
     }
 
     @Test

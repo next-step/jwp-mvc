@@ -1,5 +1,7 @@
 package core.mvc;
 
+import core.mvc.tobe.view.View;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

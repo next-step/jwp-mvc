@@ -1,6 +1,6 @@
 package core.mvc.tobe;
 
-import core.mvc.RedirectView;
+import core.mvc.tobe.view.RedirectView;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class RedirectViewTest {
 
         redirectView.render(null, request, response);
 
-        assertThat(response.getRedirectedUrl()).isEqualTo("/user");
+        assertThat(response.getRedirectedUrl()).isEqualTo(pathName);
         assertThat(response.getForwardedUrl()).isEqualTo(null);
     }
 }
