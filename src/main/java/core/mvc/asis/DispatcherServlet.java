@@ -1,5 +1,11 @@
 package core.mvc.asis;
 
+import com.google.common.collect.Lists;
+import core.mvc.ModelAndView;
+import core.mvc.view.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -17,12 +24,20 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private List<HandlerMapping> handlerMappingList = Lists.newArrayList();
+
+    private LegacyHandlerMapping lhm;
+    private AnnotationHandlerMapping ahm;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        lhm = new LegacyHandlerMapping();
+        lhm.initMapping();
+        ahm = new AnnotationHandlerMapping("next.controller");
+        ahm.initialize();
+
+        handlerMappingList.add(lhm);
+        handlerMappingList.add(ahm);
     }
 
     @Override
@@ -30,15 +45,38 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Object handler = getHandler(req);
+
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
+            execute(req, resp, handler);
+        } catch (Exception e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+
     }
+
+    private void execute(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+        if(handler instanceof Controller) {
+            String viewName = ((Controller) handler).execute(req, resp);
+            move(viewName, req, resp);
+        } else {
+            ModelAndView mav = ((HandlerExecution)handler).handle(req, resp);
+            View view = mav.getView();
+            view.render(mav.getModel(), req, resp);
+        }
+
+    }
+
+    private Object getHandler(HttpServletRequest req) {
+        for(HandlerMapping mapping : handlerMappingList) {
+            Object handler = mapping.getHandler(req);
+            if(handler != null)
+                return handler;
+        }
+        throw new RuntimeException("no mapping");
+    }
+
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
