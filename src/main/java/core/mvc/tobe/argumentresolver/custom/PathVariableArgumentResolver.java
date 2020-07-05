@@ -1,5 +1,6 @@
 package core.mvc.tobe.argumentresolver.custom;
 
+import core.annotation.web.RequestMapping;
 import core.mvc.tobe.argumentresolver.MethodArgumentResolver;
 import core.mvc.tobe.argumentresolver.MethodParameter;
 import core.mvc.tobe.argumentresolver.util.PathVariableUtil;
@@ -12,7 +13,7 @@ import java.util.Map;
 public class PathVariableArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        return methodParameter.hasPathVariable();
+        return PathVariableUtil.hasPathVariable(methodParameter);
     }
 
     @Override

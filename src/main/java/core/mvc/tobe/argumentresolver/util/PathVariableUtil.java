@@ -1,5 +1,6 @@
 package core.mvc.tobe.argumentresolver.util;
 
+import core.mvc.tobe.argumentresolver.MethodParameter;
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
@@ -14,9 +15,9 @@ public class PathVariableUtil {
                 .getUriVariables();
     }
 
-    public static boolean hasPathVariable(String path, String requestURI){
-        return PATH_PATTERN_PARSER.parse(path)
-                .matches(toPathContainer(requestURI));
+    public static boolean hasPathVariable(MethodParameter methodParameter){
+        return PATH_PATTERN_PARSER.parse(methodParameter.getPath())
+                .matches(toPathContainer(methodParameter.getRequestURI()));
     }
 
     private static PathPattern parse(String path) {

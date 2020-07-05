@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 public class IntegerArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        return methodParameter.isIntegerType();
+        Class<?> type = methodParameter.getType();
+        return type.equals(int.class) || type.equals(long.class);
     }
 
     @Override

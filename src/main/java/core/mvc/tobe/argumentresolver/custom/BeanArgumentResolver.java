@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 public class BeanArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        return methodParameter.isJavaBeanType();
+        return isJavaBeanType(methodParameter);
     }
 
     @Override
@@ -21,5 +21,17 @@ public class BeanArgumentResolver implements MethodArgumentResolver {
         Field[] declaredFields = methodParameter.getType().getDeclaredFields();
 
         return BeanManager.setFields(declaredFields, request, targetBean);
+    }
+
+    private boolean isJavaBeanType(MethodParameter methodParameter) {
+        return !isPrimitiveType(methodParameter) && !isStringType(methodParameter);
+    }
+
+    private boolean isStringType(MethodParameter methodParameter) {
+        return methodParameter.getType().equals(String.class);
+    }
+
+    private boolean isPrimitiveType(MethodParameter methodParameter) {
+        return methodParameter.getType().isPrimitive();
     }
 }

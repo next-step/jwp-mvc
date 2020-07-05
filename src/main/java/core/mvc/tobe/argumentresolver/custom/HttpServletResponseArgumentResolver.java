@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 public class HttpServletResponseArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        return methodParameter.isHttpServletResponse();
+        return methodParameter.getType().equals(HttpServletResponse.class);
     }
 
     @Override

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 public class StringArgumentResolver implements MethodArgumentResolver {
     @Override
     public boolean support(MethodParameter methodParameter) {
-        return methodParameter.isStringType();
+        return methodParameter.getType().equals(String.class);
     }
 
     @Override
