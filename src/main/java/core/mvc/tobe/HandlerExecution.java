@@ -7,6 +7,7 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -26,6 +27,12 @@ public class HandlerExecution implements Handler {
         Object[] args = Arrays.stream(nameDiscoverer.getParameterNames(method))
                 .map(request::getParameter)
                 .toArray();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (int i = 0; i < method.getParameterCount(); i++) {
+            if (HttpSession.class.equals(parameterTypes[i])) {
+                args[i] = request.getSession();
+            }
+        }
         return (ModelAndView) method.invoke(instance, args);
     }
 }
