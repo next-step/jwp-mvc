@@ -1,15 +1,18 @@
 package core.mvc.tobe.resolver.argument;
 
+import core.annotation.web.PathVariable;
 import core.mvc.tobe.utils.PathPatternUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Parameter;
 import java.util.Map;
 
 public class PathVariableArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean isSupport(MethodParameter methodParameter) {
-        return methodParameter.isPathVariableArgument();
+        Parameter parameter = methodParameter.getParameter();
+        return parameter.isAnnotationPresent(PathVariable.class);
     }
 
     @Override

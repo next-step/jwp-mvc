@@ -1,10 +1,7 @@
 package core.mvc.tobe.resolver.argument;
 
-import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -23,22 +20,6 @@ public class MethodParameter {
         this.parameterName = parameterName;
         this.parameter = parameter;
         this.parameterType = parameter.getType();
-    }
-
-    public boolean isRequestParameterArgument() {
-        return parameterType.isPrimitive() || parameterType == String.class;
-    }
-
-    public boolean isJavaBeanArgument() {
-        return parameterType.getConstructors().length > 0 && parameterType != String.class;
-    }
-
-    public boolean isPathVariableArgument() {
-        return parameter.isAnnotationPresent(PathVariable.class);
-    }
-
-    public boolean isResponseParameterArgument() {
-        return parameterType == HttpServletRequest.class || parameterType == HttpServletResponse.class;
     }
 
     public Object getParameterTypeValue(String parameterValue, Class<?> parameterType) {
@@ -63,6 +44,10 @@ public class MethodParameter {
 
     public Class<?> getParameterType() {
         return parameterType;
+    }
+
+    public Parameter getParameter() {
+        return parameter;
     }
 
     public String getMethodRequestMappingValue() {

@@ -7,7 +7,8 @@ public class RequestParameterArgumentResolver implements HandlerMethodArgumentRe
 
     @Override
     public boolean isSupport(MethodParameter methodParameter) {
-        return methodParameter.isRequestParameterArgument();
+        Class<?> parameterType = methodParameter.getParameterType();
+        return parameterType.isPrimitive() || parameterType == String.class;
     }
 
     @Override
@@ -17,4 +18,5 @@ public class RequestParameterArgumentResolver implements HandlerMethodArgumentRe
 
         return value;
     }
+
 }

@@ -15,7 +15,8 @@ public class JavaBeanArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean isSupport(MethodParameter methodParameter) {
-        return methodParameter.isJavaBeanArgument();
+        Class<?> parameterType = methodParameter.getParameterType();
+        return parameterType.getConstructors().length > 0 && parameterType != String.class;
     }
 
     @Override

@@ -6,7 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ResponseParameterArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean isSupport(MethodParameter methodParameter) {
-        return methodParameter.isResponseParameterArgument();
+        Class<?> parameterType = methodParameter.getParameterType();
+        return parameterType == HttpServletRequest.class || parameterType == HttpServletResponse.class;
     }
 
     @Override
