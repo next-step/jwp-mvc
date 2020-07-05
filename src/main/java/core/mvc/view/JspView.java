@@ -18,9 +18,7 @@ public class JspView implements View {
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         RequestDispatcher rd = request.getRequestDispatcher(combinePath(viewName));
-
         mergeAttribute(model, request);
-
         rd.forward(request, response);
     }
 
@@ -29,6 +27,9 @@ public class JspView implements View {
     }
 
     private String combinePath(String viewName) {
+        if(viewName.endsWith(prefix)) {
+            return viewName;
+        }
         return suffix + viewName + prefix;
     }
 }
