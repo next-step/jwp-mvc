@@ -26,7 +26,6 @@ public class HandlerMethodArgumentResolverTest {
 
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-
     @Test
     void string() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -64,18 +63,13 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersPostString() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
-        MockHttpServletResponse response = new MockHttpServletResponse();
         String userId = "test";
         String password = "password";
         request.addParameter("userId", userId);
         request.addParameter("password", password);
 
-        Class clazz = TestUserController.class;
-        Method method = getMethod("create_string", clazz.getDeclaredMethods());
+        ModelAndView modelAndView = executeMethod(TestUserController.class, "create_string", request);
 
-        Object[] values = getMethodExecuteParameter(request, response, method);
-
-        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(modelAndView.getObject("userId")).isEqualTo(userId);
         assertThat(modelAndView.getObject("password")).isEqualTo(password);
     }
@@ -83,18 +77,13 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersPostPrimitive() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
-        MockHttpServletResponse response = new MockHttpServletResponse();
         long id = 1;
         int age = 30;
         request.addParameter("id", Long.toString(id));
         request.addParameter("age", Integer.toString(age));
 
-        Class clazz = TestUserController.class;
-        Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, response, method);
-
-        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        ModelAndView modelAndView = executeMethod(TestUserController.class, "create_int_long", request);
 
         String modelId = Objects.toString(modelAndView.getObject("id"));
         String modelAge = Objects.toString(modelAndView.getObject("age"));
@@ -105,19 +94,13 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersPostObject() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
-        MockHttpServletResponse response = new MockHttpServletResponse();
         TestUser testUser = new TestUser("test", "pass", 30);
 
         request.addParameter("userId", testUser.getUserId());
         request.addParameter("password", testUser.getPassword());
         request.addParameter("age", Integer.toString(testUser.getAge()));
 
-        Class clazz = TestUserController.class;
-        Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
-
-        Object[] values = getMethodExecuteParameter(request, response, method);
-
-        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        ModelAndView modelAndView = executeMethod(TestUserController.class, "create_javabean", request);
 
         assertThat(modelAndView.getObject("testUser")).isEqualToComparingFieldByField(testUser);
     }
@@ -126,13 +109,8 @@ public class HandlerMethodArgumentResolverTest {
     public void usersPostPathVariable() throws Exception {
         long id = 3;
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/" + id);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        Class clazz = TestUserController.class;
-        Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
 
-        Object[] values = getMethodExecuteParameter(request, response, method);
-
-        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
+        ModelAndView modelAndView = executeMethod(TestUserController.class, "show_pathvariable", request);
 
         assertThat(modelAndView.getObject("id")).isEqualTo(id);
     }
@@ -140,14 +118,19 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     public void usersGet() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        Class clazz = MyController.class;
-        Method method = getMethod("findUserId", clazz.getDeclaredMethods());
+
+        ModelAndView modelAndView = executeMethod(MyController.class, "findUserId", request);
+
+    }
+
+    private ModelAndView executeMethod(Class<?> clazz, String methodName, HttpServletRequest request) throws Exception {
+        HttpServletResponse response = new MockHttpServletResponse();
+
+        Method method = getMethod(methodName, clazz.getDeclaredMethods());
 
         Object[] values = getMethodExecuteParameter(request, response, method);
 
-        ModelAndView modelAndView = (ModelAndView) method.invoke(clazz.newInstance(), values);
-
+        return (ModelAndView) method.invoke(clazz.newInstance(), values);
     }
 
     private Object[] getMethodExecuteParameter(HttpServletRequest request, HttpServletResponse response, Method method) {
