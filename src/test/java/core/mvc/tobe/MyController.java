@@ -21,7 +21,10 @@ public class MyController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView save(String userId, String password, String name, String email) {
+    public ModelAndView save(@RequestParam String userId,
+                             @RequestParam String password,
+                             @RequestParam String name,
+                             @RequestParam String email) {
         User user = new User(userId, password, name, email);
         logger.debug("User : {}", user);
         DataBase.addUser(user);
