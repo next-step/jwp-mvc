@@ -1,5 +1,7 @@
-package core.mvc.tobe;
+package core.mvc.tobe.resolver;
 
+import core.mvc.tobe.MyController;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -7,10 +9,11 @@ import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ArgumentResolverTest {
+class ArgumentResolverCompositeTest {
 
+    @DisplayName("인자를 올바르게 합치는지 확인")
     @Test
-    void resolve() throws NoSuchMethodException {
+    void getArguments() throws NoSuchMethodException {
 
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -20,10 +23,11 @@ class ArgumentResolverTest {
         Method method = clazz.getDeclaredMethod("findUserId", String.class);
 
         // when
-        Object[] args = ArgumentResolver.resolve(request, method);
+        ArgumentResolverComposite argumentResolverComposite = new ArgumentResolverComposite(method);
+        Object[] arguments = argumentResolverComposite.getArguments(request);
 
         // then
-        assertThat(args)
+        assertThat(arguments)
                 .containsOnly("dowon");
     }
 }

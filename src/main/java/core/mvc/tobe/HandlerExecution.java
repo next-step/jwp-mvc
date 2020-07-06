@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.mvc.Handler;
 import core.mvc.ModelAndView;
+import core.mvc.tobe.resolver.ArgumentResolverComposite;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +20,8 @@ public class HandlerExecution implements Handler {
 
     @Override
     public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Object[] args = ArgumentResolver.resolve(request, method);
+        ArgumentResolverComposite argumentResolverComposite = new ArgumentResolverComposite(method);
+        Object[] args = argumentResolverComposite.getArguments(request);
         return (ModelAndView) method.invoke(instance, args);
     }
 }

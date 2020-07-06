@@ -1,8 +1,6 @@
 package core.mvc.tobe;
 
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
+import core.annotation.web.*;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
 import next.model.User;
@@ -14,7 +12,7 @@ public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView findUserId(String userId) {
+    public ModelAndView findUserId(@RequestParam String userId) {
         logger.debug("Find UserId : {}", userId);
         User user = DataBase.findUserById(userId);
         ModelAndView mav = new ModelAndView();
@@ -28,5 +26,14 @@ public class MyController {
         logger.debug("User : {}", user);
         DataBase.addUser(user);
         return null;
+    }
+
+    @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
+    public ModelAndView findUserId2(@PathVariable String userId) {
+        logger.debug("Find UserId : {}", userId);
+        User user = DataBase.findUserById(userId);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        return mav;
     }
 }
