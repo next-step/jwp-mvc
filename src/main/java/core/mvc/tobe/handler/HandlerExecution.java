@@ -4,6 +4,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 import core.mvc.asis.Controller;
+import core.mvc.tobe.argumentresolver.util.ParameterUtil;
 import core.mvc.tobe.handler.exception.ControllerExecutionException;
 import core.mvc.tobe.handler.exception.ReflectionMethodCallException;
 import core.mvc.tobe.view.JspView;
@@ -33,7 +34,7 @@ public class HandlerExecution {
         return executeController(request, response);
     }
 
-    public boolean isNullOrEmpty(){
+    public boolean isNullOrEmpty() {
         return Objects.isNull(this) || Objects.isNull(this.getController());
     }
 
@@ -63,11 +64,10 @@ public class HandlerExecution {
         return providedMethod.equals(requestMethod);
     }
 
-    private ModelAndView callMethodUsingReflection(Method method,
-                                                   HttpServletRequest request,
-                                                   HttpServletResponse response) {
+    private ModelAndView callMethodUsingReflection(Method method, HttpServletRequest request, HttpServletResponse response) {
         try {
-            return (ModelAndView) method.invoke(controller, request, response);
+            Object[] parameters = ParameterUtil.getMethodParameters(method, request, response);
+            return (ModelAndView) method.invoke(controller, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             throw new ReflectionMethodCallException(e);

@@ -33,7 +33,7 @@ public class DispatcherServletTest {
 
     @DisplayName("초기화가 되면 컨트롤러는 적절한 ModelAndView를 생성한다. - AnnotationHandlerMapping")
     @Test
-    void getModelAndViewForUrlAnnotationHandlerMapping() {
+    void getModelAndViewForUrlAnnotationHandlerMapping() throws InstantiationException {
         //given
         MockHttpServletRequest request
                 = new MockHttpServletRequest("POST", "/users");
@@ -49,7 +49,7 @@ public class DispatcherServletTest {
 
     @DisplayName("초기화가 되면 컨트롤러는 적절한 ModelAndView를 생성한다. - UrlHandlerMapping")
     @Test
-    void getModelAndViewForUrlHandlerMapping() {
+    void getModelAndViewForUrlHandlerMapping() throws InstantiationException {
         //given
         MockHttpServletRequest request
                 = new MockHttpServletRequest(null, "/users/create");

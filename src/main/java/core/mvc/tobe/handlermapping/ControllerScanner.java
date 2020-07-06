@@ -1,6 +1,5 @@
 package core.mvc.tobe.handlermapping;
 
-import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.mvc.tobe.handler.HandlerExecution;
 import core.mvc.tobe.handler.HandlerExecutions;
@@ -10,30 +9,29 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.*;
+
 public class ControllerScanner {
-    private final Reflections REFLECTIONS;
-
-    public ControllerScanner(Object basePackage) {
-        this.REFLECTIONS = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner());
-    }
-
-    public HandlerExecutions scan() {
-        Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-
-        getTypesAnnotatedWith(Controller.class)
+    public static HandlerExecutions scan(Object basePackage) {
+        Map<HandlerKey, HandlerExecution> collect = getTypesAnnotatedWith(Controller.class, basePackage)
                 .stream()
                 .map(clazz -> HandlerExecutions.init(clazz))
-                .forEach(handler -> handlerExecutions.putAll(handler.getHandlerExecutions()));
+                .map(HandlerExecutions::getHandlerExecutions)
+                .collect(collectingAndThen(toList(), Collection::stream))
+                .flatMap(m -> m.entrySet().stream())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return new HandlerExecutions(handlerExecutions);
+        return new HandlerExecutions(collect);
     }
 
-    private Set<Class> getTypesAnnotatedWith(Class clazz) {
+    private static Set<Class> getTypesAnnotatedWith(Class clazz, Object basePackage) {
         try {
-            return REFLECTIONS.getTypesAnnotatedWith(clazz);
+            Reflections reflections = new Reflections(basePackage, new TypeAnnotationsScanner(), new SubTypesScanner());
+            return reflections.getTypesAnnotatedWith(clazz);
         } catch (Exception e) {
             throw new ControllerScanException(e);
         }

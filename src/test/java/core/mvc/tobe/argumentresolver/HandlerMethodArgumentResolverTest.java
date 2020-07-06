@@ -1,12 +1,13 @@
-package core.mvc.tobe;
+package core.mvc.tobe.argumentresolver;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.TestUserController;
+import core.mvc.tobe.argumentresolver.util.ParameterUtil;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -15,8 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HandlerMethodArgumentResolverTest {
     private static final Logger logger = LoggerFactory.getLogger(HandlerMethodArgumentResolverTest.class);
-
-    private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     @Test
     void string() throws Exception {
@@ -28,13 +27,7 @@ public class HandlerMethodArgumentResolverTest {
 
         Class clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        Object[] values = new Object[parameterNames.length];
-        for (int i = 0; i < parameterNames.length; i++) {
-            String parameterName = parameterNames[i];
-            logger.debug("parameter : {}", parameterName);
-            values[i] = request.getParameter(parameterName);
-        }
+        Object[] values = ParameterUtil.getMethodParameters(method, request, new MockHttpServletResponse());
 
         ModelAndView mav = (ModelAndView) method.invoke(clazz.newInstance(), values);
         assertThat(mav.getObject("userId")).isEqualTo(userId);
