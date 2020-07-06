@@ -3,6 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.annotation.web.RequestParam;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
 import next.model.User;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpSession;
 public class LoginController {
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView execute(String userId, String password, HttpSession session) throws Exception {
+    public ModelAndView execute(@RequestParam String userId, @RequestParam String password, HttpSession session) throws Exception {
         ModelAndView mav = new ModelAndView();
         User user = DataBase.findUserById(userId);
         if (user == null) {
