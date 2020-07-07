@@ -1,19 +1,17 @@
 package core.mvc.tobe;
 
-import java.lang.reflect.Parameter;
-
 public class MethodParameter {
 
     private final String parameterName;
-    private final Parameter parameter;
+    private final Class<?> parameterType;
 
-    public MethodParameter(String parameterName, Parameter parameter) {
+    public MethodParameter(String parameterName, Class<?> parameterType) {
         this.parameterName = parameterName;
-        this.parameter = parameter;
+        this.parameterType = parameterType;
     }
 
     public Class<?> getType() {
-        return this.parameter.getType();
+        return this.parameterType;
     }
 
     public String getName() {

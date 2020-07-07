@@ -15,7 +15,7 @@ public class MethodParameters {
 
     private MethodParameters(String[] parameterNames, Parameter[] parameters) {
         this.parameters = IntStream.range(0, parameters.length)
-                .mapToObj(i -> new MethodParameter(parameterNames[i], parameters[i]))
+                .mapToObj(i -> new MethodParameter(parameterNames[i], parameters[i].getType()))
                 .collect(Collectors.toList());
     }
 
