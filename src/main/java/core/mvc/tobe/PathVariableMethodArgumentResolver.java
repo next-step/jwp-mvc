@@ -6,6 +6,7 @@ import org.springframework.web.util.pattern.PathPattern;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public class PathVariableMethodArgumentResolver implements HandlerMethodArgumentResolver {
@@ -22,7 +23,7 @@ public class PathVariableMethodArgumentResolver implements HandlerMethodArgument
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest req) throws Exception {
+    public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Map<String, String> uriVariables = pathPattern.matchAndExtract(PathContainer.parsePath((req.getRequestURI()))).getUriVariables();
 
         DataParser dataParser = DataParser.from(methodParameter.getType());

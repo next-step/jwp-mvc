@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
@@ -58,6 +59,7 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     void test_resolveCommandObject() throws Exception {
         // given
+        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest request = new MockHttpServletRequest();
         String userId = "crystal";
         String password = "password";
@@ -73,7 +75,7 @@ public class HandlerMethodArgumentResolverTest {
         boolean supports = resolver.supports(methodParameter);
         assertThat(supports).isTrue();
 
-        Object arg = resolver.resolveArgument(methodParameter, request);
+        Object arg = resolver.resolveArgument(methodParameter, request, response);
         assertThat(arg).isInstanceOf(TestUser.class);
 
         TestUser testUser = (TestUser) arg;
@@ -86,6 +88,7 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     void test_resolveBasicDataType() throws Exception {
         // given
+        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest request = new MockHttpServletRequest();
         String userId = "crystal";
         request.addParameter("userId", userId);
@@ -97,7 +100,7 @@ public class HandlerMethodArgumentResolverTest {
         boolean supports = resolver.supports(methodParameter);
         assertThat(supports).isTrue();
 
-        Object arg = resolver.resolveArgument(methodParameter, request);
+        Object arg = resolver.resolveArgument(methodParameter, request, response);
         assertThat(arg).isInstanceOf(String.class);
 
         assertThat((String) arg).isEqualTo("crystal");
@@ -107,6 +110,7 @@ public class HandlerMethodArgumentResolverTest {
     @Test
     void test_resolvePathVariable() throws Exception {
         // given
+        MockHttpServletResponse response = new MockHttpServletResponse();
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/1");
 
         Class clazz = TestUserController.class;
@@ -122,7 +126,7 @@ public class HandlerMethodArgumentResolverTest {
 
         HandlerMethodArgumentResolver resolver = new PathVariableMethodArgumentResolver(pp);
         // when
-        long id = (long) resolver.resolveArgument(methodParameter, request);
+        long id = (long) resolver.resolveArgument(methodParameter, request, response);
         // then
         assertThat(id).isEqualTo(1);
     }

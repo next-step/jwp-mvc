@@ -4,6 +4,7 @@ import core.mvc.exception.ReflectionsException;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +16,7 @@ public class DataTypeMethodArgumentResolver implements HandlerMethodArgumentReso
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest req) throws Exception {
+    public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (DataParser.supports(methodParameter.getType())) {
             return getArg(methodParameter.getName(), methodParameter.getType(), req);
         }
