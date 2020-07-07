@@ -6,21 +6,20 @@ import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class ListUserController {
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView execute(HttpSession httpSession) throws Exception {
         ModelAndView mav = new ModelAndView();
-        if (!UserSessionUtils.isLogined(req.getSession())) {
+        if (!UserSessionUtils.isLogined(httpSession)) {
             mav.setView("redirect:/users/loginForm");
             return mav;
         }
 
-        req.setAttribute("users", DataBase.findAll());
+        mav.addObject("users", DataBase.findAll());
         mav.setView("/user/list.jsp");
         return mav;
     }

@@ -6,12 +6,13 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.Handler;
 import core.mvc.HandlerMapping;
-import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(toMap(
                         HandlerKey::from,
-                        method -> createHandlerExecution(method, instance)));
+                        method -> new HandlerExecution(method, instance)));
     }
 
     private Object createInstance(Class<?> controller) {
@@ -60,14 +61,38 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
     }
 
-    private HandlerExecution createHandlerExecution(Method method, Object instance) {
-        return (request, response) -> (ModelAndView) method.invoke(instance, request, response);
-    }
 
     @Override
     public Handler getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
+        String requestUri = getRequestUri(request);
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    private String getRequestUri(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        return handlerExecutions.keySet().stream()
+                .map(HandlerKey::getUrl)
+                .filter(mappingUri -> match(mappingUri, requestUri))
+                .findFirst()
+                .orElse(requestUri);
+    }
+
+    private boolean match(String mappingUri, String requestUri) {
+        PathPattern pathPattern = parse(mappingUri);
+        return pathPattern.matches(toPathContainer(requestUri));
+    }
+
+    private PathPattern parse(String path) {
+        PathPatternParser pp = new PathPatternParser();
+        pp.setMatchOptionalTrailingSeparator(true);
+        return pp.parse(path);
+    }
+
+    private static PathContainer toPathContainer(String path) {
+        if (path == null) {
+            return null;
+        }
+        return PathContainer.parsePath(path);
     }
 }
