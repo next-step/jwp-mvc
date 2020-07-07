@@ -4,11 +4,11 @@ import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MethodParametersTest {
 
@@ -36,6 +36,19 @@ class MethodParametersTest {
         assertThat(methodParameters.getParameters())
                 .extracting("getName", "getType")
                 .containsExactlyInAnyOrder(Tuple.tuple("id", long.class), Tuple.tuple("age", int.class));
+    }
+
+    @DisplayName("TestUserController의 create_javabean 메소드 파라미터 추출")
+    @Test
+    void test_extractMethodParameters_javaBeanType() {
+        Class<TestUserController> clazz = TestUserController.class;
+        Method method = getMethod("create_javabean", clazz.getDeclaredMethods());
+
+        MethodParameters methodParameters = MethodParameters.from(method);
+
+        assertThat(methodParameters.getParameters())
+                .extracting("getName", "getType")
+                .containsExactlyInAnyOrder(Tuple.tuple("testUser", TestUser.class));
     }
 
     private Method getMethod(String methodName, Method[] declaredMethods) {

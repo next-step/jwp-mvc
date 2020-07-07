@@ -54,6 +54,6 @@ public enum DataTypeMethodArgumentResolver implements HandlerMethodArgumentResol
         return Arrays.stream(values())
                 .filter(dataTypeMethodArgumentResolver -> dataTypeMethodArgumentResolver.supports(methodParameter))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("no matching type."));
+                .orElseGet(() -> null);
     }
 }
