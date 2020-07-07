@@ -7,35 +7,53 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DataTypeMethodArgumentResolverTest {
+class DataTypeMethodArgumentResolverTest {
 
-    @DisplayName("메소드 파라미터 내 int형 데이터에 적합 리졸버 찾기")
+    @DisplayName("파라미터가 커맨드 객체인 경우, 커맨드 객체에 값을 셋팅해서 반환")
     @Test
-    void test_staticFactoryMethod() {
-        // given
-        MethodParameter methodParameter = new MethodParameter("age", int.class);
-        // when
-        DataTypeMethodArgumentResolver resolver = DataTypeMethodArgumentResolver.from(methodParameter);
-        // then
-        assertThat(resolver == DataTypeMethodArgumentResolver.INTEGER_TYPE).isTrue();
-    }
-
-    @DisplayName("int형 데이터에 대한 리졸버 처리")
-    @Test
-    void test_resolve() {
+    void test_resolveCommandObject() throws Exception {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("age", "26");
+        String userId = "crystal";
+        String password = "password";
+        String age = "26";
+        request.addParameter("userId", userId);
+        request.addParameter("password", password);
+        request.addParameter("age", age);
 
-        MethodParameter methodParameter = new MethodParameter("age", int.class);
-        // when
-        DataTypeMethodArgumentResolver resolver = DataTypeMethodArgumentResolver.from(methodParameter);
-        try {
-            Object arg = resolver.resolveArgument(methodParameter, request);
-        // then
-            assertThat((int) arg).isEqualTo(26);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MethodParameter methodParameter = new MethodParameter("testUser", TestUser.class);
+        DataTypeMethodArgumentResolver resolver = new DataTypeMethodArgumentResolver();
+        // when // then
+        boolean supports = resolver.supports(methodParameter);
+        assertThat(supports).isTrue();
+
+        Object arg = resolver.resolveArgument(methodParameter, request);
+        assertThat(arg).isInstanceOf(TestUser.class);
+
+        TestUser testUser = (TestUser) arg;
+        assertThat(testUser.getUserId()).isEqualTo("crystal");
+        assertThat(testUser.getPassword()).isEqualTo("password");
+        assertThat(testUser.getAge()).isEqualTo(26);
+    }
+
+    @DisplayName("DataParser로 파싱 가능한 파라미터인 경우, 해당 데이터를 반환")
+    @Test
+    void test_resolveBasic() throws Exception {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        String userId = "crystal";
+        request.addParameter("userId", userId);
+
+        MethodParameter methodParameter = new MethodParameter("userId", String.class);
+
+        DataTypeMethodArgumentResolver resolver = new DataTypeMethodArgumentResolver();
+        // when // then
+        boolean supports = resolver.supports(methodParameter);
+        assertThat(supports).isTrue();
+
+        Object arg = resolver.resolveArgument(methodParameter, request);
+        assertThat(arg).isInstanceOf(String.class);
+
+        assertThat((String) arg).isEqualTo("crystal");
     }
 }

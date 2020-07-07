@@ -12,7 +12,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class MethodParametersTest {
 
-    @DisplayName("TestUserController의 create_string 메소드 파라미터 추출")
+    @DisplayName("TestUserController의 create_string 메소드 파라미터 정보 추출")
     @Test
     void test_extractMethodParameters_stringType() {
         Class<TestUserController> clazz = TestUserController.class;
@@ -25,7 +25,7 @@ class MethodParametersTest {
                 .containsExactlyInAnyOrder(Tuple.tuple("userId", String.class), Tuple.tuple("password", String.class));
     }
 
-    @DisplayName("TestUserController의 create_int_long 메소드 파라미터 추출")
+    @DisplayName("TestUserController의 create_int_long 메소드 파라미터 정보 추출")
     @Test
     void test_extractMethodParameters_primitiveType() {
         Class<TestUserController> clazz = TestUserController.class;
@@ -38,7 +38,7 @@ class MethodParametersTest {
                 .containsExactlyInAnyOrder(Tuple.tuple("id", long.class), Tuple.tuple("age", int.class));
     }
 
-    @DisplayName("TestUserController의 create_javabean 메소드 파라미터 추출")
+    @DisplayName("TestUserController의 create_javabean 메소드 파라미터 정보 추출")
     @Test
     void test_extractMethodParameters_javaBeanType() {
         Class<TestUserController> clazz = TestUserController.class;
@@ -49,6 +49,19 @@ class MethodParametersTest {
         assertThat(methodParameters.getParameters())
                 .extracting("getName", "getType")
                 .containsExactlyInAnyOrder(Tuple.tuple("testUser", TestUser.class));
+    }
+
+    @DisplayName("TestUserController의 show_pathvariable 메소드 파라미터 정보 추출")
+    @Test
+    void test_extractMethodParameters_pathVariable() {
+        Class<TestUserController> clazz = TestUserController.class;
+        Method method = getMethod("show_pathvariable", clazz.getDeclaredMethods());
+
+        MethodParameters methodParameters = MethodParameters.from(method);
+
+        assertThat(methodParameters.getParameters())
+                .extracting("getName", "getType")
+                .containsExactlyInAnyOrder(Tuple.tuple("id", long.class));
     }
 
     private Method getMethod(String methodName, Method[] declaredMethods) {
