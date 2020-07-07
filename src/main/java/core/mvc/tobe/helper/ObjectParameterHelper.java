@@ -30,6 +30,20 @@ public class ObjectParameterHelper implements HandlerMethodHelper {
         List<Class<?>> argumentTypes = new ArrayList<>();
         List<Object> values = new ArrayList<>();
 
+        findRequestParameter(request, fields, argumentTypes, values);
+
+        Class[] classes = getConstructClasses(argumentTypes);
+
+        return executeConstructor(parameterInfo, values, classes);
+    }
+
+    private Class[] getConstructClasses(List<Class<?>> argumentTypes) {
+        Class[] classes = new Class[0];
+        classes = argumentTypes.toArray(classes);
+        return classes;
+    }
+
+    private void findRequestParameter(HttpServletRequest request, Field[] fields, List<Class<?>> argumentTypes, List<Object> values) {
         for (Field field : fields) {
             String parameterValue = request.getParameter(field.getName());
 
@@ -39,19 +53,18 @@ public class ObjectParameterHelper implements HandlerMethodHelper {
             argumentTypes.add(field.getType());
             values.add(PrimitiveTypeUtil.getValue(field.getType(), parameterValue));
         }
+    }
 
-        Class[] classes = new Class[argumentTypes.size()];
-        classes = argumentTypes.toArray(classes);
-
-        Constructor constructor = null;
+    private Object executeConstructor(ParameterInfo parameterInfo, List<Object> values, Class[] classes) {
         try {
-            constructor = parameterInfo.getType().getConstructor(classes);
+            Constructor constructor = parameterInfo.getType().getConstructor(classes);
             return constructor.newInstance(values.toArray());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.error("Paramter Bind Exception Constructor Invoke : {}", e);
+            throw new IllegalArgumentException("bind Constructor Invoke error!");
         } catch (NoSuchMethodException e) {
             logger.error("Parameter Bind Exception Not Found Constructor : {}", e);
+            throw new IllegalArgumentException("Parameter Bind Exception Not Found Constructor");
         }
-        return null;
     }
 }

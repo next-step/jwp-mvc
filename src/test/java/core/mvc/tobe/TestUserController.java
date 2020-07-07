@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_string(String userId, String password) {
         logger.debug("userId: {}, password: {}", userId, password);
         ModelAndView mav = new ModelAndView();
         mav.addObject("userId", userId);
         mav.addObject("password", password);
         return mav;
-    }
+    }*/
 /*
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ModelAndView testNoArgMethod() {
@@ -36,13 +36,13 @@ public class TestUserController {
         return mav;
     }*/
 
-  /*  @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_javabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
         mav.addObject("testUser", testUser);
         return mav;
-    }*/
+    }
 
 
 /*    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
