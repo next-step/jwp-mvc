@@ -6,11 +6,16 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
+import java.util.Date;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Stream.of;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.in;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -49,7 +54,7 @@ public class ReflectionTest {
 
     @Test
     @SuppressWarnings("rawtypes")
-    public void constructor() throws Exception {
+    public void constructor() {
         Class<Question> clazz = Question.class;
         Constructor[] constructors = clazz.getConstructors();
         for (Constructor constructor : constructors) {
@@ -86,5 +91,32 @@ public class ReflectionTest {
         logger.debug(student.toString());
         assertThat(student.getName()).isEqualTo("정원");
         assertThat(student.getAge()).isEqualTo(10);
+    }
+
+    @Test
+    public void questionConstruct() {
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+        Constructor<?> constructor = of(declaredConstructors)
+                .max(comparing(Constructor::getParameterCount))
+                .orElseThrow(IllegalArgumentException::new);
+
+        final long questionId = 1L;
+        final String writer = "정원";
+        final String title = "제목";
+        final String contents = "컨첸츠";
+        final Date date = new Date();
+        final int countOfComment = 3;
+
+        Object[] parameters = new Object[]{questionId, writer, title, contents, date, countOfComment};
+
+        try {
+            Question question = (Question) constructor.newInstance(parameters);
+            assertThat(question).isEqualTo(new Question(questionId, writer, title, contents, date, countOfComment));
+
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 }
