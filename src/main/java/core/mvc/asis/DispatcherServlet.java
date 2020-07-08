@@ -37,12 +37,12 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ModelAndView modelAndView = new ModelAndView();
+        ModelAndView modelAndView;
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
         Object executor = ControllerExecutor.findExecutor(requestMappings, req);
 
         try {
-            HandlerAdapters.executeHandler(req, resp, executor);
+            modelAndView = HandlerAdapters.executeHandler(req, resp, executor);
             this.viewRender(modelAndView, req, resp);
         } catch (Exception e) {
             throw new ServletException("Displatcher servlet throw Exception", e);
