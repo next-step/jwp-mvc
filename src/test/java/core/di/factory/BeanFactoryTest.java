@@ -4,16 +4,12 @@ import com.google.common.collect.Sets;
 import core.annotation.Repository;
 import core.annotation.Service;
 import core.annotation.web.Controller;
-import core.di.factory.example.MyQnaService;
-import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BeanFactoryTest {
     private Reflections reflections;
@@ -30,14 +26,29 @@ public class BeanFactoryTest {
 
     @Test
     public void di() throws Exception {
-        QnaController qnaController = beanFactory.getBean(QnaController.class);
+        reflections = new Reflections("core.di.factory.example");
 
-        assertNotNull(qnaController);
-        assertNotNull(qnaController.getQnaService());
+        Set<Class<?>> clazzWithController = reflections.getTypesAnnotatedWith(Controller.class);
 
-        MyQnaService qnaService = qnaController.getQnaService();
-        assertNotNull(qnaService.getUserRepository());
-        assertNotNull(qnaService.getQuestionRepository());
+        System.out.println("@Controller 가 붙은 클래스");
+        clazzWithController.forEach(clazz -> System.out.println(clazz.getSimpleName()));
+
+        System.out.println("@Service 가 붙은 클래스");
+        Set<Class<?>> clazzWithService = reflections.getTypesAnnotatedWith(Service.class);
+        clazzWithService.forEach(clazz -> System.out.println(clazz.getSimpleName()));
+
+        System.out.println("@Repository 가 붙은 클래스");
+        Set<Class<?>> clazzWithRepository = reflections.getTypesAnnotatedWith(Repository.class);
+        clazzWithRepository.forEach(clazz -> System.out.println(clazz.getSimpleName()));
+
+//        QnaController qnaController = beanFactory.getBean(QnaController.class);
+//
+//        assertNotNull(qnaController);
+//        assertNotNull(qnaController.getQnaService());
+//
+//        MyQnaService qnaService = qnaController.getQnaService();
+//        assertNotNull(qnaService.getUserRepository());
+//        assertNotNull(qnaService.getQuestionRepository());
     }
 
     @SuppressWarnings("unchecked")
