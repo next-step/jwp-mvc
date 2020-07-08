@@ -5,10 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Stream.of;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -57,5 +59,32 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() {
+        Student student = new Student();
+        Field[] declaredFields = student.getClass().getDeclaredFields();
+        Stream.of(declaredFields).filter(field -> !field.isAccessible())
+                .map(field -> {
+                    field.setAccessible(true);
+                    return field;
+                })
+                .forEach(field -> {
+                    try {
+                        if (field.getName().equals("name")) {
+                            field.set(student, "정원");
+                        }
+                        if (field.getName().equals("age")) {
+                            field.set(student, 10);
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        logger.debug(student.toString());
+        assertThat(student.getName()).isEqualTo("정원");
+        assertThat(student.getAge()).isEqualTo(10);
     }
 }
