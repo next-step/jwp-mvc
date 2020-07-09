@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.stream.Stream;
 
@@ -15,7 +15,6 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Stream.of;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.in;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -25,31 +24,38 @@ public class ReflectionTest {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
         Stream.of(clazz.getDeclaredFields())
-                .map(field -> "[Field] Modifiers: " + field.getModifiers()
-                        + ", Name: " + field.getName())
+                .map(this::getInfoFrom)
                 .forEach(logger::info);
 
         Stream.of(clazz.getDeclaredMethods())
-                .map(method -> {
-                    String parameterTypes = of(method.getParameterTypes())
-                            .map(Class::getTypeName)
-                            .collect(joining(","));
-                    return "[Method] Modifiers: " + method.getModifiers()
-                            + ", Name: " + method.getName()
-                            + ", ParameterType: " + parameterTypes;
-                }).forEach(logger::info);
-
+                .map(this::getInfoFrom)
+                .forEach(logger::info);
 
         Stream.of(clazz.getDeclaredConstructors())
-                .map(constructor -> {
-                    String parameterTypes = of(constructor.getParameterTypes())
-                            .map(Class::getTypeName)
-                            .collect(joining(","));
+                .map(this::getInfoFrom)
+                .forEach(logger::info);
+    }
 
-                    return "[Constructor] Modifiers: " + constructor.getModifiers()
-                            + ", Name: " + constructor.getName()
-                            + ", ParameterType: " + parameterTypes;
-                }).forEach(logger::info);
+    private String getInfoFrom(final Field field) {
+        return "[Field] Modifiers: " + field.getModifiers() + ", Name: " + field.getName();
+    }
+
+    private String getInfoFrom(final Method method) {
+        String parameterTypes = of(method.getParameterTypes())
+                .map(Class::getTypeName)
+                .collect(joining(","));
+        return "[Method] Modifiers: " + method.getModifiers()
+                + ", Name: " + method.getName()
+                + ", ParameterType: " + parameterTypes;
+    }
+
+    private String getInfoFrom(final Constructor constructor) {
+        String parameterTypes = of(constructor.getParameterTypes())
+                .map(Class::getTypeName)
+                .collect(joining(","));
+        return "[Constructor] Modifiers: " + constructor.getModifiers()
+                + ", Name: " + constructor.getName()
+                + ", ParameterType: " + parameterTypes;
     }
 
     @Test
@@ -70,27 +76,36 @@ public class ReflectionTest {
     public void privateFieldAccess() {
         Student student = new Student();
         Field[] declaredFields = student.getClass().getDeclaredFields();
-        Stream.of(declaredFields).filter(field -> !field.isAccessible())
-                .map(field -> {
-                    field.setAccessible(true);
-                    return field;
-                })
-                .forEach(field -> {
-                    try {
-                        if (field.getName().equals("name")) {
-                            field.set(student, "정원");
-                        }
-                        if (field.getName().equals("age")) {
-                            field.set(student, 10);
-                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                });
+        Stream.of(declaredFields)
+                .filter(field -> !field.isAccessible())
+                .map(this::setFieldAccessible)
+                .forEach(field -> setFieldValue(student, field));
 
         logger.debug(student.toString());
         assertThat(student.getName()).isEqualTo("정원");
         assertThat(student.getAge()).isEqualTo(10);
+    }
+
+    private void setFieldValue(final Student student, final Field field) {
+        if (field.getName().equals("name")) {
+            setValue(student, field, "정원");
+        }
+        if (field.getName().equals("age")) {
+            setValue(student, field, 10);
+        }
+    }
+
+    private void setValue(final Student student, final Field field, final Object value) {
+        try {
+            field.set(student, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Field setFieldAccessible(final Field field) {
+        field.setAccessible(true);
+        return field;
     }
 
     @Test
