@@ -40,7 +40,8 @@ public class HandlerExecution {
         HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
         handlerMethodArgumentResolvers.addResolver(new ServletRequestMethodArgumentResolver());
         handlerMethodArgumentResolvers.addResolver(new ServletResponseMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new DataTypeMethodArgumentResolver());
+        handlerMethodArgumentResolvers.addResolver(new SimpleDataTypeMethodArgumentResolver());
+        handlerMethodArgumentResolvers.addResolver(new CommandObjectMethodArgumentResolver());
         handlerMethodArgumentResolvers.addResolver(new PathVariableMethodArgumentResolver(pathPattern));
         return handlerMethodArgumentResolvers;
     }

@@ -2,7 +2,8 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMapping;
 import core.mvc.ModelAndView;
-import core.mvc.tobe.resolver.DataTypeMethodArgumentResolver;
+import core.mvc.tobe.resolver.CommandObjectMethodArgumentResolver;
+import core.mvc.tobe.resolver.SimpleDataTypeMethodArgumentResolver;
 import core.mvc.tobe.resolver.HandlerMethodArgumentResolver;
 import core.mvc.tobe.resolver.PathVariableMethodArgumentResolver;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +74,7 @@ public class HandlerMethodArgumentResolverTest {
 
         MethodParameter methodParameter = new MethodParameter("testUser", TestUser.class);
 
-        HandlerMethodArgumentResolver resolver = new DataTypeMethodArgumentResolver();
+        HandlerMethodArgumentResolver resolver = new CommandObjectMethodArgumentResolver();
         // when // then
         boolean supports = resolver.supports(methodParameter);
         assertThat(supports).isTrue();
@@ -98,7 +99,7 @@ public class HandlerMethodArgumentResolverTest {
 
         MethodParameter methodParameter = new MethodParameter("userId", String.class);
 
-        HandlerMethodArgumentResolver resolver = new DataTypeMethodArgumentResolver();
+        HandlerMethodArgumentResolver resolver = new SimpleDataTypeMethodArgumentResolver();
         // when // then
         boolean supports = resolver.supports(methodParameter);
         assertThat(supports).isTrue();

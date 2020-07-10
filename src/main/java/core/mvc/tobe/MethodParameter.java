@@ -1,5 +1,8 @@
 package core.mvc.tobe;
 
+import core.mvc.utils.DataParser;
+
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
@@ -36,5 +39,9 @@ public class MethodParameter {
 
     public boolean hasAnnotation() {
         return this.annotations.length != 0;
+    }
+
+    public boolean isSimpleDataType() {
+        return DataParser.supports(this.parameterType);
     }
 }

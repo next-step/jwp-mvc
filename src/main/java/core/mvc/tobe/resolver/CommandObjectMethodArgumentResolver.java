@@ -9,21 +9,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 
-public class DataTypeMethodArgumentResolver implements HandlerMethodArgumentResolver {
+public class CommandObjectMethodArgumentResolver implements HandlerMethodArgumentResolver{
     @Override
     public boolean supports(MethodParameter methodParameter) {
-        return !methodParameter.hasAnnotation();
+        return !methodParameter.hasAnnotation() && !methodParameter.isSimpleDataType();
     }
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (DataParser.supports(methodParameter.getType())) {
-            return getArg(methodParameter.getName(), methodParameter.getType(), req);
-        }
-        return resolveCommandObject(methodParameter, req);
-    }
-
-    private Object resolveCommandObject(MethodParameter methodParameter, HttpServletRequest req) throws Exception {
         try {
             Object newInstance = methodParameter.getType().newInstance();
             setProperty(newInstance, req);
