@@ -37,10 +37,7 @@ public class HandlerKey {
         if (requestMethod != other.requestMethod)
             return false;
         if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+            return other.url == null;
+        } else return url.equals(other.url);
     }
 }

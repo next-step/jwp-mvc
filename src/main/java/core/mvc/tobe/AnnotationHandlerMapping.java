@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.HandlerMapping;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -26,9 +27,8 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage, TypeAnnotationsScanner.class);
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-
+        final Reflections reflections = new Reflections(basePackage, TypeAnnotationsScanner.class);
+        final Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         controllers.stream()
                 .forEach(this::initMapping);
     }
@@ -47,9 +47,9 @@ public class AnnotationHandlerMapping {
         handlerExecutions.put(key, new AnnotationControllerExecution(controller, method));
     }
 
+    @Override
     public HandlerExecution getHandler(final HttpServletRequest request) {
-        HandlerKey handlerKey = new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod()));
+        final HandlerKey handlerKey = new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod()));
         return handlerExecutions.get(handlerKey);
     }
-
 }
