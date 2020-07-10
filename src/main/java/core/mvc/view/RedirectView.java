@@ -13,6 +13,7 @@ public class RedirectView implements View {
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        System.out.println(viewName);
         response.sendRedirect(viewName);
     }
 }

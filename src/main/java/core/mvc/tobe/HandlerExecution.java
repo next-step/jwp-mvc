@@ -54,7 +54,7 @@ public class HandlerExecution {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ReflectionsException("unable to invoke method.", e);
         } catch (Exception e) {
-            throw new ReflectionsException("cannot resolve method parameter.", e);
+            throw new ReflectionsException(e);
         }
     }
 }
