@@ -25,18 +25,6 @@ public class TestUser {
         return age;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
     @Override
     public String toString() {
         return "TestUser{" +
