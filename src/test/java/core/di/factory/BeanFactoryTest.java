@@ -25,7 +25,7 @@ public class BeanFactoryTest {
     }
 
     @Test
-    public void di() throws Exception {
+    public void di() {
         reflections = new Reflections("core.di.factory.example");
 
         Set<Class<?>> clazzWithController = reflections.getTypesAnnotatedWith(Controller.class);
@@ -40,15 +40,6 @@ public class BeanFactoryTest {
         System.out.println("@Repository 가 붙은 클래스");
         Set<Class<?>> clazzWithRepository = reflections.getTypesAnnotatedWith(Repository.class);
         clazzWithRepository.forEach(clazz -> System.out.println(clazz.getSimpleName()));
-
-//        QnaController qnaController = beanFactory.getBean(QnaController.class);
-//
-//        assertNotNull(qnaController);
-//        assertNotNull(qnaController.getQnaService());
-//
-//        MyQnaService qnaService = qnaController.getQnaService();
-//        assertNotNull(qnaService.getUserRepository());
-//        assertNotNull(qnaService.getQuestionRepository());
     }
 
     @SuppressWarnings("unchecked")
