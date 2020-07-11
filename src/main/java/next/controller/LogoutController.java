@@ -1,6 +1,6 @@
 package next.controller;
 
-import core.mvc.asis.Controller;
+import core.mvc.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private Map<HandlerKey, AnnotationController> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -44,11 +44,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void getMethodConsumer(final Class<?> controller, Method method) {
         RequestMapping declaredAnnotation = method.getDeclaredAnnotation(RequestMapping.class);
         final HandlerKey key = new HandlerKey(declaredAnnotation.value(), declaredAnnotation.method());
-        handlerExecutions.put(key, new AnnotationControllerExecution(controller, method));
+        handlerExecutions.put(key, new AnnotationController(controller, method));
     }
 
     @Override
-    public HandlerExecution getHandler(final HttpServletRequest request) {
+    public core.mvc.Controller getHandler(final HttpServletRequest request) {
         final HandlerKey handlerKey = new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod()));
         return handlerExecutions.get(handlerKey);
     }

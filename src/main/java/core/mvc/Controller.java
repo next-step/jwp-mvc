@@ -1,4 +1,4 @@
-package core.mvc.asis;
+package core.mvc;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -10,6 +10,13 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PathPatternTest {
+    private static PathContainer toPathContainer(String path) {
+        if (path == null) {
+            return null;
+        }
+        return PathContainer.parsePath(path);
+    }
+
     @Test
     void match() {
         PathPattern pp = parse("/users/{id}");
@@ -33,12 +40,5 @@ public class PathPatternTest {
         PathPatternParser pp = new PathPatternParser();
         pp.setMatchOptionalTrailingSeparator(true);
         return pp.parse(path);
-    }
-
-    private static PathContainer toPathContainer(String path) {
-        if (path == null) {
-            return null;
-        }
-        return PathContainer.parsePath(path);
     }
 }

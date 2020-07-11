@@ -1,9 +1,8 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerMapping;
-import core.mvc.ModelAndView;
+import core.mvc.Controller;
+import core.mvc.HandlerMappings;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -22,7 +20,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private List<HandlerMapping> handlerMappings;
+    private HandlerMappings handlerMappings;
 
     @Override
     public void init() {
@@ -37,22 +35,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        Object handler = getHandler(req);
-        if (handler instanceof Controller) {
-            executeController(req, resp, (Controller) handler);
-        } else if (handler instanceof HandlerExecution) {
-            executeHandler(req, resp, (HandlerExecution) handler);
-        }
-    }
-
-    private void executeHandler(final HttpServletRequest req, final HttpServletResponse resp, final HandlerExecution handler) throws ServletException {
-        try {
-            ModelAndView mav = handler.handle(req, resp);
-            move(mav.getView().toString(), req, resp);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
+        Controller handler = getHandler(req);
+        executeController(req, resp, handler);
     }
 
     private void executeController(final HttpServletRequest req, final HttpServletResponse resp, final Controller handler) throws ServletException {
@@ -65,13 +49,9 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Object getHandler(final HttpServletRequest req) {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
-        return handlerMappings.stream()
-                .map(handlerMapping -> handlerMapping.getHandler(req))
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
+    private Controller getHandler(final HttpServletRequest req) {
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
+        return handlerMappings.get(req);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)

@@ -43,7 +43,8 @@ public class Junit4TestRunner {
                 } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
                     e.printStackTrace();
                 }
-            };
+            }
+            ;
         });
     }
 }

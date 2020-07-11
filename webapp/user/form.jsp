@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="kr">
@@ -30,7 +30,7 @@
                     <input type="email" class="form-control" id="email" name="email" placeholder="Email">
                 </div>
                 <button type="submit" class="btn btn-success clearfix pull-right">회원가입</button>
-                <div class="clearfix" />
+                <div class="clearfix"/>
             </form>
         </div>
     </div>
