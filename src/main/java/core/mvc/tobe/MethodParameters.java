@@ -14,9 +14,9 @@ public class MethodParameters {
 
     private final List<MethodParameter> parameters;
 
-    private MethodParameters(String[] parameterNames, Parameter[] parameters) {
+    private MethodParameters(Method method, String[] parameterNames, Parameter[] parameters) {
         this.parameters = IntStream.range(0, parameters.length)
-                .mapToObj(i -> new MethodParameter(parameterNames[i], parameters[i].getType(), parameters[i].getAnnotations()))
+                .mapToObj(i -> new MethodParameter(method, parameterNames[i], parameters[i].getType(), parameters[i].getAnnotations()))
                 .collect(Collectors.toList());
     }
 
@@ -24,7 +24,7 @@ public class MethodParameters {
         ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
         String[] parameterNames = parameterNameDiscoverer.getParameterNames(method);
         Parameter[] parameters = method.getParameters();
-        return new MethodParameters(parameterNames, parameters);
+        return new MethodParameters(method, parameterNames, parameters);
     }
 
     public List<MethodParameter> getParameters() {
