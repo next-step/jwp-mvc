@@ -5,9 +5,11 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.exception.ReflectionsException;
+import core.mvc.tobe.resolver.*;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
+import org.springframework.web.util.pattern.PathPattern;
 
 
 import java.lang.reflect.Method;
@@ -23,6 +25,7 @@ public class ControllerScanner {
 
     private final Reflections reflections;
     private final Map<Class<?>, Object> controllers = Maps.newHashMap();
+    private final HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = HandlerMethodArgumentResolvers.getDefaultHandlerMethodArgumentResolvers();
 
     public ControllerScanner(Object... basePackage) {
         this.reflections = new Reflections(basePackage);
@@ -69,6 +72,10 @@ public class ControllerScanner {
     }
 
     private HandlerExecution createHandlerExecution(Method method) {
-        return new HandlerExecution(method, this.controllers.get(method.getDeclaringClass()));
+        return new HandlerExecution(method, this.controllers.get(method.getDeclaringClass()), handlerMethodArgumentResolvers);
+    }
+
+    public int size() {
+        return this.controllers.size();
     }
 }

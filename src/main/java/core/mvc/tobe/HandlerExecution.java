@@ -25,16 +25,6 @@ public class HandlerExecution {
         this.handlerMethodArgumentResolvers = handlerMethodArgumentResolvers;
     }
 
-    private HandlerMethodArgumentResolvers getDefaultHandlerMethodArgumentResolvers(PathPattern pathPattern) {
-        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
-        handlerMethodArgumentResolvers.addResolver(new ServletRequestMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new ServletResponseMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new SimpleDataTypeMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new CommandObjectMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new PathVariableMethodArgumentResolver(pathPattern));
-        return handlerMethodArgumentResolvers;
-    }
-
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws ReflectionsException {
         try {
             MethodParameters methodParameters = MethodParameters.from(method);

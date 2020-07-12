@@ -1,11 +1,10 @@
 package core.mvc.tobe;
 
-import core.annotation.web.RequestMapping;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.resolver.CommandObjectMethodArgumentResolver;
-import core.mvc.tobe.resolver.SimpleDataTypeMethodArgumentResolver;
 import core.mvc.tobe.resolver.HandlerMethodArgumentResolver;
 import core.mvc.tobe.resolver.PathVariableMethodArgumentResolver;
+import core.mvc.tobe.resolver.SimpleDataTypeMethodArgumentResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -14,8 +13,6 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 
 
 import java.lang.reflect.Method;
@@ -123,12 +120,7 @@ public class HandlerMethodArgumentResolverTest {
         MethodParameters methodParameters = MethodParameters.from(method);
         MethodParameter methodParameter = methodParameters.getParameters().get(0);
 
-        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        final PathPatternParser ppp = new PathPatternParser();
-        ppp.setMatchOptionalTrailingSeparator(true);
-        PathPattern pp = ppp.parse(annotation.value());
-
-        HandlerMethodArgumentResolver resolver = new PathVariableMethodArgumentResolver(pp);
+        HandlerMethodArgumentResolver resolver = new PathVariableMethodArgumentResolver();
         // when
         long id = (long) resolver.resolveArgument(methodParameter, request, response);
         // then
