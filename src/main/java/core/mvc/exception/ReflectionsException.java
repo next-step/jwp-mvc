@@ -7,4 +7,8 @@ public class ReflectionsException extends ServletException {
     public ReflectionsException(String message, Throwable rootCause) {
         super(message, rootCause);
     }
+
+    public ReflectionsException(Throwable rootCause) {
+        super(rootCause);
+    }
 }

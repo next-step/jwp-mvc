@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
+import core.mvc.exception.ReflectionsException;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,12 @@ public class AnnotationHandlerMappingTest {
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
+        try {
+            handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+            handlerMapping.initialize();
+        } catch (ReflectionsException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

@@ -1,7 +1,9 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerAdapter;
 import core.mvc.ModelAndView;
 import core.mvc.exception.DefaultExceptionResolver;
+import core.mvc.tobe.AnnotationHandlerAdapter;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.view.View;
 import org.slf4j.Logger;
@@ -23,10 +25,12 @@ public class DispatcherServlet extends HttpServlet {
     public static final String CONTROLLER_PACKAGE = "next.controller";
 
     private HandlerMappings handlerMappings;
+    private HandlerAdapters handlerAdapters;
 
     @Override
     public void init() throws ServletException {
         handlerMappings = new HandlerMappings(new RequestMapping(), new AnnotationHandlerMapping(CONTROLLER_PACKAGE));
+        handlerAdapters = new HandlerAdapters(new ControllerHandlerAdapter(), new AnnotationHandlerAdapter());
     }
 
     @Override
@@ -47,8 +51,8 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void handle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-        HandlerAdapter handlerAdapter = HandlerAdapter.of(handler);
-        ModelAndView mav = handlerAdapter.handle(handler, req, resp);
+        HandlerAdapter handlerAdapter = handlerAdapters.getHandlerAdapter(handler);
+        ModelAndView mav = handlerAdapter.handle(req, resp, handler);
         render(mav, req, resp);
     }
 

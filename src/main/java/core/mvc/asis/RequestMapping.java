@@ -1,7 +1,6 @@
 package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class RequestMapping implements HandlerMapping {
         mappings.put("/users/login", new LoginController());
         mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
-        mappings.put("/users/create", new CreateUserController());
+//        mappings.put("/users/create", new CreateUserController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
 
