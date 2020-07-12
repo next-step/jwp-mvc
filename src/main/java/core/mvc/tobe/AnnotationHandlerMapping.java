@@ -31,26 +31,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() throws ReflectionsException {
-        Set<Class<?>> controllerClasses = this.controllerScanner.scan();
-
-        for (Class<?> clazz : controllerClasses) {
-            Set<Method> methods = this.controllerScanner.getMethodsWithRequestMapping(clazz);
-            methods.forEach(method -> {
-                Object controller = this.controllerScanner.get(clazz);
-                registerHandlerExecution(method, controller);
-            });
-        }
-    }
-
-    private void registerHandlerExecution(Method method, Object controller) {
-        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-        String path = annotation.value();
-        RequestMethod httpMethod = annotation.method();
-        HandlerKey handlerKey = new HandlerKey(path, httpMethod);
-
-        handlerExecutions.put(handlerKey, new HandlerExecution(method, controller));
-
-        logger.info("@ Path: {}, Controller: {}", path, controller.getClass());
+        this.handlerExecutions.putAll(this.controllerScanner.scan());
     }
 
     @Override
