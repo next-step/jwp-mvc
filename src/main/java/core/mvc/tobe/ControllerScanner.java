@@ -3,13 +3,18 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.mvc.exception.ReflectionsException;
+import core.mvc.tobe.resolver.*;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
+import org.springframework.web.util.pattern.PathPattern;
 
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,18 +25,20 @@ public class ControllerScanner {
 
     private final Reflections reflections;
     private final Map<Class<?>, Object> controllers = Maps.newHashMap();
+    private final HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = HandlerMethodArgumentResolvers.getDefaultHandlerMethodArgumentResolvers();
 
     public ControllerScanner(Object... basePackage) {
         this.reflections = new Reflections(basePackage);
     }
 
-    public Set<Class<?>> scan() throws ReflectionsException {
+    public Map<HandlerKey, HandlerExecution> scan() throws ReflectionsException {
         Set<Class<?>> controllerClasses = this.reflections.getTypesAnnotatedWith(Controller.class);
-        save(controllerClasses);
-        return controllerClasses;
+        register(controllerClasses);
+
+        return getHandlers();
     }
 
-    private void save(Set<Class<?>> controllerClasses) throws ReflectionsException {
+    private void register(Set<Class<?>> controllerClasses) throws ReflectionsException {
         for (Class<?> clazz : controllerClasses) {
             try {
                 controllers.put(clazz, clazz.newInstance());
@@ -41,11 +48,34 @@ public class ControllerScanner {
         }
     }
 
-    public Set<Method> getMethodsWithRequestMapping(Class<?> clazz) {
-        return ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
+    private Map<HandlerKey, HandlerExecution> getHandlers() {
+        Map<HandlerKey, HandlerExecution> handlers = new HashMap<>();
+        for (Method method : getAllMethod()) {
+            handlers.put(createHandlerKey(method), createHandlerExecution(method));
+        }
+        return handlers;
     }
 
-    public Object get(Class<?> declaringClass) {
-        return controllers.get(declaringClass);
+    private Set<Method> getAllMethod() {
+        Set<Method> methodsWithRequestMapping = new HashSet<>();
+        for (Class<?> controllerClass : this.controllers.keySet()) {
+            methodsWithRequestMapping.addAll(ReflectionUtils.getAllMethods(controllerClass, ReflectionUtils.withAnnotation(RequestMapping.class)));
+        }
+        return methodsWithRequestMapping;
+    }
+
+    private HandlerKey createHandlerKey(Method method) {
+        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+        String path = annotation.value();
+        RequestMethod httpMethod = annotation.method();
+        return new HandlerKey(path, httpMethod);
+    }
+
+    private HandlerExecution createHandlerExecution(Method method) {
+        return new HandlerExecution(method, this.controllers.get(method.getDeclaringClass()), handlerMethodArgumentResolvers);
+    }
+
+    public int size() {
+        return this.controllers.size();
     }
 }

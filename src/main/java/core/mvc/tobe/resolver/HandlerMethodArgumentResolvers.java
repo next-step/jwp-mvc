@@ -14,6 +14,18 @@ public class HandlerMethodArgumentResolvers {
 
     private final List<HandlerMethodArgumentResolver> resolvers = Lists.newArrayList();
 
+    private HandlerMethodArgumentResolvers() { }
+
+    public static HandlerMethodArgumentResolvers getDefaultHandlerMethodArgumentResolvers() {
+        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
+        handlerMethodArgumentResolvers.addResolver(new ServletRequestMethodArgumentResolver());
+        handlerMethodArgumentResolvers.addResolver(new ServletResponseMethodArgumentResolver());
+        handlerMethodArgumentResolvers.addResolver(new SimpleDataTypeMethodArgumentResolver());
+        handlerMethodArgumentResolvers.addResolver(new CommandObjectMethodArgumentResolver());
+        handlerMethodArgumentResolvers.addResolver(new PathVariableMethodArgumentResolver());
+        return handlerMethodArgumentResolvers;
+    }
+
     public void addResolver(HandlerMethodArgumentResolver resolver) {
         this.resolvers.add(resolver);
     }

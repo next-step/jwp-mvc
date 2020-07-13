@@ -19,31 +19,10 @@ public class HandlerExecution {
     private final Object controller;
     private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers;
 
-    public HandlerExecution(Method method, Object controller) {
+    public HandlerExecution(Method method, Object controller, HandlerMethodArgumentResolvers handlerMethodArgumentResolvers) {
         this.method = method;
         this.controller = controller;
-        initializeHandlerMethodArgumentResolvers();
-    }
-
-    private void initializeHandlerMethodArgumentResolvers() {
-        this.handlerMethodArgumentResolvers = getDefaultHandlerMethodArgumentResolvers(getPathPattern());
-    }
-
-    public PathPattern getPathPattern() {
-        RequestMapping annotation = this.method.getAnnotation(RequestMapping.class);
-        PathPatternParser ppp = new PathPatternParser();
-        ppp.setMatchOptionalTrailingSeparator(true);
-        return ppp.parse(annotation.value());
-    }
-
-    private HandlerMethodArgumentResolvers getDefaultHandlerMethodArgumentResolvers(PathPattern pathPattern) {
-        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
-        handlerMethodArgumentResolvers.addResolver(new ServletRequestMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new ServletResponseMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new SimpleDataTypeMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new CommandObjectMethodArgumentResolver());
-        handlerMethodArgumentResolvers.addResolver(new PathVariableMethodArgumentResolver(pathPattern));
-        return handlerMethodArgumentResolvers;
+        this.handlerMethodArgumentResolvers = handlerMethodArgumentResolvers;
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws ReflectionsException {
