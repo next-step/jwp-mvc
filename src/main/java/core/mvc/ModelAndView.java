@@ -1,5 +1,7 @@
 package core.mvc;
 
+import org.springframework.web.method.support.ModelAndViewContainer;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,5 +32,9 @@ public class ModelAndView {
 
     public View getView() {
         return view;
+    }
+
+    public String getViewName() {
+        return view instanceof DefaultView ? ((DefaultView) view).getViewName() : "/";
     }
 }

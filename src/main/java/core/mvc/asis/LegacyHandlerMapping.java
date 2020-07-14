@@ -14,7 +14,8 @@ public class LegacyHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
-    public void initMapping() {
+    @Override
+    public void initialize() {
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
@@ -27,13 +28,13 @@ public class LegacyHandlerMapping implements HandlerMapping {
         mappings.put("/users/update", new UpdateUserController());
 
         logger.info("Initialized Request Mapping!");
-        mappings.keySet().forEach(path -> {
-            logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
-        });
+        mappings.keySet().forEach(path ->
+                logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass()));
     }
 
     @Override
     public Controller getHandler(HttpServletRequest request) {
+        logger.debug("handlerMapping getHandler - requestUri: {}", request.getRequestURI());
         return mappings.get(request.getRequestURI());
     }
 

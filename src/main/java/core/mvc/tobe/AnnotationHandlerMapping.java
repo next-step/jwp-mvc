@@ -6,7 +6,8 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
 import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -18,6 +19,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -26,11 +28,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
-        final Reflections reflections = new Reflections(basePackage, TypeAnnotationsScanner.class);
-        final Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-        controllers.stream()
-                .forEach(this::initMapping);
+        Reflections reflections = new Reflections(basePackage);
+        Set<Class<?>> typesAnnotatedWith = reflections.getTypesAnnotatedWith(Controller.class);
+
+        for (final Class<?> controllerClazz : typesAnnotatedWith) {
+            initMapping(controllerClazz);
+        }
     }
 
     private void initMapping(Class<?> controller) {
@@ -49,6 +54,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public HandlerExecution getHandler(final HttpServletRequest request) {
+        logger.debug("handlerExecution getHandler - request: {}", request);
         final HandlerKey handlerKey = new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod()));
         return handlerExecutions.get(handlerKey);
     }
