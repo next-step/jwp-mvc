@@ -6,12 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class AnnotationControllerExecution implements HandlerExecution {
+public class AnnotationHandlerExecution implements HandlerExecution {
 
     private final Class clazz;
     private final Method method;
 
-    AnnotationControllerExecution(final Class clazz, final Method method) {
+    AnnotationHandlerExecution(final Class clazz, final Method method) {
         this.clazz = clazz;
         this.method = method;
     }

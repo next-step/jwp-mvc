@@ -44,7 +44,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void getMethodConsumer(final Class<?> controller, Method method) {
         RequestMapping declaredAnnotation = method.getDeclaredAnnotation(RequestMapping.class);
         final HandlerKey key = new HandlerKey(declaredAnnotation.value(), declaredAnnotation.method());
-        handlerExecutions.put(key, new AnnotationControllerExecution(controller, method));
+        handlerExecutions.put(key, new AnnotationHandlerExecution(controller, method));
     }
 
     @Override

@@ -1,7 +1,7 @@
-package core.mvc.asis;
+package core.mvc;
 
-import core.mvc.HandlerMapping;
-import core.mvc.ModelAndView;
+import core.mvc.asis.Controller;
+import core.mvc.asis.LegacyHandlerMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
@@ -22,7 +23,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private List<HandlerMapping> handlerMappings;
+    private List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() {
@@ -37,6 +38,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        String requestUri = req.getRequestURI();
         Object handler = getHandler(req);
         if (handler instanceof Controller) {
             executeController(req, resp, (Controller) handler);
