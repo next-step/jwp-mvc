@@ -38,7 +38,7 @@ dependencies {
     implementation 'cglib:cglib:3.3.0'
 
     // etc
-    implementation 'org.reflections:reflections:0.9.12'
+    implementation 'org.reflections:reflections:0.9.11'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
     implementation 'com.github.jknack:handlebars:4.2.0'

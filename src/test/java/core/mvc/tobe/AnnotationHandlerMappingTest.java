@@ -1,7 +1,6 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
-import core.mvc.Controller;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,8 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        Controller execution = handlerMapping.getHandler(request);
-        execution.execute(request, response);
+        HandlerExecution handler = handlerMapping.getHandler(request);
+        handler.handle(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
     }
@@ -41,7 +40,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        Controller execution = handlerMapping.getHandler(request);
-        execution.execute(request, response);
+        HandlerExecution handler = handlerMapping.getHandler(request);
+        handler.handle(request, response);
     }
 }

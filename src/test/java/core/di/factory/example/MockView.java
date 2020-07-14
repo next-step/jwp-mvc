@@ -14,9 +14,4 @@ public class MockView implements View {
 
     }
 
-    @Override
-    public String getName() {
-        return "";
-    }
-
 }

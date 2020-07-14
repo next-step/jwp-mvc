@@ -1,10 +1,12 @@
-package core.mvc.asis;
+package core.mvc;
 
-import core.mvc.Controller;
-import core.mvc.HandlerMappings;
+import core.mvc.asis.ControllerHandlerAdapter;
+import core.mvc.asis.LegacyHandlerMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecutionHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -21,37 +24,33 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private HandlerMappings handlerMappings;
+    private HandlerAdapters handlerAdpaters;
 
     @Override
     public void init() {
-        LegacyHandlerMapping lrm = new LegacyHandlerMapping();
-        lrm.initMapping();
-        handlerMappings.add(lrm);
+        handlerMappings = new HandlerMappings();
+        handlerMappings.add(new LegacyHandlerMapping());
+        handlerMappings.add(new AnnotationHandlerMapping("next.controller"));
 
-        AnnotationHandlerMapping ahm = new AnnotationHandlerMapping("next.controller");
-        ahm.initialize();
-        handlerMappings.add(ahm);
+        handlerAdpaters = new HandlerAdapters(
+                new HandlerExecutionHandlerAdapter(),
+                new ControllerHandlerAdapter());
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        Controller handler = getHandler(req);
-        executeController(req, resp, handler);
-    }
-
-    private void executeController(final HttpServletRequest req, final HttpServletResponse resp, final Controller handler) throws ServletException {
-        try {
-            String viewName = handler.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Optional<?> handler = handlerMappings.getHandler(req);
+        if (!handler.isPresent()) {
+            resp.setStatus(400);
+            return;
         }
-    }
-
-    private Controller getHandler(final HttpServletRequest req) {
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
-        return handlerMappings.get(req);
+        ModelAndView results = null;
+        try {
+            results = handlerAdpaters.execute(req, resp, handler.get());
+        } catch (Exception e) {
+            resp.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        move(results.getViewName(), req, resp);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
