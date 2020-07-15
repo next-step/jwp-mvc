@@ -12,6 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AntMatcherTest {
     private static final Logger logger = LoggerFactory.getLogger(AntMatcherTest.class);
 
+    public static boolean matches(String pattern, String inputStr) {
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+        return antPathMatcher.match(pattern, inputStr);
+    }
+
     @Test
     void match() {
         String fqdn = fullQualifiedName(ArrayList.class);
@@ -27,10 +32,5 @@ public class AntMatcherTest {
 
     private String fullQualifiedName(Class clazz) {
         return clazz.getName();
-    }
-
-    public static boolean matches(String pattern, String inputStr) {
-        AntPathMatcher antPathMatcher = new AntPathMatcher();
-        return antPathMatcher.match(pattern, inputStr);
     }
 }

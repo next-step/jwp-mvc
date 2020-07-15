@@ -1,9 +1,14 @@
 package core.mvc.asis;
 
+import core.mvc.Controller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class ForwardController implements Controller {
+    private static final Logger logger = LoggerFactory.getLogger(ForwardController.class);
     private String forwardUrl;
 
     public ForwardController(String forwardUrl) {
@@ -14,7 +19,8 @@ public class ForwardController implements Controller {
     }
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public String execute(HttpServletRequest req, HttpServletResponse resp) {
+        logger.debug("forward controller execute: forwardUrl: {}", forwardUrl);
         return forwardUrl;
     }
 }

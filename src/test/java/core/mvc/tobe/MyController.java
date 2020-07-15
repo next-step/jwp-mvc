@@ -5,6 +5,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
+import next.controller.UserSessionUtils;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,13 @@ public class MyController {
         logger.debug("Find UserId : {}", userId);
         User user = DataBase.findUserById(userId);
         request.setAttribute("user", user);
-        return null;
+
+        if (!UserSessionUtils.isLogined(request.getSession())) {
+            return new ModelAndView(new DefaultView("redirect:/users/loginForm"));
+        }
+        ModelAndView mav = new ModelAndView(new DefaultView("/user/list.jsp"));
+        mav.addObject("users", DataBase.findAll());
+        return mav;
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
@@ -34,6 +41,7 @@ public class MyController {
                 request.getParameter("email"));
         logger.debug("User : {}", user);
         DataBase.addUser(user);
-        return null;
+
+        return new ModelAndView(new DefaultView("redirect:/"));
     }
 }
