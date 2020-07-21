@@ -23,7 +23,7 @@ public class HandlerKey {
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestMethod);
+        return Objects.hash(url,requestMethod);
     }
 
     @Override
