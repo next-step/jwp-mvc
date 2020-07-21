@@ -1,14 +1,19 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
+import org.springframework.web.util.pattern.PathPattern;
+
+import java.util.Objects;
 
 public class HandlerKey {
     private String url;
     private RequestMethod requestMethod;
+    private PathPattern pathPattern;
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
+        this.pathPattern = PathPatternUtil.getPathPattern(url);
     }
 
     @Override
@@ -18,11 +23,7 @@ public class HandlerKey {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((requestMethod == null) ? 0 : requestMethod.hashCode());
-        result = prime * result + ((url == null) ? 0 : url.hashCode());
-        return result;
+        return Objects.hash(url,requestMethod);
     }
 
     @Override
@@ -39,8 +40,9 @@ public class HandlerKey {
         if (url == null) {
             if (other.url != null)
                 return false;
-        } else if (!url.equals(other.url))
-            return false;
+        } else if(pathPattern.matches(PathPatternUtil.toPathContainer(other.url))){
+            return true;
+        }
         return true;
     }
 }
