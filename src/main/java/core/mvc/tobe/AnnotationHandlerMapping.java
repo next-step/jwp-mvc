@@ -16,7 +16,7 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-
+        handlerExecutions.putAll(ControllerScanner.scan(basePackage));
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
