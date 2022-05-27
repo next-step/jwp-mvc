@@ -1,12 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'idea'
-
-idea {
-    module {
-        inheritOutputDirs = false
-        outputDir file("webapp/WEB-INF/classes")
-    }
-}
 
 group = 'camp.nextstep'
 version = '1.0.0'
