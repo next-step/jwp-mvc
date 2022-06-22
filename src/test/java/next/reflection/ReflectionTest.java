@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +14,13 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("클래스 정보 출력")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
@@ -56,6 +60,7 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("private field에 값 할당")
     @Test
     public void privateFieldAccess() throws Exception {
         Class<Student> clazz = Student.class;
@@ -72,5 +77,19 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo("성준");
         assertThat(student.getAge()).isEqualTo(99);
+    }
+
+    @DisplayName("인자를 가진 생성자의 인스턴스 생성")
+    @Test
+    public void newInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+        Constructor<?> constructors = Arrays.stream(clazz.getConstructors())
+                .filter(it -> it.getParameterCount() == 3)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+
+        Object actual = constructors.newInstance("작성자", "제목", "내용");
+
+        assertNotNull(actual);
     }
 }
