@@ -12,6 +12,8 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -40,7 +42,6 @@ public class ReflectionTest {
                 .collect(Collectors.joining(", "));
     }
 
-
     @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
@@ -53,5 +54,23 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        Student student = clazz.newInstance();
+
+        Field name = clazz.getDeclaredField("name");
+        Field age = clazz.getDeclaredField("age");
+
+        name.setAccessible(true);
+        age.setAccessible(true);
+
+        name.set(student, "성준");
+        age.set(student, 99);
+
+        assertThat(student.getName()).isEqualTo("성준");
+        assertThat(student.getAge()).isEqualTo(99);
     }
 }
