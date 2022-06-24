@@ -1,18 +1,49 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("클래스 정보 출력")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
+
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        Arrays.stream(constructors).forEach(it -> logger.debug("constructor Modifier: {}, name: {}, parameters: ({})", Modifier.toString(it.getModifiers()), it.getName(), getParameters(it.getParameters())));
+
+        Method[] methods = clazz.getDeclaredMethods();
+        Arrays.stream(methods).forEach(it -> logger.debug("method Modifier: {}, name: {}, parameters: ({})", Modifier.toString(it.getModifiers()), it.getName(), getParameters(it.getParameters())));
+
+        Field[] fields = clazz.getDeclaredFields();
+        Arrays.stream(fields).forEach(it -> logger.debug("field Modifier: {}, type: {}, name: {}", Modifier.toString(it.getModifiers()), it.getType().getName(), it.getName()));
+    }
+
+    private String getParameters(Parameter[] parameters) {
+        return Arrays.stream(parameters)
+                .map(it -> {
+                    String type = it.getType().getName();
+                    String name = it.getName();
+                    return type + " " + name;
+                })
+                .collect(Collectors.joining(", "));
     }
 
     @Test
@@ -27,5 +58,38 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @DisplayName("private field에 값 할당")
+    @Test
+    public void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        Student student = clazz.newInstance();
+
+        Field name = clazz.getDeclaredField("name");
+        Field age = clazz.getDeclaredField("age");
+
+        name.setAccessible(true);
+        age.setAccessible(true);
+
+        name.set(student, "성준");
+        age.set(student, 99);
+
+        assertThat(student.getName()).isEqualTo("성준");
+        assertThat(student.getAge()).isEqualTo(99);
+    }
+
+    @DisplayName("인자를 가진 생성자의 인스턴스 생성")
+    @Test
+    public void newInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+        Constructor<?> constructors = Arrays.stream(clazz.getConstructors())
+                .filter(it -> it.getParameterCount() == 3)
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+
+        Object actual = constructors.newInstance("작성자", "제목", "내용");
+
+        assertNotNull(actual);
     }
 }
