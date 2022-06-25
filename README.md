@@ -26,7 +26,7 @@
 - 자바 Reflection API를 활용해 다음 Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
 - 구현은 src/test/java > next.reflection > ReflectionTest 클래스의 privateFieldAccess() 메소드에 한다.
 
-* [ ] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
+* [x] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
 - Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
 
 * [ ] 요구사항 6 - component scan
