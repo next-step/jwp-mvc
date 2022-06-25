@@ -11,7 +11,7 @@
 
 ## Step 1
 
-* [ ] 요구사항 1 - 클래스 정보 출력
+* [x] 요구사항 1 - 클래스 정보 출력
 - src/test/java > next.reflection > ReflectionTest의 showClass() 메소드를 구현해 Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
 
 * [ ] 요구사항 2 - test로 시작하는 메소드 실행

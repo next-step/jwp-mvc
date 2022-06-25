@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -13,6 +15,21 @@ public class ReflectionTest {
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
+
+        logger.debug("getDeclaredFields() \n");
+        for (Field field : clazz.getDeclaredFields()) {
+            logger.debug(field.toString());
+        }
+
+        logger.debug("getDeclaredConstructors() \n");
+        for (Constructor constructor : clazz.getDeclaredConstructors()) {
+            logger.debug(constructor.toString());
+        }
+
+        logger.debug("getDeclaredMethods() \n");
+        for (Method method : clazz.getDeclaredMethods()) {
+            logger.debug(method.toString());
+        }
     }
 
     @Test
