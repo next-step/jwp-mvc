@@ -8,6 +8,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -44,5 +47,38 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    void accessPrivateField() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+
+        String name = "YD";
+        int age = 27;
+
+        setAccessibleField(clazz, "name");
+        setAccessibleField(clazz, "age");
+
+        Student student = new Student();
+
+        setValue(clazz, student, "name", name);
+        setValue(clazz, student, "age", age);
+
+        assertAll(
+                () -> assertThat(student.getName()).isEqualTo(name),
+                () -> assertThat(student.getAge()).isEqualTo(age)
+        );
+    }
+
+    private void setAccessibleField(Class<Student> clazz, String fieldName) throws NoSuchFieldException {
+        Field target = clazz.getDeclaredField(fieldName);
+        target.setAccessible(true);
+    }
+
+    private void setValue(Class<Student> clazz, Object instance, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field target = clazz.getDeclaredField(fieldName);
+        target.setAccessible(true);
+
+        target.set(instance, value);
     }
 }
