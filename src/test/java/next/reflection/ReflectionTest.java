@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -45,5 +48,26 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @DisplayName("Reflection API 를 활용해 Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.")
+    @Test
+    void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+        nameField.setAccessible(true);
+        ageField.setAccessible(true);
+
+        Student student = new Student();
+        String name = "고정완";
+        int age = 26;
+        nameField.set(student, name);
+        ageField.set(student, age);
+
+        assertAll(
+                () -> assertThat(student.getName()).isEqualTo(name),
+                () -> assertThat(student.getAge()).isEqualTo(age)
+        );
     }
 }
