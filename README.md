@@ -32,3 +32,7 @@ Junit4에서는 @Test 애노테이션일 설정되어 있는 메소드를 자동
 
 ### 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
 Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
+
+### 요구사항 6 - component scan
+src/test/java 폴더의 core.di.factory.example 패키지를 보면 DI 테스트를 위한 샘플 코드가 있다.
+core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.

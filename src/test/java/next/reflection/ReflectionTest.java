@@ -1,6 +1,10 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -96,5 +101,25 @@ public class ReflectionTest {
         assertThat(question.getWriter()).isEqualTo(writer);
         assertThat(question.getTitle()).isEqualTo(title);
         assertThat(question.getContents()).isEqualTo(contents);
+    }
+
+    @Test
+    void componentScan() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
+        for (Class<?> controllerClass : controllerClasses) {
+            logger.debug(controllerClass.getName());
+        }
+
+        Set<Class<?>> serviceClasses = reflections.getTypesAnnotatedWith(Service.class);
+        for (Class<?> serviceClass : serviceClasses) {
+            logger.debug(serviceClass.getName());
+        }
+
+        Set<Class<?>> repositoryClasses = reflections.getTypesAnnotatedWith(Repository.class);
+        for (Class<?> repositoryClass : repositoryClasses) {
+            logger.debug(repositoryClass.getName());
+        }
     }
 }
