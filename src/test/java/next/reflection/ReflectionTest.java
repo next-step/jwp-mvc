@@ -19,11 +19,11 @@ public class ReflectionTest {
 
         logger.debug("Question Class Fields:");
         Arrays.stream(clazz.getDeclaredFields())
-                        .forEach(it -> logger.debug(it.toString()));
+                .forEach(it -> logger.debug(it.toString()));
 
         logger.debug("Question Class Constructors:");
         Arrays.stream(clazz.getDeclaredConstructors())
-                        .forEach(it -> logger.debug(it.toString()));
+                .forEach(it -> logger.debug(it.toString()));
 
         logger.debug("Question Class Methods:");
         Arrays.stream(clazz.getDeclaredMethods())
@@ -59,5 +59,17 @@ public class ReflectionTest {
 
         assertThat(instance.getName()).isEqualTo("손영철");
         assertThat(instance.getAge()).isEqualTo(32);
+    }
+
+    @Test
+    void constructorWithArguments() throws Exception {
+        Class<Question> clazz = Question.class;
+        final Question question = clazz.getDeclaredConstructor(String.class, String.class, String.class)
+                .newInstance("글쓴이", "제목", "내용");
+
+        assertThat(question.getWriter()).isEqualTo("글쓴이");
+        assertThat(question.getTitle()).isEqualTo("제목");
+        assertThat(question.getContents()).isEqualTo("내용");
+
     }
 }
