@@ -1,22 +1,83 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.ModelAndView;
+import core.utils.ArrayUtils;
+import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
-    private Object[] basePackage;
+    private final Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
     public void initialize() {
+        final Set<Class<?>> controllerClasses = this.getControllerClasses();
 
+        for (Class<?> controllerClass : controllerClasses) {
+            this.registerRequestMappings(controllerClass);
+        }
+    }
+
+    private Set<Class<?>> getControllerClasses() {
+        Reflections reflections = new Reflections(basePackage);
+        return reflections.getTypesAnnotatedWith(Controller.class);
+    }
+
+    private void registerRequestMappings(Class<?> controller) {
+        Set<Method> requestMappingMethods = this.getRequestMappingMethods(controller);
+
+        for (Method requestMappingMethod : requestMappingMethods) {
+            this.registerRequestMapping(controller, requestMappingMethod);
+        }
+    }
+
+    private Set<Method> getRequestMappingMethods(Class<?> controller) {
+        return Arrays.stream(controller.getDeclaredMethods())
+                .filter(it -> it.isAnnotationPresent(RequestMapping.class))
+                .collect(Collectors.toSet());
+    }
+
+    private void registerRequestMapping(final Class<?> controllerClass, Method requestMappingMethod) {
+        final RequestMapping requestMapping = requestMappingMethod.getAnnotation(RequestMapping.class);
+        final String url = requestMapping.value();
+        final RequestMethod[] methods = ArrayUtils.isEmpty(requestMapping.method()) ?
+                RequestMethod.values() : requestMapping.method();
+
+        final Object controller = this.initializeController(controllerClass);
+        final HandlerExecution handlerExecution = new HandlerExecution() {
+            @Override
+            public ModelAndView handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+                return (ModelAndView) requestMappingMethod.invoke(controller, request, response);
+            }
+        };
+
+        for (final RequestMethod method : methods) {
+            final HandlerKey handlerKey = new HandlerKey(url, method);
+            this.handlerExecutions.put(handlerKey, handlerExecution);
+        }
+    }
+
+    private Object initializeController(final Class<?> controllerClass) {
+        try {
+            return controllerClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
