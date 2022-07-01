@@ -29,6 +29,13 @@ public class BeanFactoryTest {
     }
 
     @Test
+    void scanControllerServiceRepositoryAnnotatedClasses() {
+        final Set<Class<?>> controllerServiceRepositoryAnnotatedClasses =
+                this.getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+        controllerServiceRepositoryAnnotatedClasses.forEach(System.out::println);
+    }
+
+    @Test
     public void di() throws Exception {
         QnaController qnaController = beanFactory.getBean(QnaController.class);
 
