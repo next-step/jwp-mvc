@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMappings;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -21,36 +21,39 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping requestMapping;
-    private AnnotationHandlerMapping annotationHandlerMapping;
+    private HandlerMappings handlerMappings = new HandlerMappings();
 
     @Override
     public void init() {
-        requestMapping = new RequestMapping();
-        requestMapping.initMapping();
+        LegacyHandlerMapping legacyHandlerMapping = new LegacyHandlerMapping();
+        legacyHandlerMapping.initMapping();
 
-        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
+
+        handlerMappings.addHandlerMapping(legacyHandlerMapping, annotationHandlerMapping);
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        String requestUri = req.getRequestURI();
-        logger.info("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.info("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
         try {
-            Controller controller = requestMapping.findController(requestUri);
+            Object handler = handlerMappings.getHandler(req);
 
-            if (Objects.nonNull(controller)) {
-                String viewName = controller.execute(req, resp);
+            if (handler instanceof Controller) {
+                String viewName = ((Controller) handler).execute(req, resp);
                 move(viewName, req, resp);
                 return;
             }
 
-            HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
-            ModelAndView modelAndView = handlerExecution.handle(req, resp);
+            if (handler instanceof HandlerExecution) {
+                ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+                modelAndView.getView().render(modelAndView.getModel(), req, resp);
+                return;
+            }
 
-            modelAndView.getView().render(modelAndView.getModel(), req, resp);
+            throw new RuntimeException();
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());

@@ -1,12 +1,11 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import org.apache.commons.lang3.ArrayUtils;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -14,7 +13,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -24,29 +23,25 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
+        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
 
-        Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
-
-        for (Class<?> clazz : classes) {
-            Method[] declaredMethods = clazz.getDeclaredMethods();
-
-            Arrays.stream(declaredMethods)
-                    .filter(it -> it.isAnnotationPresent(RequestMapping.class))
-                    .forEach(it -> makeHandlerExecution(clazz, it));
-        }
+        controllers.forEach((clazz, instance) -> {
+            Set<Method> methods = controllerScanner.getMethodsWithRequestMapping(clazz);
+            methods.forEach(it -> makeHandlerExecution(instance, it));
+        });
     }
 
-    private void makeHandlerExecution(Class<?> clazz, Method method) {
+    private void makeHandlerExecution(Object clazzInstance, Method method) {
         RequestMapping annotation = method.getAnnotation(RequestMapping.class);
         RequestMethod[] requestMethods = getRequestMappingMethods(annotation);
 
-        Arrays.stream(requestMethods).forEach(requestMethod -> {
-            HandlerKey handlerKey = new HandlerKey(annotation.value(), requestMethod);
-
-            handlerExecutions.put(handlerKey,
-                    (request, response) -> (ModelAndView) method.invoke(clazz.newInstance(), request, response));
-        });
+        Arrays.stream(requestMethods)
+                .forEach(requestMethod -> {
+                    HandlerKey handlerKey = new HandlerKey(annotation.value(), requestMethod);
+                    handlerExecutions.put(handlerKey,
+                            (request, response) -> (ModelAndView) method.invoke(clazzInstance, request, response));
+                });
     }
 
     private RequestMethod[] getRequestMappingMethods(RequestMapping annotation) {
@@ -59,6 +54,7 @@ public class AnnotationHandlerMapping {
         return methods;
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
