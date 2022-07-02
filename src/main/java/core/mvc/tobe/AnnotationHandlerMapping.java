@@ -7,6 +7,8 @@ import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
 import core.utils.ArrayUtils;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -16,6 +18,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -26,6 +30,10 @@ public class AnnotationHandlerMapping {
 
     public void initialize() {
         final Set<Class<?>> controllerClasses = this.getControllerClasses();
+        logger.info("{} Class with @Controller found under package {}: {}",
+                controllerClasses.size(),
+                Arrays.toString(this.basePackage),
+                controllerClasses.stream().map(Class::getName).collect(Collectors.toList()));
 
         for (Class<?> controllerClass : controllerClasses) {
             this.registerRequestMappings(controllerClass);
