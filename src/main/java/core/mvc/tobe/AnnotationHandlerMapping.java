@@ -9,7 +9,6 @@ import core.utils.ArrayUtils;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
@@ -59,12 +58,8 @@ public class AnnotationHandlerMapping {
                 RequestMethod.values() : requestMapping.method();
 
         final Object controller = this.initializeController(controllerClass);
-        final HandlerExecution handlerExecution = new HandlerExecution() {
-            @Override
-            public ModelAndView handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-                return (ModelAndView) requestMappingMethod.invoke(controller, request, response);
-            }
-        };
+        final HandlerExecution handlerExecution = (request, response) ->
+                (ModelAndView) requestMappingMethod.invoke(controller, request, response);
 
         for (final RequestMethod method : methods) {
             final HandlerKey handlerKey = new HandlerKey(url, method);
