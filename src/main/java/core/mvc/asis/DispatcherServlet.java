@@ -1,9 +1,11 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,36 +20,39 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping ahm;
 
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
+
+        ahm = new AnnotationHandlerMapping("next.controller");
+        ahm.initialize();
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        Controller controller = rm.findController(requestUri);
+        HandlerExecution handlerExecution = this.findHandlerExecution(req);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            ModelAndView mav = handlerExecution.handle(req, resp);
+            mav.getView().render(null, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private HandlerExecution findHandlerExecution(HttpServletRequest req) {
+        String requestUri = req.getRequestURI();
+        Controller controller = rm.findController(requestUri);
+
+        if (controller != null) {
+            return controller;
         }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        return ahm.getHandler(req);
     }
 }
