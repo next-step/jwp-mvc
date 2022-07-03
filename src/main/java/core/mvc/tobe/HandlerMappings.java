@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class HandlerMappings {
     private static List<HandlerMapping> handlerMappings = new ArrayList<>();
@@ -13,13 +14,10 @@ public class HandlerMappings {
     }
 
     public Object getHandler(HttpServletRequest request) {
-        for (HandlerMapping it : handlerMappings) {
-            Object handler = it.getHandler(request);
-            if (handler != null) {
-                return handler;
-            }
-        }
-
-        throw new NoSuchElementException();
+        return handlerMappings.stream()
+                .map(it -> it.getHandler(request))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
     }
 }
