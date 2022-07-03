@@ -8,9 +8,11 @@ import core.mvc.ModelAndView;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
     private Object[] basePackages;
@@ -26,22 +28,34 @@ public class AnnotationHandlerMapping {
             Reflections reflections = new Reflections(((String) basePackage));
             Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
 
-            initHandlerExecutions(controllers);
+            initHandlerExcutions(controllers);
         }
     }
 
-    private void initHandlerExecutions(Set<Class<?>> controllers) {
+    private void initHandlerExcutions(Set<Class<?>> controllers) {
         for (Class<?> controller : controllers) {
             List.of(controller.getDeclaredMethods()).stream()
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .forEach(method -> {
                     RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+                    List<HandlerKey> handlerKeys = initHandlerKeys(requestMapping);
 
-                    HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-                    handlerExecutions.put(handlerKey, (request, response) -> (ModelAndView) method.invoke(controller.getDeclaredConstructor()
-                                                                                                                    .newInstance(), request, response));
+                    handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey, (request, response) -> (ModelAndView) method.invoke(controller.getDeclaredConstructor()
+                                                                                                                                                      .newInstance(), request, response)));
                 });
         }
+    }
+
+    private List<HandlerKey> initHandlerKeys(RequestMapping requestMapping) {
+        RequestMethod[] requestMethods = requestMapping.method();
+
+        if (requestMethods.length == 0) {
+            return HandlerKey.allMethodsKey(requestMapping.value());
+        }
+
+        return Arrays.stream(requestMethods)
+                                         .map(requestMethod -> new HandlerKey(requestMapping.value(), requestMethod))
+                                         .collect(Collectors.toList());
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
