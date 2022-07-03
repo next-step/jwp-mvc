@@ -1,6 +1,7 @@
 package core.mvc;
 
 import core.mvc.asis.LegacyHandlerMapping;
+import core.mvc.tobe.HandlerMappings;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

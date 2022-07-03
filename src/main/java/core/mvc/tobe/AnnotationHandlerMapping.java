@@ -3,8 +3,6 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.HandlerMapping;
-import core.mvc.ModelAndView;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,11 +34,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         RequestMapping annotation = method.getAnnotation(RequestMapping.class);
         RequestMethod[] requestMethods = getRequestMappingMethods(annotation);
 
+        HandlerExecution handlerExecution = new HandlerExecutionImpl(method, clazzInstance);
+
         Arrays.stream(requestMethods)
                 .forEach(requestMethod -> {
                     HandlerKey handlerKey = new HandlerKey(annotation.value(), requestMethod);
-                    handlerExecutions.put(handlerKey,
-                            (request, response) -> (ModelAndView) method.invoke(clazzInstance, request, response));
+                    handlerExecutions.put(handlerKey, handlerExecution);
                 });
     }
 
