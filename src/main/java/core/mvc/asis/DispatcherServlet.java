@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -41,16 +42,23 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
-        try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+        if (Objects.nonNull(controller)) {
+            try {
+                String viewName = controller.execute(req, resp);
+                move(viewName, req, resp);
+                return;
+            } catch (Throwable e) {
+                logger.error("Exception : {}", e);
+                throw new ServletException(e.getMessage());
+            }
+        }
 
-            HandlerExecution handler = annotationHandlerMapping.getHandler(req);
+        HandlerExecution handler = annotationHandlerMapping.getHandler(req);
+        try {
             ModelAndView modelAndView = handler.handle(req, resp);
             Map<String, Object> model = modelAndView.getModel();
             View view = modelAndView.getView();
             view.render(model, req, resp);
-
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
