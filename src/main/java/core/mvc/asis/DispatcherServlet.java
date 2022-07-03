@@ -1,5 +1,9 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -19,10 +24,15 @@ public class DispatcherServlet extends HttpServlet {
 
     private RequestMapping rm;
 
+    private AnnotationHandlerMapping annotationHandlerMapping;
+
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
+
+        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        annotationHandlerMapping.initialize();
     }
 
     @Override
@@ -34,6 +44,13 @@ public class DispatcherServlet extends HttpServlet {
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
+
+            HandlerExecution handler = annotationHandlerMapping.getHandler(req);
+            ModelAndView modelAndView = handler.handle(req, resp);
+            Map<String, Object> model = modelAndView.getModel();
+            View view = modelAndView.getView();
+            view.render(model, req, resp);
+
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
