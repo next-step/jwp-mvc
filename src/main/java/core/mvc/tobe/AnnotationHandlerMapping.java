@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackages;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -23,6 +23,7 @@ public class AnnotationHandlerMapping {
         this.basePackages = basePackages;
     }
 
+    @Override
     public void initialize() {
         for (Object basePackage : basePackages) {
             ControllerScanner controllerScanner = new ControllerScanner((String) basePackage);
@@ -57,6 +58,7 @@ public class AnnotationHandlerMapping {
                      .collect(Collectors.toList());
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod()
