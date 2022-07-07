@@ -1,7 +1,9 @@
 package next.controller;
 
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.asis.Controller;
+import core.mvc.ModelAndView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,16 +11,22 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class CreateUserController implements Controller {
+@Controller
+public class CreateUserController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
-    @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
+    @RequestMapping("/users/form")
+    public ModelAndView getJoinForm(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("/user/form.jsp");
+    }
+
+    @RequestMapping("/users/create")
+    public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) {
+        User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
+                request.getParameter("email"));
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
-        return "redirect:/";
+        return new ModelAndView("redirect:/");
     }
 }

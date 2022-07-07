@@ -1,21 +1,25 @@
 package core.mvc;
 
+import core.mvc.view.View;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
-    private View view;
-    private Map<String, Object> model = new HashMap<String, Object>();
+    /** View instance or view name String. */
+    private Object view;
+    private Map<String, Object> model = new HashMap<>();
 
     public ModelAndView() {
     }
 
-    public ModelAndView(View view) {
+    public ModelAndView(Object view) {
         this.view = view;
     }
 
-    public ModelAndView addObject(String attributeName, Object attributeValue) {
+    public ModelAndView addObject(String attributeName,
+                                  Object attributeValue) {
         model.put(attributeName, attributeValue);
         return this;
     }
@@ -29,6 +33,10 @@ public class ModelAndView {
     }
 
     public View getView() {
-        return view;
+        return (this.view instanceof View ? (View) this.view : null);
+    }
+
+    public String getViewName() {
+        return (this.view instanceof String ? (String) this.view : null);
     }
 }
