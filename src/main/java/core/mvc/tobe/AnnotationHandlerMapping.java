@@ -54,8 +54,8 @@ public class AnnotationHandlerMapping {
         }
 
         return Arrays.stream(requestMethods)
-                                         .map(requestMethod -> new HandlerKey(requestMapping.value(), requestMethod))
-                                         .collect(Collectors.toList());
+                     .map(requestMethod -> new HandlerKey(requestMapping.value(), requestMethod))
+                     .collect(Collectors.toList());
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
