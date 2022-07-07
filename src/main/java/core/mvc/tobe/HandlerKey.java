@@ -2,6 +2,10 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class HandlerKey {
     private String url;
     private RequestMethod requestMethod;
@@ -9,6 +13,12 @@ public class HandlerKey {
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
+    }
+
+    public static List<HandlerKey> allMethodsKey(String url) {
+        return Arrays.stream(RequestMethod.values())
+                     .map(requestMethod -> new HandlerKey(url, requestMethod))
+                     .collect(Collectors.toList());
     }
 
     @Override
