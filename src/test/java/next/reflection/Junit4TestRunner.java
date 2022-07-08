@@ -1,29 +1,22 @@
 package next.reflection;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-@DisplayName("Junit4TestRunner 관련 테스트")
 public class Junit4TestRunner {
-
-    @DisplayName("Junit4Test에서 @MyTest애노테이션으로 설정되어 있는 메소드를 자동으로 실행한다.")
     @Test
     public void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
 
-        Constructor<?> constructor = clazz.getConstructor();
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-
-        Arrays.stream(declaredMethods)
-                .filter(declaredMethod -> declaredMethod.isAnnotationPresent(MyTest.class))
-                .forEach(methodMyTestAnnotated -> {
+        Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(MyTest.class))
+                .forEach(method -> {
                     try {
-                        methodMyTestAnnotated.invoke(constructor.newInstance());
-                    } catch (Exception e) {
+                        method.invoke(clazz.getDeclaredConstructor().newInstance());
+                    } catch (InvocationTargetException | InstantiationException | NoSuchMethodException |
+                             IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
                 });
