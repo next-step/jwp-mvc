@@ -32,14 +32,13 @@ public class ReflectionTest {
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+        Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
+        Question question = (Question) constructor.newInstance("한비야", "여행", "재밌게 여행하자");
+
+        Assertions.assertThat(question)
+                .hasFieldOrPropertyWithValue("writer", "한비야")
+                .hasFieldOrPropertyWithValue("title", "여행")
+                .hasFieldOrPropertyWithValue("contents", "재밌게 여행하자");
     }
 
     @Test
