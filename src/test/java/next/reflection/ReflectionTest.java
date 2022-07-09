@@ -1,10 +1,12 @@
 package next.reflection;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class ReflectionTest {
@@ -38,5 +40,18 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws IllegalAccessException, NoSuchFieldException {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Student student = new Student();
+        Field nameField = clazz.getDeclaredField("name");
+        nameField.setAccessible(true);
+        nameField.set(student, "chyee");
+
+        Assertions.assertThat(student.getName()).isEqualTo("chyee");
     }
 }
