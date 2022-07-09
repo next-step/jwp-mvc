@@ -13,6 +13,7 @@ import java.util.Set;
 
 public class HandlerExecutions {
 
+    private static final HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
     private final Map<HandlerKey, HandlerExecution> handlerExecutions;
 
     public HandlerExecutions(Map<HandlerKey, HandlerExecution> handlerExecutions) {
@@ -36,7 +37,10 @@ public class HandlerExecutions {
             List<HandlerKey> handlerKeys = initHandlerKeys(requestMapping);
 
             handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey,
-                    (request, response) -> (ModelAndView) method.invoke(controllers.get(controller), request, response)));
+                    (request, response) -> {
+                        Object[] arguments = handlerMethodArgumentResolvers.resolve(method, request);
+                        return (ModelAndView) method.invoke(controllers.get(controller), arguments);
+                    }));
         });
     }
 
