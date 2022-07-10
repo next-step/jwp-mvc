@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.resolver;
 
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -23,7 +23,7 @@ public class HandlerMethodArgumentResolvers {
             HandlerMethodArgumentResolver handlerMethodArgumentResolver = handlerMethodArgumentResolvers.stream()
                                                                                                                  .filter(resolver -> resolver.supportsParameter(parameter))
                                                                                                                  .findFirst()
-                                                                                                                 .orElseThrow(IllegalAccessError::new);
+                                                                                                                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 파라미터 타입 입니다."));
 
             arguments[i] = handlerMethodArgumentResolver.resolveArgument(parameter, parameterNames[i], httpServletRequest);
         }
