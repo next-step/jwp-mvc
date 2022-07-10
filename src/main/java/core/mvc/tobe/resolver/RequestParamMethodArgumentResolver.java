@@ -1,24 +1,27 @@
 package core.mvc.tobe.resolver;
 
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Objects;
 
 public class RequestParamMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(Parameter parameter) {
-        if (parameter.isAnnotationPresent(RequestParam.class) || BeanUtils.isSimpleProperty(parameter.getType())) {
+        if (parameter.isAnnotationPresent(RequestParam.class) ||
+                (!parameter.isAnnotationPresent(PathVariable.class) && BeanUtils.isSimpleProperty(parameter.getType()))) {
             return true;
         }
         return false;
     }
 
     @Override
-    public Object resolveArgument(Parameter parameter, String parameterName, HttpServletRequest httpServletRequest) {
+    public Object resolveArgument(Parameter parameter, String parameterName, Method method, HttpServletRequest httpServletRequest) {
         String parameterValue = null;
 
         if (parameter.isAnnotationPresent(RequestParam.class)) {

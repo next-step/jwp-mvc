@@ -15,6 +15,10 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     public static List<HandlerKey> allMethodsKey(String url) {
         return toList(url, RequestMethod.values());
     }

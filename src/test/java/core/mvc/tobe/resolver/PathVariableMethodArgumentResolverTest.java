@@ -1,6 +1,8 @@
-package core.mvc.tobe;
+package core.mvc.tobe.resolver;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +11,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class JavaBeanMethodArgumentResolverTest {
+class PathVariableMethodArgumentResolverTest {
 
     private AnnotationHandlerMapping handlerMapping;
 
@@ -19,22 +21,17 @@ class JavaBeanMethodArgumentResolverTest {
         handlerMapping.initialize();
     }
 
-    @DisplayName("Java Bean Type 파라미터 맵핑이 성공한다.")
+    @DisplayName("PathVariable 파라미터 맵핑이 성공한다.")
     @Test
-    void javaBean() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/javabean");
-        request.setParameter("userId", "dean");
-        request.setParameter("password", "password");
-        request.setParameter("age", "30");
+    void pathVariable() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/30");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         ModelAndView handle = execution.handle(request, response);
 
-        TestUser testUser = (TestUser) handle.getModel().get("testUser");
+        long id = (long) handle.getModel().get("id");
 
-        assertThat(testUser.getUserId()).isEqualTo("dean");
-        assertThat(testUser.getPassword()).isEqualTo("password");
-        assertThat(testUser.getAge()).isEqualTo(30);
+        assertThat(id).isEqualTo(30L);
     }
 }

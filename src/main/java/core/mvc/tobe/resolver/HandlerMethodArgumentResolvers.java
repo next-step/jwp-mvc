@@ -10,7 +10,8 @@ import java.util.List;
 
 public class HandlerMethodArgumentResolvers {
     private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-    private final List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers = List.of(new RequestParamMethodArgumentResolver(), new JavaBeanMethodArgumentResolver());
+    private final List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers =
+            List.of(new RequestParamMethodArgumentResolver(), new JavaBeanMethodArgumentResolver(), new PathVariableMethodArgumentResolver());
 
     public Object[] resolve(Method method, HttpServletRequest httpServletRequest) {
         Parameter[] parameters = method.getParameters();
@@ -25,7 +26,7 @@ public class HandlerMethodArgumentResolvers {
                                                                                                                  .findFirst()
                                                                                                                  .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 파라미터 타입 입니다."));
 
-            arguments[i] = handlerMethodArgumentResolver.resolveArgument(parameter, parameterNames[i], httpServletRequest);
+            arguments[i] = handlerMethodArgumentResolver.resolveArgument(parameter, parameterNames[i], method, httpServletRequest);
         }
 
         return arguments;
