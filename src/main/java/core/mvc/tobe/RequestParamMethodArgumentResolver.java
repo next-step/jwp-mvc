@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Parameter;
+import java.util.Objects;
 
 public class RequestParamMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
@@ -18,11 +19,13 @@ public class RequestParamMethodArgumentResolver implements HandlerMethodArgument
 
     @Override
     public Object resolveArgument(Parameter parameter, String parameterName, HttpServletRequest httpServletRequest) {
+        String parameterValue = null;
+
         if (parameter.isAnnotationPresent(RequestParam.class)) {
             RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
-            return httpServletRequest.getParameter(StringUtils.hasText(requestParam.name()) ? requestParam.name() : parameterName);
+            parameterValue = httpServletRequest.getParameter(StringUtils.hasText(requestParam.name()) ? requestParam.name() : parameterName);
         }
 
-        return httpServletRequest.getParameter(parameterName);
+        return ParameterTypeConverter.convert(parameter.getType(), Objects.isNull(parameterValue) ? httpServletRequest.getParameter(parameterName) : parameterValue);
     }
 }
