@@ -4,6 +4,7 @@ import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -23,46 +24,40 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
-
-    private AnnotationHandlerMapping annotationHandlerMapping;
+    private HandlerMappings handlerMappings;
 
     @Override
-    public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
-
-        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        annotationHandlerMapping.initialize();
+    public void init() {
+        handlerMappings = new HandlerMappings(List.of(new LegacyHandlerMapping(), new AnnotationHandlerMapping("core.mvc.tobe")));
+        handlerMappings.initialize();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
-        if (Objects.nonNull(controller)) {
-            try {
-                String viewName = controller.execute(req, resp);
+        Object handler = handlerMappings.getHandler(req);
+        try {
+            if (handler instanceof Controller) {
+                String viewName = ((Controller) handler).execute(req, resp);
                 move(viewName, req, resp);
                 return;
-            } catch (Throwable e) {
-                logger.error("Exception : {}", e);
-                throw new ServletException(e.getMessage());
             }
-        }
 
-        HandlerExecution handler = annotationHandlerMapping.getHandler(req);
-        try {
-            ModelAndView modelAndView = handler.handle(req, resp);
-            Map<String, Object> model = modelAndView.getModel();
-            View view = modelAndView.getView();
-            view.render(model, req, resp);
+            if (handler instanceof HandlerExecution) {
+                ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+                Map<String, Object> model = modelAndView.getModel();
+                View view = modelAndView.getView();
+                view.render(model, req, resp);
+                return;
+            }
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+
+        throw new IllegalArgumentException("지원하지 않은 Handler type 입니다.");
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)

@@ -1,63 +1,30 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.ModelAndView;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackages;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private HandlerExecutions handlerExecutions;
 
     public AnnotationHandlerMapping(Object... basePackages) {
         this.basePackages = basePackages;
     }
 
+    @Override
     public void initialize() {
         for (Object basePackage : basePackages) {
-            Reflections reflections = new Reflections(((String) basePackage));
-            Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+            ControllerScanner controllerScanner = new ControllerScanner((String) basePackage);
+            Map<Class, Object> controllers = controllerScanner.getControllers();
 
-            initHandlerExcutions(controllers);
+            handlerExecutions = HandlerExecutions.of(controllers);
         }
     }
 
-    private void initHandlerExcutions(Set<Class<?>> controllers) {
-        for (Class<?> controller : controllers) {
-            List.of(controller.getDeclaredMethods()).stream()
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(method -> {
-                    RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                    List<HandlerKey> handlerKeys = initHandlerKeys(requestMapping);
-
-                    handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey, (request, response) -> (ModelAndView) method.invoke(controller.getDeclaredConstructor()
-                                                                                                                                                      .newInstance(), request, response)));
-                });
-        }
-    }
-
-    private List<HandlerKey> initHandlerKeys(RequestMapping requestMapping) {
-        RequestMethod[] requestMethods = requestMapping.method();
-
-        if (requestMethods.length == 0) {
-            return HandlerKey.allMethodsKey(requestMapping.value());
-        }
-
-        return Arrays.stream(requestMethods)
-                                         .map(requestMethod -> new HandlerKey(requestMapping.value(), requestMethod))
-                                         .collect(Collectors.toList());
-    }
-
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod()
