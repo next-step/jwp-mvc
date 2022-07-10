@@ -42,7 +42,7 @@ public class HandlerExecutions {
 
             handlerKeys.forEach(handlerKey -> handlerExecutions.put(handlerKey,
                     (request, response) -> {
-                        Object[] arguments = handlerMethodArgumentResolvers.resolve(method, request);
+                        Object[] arguments = handlerMethodArgumentResolvers.resolve(method, request, response);
                         return (ModelAndView) method.invoke(controllers.get(controller), arguments);
                     }));
         });

@@ -3,6 +3,7 @@ package core.mvc.tobe.resolver;
 import org.springframework.beans.BeanUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -17,7 +18,7 @@ public class JavaBeanMethodArgumentResolver implements HandlerMethodArgumentReso
     }
 
     @Override
-    public Object resolveArgument(Parameter parameter, String parameterName, Method method, HttpServletRequest httpServletRequest) {
+    public Object resolveArgument(Parameter parameter, String parameterName, Method method, HttpServletRequest request, HttpServletResponse response) {
         Class<?> type = parameter.getType();
         Object newInstance = null;
         try {
@@ -27,7 +28,7 @@ public class JavaBeanMethodArgumentResolver implements HandlerMethodArgumentReso
             for (Field field : fields) {
                 field.setAccessible(true);
 
-                field.set(newInstance, ParameterTypeConverter.convert(field.getType(), httpServletRequest.getParameter(field.getName())));
+                field.set(newInstance, ParameterTypeConverter.convert(field.getType(), request.getParameter(field.getName())));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
