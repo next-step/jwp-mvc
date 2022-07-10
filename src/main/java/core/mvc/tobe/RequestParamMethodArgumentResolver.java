@@ -23,9 +23,19 @@ public class RequestParamMethodArgumentResolver implements HandlerMethodArgument
 
         if (parameter.isAnnotationPresent(RequestParam.class)) {
             RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
-            parameterValue = httpServletRequest.getParameter(StringUtils.hasText(requestParam.name()) ? requestParam.name() : parameterName);
+            parameterValue = getParameterValueByRequestParam(parameterName, httpServletRequest, requestParam);
         }
 
         return ParameterTypeConverter.convert(parameter.getType(), Objects.isNull(parameterValue) ? httpServletRequest.getParameter(parameterName) : parameterValue);
+    }
+
+    private String getParameterValueByRequestParam(String parameterName, HttpServletRequest httpServletRequest, RequestParam requestParam) {
+        if (StringUtils.hasText(requestParam.value())) {
+            return httpServletRequest.getParameter(requestParam.value());
+        }
+        if (StringUtils.hasText(requestParam.name())) {
+            return httpServletRequest.getParameter(requestParam.name());
+        }
+        return parameterName;
     }
 }
