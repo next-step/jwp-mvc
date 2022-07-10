@@ -10,7 +10,7 @@ import java.util.List;
 
 public class HandlerMethodArgumentResolvers {
     private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-    private final List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers = List.of(new RequestParamMethodArgumentResolver());
+    private final List<HandlerMethodArgumentResolver> handlerMethodArgumentResolvers = List.of(new RequestParamMethodArgumentResolver(), new JavaBeanMethodArgumentResolver());
 
     public Object[] resolve(Method method, HttpServletRequest httpServletRequest) {
         Parameter[] parameters = method.getParameters();
