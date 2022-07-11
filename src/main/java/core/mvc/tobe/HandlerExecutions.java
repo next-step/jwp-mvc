@@ -48,10 +48,8 @@ public class HandlerExecutions {
         if (requestMethods.length == 0) {
             return HandlerKey.allMethodsKey(requestMapping.value());
         }
-
-        return Arrays.stream(requestMethods)
-                     .map(requestMethod -> new HandlerKey(requestMapping.value(), requestMethod))
-                     .collect(Collectors.toList());
+        
+        return HandlerKey.listOf(requestMapping.value(), requestMethods);
     }
 
     public HandlerExecution get(HandlerKey handlerKey) {
