@@ -5,7 +5,7 @@ public class TestUser {
     private String password;
     private int age;
 
-    protected TestUser() {
+    public TestUser() {
     }
 
     public TestUser(String userId, String password, int age) {

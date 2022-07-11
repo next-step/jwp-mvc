@@ -60,18 +60,23 @@ public class HandlerExecutions {
 
     public HandlerExecution get(HandlerKey handlerKey) {
         String url = handlerKey.getUrl();
+
+        HandlerExecution handlerExecution = handlerExecutions.get(handlerKey);
+        if (Objects.nonNull(handlerExecution)) {
+            return handlerExecution;
+        }
+
+        HandlerKey pathVariableHandlerKey = getPathVariableHandlerKey(url);
+        return handlerExecutions.get(pathVariableHandlerKey);
+    }
+
+    private HandlerKey getPathVariableHandlerKey(String url) {
         PathContainer pathContainer = PathPatternUtils.toPathContainer(url);
         Set<HandlerKey> handlerKeys = handlerExecutions.keySet();
 
-        HandlerKey pathVariableHandlerKey = handlerKeys.stream()
-                                            .filter(key -> PathPatternUtils.parse(key.getUrl())
-                                                                           .matches(pathContainer))
-                                            .findAny()
-                                            .orElseGet(null);
-
-        if (Objects.nonNull(pathVariableHandlerKey)) {
-            return handlerExecutions.get(pathVariableHandlerKey);
-        }
-        return handlerExecutions.get(handlerKey);
+        return handlerKeys.stream()
+                   .filter(key -> PathPatternUtils.parse(key.getUrl()).matches(pathContainer))
+                   .findAny()
+                   .orElseThrow(() -> new IllegalArgumentException("지원하지 않은 URI 입니다."));
     }
 }
