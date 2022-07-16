@@ -15,8 +15,20 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     public static List<HandlerKey> allMethodsKey(String url) {
-        return Arrays.stream(RequestMethod.values())
+        return toList(url, RequestMethod.values());
+    }
+
+    public static List<HandlerKey> listOf(String url, RequestMethod[] requestMethods) {
+        return toList(url, requestMethods);
+    }
+
+    private static List<HandlerKey> toList(String url, RequestMethod[] requestMethods) {
+        return Arrays.stream(requestMethods)
                      .map(requestMethod -> new HandlerKey(url, requestMethod))
                      .collect(Collectors.toList());
     }
