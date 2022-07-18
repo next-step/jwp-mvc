@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class AnnotationHandlerMapping implements HandlerMapping {
+public class AnnotationHandlerMapping extends HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -24,7 +24,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public void initialize() {
         new Reflections(basePackage)
                 .getTypesAnnotatedWith(Controller.class)
-                .forEach(this::putHandlerExecution);
+                .forEach(this::putHandlerExecutions);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private void putHandlerExecution(Class<?> controllerClass) {
+    private void putHandlerExecutions(Class<?> controllerClass) {
         Object declaredObject;
         try {
             declaredObject = controllerClass.getDeclaredConstructor().newInstance();
