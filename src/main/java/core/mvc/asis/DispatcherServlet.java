@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.AnnotationHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +17,20 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String BASE_PACKAGE = "next.controller";
 
     private LegacyHandlerMapping legacyHandlerMapping;
+    private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() throws ServletException {
-        legacyHandlerMapping = new LegacyHandlerMapping();
+        LegacyHandlerMapping legacyHandlerMapping = new LegacyHandlerMapping();
         legacyHandlerMapping.initMapping();
+        this.legacyHandlerMapping = legacyHandlerMapping;
+
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        annotationHandlerMapping.initialize();
+        this.annotationHandlerMapping = annotationHandlerMapping;
     }
 
     @Override
