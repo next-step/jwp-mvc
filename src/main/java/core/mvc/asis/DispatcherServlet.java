@@ -38,7 +38,7 @@ public class DispatcherServlet extends HttpServlet {
         HandlerExecution handlerExecution = this.findHandlerExecution(req);
         try {
             ModelAndView mav = handlerExecution.handle(req, resp);
-            mav.getView().render(null, req, resp);
+            mav.getView().render(mav.getModel(), req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
@@ -50,7 +50,7 @@ public class DispatcherServlet extends HttpServlet {
         Controller controller = rm.findController(requestUri);
 
         if (controller != null) {
-            return controller;
+            return new ControllerHandlerExecutionAdapter(controller);
         }
 
         return ahm.getHandler(req);

@@ -21,6 +21,10 @@ public class JspView implements View {
             return;
         }
 
+        for (final Map.Entry<String, ?> modelAttribute: model.entrySet()) {
+            request.setAttribute(modelAttribute.getKey(), modelAttribute.getValue());
+        }
+
         RequestDispatcher rd = request.getRequestDispatcher(this.viewName);
         rd.forward(request, response);
     }
