@@ -1,7 +1,10 @@
 package core.mvc.asis;
 
 import core.mvc.tobe.HandlerMapping;
-import next.controller.*;
+import next.controller.CreateUserController;
+import next.controller.LogoutController;
+import next.controller.UpdateFormUserController;
+import next.controller.UpdateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +17,6 @@ public class LegacyHandlerMapping extends HandlerMapping {
     private Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
         mappings.put("/users/create", new CreateUserController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
