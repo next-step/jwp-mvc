@@ -1,14 +1,18 @@
 package next.controller;
 
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.asis.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ListUserController implements Controller {
-    @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+import static core.annotation.web.RequestMethod.GET;
+
+@Controller
+public class ListUserController {
+    @RequestMapping(value = "/users", method = GET)
+    public String execute(HttpServletRequest req, HttpServletResponse resp) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return "redirect:/users/loginForm";
         }
