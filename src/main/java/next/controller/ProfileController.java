@@ -8,11 +8,9 @@ import next.model.User;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.annotation.web.RequestMethod.GET;
-
 @Controller
 public class ProfileController {
-    @RequestMapping(value = "/users/profile", method = GET)
+    @RequestMapping("/users/profile")
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);

@@ -9,11 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static core.annotation.web.RequestMethod.GET;
-
 @Controller
 public class LoginController {
-    @RequestMapping(value = "/users/login", method = GET)
+    @RequestMapping("/users/login")
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");

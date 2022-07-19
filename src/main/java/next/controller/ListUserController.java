@@ -7,11 +7,9 @@ import core.db.DataBase;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.annotation.web.RequestMethod.GET;
-
 @Controller
 public class ListUserController {
-    @RequestMapping(value = "/users", method = GET)
+    @RequestMapping("/users")
     public String execute(HttpServletRequest req, HttpServletResponse resp) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return "redirect:/users/loginForm";

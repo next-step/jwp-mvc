@@ -10,13 +10,11 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.annotation.web.RequestMethod.GET;
-
 @Controller
 public class UpdateUserController {
     private static final Logger log = LoggerFactory.getLogger(UpdateUserController.class);
 
-    @RequestMapping(value = "/users/update", method = GET)
+    @RequestMapping("/users/update")
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {

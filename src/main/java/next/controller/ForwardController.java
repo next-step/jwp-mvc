@@ -6,17 +6,15 @@ import core.annotation.web.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.annotation.web.RequestMethod.GET;
-
 @Controller
 public class ForwardController {
 
-    @RequestMapping(value = "/users/form", method = GET)
+    @RequestMapping("/users/form")
     public String redirectUsersForm(HttpServletRequest req, HttpServletResponse resp) {
         return "/user/form.jsp";
     }
 
-    @RequestMapping(value = "/users/loginForm", method = GET)
+    @RequestMapping("/users/loginForm")
     public String redirectLoginForm(HttpServletRequest req, HttpServletResponse resp) {
         return "/user/login.jsp";
     }

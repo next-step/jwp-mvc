@@ -8,12 +8,10 @@ import next.model.User;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static core.annotation.web.RequestMethod.GET;
-
 @Controller
 public class UpdateFormUserController {
 
-    @RequestMapping(value = "/users/updateForm", method = GET)
+    @RequestMapping("/users/updateForm")
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);

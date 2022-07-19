@@ -24,7 +24,7 @@ public class AnnotationHandlerMapping extends HandlerMapping {
     public void initialize() {
         new Reflections(basePackage)
                 .getTypesAnnotatedWith(Controller.class)
-                .forEach(this::putHandlerExecutions);
+                .forEach(this::putHandlerExecutionsByController);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class AnnotationHandlerMapping extends HandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private void putHandlerExecutions(Class<?> controllerClass) {
+    private void putHandlerExecutionsByController(Class<?> controllerClass) {
         Object declaredObject;
         try {
             declaredObject = controllerClass.getDeclaredConstructor().newInstance();
@@ -48,16 +48,20 @@ public class AnnotationHandlerMapping extends HandlerMapping {
         ReflectionUtils.getAllMethods(
                 controllerClass,
                 ReflectionUtils.withAnnotation(RequestMapping.class)
-        ).forEach(method -> handlerExecutions.put(
-                createHandlerKey(method),
-                new HandlerExecution(declaredObject, method)
-        ));
+        ).forEach(method -> putHandlerExecutionsByMethod(declaredObject, method));
     }
 
-    private HandlerKey createHandlerKey(Method method) {
+    private void putHandlerExecutionsByMethod(Object declaredObject, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         String url = requestMapping.value();
-        RequestMethod requestMethod = requestMapping.method();
-        return new HandlerKey(url, requestMethod);
+        RequestMethod[] requestMethods = requestMapping.method().length > 0
+                ? requestMapping.method()
+                : RequestMethod.values();
+        for (RequestMethod requestMethod : requestMethods) {
+            handlerExecutions.put(
+                    new HandlerKey(url, requestMethod),
+                    new HandlerExecution(declaredObject, method)
+            );
+        }
     }
 }
