@@ -18,6 +18,7 @@ public class JspView implements View {
     public void render(
             Map<String, ?> model, HttpServletRequest request, HttpServletResponse response
     ) throws Exception {
+        model.forEach((key, value) -> request.setAttribute(key, value));
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
             response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;

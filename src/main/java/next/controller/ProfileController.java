@@ -18,7 +18,8 @@ public class ProfileController {
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
-        req.setAttribute("user", user);
-        return ModelAndView.from("/user/profile.jsp");
+        ModelAndView modelAndView = ModelAndView.from("/user/profile.jsp");
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 }

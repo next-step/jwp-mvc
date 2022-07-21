@@ -16,7 +16,8 @@ public class ListUserController {
             return ModelAndView.from("redirect:/users/loginForm");
         }
 
-        req.setAttribute("users", DataBase.findAll());
-        return ModelAndView.from("/user/list.jsp");
+        ModelAndView modelAndView = ModelAndView.from("/user/list.jsp");
+        modelAndView.addObject("users", DataBase.findAll());
+        return modelAndView;
     }
 }

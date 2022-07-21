@@ -1,7 +1,6 @@
 package core.mvc;
 
 import core.mvc.exception.NotFoundException;
-import core.mvc.view.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +44,9 @@ public class DispatcherServlet extends HttpServlet {
     private void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Object handler = getHandler(request);
         if (handler instanceof HandlerExecution) {
-            render(
-                    ((HandlerExecution) handler).handle(request, response),
-                    request,
-                    response
-            );
+            ((HandlerExecution) handler)
+                    .handle(request, response)
+                    .render(request, response);
         }
     }
 
@@ -59,14 +56,5 @@ public class DispatcherServlet extends HttpServlet {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException(request))
                 .getHandler(request);
-    }
-
-    private void render(
-            ModelAndView modelAndView,
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws Exception {
-        modelAndView.getView()
-                .render(modelAndView.getModel(), request, response);
     }
 }

@@ -19,7 +19,8 @@ public class UpdateFormUserController {
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
-        req.setAttribute("user", user);
-        return ModelAndView.from("/user/updateForm.jsp");
+        ModelAndView modelAndView = ModelAndView.from("/user/updateForm.jsp");
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 }

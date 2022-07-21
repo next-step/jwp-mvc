@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 public class HomeController {
     @RequestMapping("/")
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) {
-        req.setAttribute("users", DataBase.findAll());
-        return ModelAndView.from("home.jsp");
+        ModelAndView modelAndView = ModelAndView.from("home.jsp");
+        modelAndView.addObject("users", DataBase.findAll());
+        return modelAndView;
     }
 }

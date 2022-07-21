@@ -18,8 +18,9 @@ public class LoginController {
         String password = req.getParameter("password");
         User user = DataBase.findUserById(userId);
         if (user == null) {
-            req.setAttribute("loginFailed", true);
-            return ModelAndView.from("/user/login.jsp");
+            ModelAndView modelAndView = ModelAndView.from("/user/login.jsp");
+            modelAndView.addObject("loginFailed", true);
+            return modelAndView;
         }
         if (user.matchPassword(password)) {
             HttpSession session = req.getSession();
