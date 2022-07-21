@@ -1,10 +1,8 @@
-package core.mvc.asis;
+package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
+import core.mvc.asis.Controller;
 import core.mvc.exception.NotFoundException;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +27,6 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        LegacyHandlerMapping legacyHandlerMapping = new LegacyHandlerMapping();
-        legacyHandlerMapping.initMapping();
-        handlerMappings.add(legacyHandlerMapping);
-
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
