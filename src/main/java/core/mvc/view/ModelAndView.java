@@ -1,4 +1,4 @@
-package core.mvc;
+package core.mvc.view;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -6,13 +6,17 @@ import java.util.Map;
 
 public class ModelAndView {
     private View view;
-    private Map<String, Object> model = new HashMap<String, Object>();
+    private Map<String, Object> model = new HashMap<>();
 
     public ModelAndView() {
     }
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public static ModelAndView from(String viewName) {
+        return new ModelAndView(new JspView(viewName));
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
