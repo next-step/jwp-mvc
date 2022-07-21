@@ -1,7 +1,5 @@
-package core.mvc.tobe;
+package core.mvc;
 
-import core.mvc.ModelAndView;
-import core.mvc.asis.Controller;
 import core.mvc.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,13 +56,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Object handler = getHandler(request);
-        if (handler instanceof Controller) {
-            render(
-                    ((Controller) handler).execute(request, response),
-                    request,
-                    response
-            );
-        } else if (handler instanceof HandlerExecution) {
+        if (handler instanceof HandlerExecution) {
             render(
                     ((HandlerExecution) handler).handle(request, response),
                     request,
