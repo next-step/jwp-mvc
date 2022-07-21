@@ -1,5 +1,7 @@
 package core.mvc;
 
+import core.mvc.view.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -13,7 +15,7 @@ public class HandlerExecution {
         this.method = method;
     }
 
-    public Object handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return method.invoke(declaredObject, request, response);
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return (ModelAndView) method.invoke(declaredObject, request, response);
     }
 }
