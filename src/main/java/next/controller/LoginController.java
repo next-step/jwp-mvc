@@ -5,6 +5,7 @@ import core.annotation.web.RequestMapping;
 import core.db.DataBase;
 import core.mvc.view.JspView;
 import core.mvc.view.ModelAndView;
+import core.mvc.view.RedirectView;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ public class LoginController {
         if (user.matchPassword(password)) {
             HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return new ModelAndView(new JspView("redirect:/"));
+            return new ModelAndView(new RedirectView("/"));
         } else {
             req.setAttribute("loginFailed", true);
             return new ModelAndView(new JspView("/user/login.jsp"));
