@@ -2,6 +2,7 @@ package next.controller;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.mvc.view.JspView;
 import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,6 @@ public class LogoutController {
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return ModelAndView.from("redirect:/");
+        return new ModelAndView(new JspView("redirect:/"));
     }
 }

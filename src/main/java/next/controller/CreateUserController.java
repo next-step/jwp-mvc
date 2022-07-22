@@ -3,6 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
+import core.mvc.view.JspView;
 import core.mvc.view.ModelAndView;
 import next.model.User;
 import org.slf4j.Logger;
@@ -22,6 +23,6 @@ public class CreateUserController {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
-        return ModelAndView.from("redirect:/");
+        return new ModelAndView(new JspView("redirect:/"));
     }
 }
