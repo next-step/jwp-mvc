@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -67,6 +67,23 @@ class ReflectionTest {
             logger.debug("{} {}({})", returnType, name, parameterClasses);
         }
         logger.debug("=============================");
+    }
+
+    @DisplayName("요구사항 4 - Student 클래스의 name과 age 필드에 값을 할당한다.")
+    @Test
+    void privateFieldAccess() throws Exception {
+        Class<Student> clazz = Student.class;
+        Field name = clazz.getDeclaredField("name");
+        Field age = clazz.getDeclaredField("age");
+
+        Student student = new Student();
+        name.setAccessible(true);
+        name.set(student, "홍길동");
+        age.setAccessible(true);
+        age.set(student, 30);
+
+        assertThat(student.getName()).isEqualTo("홍길동");
+        assertThat(student.getAge()).isEqualTo(30);
     }
 
     @Test
