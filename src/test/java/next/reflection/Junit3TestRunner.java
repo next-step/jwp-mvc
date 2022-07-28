@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class Junit3TestRunner {
 
-    @DisplayName("JUnit3Test 클래스의 메서드 중에서 'test'로 시작하는 메서드만 실행한다.")
+    @DisplayName("요구사항 2 - JUnit3Test 클래스의 메서드 중에서 'test'로 시작하는 메서드만 실행한다.")
     @Test
     void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
