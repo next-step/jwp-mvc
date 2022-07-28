@@ -9,7 +9,7 @@
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
 
 ## 기능 요구사항 - 1단계 (자바 Reflection)
-- [ ] `Question` 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
+- [x] `Question` 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
 - [ ] `Junit3Test` 클래스에서 'test'로 시작하는 메소드만 Java Reflection을 활용해 실행하도록 구현한다.
 - [ ] `Junit4Test` 클래스에서 `@MyTest` 애노테이션으로 설정되어 있는 메소드만 Java Reflection을 활용해 실행하도록 구현한다.
 - [ ] `Student` 클래스의 `name`과 `age` 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
