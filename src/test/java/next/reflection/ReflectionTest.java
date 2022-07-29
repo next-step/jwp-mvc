@@ -1,10 +1,6 @@
 package next.reflection;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.assertj.core.api.Assertions.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -12,8 +8,10 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -84,6 +82,18 @@ class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo("홍길동");
         assertThat(student.getAge()).isEqualTo(30);
+    }
+
+    @DisplayName("요구사항 5 - Question 클래스의 인스턴스를 생성한다.")
+    @Test
+    void newInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+        Constructor<Question> constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        Question question = constructor.newInstance("홍길동", "제목입니다", "내용입니다");
+
+        assertThat(question.getWriter()).isEqualTo("홍길동");
+        assertThat(question.getTitle()).isEqualTo("제목입니다");
+        assertThat(question.getContents()).isEqualTo("내용입니다");
     }
 
     @Test
