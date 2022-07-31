@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import static org.reflections.ReflectionUtils.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
@@ -32,12 +33,21 @@ public class AnnotationHandlerMapping {
 
     private void mappingHandlerExecutions(Class<?> controller) {
         Set<Method> methods = get(Methods.of(controller, withAnnotation(RequestMapping.class)));
+        Object handler = createHandlerInstance(controller);
         methods.forEach(method -> {
             RequestMapping annotation = method.getAnnotation(RequestMapping.class);
             HandlerKey handlerKey = new HandlerKey(annotation.value(), annotation.method());
-            HandlerExecution handlerExecution = new HandlerExecution(method);
+            HandlerExecution handlerExecution = new HandlerExecution(handler, method);
             handlerExecutions.put(handlerKey, handlerExecution);
         });
+    }
+
+    private Object createHandlerInstance(Class<?> controller) {
+        try {
+            return controller.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
