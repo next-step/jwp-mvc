@@ -1,11 +1,14 @@
 package next.reflection;
 
 import java.lang.reflect.Method;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class Junit3TestRunner {
+class Junit3TestRunner {
+
+    @DisplayName("test로 시작하는 메소드만 Java Replection을 활용해 실행")
     @Test
-    public void run() throws Exception {
+    void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
         final Object instance = clazz.getConstructors()[0].newInstance();
 

@@ -15,6 +15,7 @@ public class ReflectionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
