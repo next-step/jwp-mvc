@@ -15,7 +15,9 @@
   - getDeclaredConstructors()
   - getDeclaredMethods()
   - getDeclaredFields()
-- [ ] [요구사항2] Junit3Test 클래스에서 test로 시작하는 메소드만 Java Replection을 활용해 실행하도록 구현한다.
+- [x] [요구사항2] Junit3Test 클래스에서 test로 시작하는 메소드만 Java Replection을 활용해 실행하도록 구현한다.
+  - getMethods()
+  - method.invoke(new Object());
 - [ ] [요구사항3] Junit4Test 클래스에서 @MyTest 애노테이션으로 설정되어 있는 메소드만 Java Replection을 활용해 실행하도록 구현한다.
 - [ ] [요구사항4] Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
 - [ ] [요구사항5] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
