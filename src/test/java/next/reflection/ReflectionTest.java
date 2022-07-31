@@ -2,6 +2,8 @@ package next.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,5 +46,31 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @DisplayName("Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다")
+    @Test
+    void privateFieldAccess() throws IllegalAccessException {
+        final Class<Student> clazz = Student.class;
+        logger.debug("clazz = {}", clazz);
+
+        final Student student = new Student();
+
+        final Field[] declaredFields = clazz.getDeclaredFields();
+        for (final Field declaredField : declaredFields) {
+            if (declaredField.getName().equals("name")) {
+                declaredField.setAccessible(true);
+                declaredField.set(student, "홍길동");
+            }
+
+            if (declaredField.getName().equals("age")) {
+                declaredField.setAccessible(true);
+                declaredField.set(student, 20);
+            }
+        }
+
+        Assertions.assertThat(student.getName()).isEqualTo("홍길동");
+        Assertions.assertThat(student.getAge()).isSameAs(20);
+
     }
 }
