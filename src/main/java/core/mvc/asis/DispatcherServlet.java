@@ -23,13 +23,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private LegacyHandlerMapping legacyHandlerMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        legacyHandlerMapping = new LegacyHandlerMapping();
+        legacyHandlerMapping.initMapping();
 
         annotationHandlerMapping = new AnnotationHandlerMapping();
         annotationHandlerMapping.initialize();
@@ -40,23 +40,28 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
         try {
-            handleRequest(controller, req, resp);
+            handleRequest(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e.getMessage(), e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void handleRequest(Controller controller, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Controller controller = (Controller) legacyHandlerMapping.getHandler(req);
         if (controller != null) {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
             return;
         }
 
-        HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
+        HandlerExecution handlerExecution = (HandlerExecution) annotationHandlerMapping.getHandler(req);
+        if (handlerExecution == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
         ModelAndView mav = handlerExecution.handle(req, resp);
         Map<String, Object> model = mav.getModel();
         mav.getView().render(model, req, resp);

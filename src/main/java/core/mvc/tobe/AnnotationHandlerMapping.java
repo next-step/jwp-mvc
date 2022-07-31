@@ -17,7 +17,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
@@ -36,9 +36,9 @@ public class AnnotationHandlerMapping {
         Object handler = createHandlerInstance(controller);
         methods.forEach(method -> {
             RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-            HandlerKey handlerKey = new HandlerKey(annotation.value(), annotation.method());
-            HandlerExecution handlerExecution = new HandlerExecution(handler, method);
-            handlerExecutions.put(handlerKey, handlerExecution);
+            HandlerKey key = new HandlerKey(annotation.value(), annotation.method());
+            HandlerExecution execution = new HandlerExecution(handler, method);
+            handlerExecutions.put(key, execution);
         });
     }
 
@@ -50,7 +50,8 @@ public class AnnotationHandlerMapping {
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    @Override
+    public Object getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
