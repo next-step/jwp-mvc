@@ -7,15 +7,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
-    private final Object declaredObject;
+    private final Object target;
     private final Method method;
 
-    public HandlerExecution(Object declaredObject, Method method) {
-        this.declaredObject = declaredObject;
+    public HandlerExecution(Object target, Method method) {
+        this.target = target;
         this.method = method;
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(declaredObject, request, response);
+        return (ModelAndView) method.invoke(target, request, response);
     }
 }
