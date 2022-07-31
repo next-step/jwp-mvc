@@ -1,5 +1,7 @@
 package next.reflection;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,21 @@ public class ReflectionTest {
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
+
+        final Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+        for (Constructor<?> constructor : declaredConstructors) {
+            logger.debug("constructor : {}", constructor.toString());
+        }
+
+        final Method[] declaredMethods = clazz.getDeclaredMethods();
+        for (Method method : declaredMethods) {
+            logger.debug("method : {}", method.toString());
+        }
+
+        final Field[] declaredFields = clazz.getDeclaredFields();
+        for (Field field : declaredFields) {
+            logger.debug("field : {}", field.toString());
+        }
     }
 
     @Test
