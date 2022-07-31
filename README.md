@@ -25,7 +25,8 @@
 - [x] [요구사항4] Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
   - declaredField.setAccessible(true);
   - declaredField.set(student, "홍길동"); 
-- [ ] [요구사항5] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
+- [x] [요구사항5] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
+  - constructors[0].newInstance
 - [ ] [요구사항6] core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
 
 

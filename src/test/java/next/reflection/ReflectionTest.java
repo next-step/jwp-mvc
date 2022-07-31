@@ -1,16 +1,18 @@
 package next.reflection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-
 public class ReflectionTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
@@ -69,8 +71,25 @@ public class ReflectionTest {
             }
         }
 
-        Assertions.assertThat(student.getName()).isEqualTo("홍길동");
-        Assertions.assertThat(student.getAge()).isSameAs(20);
+        assertThat(student.getName()).isEqualTo("홍길동");
+        assertThat(student.getAge()).isSameAs(20);
 
+    }
+
+    @DisplayName("Question 클래스의 인스턴스를 자바 Reflection API를 활용해 생성한다")
+    @Test
+    void create_question_instance_with_reflection_api() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        final Class<Question> clazz = Question.class;
+
+        final Constructor<?>[] constructors = clazz.getConstructors();
+        for (final Constructor<?> constructor : constructors) {
+            logger.debug("constructor : {}", constructor.toString());
+        }
+
+        final Object actual = constructors[0].newInstance("작성자", "제목", "내용");
+
+        final Question expected = new Question("작성자", "제목", "내용");
+
+        assertThat(actual).isEqualTo(expected);
     }
 }
