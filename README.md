@@ -7,3 +7,26 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+# 🚀 1단계 - 자바 reflection
+
+### 요구사항
+- [x] [요구사항1] Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
+  - getDeclaredConstructors()
+  - getDeclaredMethods()
+  - getDeclaredFields()
+- [x] [요구사항2] Junit3Test 클래스에서 `test`로 시작하는 메소드만 Java Replection을 활용해 실행하도록 구현한다.
+  - getMethods()
+  - method.invoke(new Object());
+- [x] [요구사항3] Junit4Test 클래스에서 `@MyTest` 애노테이션으로 설정되어 있는 메소드만 Java Replection을 활용해 실행하도록 구현한다.
+  - getMethods()
+  - method.isAnnotationPresent(MyTest.class);
+  - method.invoke(new Object()); 
+- [x] [요구사항4] Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
+  - declaredField.setAccessible(true);
+  - declaredField.set(student, "홍길동"); 
+- [x] [요구사항5] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
+  - constructors[0].newInstance
+- [x] [요구사항6] core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+  - reflections.getTypesAnnotatedWith(annotation)
+

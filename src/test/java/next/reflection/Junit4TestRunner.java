@@ -1,11 +1,24 @@
 package next.reflection;
 
+import java.lang.reflect.Method;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class Junit4TestRunner {
+class Junit4TestRunner {
+
+    @DisplayName("@MyTest 애노테이션으로 설정되어 있는 메소드만 Java Replection을 활용해 실행")
     @Test
-    public void run() throws Exception {
+    void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
-        // TODO Junit4Test에서 @MyTest 애노테이션이 있는 메소드 실행
+
+        final Object instance = clazz.getConstructors()[0].newInstance();
+
+        final Method[] methods = clazz.getMethods();
+        for (final Method method : methods) {
+            if (method.isAnnotationPresent(MyTest.class)) {
+                method.invoke(instance);
+            }
+        }
+
     }
 }
