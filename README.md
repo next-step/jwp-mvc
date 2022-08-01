@@ -15,3 +15,9 @@
 - [x] `Student` 클래스의 `name`과 `age` 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인한다.
 - [x] `Question` 클래스의 인스턴스를 자바 Reflection API를 활용하여 생성한다.
 - [x] `core.di.factory.example` 패키지에서 `@Controller`, `@Service`, `@Repository` 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+## 기능 요구사항 - 2단계 (@MVC 구현)
+- [x] 애노테이션 기반의 MVC 프레임워크를 구현한다. 
+  - [x] 클라이언트 요청과 해당 요청을 처리할 핸들러의 매핑 정보를 갖는 `AnnotationHandlerMapping` 클래스를 구현한다.
+  - [x] 요청을 처리할 핸들러인 `HandlerExecution` 클래스를 구현한다.
+- [x] 레거시 MVC 프레임워크와 애노테이션 기반 MVC 프레임워크를 통합한다.
