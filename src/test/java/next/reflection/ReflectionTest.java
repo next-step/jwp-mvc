@@ -121,7 +121,7 @@ public class ReflectionTest {
 
         // ================ 방법1 ================
         Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
-        Question question1 = (Question)declaredConstructors[0].newInstance(writer, title, content);
+        Question question1 = (Question) declaredConstructors[0].newInstance(writer, title, content);
         assertThat(question1.getWriter()).isEqualTo(writer);
         assertThat(question1.getTitle()).isEqualTo(title);
         assertThat(question1.getContents()).isEqualTo(content);
