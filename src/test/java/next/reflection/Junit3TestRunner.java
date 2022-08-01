@@ -13,7 +13,7 @@ public class Junit3TestRunner {
         for (Method method : declaredMethods) {
             String methodName = method.getName();
 
-            if(methodName.startsWith("test")) {
+            if (methodName.startsWith("test")) {
                 method.invoke(clazz.newInstance());
             }
         }
