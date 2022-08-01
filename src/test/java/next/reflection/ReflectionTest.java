@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,5 +109,30 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo(name);
         assertThat(student.getAge()).isEqualTo(age);
+    }
+
+    @Test
+    void 인자를가진_생성자의_인스턴스생성() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String writer = "장형주";
+        String title = "reflection연습";
+        String content = "reflection을 연습해보자";
+
+        Class<Question> clazz = Question.class;
+
+        // ================ 방법1 ================
+        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+        Question question1 = (Question)declaredConstructors[0].newInstance(writer, title, content);
+        assertThat(question1.getWriter()).isEqualTo(writer);
+        assertThat(question1.getTitle()).isEqualTo(title);
+        assertThat(question1.getContents()).isEqualTo(content);
+        assertThat(question1).isEqualTo(new Question(writer, title, content));
+
+        // ================ 방법2 ================
+        Constructor<Question> constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        Question question2 = constructor.newInstance(writer, title, content);
+        assertThat(question2.getWriter()).isEqualTo(writer);
+        assertThat(question2.getTitle()).isEqualTo(title);
+        assertThat(question2.getContents()).isEqualTo(content);
+        assertThat(question2).isEqualTo(new Question(writer, title, content));
     }
 }
