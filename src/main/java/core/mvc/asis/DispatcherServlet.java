@@ -1,7 +1,10 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.*;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerAdapter;
+import core.mvc.tobe.HandlerAdapters;
+import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +25,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private final List<HandlerMapping> handlerMappings = new ArrayList<>();
-    private final List<HandlerAdapter> handlerAdapters = new ArrayList<>();
+    private final HandlerAdapters handlerAdapters = new HandlerAdapters();
 
     @Override
     public void init() throws ServletException {
@@ -33,13 +36,6 @@ public class DispatcherServlet extends HttpServlet {
 
         handlerMappings.add(legacyHandlerMapping);
         handlerMappings.add(annotationHandlerMapping);
-
-        initHandlerAdapters();
-    }
-
-    private void initHandlerAdapters() {
-        handlerAdapters.add(new ControllerHandlerAdapter());
-        handlerAdapters.add(new HandlerExecutionHandlerAdapter());
     }
 
     @Override
@@ -63,10 +59,7 @@ public class DispatcherServlet extends HttpServlet {
         }
 
         Object handler = maybeHandler.get();
-        HandlerAdapter handlerAdapter = handlerAdapters.stream()
-            .filter(adapter -> adapter.supports(handler))
-            .findFirst()
-            .orElseThrow(RuntimeException::new);
+        HandlerAdapter handlerAdapter = handlerAdapters.getHandlerAdapter(handler);
 
         ModelAndView mav = handlerAdapter.handle(request, response, handler);
         mav.getView().render(mav.getModel(), request, response);
