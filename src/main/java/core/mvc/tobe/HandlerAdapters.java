@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import org.reflections.Reflections;
 
+import javax.servlet.ServletException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +30,10 @@ public class HandlerAdapters {
         }
     }
 
-    public HandlerAdapter getHandlerAdapter(Object handler) {
+    public HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
         return adapters.stream()
             .filter(adapter -> adapter.supports(handler))
             .findFirst()
-            .orElseThrow(RuntimeException::new);
+            .orElseThrow(() -> new ServletException(String.format("해당 핸들러를 처리할 어댑터를 찾을 수 없습니다: %s", handler)));
     }
 }
