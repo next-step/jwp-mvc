@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,5 +58,24 @@ public class ReflectionTest {
     public void setField(Field field, Object instance, Object value) throws IllegalAccessException {
         field.setAccessible(true);
         field.set(instance, value);
+    }
+
+    @Test
+    @DisplayName("Question 클래스 인자를 가진 생성자의 인스턴스 생성")
+    public void createInstanceWithArgs() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        logger.debug(clazz.getName());
+
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        for (Constructor constructor : constructors) {
+            logger.debug("Constructor : {}", constructor.toString());
+        }
+
+        Date date = new Date();
+        Object actual1 = constructors[0].newInstance("DHLEE", "Title", "Contents");
+        Object actual2 = constructors[1].newInstance(1, "DHLEE", "Title", "Contents", date, 3);
+
+        assertThat(actual1).isEqualTo(new Question("DHLEE", "Title", "Contents"));
+        assertThat(actual2).isEqualTo(new Question(1, "DHLEE", "Title", "Contents", date, 3));
     }
 }
