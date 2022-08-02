@@ -1,5 +1,7 @@
 package next.reflection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -32,5 +34,27 @@ public class ReflectionTest {
         for (Method method : methods) {
             logger.debug("Method : {}", method.toString());
         }
+    }
+
+    @Test
+    @DisplayName("Student 클래스 private field Getter 메서드를 통한 값 출력")
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+
+        Student student = new Student();
+        setField(nameField, student, "DHLEE");
+        setField(ageField, student, 32);
+
+        assertThat(student.getName()).isEqualTo("DHLEE");
+        assertThat(student.getAge()).isEqualTo(32);
+    }
+
+    public void setField(Field field, Object instance, Object value) throws IllegalAccessException {
+        field.setAccessible(true);
+        field.set(instance, value);
     }
 }
