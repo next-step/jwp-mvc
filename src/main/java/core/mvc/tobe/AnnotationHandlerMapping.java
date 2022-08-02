@@ -1,21 +1,18 @@
 package core.mvc.tobe;
 
-import static org.reflections.ReflectionUtils.*;
+import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
+import org.reflections.Reflections;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.reflections.Reflections;
-
-import com.google.common.collect.Maps;
-
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
+import static org.reflections.ReflectionUtils.*;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
@@ -25,6 +22,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
         Reflections reflections = new Reflections(basePackage);
         reflections.getTypesAnnotatedWith(Controller.class)

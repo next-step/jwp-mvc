@@ -1,10 +1,9 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerAdapter;
 import core.mvc.tobe.HandlerAdapters;
-import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
@@ -24,18 +20,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
-    private final HandlerAdapters handlerAdapters = new HandlerAdapters();
+    private HandlerMappings handlerMappings;
+    private HandlerAdapters handlerAdapters;
 
     @Override
     public void init() throws ServletException {
-        LegacyHandlerMapping legacyHandlerMapping = new LegacyHandlerMapping();
-        legacyHandlerMapping.initMapping();
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping();
-        annotationHandlerMapping.initialize();
-
-        handlerMappings.add(legacyHandlerMapping);
-        handlerMappings.add(annotationHandlerMapping);
+        handlerMappings = new HandlerMappings();
+        handlerAdapters = new HandlerAdapters();
     }
 
     @Override
@@ -52,7 +43,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Optional<Object> maybeHandler = getHandler(request);
+        Optional<Object> maybeHandler = handlerMappings.getHandler(request);
         if (maybeHandler.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -63,12 +54,5 @@ public class DispatcherServlet extends HttpServlet {
 
         ModelAndView mav = handlerAdapter.handle(request, response, handler);
         mav.getView().render(mav.getModel(), request, response);
-    }
-
-    private Optional<Object> getHandler(HttpServletRequest request) {
-        return handlerMappings.stream()
-            .map(handlerMapping -> handlerMapping.getHandler(request))
-            .filter(Objects::nonNull)
-            .findFirst();
     }
 }
