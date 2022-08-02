@@ -9,6 +9,8 @@ import java.util.Map;
 
 public class JspView implements View {
 
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+
     private final String viewName;
 
     public JspView(String viewName) {
@@ -17,6 +19,11 @@ public class JspView implements View {
 
     @Override
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
+            response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+            return;
+        }
+
         model.forEach(request::setAttribute);
         RequestDispatcher dispatcher = request.getRequestDispatcher(String.format("/%s.jsp", viewName));
         dispatcher.forward(request, response);
