@@ -2,15 +2,21 @@ package next.reflection;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -57,4 +63,27 @@ public class ReflectionTest {
                 .map(Member::getName)
                 .collect(Collectors.joining(delimiter));
     }
+
+    @DisplayName("Reflection API를 이용해 private field에 값을 할당할 수 있다.")
+    @ParameterizedTest
+    @CsvSource(value = {"a,0", "b,2", "catsbi,35", "crong, 7"})
+    public void privateFieldAccess(String name, int age) throws Exception {
+
+        Class<Student> clazz = Student.class;
+        Constructor<Student> constructor = clazz.getConstructor();
+
+        Student student = constructor.newInstance();
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+
+        nameField.setAccessible(true);
+        ageField.setAccessible(true);
+
+        nameField.set(student, name);
+        ageField.setInt(student, age);
+
+        assertThat(student.getName()).isEqualTo(name);
+        assertThat(student.getAge()).isEqualTo(age);
+    }
+
 }
