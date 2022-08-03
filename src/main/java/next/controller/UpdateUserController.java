@@ -1,28 +1,38 @@
 package next.controller;
 
-import core.db.DataBase;
-import core.mvc.asis.Controller;
-import next.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class UpdateUserController implements Controller {
-    private static final Logger log = LoggerFactory.getLogger(UpdateUserController.class);
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = DataBase.findUserById(req.getParameter("userId"));
-        if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
+import core.db.DataBase;
+import core.mvc.ModelAndView;
+import next.model.User;
+
+@Controller
+public class UpdateUserController {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateUserController.class);
+
+    @RequestMapping(value = "/users/update", method = RequestMethod.POST)
+    public ModelAndView update(HttpServletRequest request, HttpServletResponse response) {
+        User user = DataBase.findUserById(request.getParameter("userId"));
+        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
-        log.debug("Update User : {}", updateUser);
+        User updateUser = new User(
+            request.getParameter("userId"),
+            request.getParameter("password"),
+            request.getParameter("name"),
+            request.getParameter("email")
+        );
+
+        logger.debug("Update User : {}", updateUser);
         user.update(updateUser);
-        return "redirect:/";
+        return ModelAndView.withJspView("redirect:/");
     }
 }
