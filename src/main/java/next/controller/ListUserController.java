@@ -1,19 +1,23 @@
 package next.controller;
 
-import core.db.DataBase;
-import core.mvc.asis.Controller;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ListUserController implements Controller {
-    @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (!UserSessionUtils.isLogined(req.getSession())) {
-            return "redirect:/users/loginForm";
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.db.DataBase;
+import core.mvc.ModelAndView;
+
+@Controller
+public class ListUserController {
+
+    @RequestMapping("/users")
+    public ModelAndView users(HttpServletRequest request, HttpServletResponse response) {
+        if (!UserSessionUtils.isLogined(request.getSession())) {
+            return ModelAndView.withJspView("redirect:/users/loginForm");
         }
 
-        req.setAttribute("users", DataBase.findAll());
-        return "/user/list.jsp";
+        request.setAttribute("users", DataBase.findAll());
+        return ModelAndView.withJspView("/user/list.jsp");
     }
 }
