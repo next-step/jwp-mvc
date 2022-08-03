@@ -1,5 +1,7 @@
 package core.mvc;
 
+import core.mvc.tobe.JspView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
@@ -15,6 +17,10 @@ public class ModelAndView {
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public static ModelAndView withJspView(String viewName) {
+        return new ModelAndView(new JspView(viewName));
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
