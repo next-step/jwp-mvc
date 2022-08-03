@@ -7,14 +7,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
+import java.lang.reflect.Parameter;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,8 +50,8 @@ public class ReflectionTest {
     public void printAllByQuestion() {
         Class<Question> questionClass = Question.class;
 
-        String constructors = extractAndJoining(questionClass.getDeclaredConstructors(),DELIMITER);
-        String methods = extractAndJoining(questionClass.getDeclaredMethods(),DELIMITER);
+        String constructors = extractAndJoining(questionClass.getDeclaredConstructors(), DELIMITER);
+        String methods = extractAndJoining(questionClass.getDeclaredMethods(), DELIMITER);
         String fields = extractAndJoining(questionClass.getDeclaredFields(), DELIMITER);
 
         logger.info("생성자 목록: {}", constructors);
@@ -86,4 +88,29 @@ public class ReflectionTest {
         assertThat(student.getAge()).isEqualTo(age);
     }
 
+    @DisplayName("Reflection API를 이용해 인자를 가진 생성자의 인스턴스를 생성할 수 있다.")
+    @Test
+    public void createWithParameters() throws Exception {
+        //given
+        String[] args = new String[]{"catsbi", "만들면서 배우는 Spring3기", "리플렉션 학습하기"};
+
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        Constructor<?> constructor = constructors[0];
+
+        Parameter[] parameters = constructor.getParameters();
+
+        Object[] params = IntStream.range(0, parameters.length)
+                .mapToObj(idx -> parameters[idx].getType().cast(args[idx]))
+                .toArray();
+
+
+        //when
+        Question question = (Question) constructor.newInstance(params);
+
+        //then
+        assertThat(question.getWriter()).isEqualTo(args[0]);
+        assertThat(question.getTitle()).isEqualTo(args[1]);
+        assertThat(question.getContents()).isEqualTo(args[2]);
+    }
 }
