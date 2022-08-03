@@ -30,7 +30,10 @@ public class User {
     }
 
     public void update(User updateUser) {
-        this.password = updateUser.password;
+        String updatedPassword = updateUser.getPassword();
+        if (updatedPassword != null && !updatedPassword.isBlank()) {
+            this.password = updateUser.password;
+        }
         this.name = updateUser.name;
         this.email = updateUser.email;
     }
