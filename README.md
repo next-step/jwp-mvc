@@ -33,9 +33,9 @@
 # 🚀 2단계 - @MVC 구현
 
 ### 요구사항
-- [ ] @Controller, @RequestMapping 애노테이션이 적용된 컨트롤러를 찾아 실행한다.
-  - [ ] @RequestMapping은 method가 설정되지 않으면 모든 HTTP Method를 지원해야 한다.
-  - [ ] AnnotationHandlerMappingTest 테스트가 성공해야한다.
+- [x] @Controller, @RequestMapping 애노테이션이 적용된 컨트롤러를 찾아 실행할 수 있는 프레임워크 구현
+  - [x] @RequestMapping은 method가 설정되지 않으면 모든 HTTP Method를 지원해야 한다.
+  - [x] AnnotationHandlerMappingTest 테스트가 성공해야한다.
 - [ ] 기존 컨트롤러와 애너테이션이 적용된 컨트롤러가 공존해야 한다.
   - [ ] DispatchServlet에서 RequestMapping과 AnnotationHandlerMapping 모두 적용되어야 한다.
   - [ ] 기존의 컨트롤러와 동일한 뷰를 처리할 수 있도록 구현한다.
