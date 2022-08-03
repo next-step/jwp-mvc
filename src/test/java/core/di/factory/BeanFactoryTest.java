@@ -62,7 +62,7 @@ public class BeanFactoryTest {
     void find_specification_annotations() {
         final Set<Class<?>> classesWithAnnotations = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
 
-        assertThat(classesWithAnnotations).containsExactly(
+        assertThat(classesWithAnnotations).contains(
             JdbcUserRepository.class,
             JdbcQuestionRepository.class,
             QnaController.class,
