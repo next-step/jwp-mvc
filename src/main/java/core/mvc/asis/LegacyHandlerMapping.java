@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.mvc.tobe.HandlerMapping;
-import next.controller.HomeController;
 import next.controller.ListUserController;
 import next.controller.LoginController;
 import next.controller.LogoutController;
@@ -25,7 +24,6 @@ public class LegacyHandlerMapping implements HandlerMapping {
 
     @Override
     public void initialize() {
-        mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
         mappings.put("/users", new ListUserController());
