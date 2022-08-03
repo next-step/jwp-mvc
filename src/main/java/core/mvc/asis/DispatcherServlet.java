@@ -19,7 +19,7 @@ import java.util.Optional;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final Object[] BASE_PACKAGES = {"next.controller"};
+    private static final Object[] BASE_PACKAGES = {"next.controller", "core.mvc.tobe"};
 
     private HandlerMappings handlerMappings;
     private HandlerAdapters handlerAdapters;
