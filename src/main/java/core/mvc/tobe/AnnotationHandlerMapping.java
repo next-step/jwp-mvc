@@ -9,8 +9,11 @@ import org.reflections.Reflections;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.reflections.ReflectionUtils.*;
 
@@ -34,9 +37,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Object handler = createHandlerInstance(controller);
         methods.forEach(method -> {
             RequestMapping annotation = method.getAnnotation(RequestMapping.class);
-            HandlerKey key = new HandlerKey(annotation.value(), annotation.method());
+            List<HandlerKey> handlerKeys = getHandlerKeys(annotation);
             HandlerExecution execution = new HandlerExecution(handler, method);
-            handlerExecutions.put(key, execution);
+            handlerKeys.forEach(key -> handlerExecutions.put(key, execution));
         });
     }
 
@@ -46,6 +49,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<HandlerKey> getHandlerKeys(RequestMapping annotation) {
+        String url = annotation.value();
+        RequestMethod[] requestMethods = annotation.method();
+
+        if (requestMethods.length == 0) {
+            requestMethods = RequestMethod.values();
+        }
+
+        return Arrays.stream(requestMethods)
+            .map(requestMethod -> new HandlerKey(url, requestMethod))
+            .collect(Collectors.toList());
     }
 
     @Override
