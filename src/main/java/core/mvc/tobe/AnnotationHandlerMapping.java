@@ -23,7 +23,7 @@ public class AnnotationHandlerMapping {
 
     private final Object[] basePackage;
 
-    private static final Map<HandlerKey, HandlerExecution> HANDLER_EXECUTIONS = Maps.newHashMap();
+    private static final Map<HandlerKey, HandlerExecutable> HANDLER_EXECUTIONS = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -43,7 +43,7 @@ public class AnnotationHandlerMapping {
 
         for (final Method method : methods) {
             final List<HandlerKey> handlerKeys = createHandlerKeys(method);
-            final HandlerExecution handlerExecution = new HandlerExecution(handler, method);
+            final HandlerExecutable handlerExecution = new HandlerExecution(handler, method);
             mappingHandler(handlerKeys, handlerExecution);
         }
     }
@@ -67,7 +67,7 @@ public class AnnotationHandlerMapping {
             .collect(Collectors.toList());
     }
 
-    private void mappingHandler(final List<HandlerKey> handlerKeys, final HandlerExecution handlerExecution) {
+    private void mappingHandler(final List<HandlerKey> handlerKeys, final HandlerExecutable handlerExecution) {
         for (final HandlerKey handlerKey : handlerKeys) {
             HANDLER_EXECUTIONS.put(handlerKey, handlerExecution);
         }
@@ -81,7 +81,7 @@ public class AnnotationHandlerMapping {
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public HandlerExecutable getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return HANDLER_EXECUTIONS.get(new HandlerKey(requestUri, rm));

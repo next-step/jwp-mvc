@@ -33,7 +33,7 @@ class AnnotationHandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecutable execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
@@ -46,7 +46,7 @@ class AnnotationHandlerMappingTest {
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecutable execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
     }
 
@@ -56,7 +56,7 @@ class AnnotationHandlerMappingTest {
     void all_request_method(RequestMethod method) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest(method.name(), "/allMethod");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = handlerMapping.getHandler(request);
+        HandlerExecutable execution = handlerMapping.getHandler(request);
         final ModelAndView mav = execution.handle(request, response);
 
         assertThat(mav.getObject("thank")).isEqualTo("you");
