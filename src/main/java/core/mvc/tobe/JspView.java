@@ -26,7 +26,7 @@ public class JspView implements View {
         }
 
         if (hasModel(model)) {
-            moveModelObjectsToRequestAttributes(model, request);
+            copyModelObjectsIntoRequestAttributes(model, request);
         }
 
         final RequestDispatcher requestDispatcher = request.getRequestDispatcher(jspPath);
@@ -37,7 +37,7 @@ public class JspView implements View {
         return model != null && !model.isEmpty();
     }
 
-    private static void moveModelObjectsToRequestAttributes(final Map<String, ?> model, final HttpServletRequest request) {
+    private static void copyModelObjectsIntoRequestAttributes(final Map<String, ?> model, final HttpServletRequest request) {
         for (final Entry<String, ?> entry : model.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
         }
