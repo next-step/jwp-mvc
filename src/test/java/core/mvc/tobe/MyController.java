@@ -43,4 +43,12 @@ public class MyController {
         mav.addObject("thank", "you");
         return mav;
     }
+
+    @RequestMapping("/welcome")
+    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mav = new ModelAndView(new JspView("/home.jsp"));
+        mav.addObject("hi", "there");
+        return mav;
+    }
+
 }
