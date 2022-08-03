@@ -53,6 +53,6 @@ public class DispatcherServlet extends HttpServlet {
         HandlerAdapter handlerAdapter = handlerAdapters.getHandlerAdapter(handler);
 
         ModelAndView mav = handlerAdapter.handle(request, response, handler);
-        mav.getView().render(mav.getModel(), request, response);
+        mav.render(request, response);
     }
 }
