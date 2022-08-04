@@ -34,7 +34,8 @@ class Junit3TestRunner {
         //then
         assertAll(
                 () -> verify(print, times(1)).println("Running Test1"),
-                () -> verify(print, times(1)).println("Running Test2")
+                () -> verify(print, times(1)).println("Running Test2"),
+                () -> verify(print, never()).println("Running Test3")
         );
     }
 }
