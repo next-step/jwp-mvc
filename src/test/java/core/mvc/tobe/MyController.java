@@ -36,4 +36,13 @@ public class MyController {
         DataBase.addUser(user);
         return null;
     }
+
+    @RequestMapping(value = "/anyMethod/users")
+    public ModelAndView findUserIdByAnyHttpMethod(HttpServletRequest request, HttpServletResponse response) {
+        String userId = request.getParameter("userId");
+        logger.debug("Find UserId : {}", userId);
+        User user = DataBase.findUserById(userId);
+        request.setAttribute("user", user);
+        return null;
+    }
 }

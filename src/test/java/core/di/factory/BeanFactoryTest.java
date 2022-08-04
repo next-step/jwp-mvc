@@ -6,20 +6,17 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
-import next.reflection.ReflectionTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,7 +29,7 @@ public class BeanFactoryTest {
 
     @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setup() {
+    public void setup() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         reflections = new Reflections("core.di.factory.example");
         Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
         beanFactory = new BeanFactory(preInstanticateClazz);

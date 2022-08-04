@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +24,10 @@ public class BeanFactory {
         return (T) beans.get(requiredType);
     }
 
-    public void initialize() {
-
+    public void initialize() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        for (Class<?> clazz : preInstanticateBeans) {
+            Object instance = clazz.getDeclaredConstructor().newInstance();
+            beans.put(clazz, instance);
+        }
     }
 }
