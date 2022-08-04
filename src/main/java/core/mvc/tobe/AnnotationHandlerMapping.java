@@ -5,6 +5,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.di.factory.BeanFactory;
+import core.mvc.HandlerMapping;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private BeanFactory beanFactory;
     private Object[] basePackage;
 
@@ -55,6 +56,7 @@ public class AnnotationHandlerMapping {
     }
 
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
