@@ -12,17 +12,9 @@ public class HandlerMappings {
 
     private final List<HandlerMapping> mappings = new ArrayList<>();
 
-    public HandlerMappings() {
-        initHandlerMappings();
-    }
-
-    private void initHandlerMappings() {
+    public HandlerMappings(Object... basePackage) {
         mappings.add(new LegacyHandlerMapping());
-        mappings.add(new AnnotationHandlerMapping("core.mvc.tobe"));
-        initialize();
-    }
-
-    public void initialize() {
+        mappings.add(new AnnotationHandlerMapping(basePackage));
         mappings.forEach(HandlerMapping::initialize);
     }
 

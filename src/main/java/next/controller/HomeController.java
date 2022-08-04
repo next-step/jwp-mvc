@@ -1,15 +1,19 @@
 package next.controller;
 
-import core.db.DataBase;
-import core.mvc.asis.Controller;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class HomeController implements Controller {
-    @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        req.setAttribute("users", DataBase.findAll());
-        return "home.jsp";
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.db.DataBase;
+import core.mvc.ModelAndView;
+
+@Controller
+public class HomeController {
+
+    @RequestMapping("/")
+    public ModelAndView home(HttpServletRequest request, HttpServletResponse response) {
+        request.setAttribute("users", DataBase.findAll());
+        return ModelAndView.withJspView("home.jsp");
     }
 }

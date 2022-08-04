@@ -12,12 +12,8 @@ public class HandlerAdapters {
 
     private final List<HandlerAdapter> adapters = new ArrayList<>();
 
-    public HandlerAdapters() {
-        initHandlerAdapters();
-    }
-
-    private void initHandlerAdapters() {
-        Reflections reflections = new Reflections("core.mvc.tobe");
+    public HandlerAdapters(Object... basePackages) {
+        Reflections reflections = new Reflections(basePackages);
         Set<Class<? extends HandlerAdapter>> classes = reflections.getSubTypesOf(HandlerAdapter.class);
         classes.forEach(clazz -> adapters.add(createNewInstance(clazz)));
     }

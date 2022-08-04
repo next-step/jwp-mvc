@@ -1,32 +1,36 @@
 package core.mvc.asis;
 
-import core.mvc.ModelAndView;
-import core.mvc.tobe.HandlerAdapter;
-import core.mvc.tobe.HandlerAdapters;
-import core.mvc.tobe.HandlerMappings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import core.mvc.ModelAndView;
+import core.mvc.tobe.HandlerAdapter;
+import core.mvc.tobe.HandlerAdapters;
+import core.mvc.tobe.HandlerMappings;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
+    private static final Object HANDLER_MAPPING_BASE_PACKAGE = "next.controller";
+    private static final Object HANDLER_ADAPTER_BASE_PACKAGE = "core.mvc.tobe";
 
     private HandlerMappings handlerMappings;
     private HandlerAdapters handlerAdapters;
 
     @Override
     public void init() throws ServletException {
-        handlerMappings = new HandlerMappings();
-        handlerAdapters = new HandlerAdapters();
+        handlerMappings = new HandlerMappings(HANDLER_MAPPING_BASE_PACKAGE);
+        handlerAdapters = new HandlerAdapters(HANDLER_ADAPTER_BASE_PACKAGE);
     }
 
     @Override
@@ -53,6 +57,6 @@ public class DispatcherServlet extends HttpServlet {
         HandlerAdapter handlerAdapter = handlerAdapters.getHandlerAdapter(handler);
 
         ModelAndView mav = handlerAdapter.handle(request, response, handler);
-        mav.getView().render(mav.getModel(), request, response);
+        mav.render(request, response);
     }
 }
