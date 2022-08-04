@@ -1,53 +1,62 @@
 package core.mvc.asis;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.RequestDispatcher;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.ControllerExecution;
+import core.mvc.tobe.HandlerExecutable;
+import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private RequestMapping requestMapping;
+    private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        requestMapping = new RequestMapping();
+        requestMapping.initMapping();
+        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        annotationHandlerMapping.initialize();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String requestUri = request.getRequestURI();
+        logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
-        try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
-    }
+        HandlerExecutable handlerExecutable = getHandlerExecutable(request, requestUri);
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+        if (handlerExecutable == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        try {
+            final ModelAndView modelAndView = handlerExecutable.handle(request, response);
+            modelAndView.render(request, response);
+        } catch (Exception e) {
+            logger.error("Exception : {}", e.getMessage(), e);
+            throw new ServletException(e.getMessage());
+        }
+
+    }
+
+    private HandlerExecutable getHandlerExecutable(final HttpServletRequest request, final String requestUri) {
+        Controller controller = requestMapping.findController(requestUri);
+        if (controller != null) {
+            return new ControllerExecution(controller);
+        }
+        return annotationHandlerMapping.getHandler(request);
     }
 }
