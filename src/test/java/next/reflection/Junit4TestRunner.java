@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,7 +24,7 @@ class Junit4TestRunner {
         Class<Junit4Test> junit4TestClass = Junit4Test.class;
         Junit4Test junit4Test = junit4TestClass.getDeclaredConstructor().newInstance();
         List<Method> methodsWithMyTestAnnotation = Stream.of(junit4TestClass.getDeclaredMethods())
-                .filter(this::isDeclaredMyTestAnnotation)
+                .filter(method -> method.isAnnotationPresent(MyTest.class))
                 .collect(Collectors.toList());
         //when
         for (Method method : methodsWithMyTestAnnotation) {
@@ -37,10 +36,5 @@ class Junit4TestRunner {
                 () -> verify(print, times(1)).println("Running Test2"),
                 () -> verify(print, never()).println("Running Test3")
         );
-    }
-
-    private boolean isDeclaredMyTestAnnotation(Method method) {
-        return Arrays.stream(method.getDeclaredAnnotations())
-                .anyMatch(annotation -> annotation.annotationType().isAssignableFrom(MyTest.class));
     }
 }
