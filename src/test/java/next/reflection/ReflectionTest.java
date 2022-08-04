@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -61,16 +66,26 @@ class ReflectionTest {
     }
 
     @Test
+    @DisplayName("인자가 있는 생성자로 인스턴스 생성")
     @SuppressWarnings("rawtypes")
     void constructor() throws Exception {
-        Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+        //given
+        Class<Question> questionClass = Question.class;
+        List<Class<?>> targetConstructorTypes = Arrays.asList(Long.TYPE, String.class, String.class, String.class, Date.class, Integer.TYPE);
+        Constructor<?> targetConstructor = Stream.of(questionClass.getDeclaredConstructors())
+                .filter(constructor -> targetConstructorTypes.equals(Arrays.asList(constructor.getParameterTypes())))
+                .findAny()
+                .get();
+
+        int id = 10;
+        String writer = "writer";
+        String title = "title";
+        String contents = "contents";
+        Date createdAt = Date.from(Instant.now());
+        int tenCountOfComment = 5;
+        //when
+        Object tenIdQuestion = targetConstructor.newInstance(id, writer, title, contents, createdAt, tenCountOfComment);
+        //then
+        assertThat(tenIdQuestion).isEqualTo(new Question(id, writer, title, contents, createdAt, tenCountOfComment));
     }
 }
