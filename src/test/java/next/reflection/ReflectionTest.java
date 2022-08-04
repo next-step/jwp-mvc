@@ -38,6 +38,29 @@ class ReflectionTest {
     }
 
     @Test
+    @DisplayName("private field 값 할당")
+    void privateFieldAccess() throws Exception {
+        //given
+        Student student = new Student();
+        int updatedAge = 5;
+        String updatedName = "name";
+
+        Class<Student> studentClass = Student.class;
+        Field ageField = studentClass.getDeclaredField("age");
+        Field nameField = studentClass.getDeclaredField("name");
+        //when
+        ageField.setAccessible(true);
+        nameField.setAccessible(true);
+        ageField.set(student, updatedAge);
+        nameField.set(student, updatedName);
+        //then
+        assertAll(
+                () -> assertThat(student.getAge()).isEqualTo(updatedAge),
+                () -> assertThat(student.getName()).isEqualTo(updatedName)
+        );
+    }
+
+    @Test
     @SuppressWarnings("rawtypes")
     void constructor() throws Exception {
         Class<Question> clazz = Question.class;
