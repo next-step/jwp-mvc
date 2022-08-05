@@ -1,5 +1,13 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.adapter.AnnotationHandlerAdapter;
+import core.mvc.tobe.adapter.HandlerAdapter;
+import core.mvc.tobe.adapter.RequestMappingAdapter;
+import core.mvc.tobe.handler.AnnotationHandlerMapping;
+import core.mvc.tobe.handler.HandlerMapping;
+import core.mvc.tobe.handler.RequestMapping;
+import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,19 +18,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private static final String BASE_PACKAGE_START = "next";
+
+    List<HandlerAdapter> handlerAdapters = new ArrayList<>();
+    List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        handlerAdapters.add(new AnnotationHandlerAdapter());
+        handlerAdapters.add(new RequestMappingAdapter());
+
+        handlerMappings.add(new AnnotationHandlerMapping());
+        handlerMappings.add(new RequestMapping());
     }
 
     @Override
@@ -30,24 +45,34 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Object handler = null;
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            handler = findHandler(req);
+            HandlerAdapter handlerAdapter = getHandlerAdapter(handler);
+            ModelAndView mv = handlerAdapter.handle(req, resp, handler);
+
+            mv.getView().render(mv.getModel(), req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private HandlerAdapter getHandlerAdapter(Object handler) throws NotFoundException {
+        for (HandlerAdapter handlerAdapter : handlerAdapters) {
+            if (handlerAdapter.support(handler)) {
+                return handlerAdapter;
+            }
         }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        throw new NotFoundException("요청에 맞는 어뎁터가 없습니다.");
+    }
+
+    private Object findHandler(HttpServletRequest req) throws NotFoundException {
+        for (HandlerMapping handlerMapping : handlerMappings) {
+            return handlerMapping.getHandler(req);
+        }
+
+        throw new NotFoundException("요청에 맞는 핸들러가 없습니다.");
     }
 }
