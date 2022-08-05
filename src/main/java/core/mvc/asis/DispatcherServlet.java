@@ -1,53 +1,74 @@
 package core.mvc.asis;
 
+import core.mvc.DefaultView;
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    public static final String FAILED_INITIALIZE_ANNOTATION_HANDLER_MAPPING_MESSAGE = "애노테이션 핸들러 매핑 초기화에 실패했습니다.";
+    public static final String INVALID_HANDLER_MESSAGE = "유효한 핸들러가 아닙니다.";
+    private AnnotationHandlerMapping ahm;
 
-    private RequestMapping rm;
+    private List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+
+        try {
+            ahm = new AnnotationHandlerMapping("next.controller");
+            ahm.initialize();
+            handlerMappings.add(ahm);
+
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException e) {
+            logger.error(FAILED_INITIALIZE_ANNOTATION_HANDLER_MAPPING_MESSAGE);
+            throw new ServletException(e);
+        }
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        Controller controller = rm.findController(requestUri);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
+            Object handler = findHandler(req);
+            ModelAndView mav = handle(handler, req, resp);
+            mav.render(req, resp);
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
+
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
+    private Object findHandler(HttpServletRequest req) throws NoSuchMethodException {
+        return handlerMappings.stream()
+                .filter(hm -> Objects.nonNull(hm.getHandler(req)))
+                .findFirst()
+                .map(hm-> hm.getHandler(req))
+                .orElseThrow(NoSuchMethodException::new);
+    }
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+    private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution)handler).handle(req,resp);
+        }
+        throw new ServletException(INVALID_HANDLER_MESSAGE);
     }
 }

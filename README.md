@@ -83,3 +83,12 @@
       core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
         - Reflections Library 라이브러리를 활용한다. Reflections Library는 클래스패스에 이미 추가되어 있다.
         - A Guide to the Reflections Library 문서를 참고한다.
+
+
+## Step 2 - @MVC 구현
+- 요구사항1 - 애노테이션 기반 MVC 프레임워크
+  - [x] HTTP 메소드 애노테이션 만들기 : `@RequestMapping` -> 기존에 존재하는 애노테이션 활용
+  - [x] `@RequestMapping` 애노테이션 속성값이 없을 경우 모든 메소드를 받을 수 있도록 만들기 
+
+- 요구사항2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+  - [x] 이전에 구현되어 있던 컨트롤러를 애노테이션 기반으로 변환작업
