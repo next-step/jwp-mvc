@@ -1,4 +1,4 @@
-package core.mvc.tobe.adapter;
+package core.mvc.tobe.handler;
 
 public class NotExistHandlerException extends RuntimeException {
     public NotExistHandlerException() {

@@ -3,9 +3,11 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.adapter.AnnotationHandlerAdapter;
 import core.mvc.tobe.adapter.HandlerAdapter;
+import core.mvc.tobe.adapter.NotExistAdapterException;
 import core.mvc.tobe.adapter.RequestMappingAdapter;
 import core.mvc.tobe.handler.AnnotationHandlerMapping;
 import core.mvc.tobe.handler.HandlerMapping;
+import core.mvc.tobe.handler.NotExistHandlerException;
 import core.mvc.tobe.handler.RequestMapping;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
@@ -65,7 +67,7 @@ public class DispatcherServlet extends HttpServlet {
             }
         }
 
-        throw new NotFoundException("요청에 맞는 어뎁터가 없습니다.");
+        throw new NotExistAdapterException("요청에 맞는 어뎁터가 없습니다.");
     }
 
     private Object findHandler(HttpServletRequest req) throws NotFoundException {
@@ -73,6 +75,6 @@ public class DispatcherServlet extends HttpServlet {
             return handlerMapping.getHandler(req);
         }
 
-        throw new NotFoundException("요청에 맞는 핸들러가 없습니다.");
+        throw new NotExistHandlerException("요청에 맞는 핸들러가 없습니다.");
     }
 }
