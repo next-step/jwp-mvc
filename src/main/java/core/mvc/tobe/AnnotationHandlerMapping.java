@@ -11,6 +11,8 @@ import org.reflections.Reflections;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -49,35 +51,37 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private List<Map.Entry<HandlerKey, HandlerExecution>> createHandlerExecution(Class<?> controllerType) {
-        Controller controllerAnno = controllerType.getDeclaredAnnotation(Controller.class);
-        String controllerPath = controllerAnno.path();
-
         @SuppressWarnings("unchecked")
         Set<Method> methods = getAllMethods(controllerType, withAnnotation(RequestMapping.class));
 
-        if (methods.isEmpty()) {
-            return Collections.emptyList();
+        return methods.stream()
+                .flatMap(method-> {
+                    List<Map.Entry<HandlerKey, HandlerExecution>> list = createHandlerEntry(controllerType, method);
+                    return list.stream();
+                }).collect(Collectors.toList());
+    }
+
+    private List<Map.Entry<HandlerKey, HandlerExecution>> createHandlerEntry(Class<?> controllerType, Method method) {
+        Controller cAnno = controllerType.getDeclaredAnnotation(Controller.class);
+        RequestMapping rmAnno = method.getAnnotation(RequestMapping.class);
+        HandlerExecution handlerExecution = new HandlerExecution(beanFactory.getBean(controllerType), method);
+
+        RequestMethod[] requestMethods = rmAnno.method();
+        if (requestMethods.length == 0) {
+            requestMethods = RequestMethod.values();
         }
 
-        return methods.stream()
-                .map(method-> {
-                    RequestMapping rm = method.getAnnotation(RequestMapping.class);
-                    HandlerKey handlerKey = new HandlerKey(controllerPath + rm.value(), rm.method());
-                    HandlerExecution handlerExecution = new HandlerExecution(beanFactory.getBean(controllerType), method);
-
-                    return Map.entry(handlerKey, handlerExecution);
-                }).collect(Collectors.toList());
+        return Arrays.stream(requestMethods).map(m -> {
+            HandlerKey handlerKey = new HandlerKey(cAnno.path() + rmAnno.value(), m);
+            return Map.entry(handlerKey, handlerExecution);
+        }).collect(Collectors.toList());
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, rm));
 
-        if (Objects.isNull(handlerExecution)) {
-            return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.NONE));
-        }
-        return handlerExecution;
+        return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 }
