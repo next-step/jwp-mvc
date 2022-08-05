@@ -9,7 +9,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
@@ -71,9 +70,9 @@ class ReflectionTest {
     void constructor() throws Exception {
         //given
         Class<Question> questionClass = Question.class;
-        List<Class<?>> targetConstructorTypes = Arrays.asList(Long.TYPE, String.class, String.class, String.class, Date.class, Integer.TYPE);
+        List<Class<?>> targetConstructorTypes = List.of(Long.TYPE, String.class, String.class, String.class, Date.class, Integer.TYPE);
         Constructor<?> targetConstructor = Stream.of(questionClass.getDeclaredConstructors())
-                .filter(constructor -> targetConstructorTypes.equals(Arrays.asList(constructor.getParameterTypes())))
+                .filter(constructor -> targetConstructorTypes.equals(List.of(constructor.getParameterTypes())))
                 .findAny()
                 .get();
 
