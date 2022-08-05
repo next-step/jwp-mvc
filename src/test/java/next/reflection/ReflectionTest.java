@@ -1,10 +1,13 @@
 package next.reflection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class ReflectionTest {
@@ -57,7 +60,7 @@ public class ReflectionTest {
 
     @Test
     @SuppressWarnings("rawtypes")
-    public void constructor() throws Exception {
+    public void constructor() {
         Class<Question> clazz = Question.class;
         Constructor[] constructors = clazz.getConstructors();
         for (Constructor constructor : constructors) {
@@ -67,5 +70,30 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    void privateFieldAccess() {
+        Class<Student> clazz = Student.class;
+        String inputName = "재성";
+        int inputAge = 20;
+        try {
+            Field name = clazz.getDeclaredField("name");
+            Field age = clazz.getDeclaredField("age");
+
+            name.setAccessible(true);
+            age.setAccessible(true);
+
+            Student student = new Student();
+
+            name.set(student, inputName);
+            age.set(student, inputAge);
+
+            assertThat(student.getName()).isEqualTo(inputName);
+            assertThat(student.getAge()).isEqualTo(inputAge);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        logger.debug(clazz.getName());
     }
 }
