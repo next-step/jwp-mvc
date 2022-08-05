@@ -1,10 +1,15 @@
 package core.mvc.asis;
 
+import core.annotation.web.RequestMapping;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@core.annotation.web.Controller
 public class ForwardController implements Controller {
     private String forwardUrl;
+
+    public ForwardController() {}
 
     public ForwardController(String forwardUrl) {
         this.forwardUrl = forwardUrl;
