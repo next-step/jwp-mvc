@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Date;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -95,5 +97,24 @@ public class ReflectionTest {
             throw new RuntimeException(e);
         }
         logger.debug(clazz.getName());
+    }
+
+    @Test
+    void createQuestWithArguments() {
+        Arrays.stream(Question.class.getConstructors())
+                .forEach(constructor -> {
+                    try {
+                        if (constructor.getParameterCount() == 3) {
+                            Object instance = constructor.newInstance(
+                                    "writer",
+                                    "title",
+                                    "contents"
+                            );
+                            assertThat(instance).isNotNull();
+                        }
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 }
