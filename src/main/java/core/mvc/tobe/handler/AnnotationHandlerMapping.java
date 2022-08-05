@@ -1,13 +1,16 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handler;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerKey;
+import core.mvc.tobe.adapter.AnnotationHandlerAdapter;
 import org.reflections.Reflections;
-import org.springframework.http.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
@@ -37,16 +40,23 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
     }
 
-    private void mappingMethods(Class<RequestMapping> requestMappingAnnotation, Class<?> aClass, Method[] methods) {
+    private void mappingMethods(Class<RequestMapping> requestMappingAnnotation, Class<?> clazz, Method[] methods) {
+        Object instanceClazz;
+        try {
+            instanceClazz = clazz.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return ;
+        }
         for (Method method : methods) {
-            requestMappingMethodPut(aClass, method, method.getAnnotation(requestMappingAnnotation));
+            requestMappingMethodPut(instanceClazz, method, method.getAnnotation(requestMappingAnnotation));
         }
     }
 
-    private void requestMappingMethodPut(Class<?> aClass, Method method, RequestMapping requestMapping) {
+    private void requestMappingMethodPut(Object clazz, Method method, RequestMapping requestMapping) {
         if (Objects.nonNull(requestMapping)) {
 
-            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(aClass, method));
+            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(clazz, method));
         }
     }
 

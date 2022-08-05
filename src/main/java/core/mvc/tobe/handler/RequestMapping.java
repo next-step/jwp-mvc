@@ -1,5 +1,8 @@
-package core.mvc.asis;
+package core.mvc.tobe.handler;
 
+import core.mvc.asis.Controller;
+import core.mvc.asis.DispatcherServlet;
+import core.mvc.asis.ForwardController;
 import core.mvc.tobe.handler.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
@@ -42,6 +45,6 @@ public class RequestMapping implements HandlerMapping {
     @Override
     public Object getHandler(HttpServletRequest request) {
         initMapping();
-        return mappings.get(request.getRequestURI());
+        return findController(request.getRequestURI());
     }
 }
