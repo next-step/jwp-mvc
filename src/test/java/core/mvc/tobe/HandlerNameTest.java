@@ -1,0 +1,44 @@
+package core.mvc.tobe;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import next.controller.AnnotatedController;
+import next.controller.NamedAnnotatedController;
+import next.controller.NotAnnotatedController;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class HandlerNameTest {
+
+    @DisplayName("핸들러의 애너테이션의 값으로 이름을 반환한다.")
+    @Test
+    void generate_handler_name_by_annotation_value() {
+        final Class<?> namedController = NamedAnnotatedController.class;
+
+        final String actual = HandlerName.generate(namedController);
+
+        assertThat(actual).isEqualTo("namedController");
+    }
+
+    @DisplayName("핸들러의 애너테이션의 값이 없으면 컨트롤러명을 lowerCamelCase 로 반환한다.")
+    @Test
+    void generate_lower_camel_case_handler_name_without_annotation_value() {
+        final Class<?> annotatedController = AnnotatedController.class;
+
+        final String actual = HandlerName.generate(annotatedController);
+
+        assertThat(actual).isEqualTo("annotatedController");
+    }
+
+    @DisplayName("핸들러에 Controller 애너테이션이 없으면 예외를 발생시킨다")
+    @Test
+    void throw_exception_without_controller_annotation() {
+        final Class<?> notAnnotatedController = NotAnnotatedController.class;
+
+        assertThatThrownBy(() -> HandlerName.generate(notAnnotatedController))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Controller 애너테이션이 없습니다 : next.controller.NotAnnotatedController");
+
+    }
+}
