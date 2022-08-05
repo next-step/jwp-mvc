@@ -50,9 +50,9 @@
 힌트를 참고하여 리팩토링 및 구현하여 신규 MVC 프레임워크로 전환한다.
 
 ### TODO LIST
-- [ ] ControllerScanner 추가
-  - [ ] Reflections 라이브러리를 활용해 @Controller 애노테이션이 적용된 클래스를 찾는다.
-  - [ ] 찾은 컨트롤러의 인스턴트를 생성하여 Map 자료 구조에 저장한다. (한 번만 생성해서 재사용할 수 있도록 하기 위함?)
+- [x] ControllerScanner 추가
+  - [x] Reflections 라이브러리를 활용해 @Controller 애노테이션이 적용된 클래스를 찾는다.
+  - [x] 찾은 컨트롤러의 인스턴트를 생성하여 Map 자료 구조에 저장한다. (한 번만 생성해서 재사용할 수 있도록 하기 위함?)
   - [x] 중복 인스턴스를 방지하기 위해 클래스의 이름으로 구분하여 저장한다.
   - [x] @Controller 의 값이 있는 경우 컨트롤러의 이름을 @Controller 애노테이션의 값으로 사용한다.
   - [x] @Controller 의 값이 없는 경우 컨트롤러의 이름을 lowerCamelCase 로 사용한다.
