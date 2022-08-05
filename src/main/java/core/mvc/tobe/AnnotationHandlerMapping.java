@@ -11,17 +11,21 @@ import org.reflections.Reflections;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private BeanFactory beanFactory;
-    private Object[] basePackage;
+    private final Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -34,27 +38,36 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         this.beanFactory = new BeanFactory(controllerTypes);
         beanFactory.initialize();
 
-        controllerTypes.forEach(this::addHandlers);
+        this.handlerExecutions.putAll(getHandlerExecutions(controllerTypes));
     }
 
-    private void addHandlers(Class<?> controllerType) {
+    private Map<HandlerKey, HandlerExecution> getHandlerExecutions(Set<Class<?>> controllerTypes) {
+        return controllerTypes.stream()
+                .map(this::createHandlerExecution)
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private List<Map.Entry<HandlerKey, HandlerExecution>> createHandlerExecution(Class<?> controllerType) {
         Controller controllerAnno = controllerType.getDeclaredAnnotation(Controller.class);
         String controllerPath = controllerAnno.path();
 
-        Arrays.stream(controllerType.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .forEach(addHandlerAction(controllerType, controllerPath));
+        @SuppressWarnings("unchecked")
+        Set<Method> methods = getAllMethods(controllerType, withAnnotation(RequestMapping.class));
+
+        if (methods.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return methods.stream()
+                .map(method-> {
+                    RequestMapping rm = method.getAnnotation(RequestMapping.class);
+                    HandlerKey handlerKey = new HandlerKey(controllerPath + rm.value(), rm.method());
+                    HandlerExecution handlerExecution = new HandlerExecution(beanFactory.getBean(controllerType), method);
+
+                    return Map.entry(handlerKey, handlerExecution);
+                }).collect(Collectors.toList());
     }
-
-    private Consumer<Method> addHandlerAction(Class<?> controllerType, String controllerPath) {
-        return method -> {
-            RequestMapping rm = method.getAnnotation(RequestMapping.class);
-
-            HandlerKey handlerKey = new HandlerKey(controllerPath + rm.value(), rm.method());
-            handlerExecutions.put(handlerKey, new HandlerExecution(beanFactory.getBean(controllerType), method));
-        };
-    }
-
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
