@@ -76,15 +76,15 @@ class ReflectionTest {
                 .findAny()
                 .get();
 
-        int id = 10;
+        int tenId = 10;
         String writer = "writer";
         String title = "title";
         String contents = "contents";
-        Date createdAt = Date.from(Instant.now());
-        int tenCountOfComment = 5;
+        Date nowCreatedAt = Date.from(Instant.now());
+        int fiveCountOfComment = 5;
         //when
-        Object tenIdQuestion = targetConstructor.newInstance(id, writer, title, contents, createdAt, tenCountOfComment);
+        Object tenIdQuestion = targetConstructor.newInstance(tenId, writer, title, contents, nowCreatedAt, fiveCountOfComment);
         //then
-        assertThat(tenIdQuestion).isEqualTo(new Question(id, writer, title, contents, createdAt, tenCountOfComment));
+        assertThat(tenIdQuestion).isEqualTo(new Question(tenId, writer, title, contents, nowCreatedAt, fiveCountOfComment));
     }
 }
