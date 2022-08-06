@@ -31,7 +31,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView users(HttpServletRequest request, HttpServletResponse response) {
         if (!UserSessionUtils.isLogined(request.getSession())) {
-            return ModelAndView.jsp("redirect:/users/loginForm");
+            return ModelAndView.redirect("/users/loginForm");
         }
 
         return ModelAndView.jsp("/user/list.jsp")
@@ -51,7 +51,7 @@ public class UsersController {
         if (user.matchPassword(password)) {
             HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return ModelAndView.jsp("redirect:/");
+            return ModelAndView.redirect("/");
         } else {
             return ModelAndView.jsp("/user/login.jsp")
                 .addObject("loginFailed", true);
@@ -74,7 +74,7 @@ public class UsersController {
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return ModelAndView.jsp("redirect:/");
+        return ModelAndView.redirect("/");
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -87,7 +87,7 @@ public class UsersController {
         logger.debug("User : {}", user);
 
         DataBase.addUser(user);
-        return ModelAndView.jsp("redirect:/");
+        return ModelAndView.redirect("/");
     }
 
     @RequestMapping(value = "/updateForm", method = RequestMethod.GET)
@@ -116,7 +116,7 @@ public class UsersController {
 
         user.update(updateUser);
 
-        return ModelAndView.jsp("redirect:/");
+        return ModelAndView.redirect("/");
     }
 
 

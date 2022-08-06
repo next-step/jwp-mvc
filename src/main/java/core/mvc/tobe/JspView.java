@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public class JspView implements View {
 
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-
     private final String jspPath;
 
     public JspView(final String jspPath) {
@@ -20,11 +18,6 @@ public class JspView implements View {
 
     @Override
     public void render(final Map<String, ?> model, final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        if (jspPath.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            response.sendRedirect(jspPath.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
         if (hasModel(model)) {
             copyModelObjectsIntoRequestAttributes(model, request);
         }
