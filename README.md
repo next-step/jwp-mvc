@@ -56,6 +56,13 @@
   - [x] 중복 인스턴스를 방지하기 위해 클래스의 이름으로 구분하여 저장한다.
   - [x] @Controller 의 값이 있는 경우 컨트롤러의 이름을 @Controller 애노테이션의 값으로 사용한다.
   - [x] @Controller 의 값이 없는 경우 컨트롤러의 이름을 lowerCamelCase 로 사용한다.
+- [ ] RequestMappingScanner 추가
+  - [ ] 컨트롤러 인스턴스를 기반으로 @RequestMapping 애너테이션이 적용된 메서드를 찾는다. 
+  - [ ] 메서드에 적용된 @RequestMapping 의 정보로 HandlerKey 를 생성한다.
+    - [ ] 컨트롤러에 적용된 @RequestMapping 의 값을 메서드의 value 의 prefix 로 적용한다. 
+    - [ ] 컨트롤러에 적용된 @RequestMapping 의 RequestMethod 가 메서드에 적용된 RequestMethod 보다 우선 순위가 높다. 
+  - [ ] 메서드와 컨트롤러 인스턴스로 HandlerExecution 을 생성한다.
+  - [ ] HandlerKey 와 HandlerExecution 를 Map 자료 구조로 반환한다.
 - [x] AnnotationHandlerMapping 에서 ControllerScanner 활용
   - [x] ControllerScanner 가 찾은 클래스들에서 @RequestMapping 애노테이션이 적용된 메서드를 찾는다.
   - [x] 메서드에 적용된 @RequestMapping 의 정보로 HandlerKey 를 생성한다.
