@@ -49,7 +49,7 @@ public class ControllerExecution implements HandlerExecutable {
             return false;
         }
         final ControllerExecution that = (ControllerExecution) o;
-        return Objects.equals(controller, that.controller);
+        return controller.getClass().equals(that.controller.getClass());
     }
 
     @Override
