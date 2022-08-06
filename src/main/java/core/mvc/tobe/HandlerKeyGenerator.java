@@ -2,9 +2,7 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,7 +10,8 @@ import java.util.stream.Stream;
 
 public class HandlerKeyGenerator {
 
-    private static final String DEFAULT_VALUE = "";
+    private static final String EMPTY_VALUE = "";
+    private static final RequestMethod[] EMPTY_REQUEST_METHOD = {};
 
     private HandlerKeyGenerator() {
         throw new AssertionError();
@@ -28,9 +27,27 @@ public class HandlerKeyGenerator {
             .collect(Collectors.toList());
     }
 
+    private static String getControllerValue(final RequestMapping controllerAnnotation) {
+        if (controllerAnnotation == null) {
+            return EMPTY_VALUE;
+        }
+
+        return controllerAnnotation.value();
+    }
+
     private static Set<RequestMethod> mergeRequestMethods(final RequestMapping controllerAnnotation, final RequestMapping methodAnnotation) {
         final RequestMethod[] controllerRequestMethods = getRequestMethods(controllerAnnotation);
         final RequestMethod[] methodRequestMethods = getRequestMethods(methodAnnotation);
+
+        if (hasMethodsOnlyOne(controllerRequestMethods, methodRequestMethods)) {
+            return Arrays.stream(controllerRequestMethods)
+                .collect(Collectors.toSet());
+        }
+
+        if (hasMethodsOnlyOne(methodRequestMethods, controllerRequestMethods)) {
+            return Arrays.stream(methodRequestMethods)
+                .collect(Collectors.toSet());
+        }
 
         return Stream.of(controllerRequestMethods, methodRequestMethods)
             .flatMap(Arrays::stream)
@@ -39,19 +56,25 @@ public class HandlerKeyGenerator {
 
     private static RequestMethod[] getRequestMethods(final RequestMapping annotation) {
         if (annotation == null) {
-            return new RequestMethod[]{};
+            return EMPTY_REQUEST_METHOD;
         }
 
-        if (annotation.method().length == 0) {
+        return getRequestMethods(annotation.method());
+    }
+
+    private static RequestMethod[] getRequestMethods(final RequestMethod[] methods) {
+        if (methods.length == 0) {
             return RequestMethod.values();
         }
-        return annotation.method();
+        return methods;
     }
 
-    private static String getControllerValue(final RequestMapping controllerAnnotation) {
-        if (controllerAnnotation == null) {
-            return DEFAULT_VALUE;
+    private static boolean hasMethodsOnlyOne(final RequestMethod[] target, final RequestMethod[] other) {
+        if (target.length == 0) {
+            return false;
         }
-        return controllerAnnotation.value();
+
+        return Arrays.equals(other, RequestMethod.values());
     }
+
 }

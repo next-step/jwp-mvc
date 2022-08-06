@@ -1,7 +1,6 @@
 package core.mvc.tobe;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -74,7 +73,36 @@ class HandlerKeyGeneratorTest {
         assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
+    @DisplayName("클래스에 적용된 RequestMethod 는 있지만 메서드에 적용된 RequestMethod 가 없다면 클래스의 RequestMethod 만 허용한다.")
+    @Test
+    void only_the_request_methods_of_the_class_is_allowed() {
+        final RequestMapping controllerAnnotation = controllerAnnotationWithValueWithGetMethod();
+        final RequestMapping methodAnnotation = methodAnnotationWithValue();
 
+        final List<HandlerKey> actual = HandlerKeyGenerator.generate(controllerAnnotation, methodAnnotation);
+
+        final List<HandlerKey> expected = List.of(
+            new HandlerKey("/controllerPath/methodPath", RequestMethod.GET)
+        );
+
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+    }
+
+    @DisplayName("클래스에 적용된 RequestMethod 가 없다면 메서드에 적용된 RequestMethod 만 허용한다")
+    @Test
+    void only_the_request_methods_of_the_method_is_allowed() {
+        final RequestMapping controllerAnnotation = controllerAnnotationWithValue();
+        final RequestMapping methodAnnotation = methodAnnotationWithValueWithPostMethodAndGetMethod();
+
+        final List<HandlerKey> actual = HandlerKeyGenerator.generate(controllerAnnotation, methodAnnotation);
+
+        final List<HandlerKey> expected = List.of(
+            new HandlerKey("/controllerPath/methodPath", RequestMethod.GET),
+            new HandlerKey("/controllerPath/methodPath", RequestMethod.POST)
+        );
+
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+    }
 
     private static RequestMapping controllerAnnotationWithValue() {
         return new RequestMapping() {

@@ -62,13 +62,13 @@
     - [x] @RequestMapping 애노테이션이 적용된 메서드가 없으면 빈 값을 반환한다.
   - [ ] @RequestMapping 정보로 HandlerKeyGenerator 를 활용하여 HandlerKey 를 생성한다. 
   - [ ] 메서드와 컨트롤러 인스턴스로 HandlerExecution 을 생성하여 HandlerKey 를 키로 설정하여 Map 자료 구조로 반환한다. 
-- [ ] HandlerKey 를 생성하는 HandlerKeyGenerator 추가 
-  - [ ] @RequestMapping 의 정보로 HandlerKey 를 생성한다.
+- [x] HandlerKey 목록을 생성하는 HandlerKeysGenerator 추가 
+  - [x] @RequestMapping 의 정보로 HandlerKey 를 생성한다.
     - [x] 컨트롤러에 적용된 @RequestMapping 의 value 를 메서드 @RequestMapping value 의 prefix 로 적용한다. 
     - [x] 클래스에 적용된 RequestMethod 와 메서드에 적용된 RequestMethod 를 모두 허용한다.
       - [x] 컨트롤러에 @RequestMapping 이 없으면 메서드에 적용된 RequestMethod 만 허용한다.
-    - [ ] 클래스에 적용된 RequestMethod 는 있지만 메서드에 적용된 RequestMethod 가 없다면 클래스의 RequestMethod 만 허용한다.
-    - [ ] 클래스에 적용된 RequestMethod 가 없다면 메서드에 적용된 RequestMethod 만 허용한다. (둘 다 없다면 모든 RequestMethod 를 허용)
+    - [x] 클래스에 적용된 RequestMethod 는 있지만 메서드에 적용된 RequestMethod 가 없다면 클래스의 RequestMethod 만 허용한다.
+    - [x] 클래스에 적용된 RequestMethod 가 없다면 메서드에 적용된 RequestMethod 만 허용한다. (둘 다 없다면 모든 RequestMethod 를 허용)
 - [x] AnnotationHandlerMapping 에서 ControllerScanner 활용
   - [x] ControllerScanner 가 찾은 클래스들에서 @RequestMapping 애노테이션이 적용된 메서드를 찾는다.
   - [x] 메서드에 적용된 @RequestMapping 의 정보로 HandlerKey 를 생성한다.
