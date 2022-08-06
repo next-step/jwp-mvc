@@ -21,13 +21,14 @@ class RequestMappingTest {
         requestMapping.initMapping();
     }
 
-    @DisplayName("요청 uri와 일치하는 컨트롤러가 없는 경우 예외를 발생한다")
+    @DisplayName("요청 uri와 일치하는 컨트롤러가 없는 경우 실행할 수 없다")
     @Test
-    void exception_if_no_controller_matches_request_uri() {
+    void cannot_execute_if_no_controller_matches_request_uri() {
         final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/not-exists");
 
-        assertThatThrownBy(() -> requestMapping.getHandler(request)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("요청 uri에 해당하는 컨트롤러가 없습니다: /not-exists");
+        final HandlerExecutable actual = requestMapping.getHandler(request);
+
+        assertThat(actual.executable()).isFalse();
     }
 
     @DisplayName("요청 uri와 일치하는 있는 경우 실행기를 반환한다")

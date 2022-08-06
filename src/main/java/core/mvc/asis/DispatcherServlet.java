@@ -29,7 +29,7 @@ public class DispatcherServlet extends HttpServlet {
         requestMapping.initMapping();
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
-        handlerMappings.add(requestMapping);
+//        handlerMappings.add(requestMapping);
         handlerMappings.add(annotationHandlerMapping);
     }
 

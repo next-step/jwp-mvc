@@ -2,11 +2,9 @@ package core.mvc.tobe;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import core.annotation.web.Controller;
 import core.mvc.tobe.exception.DuplicatedControllerDefinitionException;
 import java.util.Set;
-import next.controller.AnnotatedController;
-import next.controller.NamedAnnotatedController;
-import next.controller.WithoutMethodController;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
@@ -26,11 +24,8 @@ class ControllerScannerTest {
 
         final Set<Object> controllers = controllerScanner.getControllers();
 
-        assertThat(controllers).hasOnlyElementsOfTypes(
-            AnnotatedController.class,
-            NamedAnnotatedController.class,
-            WithoutMethodController.class
-        );
+        final Set<Class<?>> expected = reflections.getTypesAnnotatedWith(Controller.class);
+        assertThat(controllers).hasOnlyElementsOfTypes(expected.toArray(new Class<?>[0]));
     }
 
     @DisplayName("@Controller 애노테이션이 적용된 클래스를 찾지 못한다.")
