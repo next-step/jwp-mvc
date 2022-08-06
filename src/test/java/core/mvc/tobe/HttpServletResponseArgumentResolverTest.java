@@ -21,7 +21,7 @@ class HttpServletResponseArgumentResolverTest extends ArgumentResolverTest {
 
     private final ArgumentResolver argumentResolver = new HttpServletResponseArgumentResolver();
 
-    @DisplayName("핸들러 메서드의 HttpServletResponse 인자를 매핑한다.")
+    @DisplayName("핸들러 메서드의 HttpServletResponse 타입 인자를 매핑한다.")
     @Test
     void resolveArgument() throws Exception {
         Class<HomeController> clazz = HomeController.class;

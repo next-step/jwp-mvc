@@ -6,15 +6,20 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+
 import core.mvc.ModelAndView;
 
 public class HandlerExecution {
 
     private final Object handler;
     private final Method method;
+    private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
     private final List<ArgumentResolver> argumentResolvers = List.of(
         new HttpServletRequestArgumentResolver(),
-        new HttpServletResponseArgumentResolver()
+        new HttpServletResponseArgumentResolver(),
+        new StringArgumentResolver()
     );
 
     public HandlerExecution(Object handler, Method method) {
@@ -34,8 +39,10 @@ public class HandlerExecution {
     private MethodParameter[] getMethodParameters() {
         Class<?>[] parameterTypes = method.getParameterTypes();
         MethodParameter[] methodParameters = new MethodParameter[parameterTypes.length];
+        String[] parameterNames = nameDiscoverer.getParameterNames(method);
+
         for (int index = 0; index < parameterTypes.length; index++) {
-            methodParameters[index] = new MethodParameter(parameterTypes[index], method);
+            methodParameters[index] = new MethodParameter(parameterTypes[index], method, parameterNames[index]);
         }
         return methodParameters;
     }

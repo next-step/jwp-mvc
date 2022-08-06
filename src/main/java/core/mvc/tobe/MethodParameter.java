@@ -6,10 +6,12 @@ public class MethodParameter {
 
     private final Class<?> type;
     private final Method method;
+    private final String parameterName;
 
-    public MethodParameter(Class<?> type, Method method) {
+    public MethodParameter(Class<?> type, Method method, String parameterName) {
         this.type = type;
         this.method = method;
+        this.parameterName = parameterName;
     }
 
     public Class<?> getType() {
@@ -18,5 +20,9 @@ public class MethodParameter {
 
     public Method getMethod() {
         return method;
+    }
+
+    public String getParameterName() {
+        return parameterName;
     }
 }
