@@ -7,6 +7,9 @@ import core.mvc.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
 
@@ -38,10 +41,27 @@ public class TestUserController {
 
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-    public ModelAndView show_pathvariable(@PathVariable long id) {
+    public ModelAndView show_pathvariable(@PathVariable(name = "userId") long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
         return mav;
     }
+
+    @RequestMapping(value = "/users/{id}/{name}/{age}", method = RequestMethod.GET)
+    public ModelAndView show_multiple_pathvariables(@PathVariable("id") long userId,
+                                                    @PathVariable String name,
+                                                    @PathVariable(value = "age") int age) {
+        logger.debug("userId: {}", userId);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("id", userId);
+        return mav;
+    }
+
+    @RequestMapping(value = "/http-servlet", method = RequestMethod.GET)
+    public ModelAndView httpServletXXXX(HttpServletRequest req, HttpServletResponse resq) {
+
+        return ModelAndView.newInstance("httpServlet");
+    }
+
 }
