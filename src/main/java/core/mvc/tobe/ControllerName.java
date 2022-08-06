@@ -2,9 +2,9 @@ package core.mvc.tobe;
 
 import core.annotation.web.Controller;
 
-public class HandlerName {
+public class ControllerName {
 
-    private HandlerName() {
+    private ControllerName() {
         throw new AssertionError();
     }
 

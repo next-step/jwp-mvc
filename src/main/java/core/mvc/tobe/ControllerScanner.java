@@ -27,7 +27,7 @@ public class ControllerScanner {
         final Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
 
         for (Class<?> clazz : classes) {
-            final String name = HandlerName.generate(clazz);
+            final String name = ControllerName.generate(clazz);
             final Object controller = instantiateController(clazz);
 
             validateDuplicatedController(name);
