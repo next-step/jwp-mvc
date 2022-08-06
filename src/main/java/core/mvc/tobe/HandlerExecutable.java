@@ -6,5 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface HandlerExecutable {
 
+    boolean executable();
+
     ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }

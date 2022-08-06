@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import core.mvc.ModelAndView;
 import java.lang.reflect.Method;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -35,4 +39,24 @@ class HandlerExecutionTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @DisplayName("Handler가 실행가능한 상태인지 확인한다")
+    @ParameterizedTest
+    @MethodSource
+    void executable(Object handler, Method method, boolean expected) {
+        final HandlerExecutable handlerExecution = new HandlerExecution(handler, method);
+
+        final boolean actual = handlerExecution.executable();
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> executable() throws Exception {
+        final MyController myController = MyController.class.getConstructor().newInstance();
+        final Method method = MyController.class.getMethod("welcome", HttpServletRequest.class, HttpServletResponse.class);
+
+        return Stream.of(
+            Arguments.of(null, null, false),
+            Arguments.of(myController, method, true)
+        );
+    }
 }

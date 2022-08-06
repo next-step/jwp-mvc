@@ -25,6 +25,11 @@ public class ControllerExecution implements HandlerExecutable {
         return modelAndView;
     }
 
+    @Override
+    public boolean executable() {
+        return controller != null;
+    }
+
     private static void copyRequestAttributesIntoModelObjects(final HttpServletRequest request, final ModelAndView modelAndView) {
         final Enumeration<String> attributeNames = request.getAttributeNames();
         while (attributeNames.hasMoreElements()) {

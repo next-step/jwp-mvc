@@ -22,6 +22,11 @@ public class HandlerExecution implements HandlerExecutable {
     }
 
     @Override
+    public boolean executable() {
+        return handler != null && method != null;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
@@ -36,5 +41,13 @@ public class HandlerExecution implements HandlerExecutable {
     @Override
     public int hashCode() {
         return Objects.hash(handler, method);
+    }
+
+    @Override
+    public String toString() {
+        return "HandlerExecution{" +
+            "handler=" + handler.getClass() +
+            ", method=" + method.getName() +
+            '}';
     }
 }
