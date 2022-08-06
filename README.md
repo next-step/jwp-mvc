@@ -73,7 +73,7 @@
   - [x] ControllerScanner 로 @Controller 애노테이션이 적용된 클래스의 인스턴스들을 찾는다.
   - [x] RequestMappingScanner 로 HandlerKey 와 HandlerExecutable 쌍을 생성하여 HANDLER_EXECUTIONS 에 저장한다.
 - [ ] HandlerMapping 추가
-  - [ ] RequestMapping 과 AnnotationHandlerMapping 의 공통부분을 추상화한 HandlerMapping 인터페이스를 생성한다.
+  - [x] RequestMapping 과 AnnotationHandlerMapping 의 공통부분을 추상화한 HandlerMapping 인터페이스를 생성한다.
   - [ ] RequestMapping 과 AnnotationHandlerMapping 을 HandlerMapping 의 구현체로 변경한다.
 - [ ] DispatcherServlet 초기화 변경
   - [ ] 초기화 과정에서 HandlerMapping 의 구현체들을 모두 초기화한다.
