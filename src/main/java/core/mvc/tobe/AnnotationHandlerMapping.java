@@ -7,7 +7,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.reflections.Reflections;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private final Object[] basePackage;
 
@@ -29,6 +29,7 @@ public class AnnotationHandlerMapping {
         }
     }
 
+    @Override
     public HandlerExecutable getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
