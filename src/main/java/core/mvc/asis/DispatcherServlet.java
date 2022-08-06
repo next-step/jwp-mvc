@@ -8,6 +8,7 @@ import core.mvc.tobe.NotFoundExecution;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -49,13 +50,12 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private HandlerExecutable getHandlerExecutable(final HttpServletRequest request) {
-        for (final HandlerMapping handlerMapping : handlerMappings) {
-            final HandlerExecutable handler = handlerMapping.getHandler(request);
-            if (handler != null && handler.executable()) {
-                return handler;
-            }
-        }
-        return new NotFoundExecution();
+        return handlerMappings.stream()
+            .map(handlerMapping -> handlerMapping.getHandler(request))
+            .filter(Objects::nonNull)
+            .filter(HandlerExecutable::executable)
+            .findAny()
+            .orElse(new NotFoundExecution());
     }
 
 }
