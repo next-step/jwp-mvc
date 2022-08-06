@@ -101,6 +101,6 @@
 ## Step 4 - Controller 메소드 인자 매핑
 
 - 요구사항 
-  - [ ] 메서드에 필요한 파라미터 HttpServletRequest에서 추출하기
-  - [ ] @PathVariable 애노테이션이 붙은 파라미터 값 requestURI에서 추출하기 
-  - [ ] 기존 컨트롤러의 파라미터 전환하기
+  - [x] 메서드에 필요한 파라미터 HttpServletRequest에서 추출하기
+  - [x] @PathVariable 애노테이션이 붙은 파라미터 값 requestURI에서 추출하기 
+  - [x] 기존 컨트롤러의 파라미터 전환하기
