@@ -1,17 +1,21 @@
 package core.mvc.tobe;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class MethodParameter {
 
     private final Class<?> type;
     private final Method method;
     private final String parameterName;
+    private final Annotation[] annotations;
 
-    public MethodParameter(Class<?> type, Method method, String parameterName) {
+    public MethodParameter(Class<?> type, Method method, String parameterName, Annotation[] annotations) {
         this.type = type;
         this.method = method;
         this.parameterName = parameterName;
+        this.annotations = annotations;
     }
 
     public Class<?> getType() {
@@ -24,5 +28,21 @@ public class MethodParameter {
 
     public String getParameterName() {
         return parameterName;
+    }
+
+    public <A extends Annotation> boolean hasAnnotation(Class<A> annotationType) {
+        return getAnnotation(annotationType) != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <A extends Annotation> A getAnnotation(Class<A> annotationType) {
+        return (A) Arrays.stream(annotations)
+            .filter(annotationType::isInstance)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public boolean isStringType() {
+        return this.type == String.class;
     }
 }

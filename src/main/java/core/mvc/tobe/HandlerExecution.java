@@ -1,6 +1,8 @@
 package core.mvc.tobe;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +21,7 @@ public class HandlerExecution {
     private final List<ArgumentResolver> argumentResolvers = List.of(
         new HttpServletRequestArgumentResolver(),
         new HttpServletResponseArgumentResolver(),
-        new StringArgumentResolver()
+        new RequestParamMethodArgumentResolver()
     );
 
     public HandlerExecution(Object handler, Method method) {
@@ -40,10 +42,13 @@ public class HandlerExecution {
         Class<?>[] parameterTypes = method.getParameterTypes();
         MethodParameter[] methodParameters = new MethodParameter[parameterTypes.length];
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
+        Parameter[] parameters = method.getParameters();
 
         for (int index = 0; index < parameterTypes.length; index++) {
-            methodParameters[index] = new MethodParameter(parameterTypes[index], method, parameterNames[index]);
+            Annotation[] annotations = parameters[index].getAnnotations();
+            methodParameters[index] = new MethodParameter(parameterTypes[index], method, parameterNames[index], annotations);
         }
+
         return methodParameters;
     }
 
