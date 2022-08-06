@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import core.mvc.tobe.ControllerExecution;
 import core.mvc.tobe.HandlerExecutable;
-import next.controller.HomeController;
+import next.controller.UpdateUserController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,11 +33,11 @@ class RequestMappingTest {
     @DisplayName("요청 uri와 일치하는 있는 경우 실행기를 반환한다")
     @Test
     void returns_the_controller_matching_request_uri() {
-        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/update");
 
         final HandlerExecutable actual = requestMapping.getHandler(request);
 
-        final ControllerExecution expected = new ControllerExecution(new HomeController());
+        final ControllerExecution expected = new ControllerExecution(new UpdateUserController());
 
         assertThat(actual).isEqualTo(expected);
     }

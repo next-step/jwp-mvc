@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import next.controller.CreateUserController;
-import next.controller.HomeController;
 import next.controller.ListUserController;
 import next.controller.LoginController;
 import next.controller.LogoutController;
@@ -23,7 +22,7 @@ public class RequestMapping implements HandlerMapping {
     private final Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/", new HomeController());
+//        mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
         mappings.put("/users", new ListUserController());
@@ -45,11 +44,7 @@ public class RequestMapping implements HandlerMapping {
     @Override
     public HandlerExecutable getHandler(final HttpServletRequest request) {
         final String requestUri = request.getRequestURI();
-        if (mappings.containsKey(requestUri)) {
-            return new ControllerExecution(mappings.get(requestUri));
-        }
-
-        throw new IllegalArgumentException("요청 uri에 해당하는 컨트롤러가 없습니다: " + requestUri);
+        return new ControllerExecution(mappings.get(requestUri));
     }
 
     void put(String url, Controller controller) {

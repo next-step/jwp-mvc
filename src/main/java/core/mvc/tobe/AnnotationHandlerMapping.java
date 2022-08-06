@@ -6,8 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
+
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private final Object[] basePackage;
 
@@ -27,6 +31,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
             final Map<HandlerKey, HandlerExecutable> handlerExecutable = RequestMappingScanner.getHandlerExecutable(controller);
             HANDLER_EXECUTIONS.putAll(handlerExecutable);
         }
+        logger.info("Initialized Annotation Handler Mapping!");
+        HANDLER_EXECUTIONS.keySet().forEach(key -> logger.info("Path : {}, Controller : {}", key, HANDLER_EXECUTIONS.get(key)));
     }
 
     @Override

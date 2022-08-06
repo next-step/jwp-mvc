@@ -27,7 +27,7 @@ public class DispatcherServlet extends HttpServlet {
     public void init() throws ServletException {
         RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
         handlerMappings.add(requestMapping);
         handlerMappings.add(annotationHandlerMapping);
@@ -56,10 +56,13 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private HandlerExecutable getHandlerExecutable(final HttpServletRequest request) {
-        return handlerMappings.stream()
-            .map(mapping -> mapping.getHandler(request))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException("요청 uri에 해당하는 컨트롤러가 없습니다: " + request.getRequestURI()));
+        for (final HandlerMapping handlerMapping : handlerMappings) {
+            final HandlerExecutable handler = handlerMapping.getHandler(request);
+            if (handler.executable()) {
+                return handler;
+            }
+        }
+        return null;
     }
 
 }
