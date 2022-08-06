@@ -26,8 +26,7 @@ class HandlerKeyGeneratorTest {
             .map(it -> new HandlerKey("/controllerPath/methodPath", it))
             .collect(Collectors.toList());
 
-        assertThat(actual).isEqualTo(expected);
-
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @DisplayName("컨트롤러에 적용된 @RequestMapping 이 없으면 메서드 @RequestMapping 의 value 만 허용한다 ")
@@ -41,8 +40,38 @@ class HandlerKeyGeneratorTest {
             .map(it -> new HandlerKey("/methodPath", it))
             .collect(Collectors.toList());
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+    }
 
+    @DisplayName("클래스에 적용된 RequestMethod 와 메서드에 적용된 RequestMethod 를 모두 허용한다.")
+    @Test
+    void both_the_class_request_method_and_the_method_request_method_are_allowed() {
+        final RequestMapping controllerAnnotation = controllerAnnotationWithValueWithGetMethod();
+        final RequestMapping methodAnnotation = methodAnnotationWithValueWithPostMethod();
+
+        final List<HandlerKey> actual = HandlerKeyGenerator.generate(controllerAnnotation, methodAnnotation);
+
+        final List<HandlerKey> expected = List.of(
+            new HandlerKey("/controllerPath/methodPath", RequestMethod.GET),
+            new HandlerKey("/controllerPath/methodPath", RequestMethod.POST)
+        );
+
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
+    }
+
+    @DisplayName("컨트롤러에 적용된 @RequestMapping 이 없으면 메서드에 적용된 RequestMethod 만 허용한다.")
+    @Test
+    void the_method_request_methods_are_allowed_without_controller_request_methods() {
+        final RequestMapping methodAnnotation = methodAnnotationWithValueWithPostMethodAndGetMethod();
+
+        final List<HandlerKey> actual = HandlerKeyGenerator.generate(null, methodAnnotation);
+
+        final List<HandlerKey> expected = List.of(
+            new HandlerKey("/methodPath", RequestMethod.GET),
+            new HandlerKey("/methodPath", RequestMethod.POST)
+        );
+
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
 
@@ -66,6 +95,25 @@ class HandlerKeyGeneratorTest {
         };
     }
 
+    private static RequestMapping controllerAnnotationWithValueWithGetMethod() {
+        return new RequestMapping() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return RequestMapping.class;
+            }
+
+            @Override
+            public String value() {
+                return "/controllerPath";
+            }
+
+            @Override
+            public RequestMethod[] method() {
+                return new RequestMethod[]{RequestMethod.GET};
+            }
+        };
+    }
+
     private static RequestMapping methodAnnotationWithValue() {
         return new RequestMapping() {
             @Override
@@ -81,6 +129,44 @@ class HandlerKeyGeneratorTest {
             @Override
             public RequestMethod[] method() {
                 return new RequestMethod[]{};
+            }
+        };
+    }
+
+    private static RequestMapping methodAnnotationWithValueWithPostMethod() {
+        return new RequestMapping() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return RequestMapping.class;
+            }
+
+            @Override
+            public String value() {
+                return "/methodPath";
+            }
+
+            @Override
+            public RequestMethod[] method() {
+                return new RequestMethod[]{RequestMethod.POST};
+            }
+        };
+    }
+
+    private static RequestMapping methodAnnotationWithValueWithPostMethodAndGetMethod() {
+        return new RequestMapping() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return RequestMapping.class;
+            }
+
+            @Override
+            public String value() {
+                return "/methodPath";
+            }
+
+            @Override
+            public RequestMethod[] method() {
+                return new RequestMethod[]{RequestMethod.POST, RequestMethod.GET};
             }
         };
     }
