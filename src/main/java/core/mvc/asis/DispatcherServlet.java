@@ -4,6 +4,7 @@ import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecutable;
 import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.NotFoundExecution;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +26,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        RequestMapping requestMapping = new RequestMapping();
-        requestMapping.initMapping();
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
-//        handlerMappings.add(requestMapping);
         handlerMappings.add(annotationHandlerMapping);
     }
 
@@ -39,11 +37,6 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
         HandlerExecutable handlerExecutable = getHandlerExecutable(request);
-
-        if (handlerExecutable == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
 
         try {
             final ModelAndView modelAndView = handlerExecutable.handle(request, response);
@@ -58,11 +51,11 @@ public class DispatcherServlet extends HttpServlet {
     private HandlerExecutable getHandlerExecutable(final HttpServletRequest request) {
         for (final HandlerMapping handlerMapping : handlerMappings) {
             final HandlerExecutable handler = handlerMapping.getHandler(request);
-            if (handler.executable()) {
+            if (handler != null && handler.executable()) {
                 return handler;
             }
         }
-        return null;
+        return new NotFoundExecution();
     }
 
 }
