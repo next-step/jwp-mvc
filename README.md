@@ -69,11 +69,9 @@
       - [x] 컨트롤러에 @RequestMapping 이 없으면 메서드에 적용된 RequestMethod 만 허용한다.
     - [x] 클래스에 적용된 RequestMethod 는 있지만 메서드에 적용된 RequestMethod 가 없다면 클래스의 RequestMethod 만 허용한다.
     - [x] 클래스에 적용된 RequestMethod 가 없다면 메서드에 적용된 RequestMethod 만 허용한다. (둘 다 없다면 모든 RequestMethod 를 허용)
-- [x] AnnotationHandlerMapping 에서 ControllerScanner 활용
-  - [x] ControllerScanner 가 찾은 클래스들에서 @RequestMapping 애노테이션이 적용된 메서드를 찾는다.
-  - [x] 메서드에 적용된 @RequestMapping 의 정보로 HandlerKey 를 생성한다.
-  - [x] 메서드와 컨트롤러 인스턴스로 HandlerExecution 을 생성한다.
-  - [x] HandlerKey 와 HandlerExecution 을 HANDLER_EXECUTIONS 에 추가한다.
+- [x] AnnotationHandlerMapping 에서 ControllerScanner, RequestMappingScanner 활용
+  - [x] ControllerScanner 로 @Controller 애노테이션이 적용된 클래스의 인스턴스들을 찾는다.
+  - [x] RequestMappingScanner 로 HandlerKey 와 HandlerExecutable 쌍을 생성하여 HANDLER_EXECUTIONS 에 저장한다.
 - [ ] HandlerMapping 추가
   - [ ] RequestMapping 과 AnnotationHandlerMapping 의 공통부분을 추상화한 HandlerMapping 인터페이스를 생성한다.
   - [ ] RequestMapping 과 AnnotationHandlerMapping 을 HandlerMapping 의 구현체로 변경한다.
