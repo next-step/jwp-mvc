@@ -22,6 +22,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
+    private static final HandlerExecutable NOT_FOUND_EXECUTION = new NotFoundExecution();
 
     private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
@@ -55,7 +56,7 @@ public class DispatcherServlet extends HttpServlet {
             .filter(Objects::nonNull)
             .filter(HandlerExecutable::executable)
             .findAny()
-            .orElse(new NotFoundExecution());
+            .orElse(NOT_FOUND_EXECUTION);
     }
 
 }
