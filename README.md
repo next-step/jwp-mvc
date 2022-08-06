@@ -75,10 +75,10 @@
 - [x] HandlerMapping 추가
   - [x] RequestMapping 과 AnnotationHandlerMapping 의 공통부분을 추상화한 HandlerMapping 인터페이스를 생성한다.
   - [x] RequestMapping 과 AnnotationHandlerMapping 을 HandlerMapping 의 구현체로 변경한다.
-- [ ] DispatcherServlet 초기화 변경
-  - [ ] 초기화 과정에서 HandlerMapping 의 구현체들을 모두 초기화한다.
-  - [ ] 초기화한 HandlerMapping 을 List 자료 구조로 관리한다. 
-  - [ ] 클라이언트의 요청을 HandlerMapping 에서 찾아 컨트롤러를 실행한다.
+- [x] DispatcherServlet 초기화 변경
+  - [x] 초기화 과정에서 HandlerMapping 의 구현체들을 모두 초기화한다.
+  - [x] 초기화한 HandlerMapping 을 List 자료 구조로 관리한다. 
+  - [x] 클라이언트의 요청을 HandlerMapping 에서 찾아 컨트롤러를 실행한다.
 - [ ] 기존 컨트롤러들을 애너테이션 기반으로 모두 변경 후 정상적으로 동작해야한다.
   - [ ] 1개의 컨트롤러를 애너테이션 기반으로 변경 후 테스트한다.
   - [ ] 테스트에 성공하면 모든 컨트롤러를 애너테이션 기반으로 변경하여 테스트한다.

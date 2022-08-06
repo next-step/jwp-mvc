@@ -2,9 +2,11 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.ControllerExecution;
 import core.mvc.tobe.HandlerExecutable;
+import core.mvc.tobe.HandlerMapping;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,15 +21,16 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private RequestMapping requestMapping;
-    private AnnotationHandlerMapping annotationHandlerMapping;
+    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
-        requestMapping = new RequestMapping();
+        RequestMapping requestMapping = new RequestMapping();
         requestMapping.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         annotationHandlerMapping.initialize();
+        handlerMappings.add(requestMapping);
+        handlerMappings.add(annotationHandlerMapping);
     }
 
     @Override
@@ -35,7 +38,7 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        HandlerExecutable handlerExecutable = getHandlerExecutable(request, requestUri);
+        HandlerExecutable handlerExecutable = getHandlerExecutable(request);
 
         if (handlerExecutable == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -52,11 +55,11 @@ public class DispatcherServlet extends HttpServlet {
 
     }
 
-    private HandlerExecutable getHandlerExecutable(final HttpServletRequest request, final String requestUri) {
-        Controller controller = requestMapping.findController(requestUri);
-        if (controller != null) {
-            return new ControllerExecution(controller);
-        }
-        return annotationHandlerMapping.getHandler(request);
+    private HandlerExecutable getHandlerExecutable(final HttpServletRequest request) {
+        return handlerMappings.stream()
+            .map(mapping -> mapping.getHandler(request))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("요청 uri에 해당하는 컨트롤러가 없습니다: " + request.getRequestURI()));
     }
+
 }
