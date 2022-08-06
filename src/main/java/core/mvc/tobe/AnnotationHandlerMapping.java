@@ -4,11 +4,8 @@ import static org.reflections.ReflectionUtils.Methods;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import core.mvc.tobe.exception.InvalidInstanceException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -31,16 +28,17 @@ public class AnnotationHandlerMapping {
 
     public void initialize() {
         final Reflections reflections = new Reflections(basePackage);
-        final Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-        for (final Class<?> controller : controllers) {
-            final Set<Method> methods = ReflectionUtils.get(Methods.of(controller, withAnnotation(RequestMapping.class)));
+        final ControllerScanner controllerScanner = new ControllerScanner(reflections);
+        controllerScanner.instantiateControllers();
+        final Set<Object> controllers = controllerScanner.getControllers();
+
+        for (final Object controller : controllers) {
+            final Set<Method> methods = ReflectionUtils.get(Methods.of(controller.getClass(), withAnnotation(RequestMapping.class)));
             mappingHandler(controller, methods);
         }
     }
 
-    private void mappingHandler(final Class<?> controller, final Set<Method> methods) {
-        final Object handler = getHandlerInstance(controller);
-
+    private void mappingHandler(final Object handler, final Set<Method> methods) {
         for (final Method method : methods) {
             final List<HandlerKey> handlerKeys = createHandlerKeys(method);
             final HandlerExecutable handlerExecution = new HandlerExecution(handler, method);
@@ -70,14 +68,6 @@ public class AnnotationHandlerMapping {
     private void mappingHandler(final List<HandlerKey> handlerKeys, final HandlerExecutable handlerExecution) {
         for (final HandlerKey handlerKey : handlerKeys) {
             HANDLER_EXECUTIONS.put(handlerKey, handlerExecution);
-        }
-    }
-
-    private static Object getHandlerInstance(final Class<?> controller) {
-        try {
-            return controller.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new InvalidInstanceException(e);
         }
     }
 
