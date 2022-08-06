@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @RequestMapping("/login")
-    public ModelAndView login(String userId, String password, HttpServletRequest request) {
+    public ModelAndView login(String userId, String password, HttpSession session,  HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
 
         if (user == null) {
@@ -48,7 +48,6 @@ public class UserController {
             return ModelAndView.newInstance("/user/login.jsp");
         }
         if (user.matchPassword(password)) {
-            HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
             return ModelAndView.newInstance("redirect:/");
         } else {
@@ -84,9 +83,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/updateForm", method = RequestMethod.GET)
-    public ModelAndView updateUserForm(String userId, HttpServletRequest request) {
+    public ModelAndView updateUserForm(String userId, HttpSession session, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
-        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
+        if (!UserSessionUtils.isSameUser(session, user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
         request.setAttribute("user", user);
@@ -94,9 +93,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ModelAndView updateUser(String userId, String password, String name, String email, HttpServletRequest request) {
+    public ModelAndView updateUser(String userId, String password, String name, String email, HttpSession session , HttpServletRequest request) {
         User user = DataBase.findUserById(request.getParameter("userId"));
-        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
+        if (!UserSessionUtils.isSameUser(session, user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
