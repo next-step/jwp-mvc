@@ -5,23 +5,24 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.di.factory.BeanFactory;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AnnotationHandlerMapping {
 
+    public static final List<RequestMethod> DEFAULT_REQUEST_METHODS = List.of(RequestMethod.values());
+
     private final BeanFactory beanFactory;
-    private final Object[] basePackage;
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(BeanFactory beanFactory, Object... basePackage) {
+    public AnnotationHandlerMapping(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-        this.basePackage = basePackage;
     }
 
     public void initialize() {
@@ -35,16 +36,33 @@ public class AnnotationHandlerMapping {
     }
 
     private Map<HandlerKey, HandlerExecution> handlerKeyExecutionsMap() {
-        return new Reflections(basePackage).getTypesAnnotatedWith(Controller.class)
+        return beanFactory.beansWithAnnotationType(Controller.class)
+                .keySet()
                 .stream()
                 .flatMap(controllerClass -> Stream.of(controllerClass.getDeclaredMethods()))
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toMap(this::toHandlerKey, method ->
-                        new HandlerExecution(beanFactory.getBean(method.getDeclaringClass()), method)));
+                .flatMap(method -> keyExecutions(method).stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private HandlerKey toHandlerKey(Method method) {
+    private List<Map.Entry<HandlerKey, HandlerExecution>> keyExecutions(Method method) {
         RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
-        return new HandlerKey(requestMapping.value(), requestMapping.method());
+        return requestMethods(requestMapping)
+                .stream()
+                .map(requestMethod -> new HandlerKey(requestMapping.value(), requestMethod))
+                .map(key -> new AbstractMap.SimpleEntry<>(key, toHandlerExecution(method)))
+                .collect(Collectors.toList());
+    }
+
+    private List<RequestMethod> requestMethods(RequestMapping requestMapping) {
+        List<RequestMethod> methods = List.of(requestMapping.method());
+        if (methods.isEmpty()) {
+            return DEFAULT_REQUEST_METHODS;
+        }
+        return methods;
+    }
+
+    private HandlerExecution toHandlerExecution(Method method) {
+        return new HandlerExecution(beanFactory.getBean(method.getDeclaringClass()), method);
     }
 }

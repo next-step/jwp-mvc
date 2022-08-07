@@ -3,7 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.ForwardView;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +21,6 @@ public class HomeController implements core.mvc.asis.Controller {
 
     @RequestMapping("/")
     public ModelAndView home(HttpServletRequest req, HttpServletResponse resp) {
-        return ModelAndView.of(Map.of("users", DataBase.findAll()), ForwardView.from("home.jsp"));
+        return ModelAndView.of(Map.of("users", DataBase.findAll()), JspView.from("home.jsp"));
     }
 }

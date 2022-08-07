@@ -6,17 +6,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-public final class ForwardView implements View {
+public final class JspView implements View {
 
     private final String viewName;
 
-    private ForwardView(String viewName) {
+    private JspView(String viewName) {
         Assert.hasText(viewName, "'viewName' must not be blank");
         this.viewName = viewName;
     }
 
-    public static ForwardView from(String viewName) {
-        return new ForwardView(viewName);
+    public static JspView from(String viewName) {
+        return new JspView(viewName);
     }
 
     @Override

@@ -4,7 +4,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
-import core.mvc.ForwardView;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
 import next.model.User;
@@ -21,12 +21,12 @@ public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping("/users")
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ModelAndView userList(HttpServletRequest req, HttpServletResponse resp) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return ModelAndView.from(RedirectView.from("/users/loginForm"));
         }
-        return ModelAndView.of(Map.of("users", DataBase.findAll()), ForwardView.from("/user/list.jsp"));
+        return ModelAndView.of(Map.of("users", DataBase.findAll()), JspView.from("/user/list.jsp"));
     }
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
@@ -39,23 +39,23 @@ public class UserController {
         return ModelAndView.from(RedirectView.root());
     }
 
-    @RequestMapping(value = "/users/form")
+    @RequestMapping(value = "/users/form", method = RequestMethod.GET)
     public ModelAndView userForm(HttpServletRequest req, HttpServletResponse resp) {
-        return ModelAndView.from(ForwardView.from("/user/form.jsp"));
+        return ModelAndView.from(JspView.from("/user/form.jsp"));
     }
 
-    @RequestMapping("/users/profile")
+    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
     public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp) {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
-        return ModelAndView.of(Map.of("user", user), ForwardView.from("/user/profile.jsp"));
+        return ModelAndView.of(Map.of("user", user), JspView.from("/user/profile.jsp"));
     }
 
-    @RequestMapping(value = "/users/loginForm")
+    @RequestMapping(value = "/users/loginForm", method = RequestMethod.GET)
     public ModelAndView userLoginForm(HttpServletRequest req, HttpServletResponse resp) {
-        return ModelAndView.from(ForwardView.from("/user/login.jsp"));
+        return ModelAndView.from(JspView.from("/user/login.jsp"));
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
@@ -63,7 +63,7 @@ public class UserController {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (user == null) {
             return ModelAndView.of(Map.of("loginFailed", true),
-                    ForwardView.from("/user/login.jsp"));
+                    JspView.from("/user/login.jsp"));
         }
         String password = req.getParameter("password");
         if (user.matchPassword(password)) {
@@ -72,24 +72,24 @@ public class UserController {
             return ModelAndView.from(RedirectView.root());
         }
         return ModelAndView.of(Map.of("loginFailed", true),
-                ForwardView.from("/user/login.jsp"));
+                JspView.from("/user/login.jsp"));
     }
 
-    @RequestMapping(value = "/users/logout")
+    @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return ModelAndView.from(RedirectView.root());
     }
 
-    @RequestMapping(value = "/users/updateForm")
+    @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
         return ModelAndView.of(Map.of("user", user),
-                ForwardView.from("/user/updateForm.jsp"));
+                JspView.from("/user/updateForm.jsp"));
     }
 
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)

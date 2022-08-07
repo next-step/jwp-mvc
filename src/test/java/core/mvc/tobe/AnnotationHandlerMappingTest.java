@@ -21,7 +21,7 @@ class AnnotationHandlerMappingTest {
         BeanFactory beanFactory = new BeanFactory(new Reflections("core.mvc.tobe").getTypesAnnotatedWith(Controller.class));
         beanFactory.initialize();
 
-        handlerMapping = new AnnotationHandlerMapping(beanFactory, "core.mvc.tobe");
+        handlerMapping = new AnnotationHandlerMapping(beanFactory);
         handlerMapping.initialize();
     }
 
