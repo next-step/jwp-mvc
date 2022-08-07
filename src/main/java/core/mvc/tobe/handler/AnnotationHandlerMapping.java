@@ -8,6 +8,8 @@ import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerKey;
 import core.mvc.tobe.adapter.AnnotationHandlerAdapter;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
@@ -19,12 +21,15 @@ import java.util.Set;
 import static org.reflections.scanners.Scanners.TypesAnnotated;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
+        initialize();
     }
 
     public void initialize() {
@@ -61,7 +66,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
-        initialize();
+        logger.info("AnnotationHandlerMapping getHandler");
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
