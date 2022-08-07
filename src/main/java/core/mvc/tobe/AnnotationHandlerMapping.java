@@ -1,12 +1,21 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 public class AnnotationHandlerMapping {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -15,8 +24,39 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    public void initialize() {
+    public void initialize() throws InstantiationException, IllegalAccessException {
+        Reflections reflections = new Reflections(basePackage);
+        initializeHandlerExecution(reflections);
+    }
 
+    private void initializeHandlerExecution(Reflections reflections) throws InstantiationException, IllegalAccessException {
+        Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
+        for (Class<?> controllerClass : controllerClasses) {
+            Controller controllerAnnotation = controllerClass.getAnnotation(Controller.class);
+            String controllerLevelPath = controllerAnnotation.path();
+
+            requestMethodScan(controllerLevelPath, controllerClass);
+        }
+    }
+
+    private void requestMethodScan(String controllerLevelPath, Class<?> controllerClass) throws InstantiationException, IllegalAccessException {
+        Object controllerInstance = controllerClass.newInstance();
+        Method[] methods = controllerClass.getDeclaredMethods();
+        for (Method method : methods) {
+            addHendlerExecution(controllerInstance, controllerLevelPath, method);
+        }
+    }
+
+    private void addHendlerExecution(Object controllerInstance, String controllerLevelPath, Method method) {
+        if(method.isAnnotationPresent(RequestMapping.class)) {
+            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+            String path = requestMapping.value();
+            RequestMethod requestMethod = requestMapping.method();
+
+            HandlerKey handlerKey = new HandlerKey(controllerLevelPath + path, requestMethod);
+            logger.info("Add RequestMapping URL : {}, method : {}", handlerKey, method);
+            handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
+        }
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
