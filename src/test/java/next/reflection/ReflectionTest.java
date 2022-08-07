@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -94,6 +95,31 @@ public class ReflectionTest {
         if (declaredField.getType().equals(int.class)) {
             declaredField.set(student, age);
         }
+    }
+
+    @Test
+    void createQuestion() throws Exception {
+        // given // when
+        Question question = createInstance(Question.class, "재성", "질문입니다.", "내용입니다.");
+
+        // then
+        Assertions.assertThat(question.getWriter()).isEqualTo("재성");
+        Assertions.assertThat(question.getTitle()).isEqualTo("질문입니다.");
+        Assertions.assertThat(question.getContents()).isEqualTo("내용입니다.");
+    }
+
+    private Question createInstance(Class<Question> clazz, Object... args) throws Exception {
+        Constructor<Question> constructor = findConstructor(clazz, args);
+
+        return constructor.newInstance(args);
+    }
+
+    private Constructor<Question> findConstructor(Class<Question> clazz, Object[] args) throws Exception {
+        Class<?>[] argTypes = Arrays.stream(args)
+                .map(Object::getClass)
+                .toArray(Class[]::new);
+
+        return clazz.getDeclaredConstructor(argTypes);
     }
 
     @Test
