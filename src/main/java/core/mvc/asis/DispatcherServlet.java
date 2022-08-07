@@ -1,26 +1,18 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.adapter.AnnotationHandlerAdapter;
-import core.mvc.tobe.adapter.HandlerAdapter;
-import core.mvc.tobe.adapter.NotExistAdapterException;
-import core.mvc.tobe.adapter.RequestMappingAdapter;
-import core.mvc.tobe.handler.AnnotationHandlerMapping;
-import core.mvc.tobe.handler.HandlerMapping;
-import core.mvc.tobe.handler.NotExistHandlerException;
-import core.mvc.tobe.handler.RequestMapping;
+import core.mvc.tobe.adapter.*;
+import core.mvc.tobe.handler.*;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
@@ -28,18 +20,27 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private static final String BASE_PACKAGE_START = "next";
-
-    List<HandlerAdapter> handlerAdapters = new ArrayList<>();
-    List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private HandlerAdapters handlerAdapters;
+    private HandlerMappings handlerMappings;
 
     @Override
     public void init() throws ServletException {
-        handlerAdapters.add(new AnnotationHandlerAdapter());
-        handlerAdapters.add(new RequestMappingAdapter());
+        handlerMappings = new HandlerMappings(createHandlerMappings());
+        handlerAdapters = new HandlerAdapters(createHandlerAdapters());
+    }
 
-        handlerMappings.add(new AnnotationHandlerMapping());
-        handlerMappings.add(new RequestMapping());
+    private List<HandlerAdapter> createHandlerAdapters() {
+        return Arrays.asList(
+                new AnnotationHandlerAdapter(),
+                new RequestMappingAdapter()
+        );
+    }
+
+    private List<HandlerMapping> createHandlerMappings() {
+        return Arrays.asList(
+                new RequestMapping(),
+                new AnnotationHandlerMapping()
+        );
     }
 
     @Override
@@ -61,7 +62,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private HandlerAdapter getHandlerAdapter(Object handler) throws NotFoundException {
-        for (HandlerAdapter handlerAdapter : handlerAdapters) {
+        for (HandlerAdapter handlerAdapter : handlerAdapters.getHandlerAdapters()) {
             if (handlerAdapter.support(handler)) {
                 return handlerAdapter;
             }
@@ -71,7 +72,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object findHandler(HttpServletRequest req) throws NotFoundException {
-        for (HandlerMapping handlerMapping : handlerMappings) {
+        for (HandlerMapping handlerMapping : handlerMappings.getHandlerMappings()) {
             return handlerMapping.getHandler(req);
         }
 
