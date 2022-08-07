@@ -1,8 +1,6 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.di.factory.BeanFactory;
 
@@ -11,22 +9,18 @@ import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class AnnotationHandlerMapping {
+    private Object[] basePackage;
 
     public static final List<RequestMethod> DEFAULT_REQUEST_METHODS = List.of(RequestMethod.values());
 
-    private final BeanFactory beanFactory;
-    private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
-
-    public AnnotationHandlerMapping(BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
+    public AnnotationHandlerMapping(Object... basePackage) {
+        this.basePackage = basePackage;
     }
 
     public void initialize() {
-        handlerExecutions.putAll(handlerKeyExecutionsMap());
+
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
