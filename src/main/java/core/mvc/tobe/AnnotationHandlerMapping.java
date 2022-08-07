@@ -38,7 +38,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> controllerClass : controllerClasses) {
             Controller controllerAnnotation = controllerClass.getAnnotation(Controller.class);
-            String controllerLevelPath = controllerAnnotation.path();
+            String controllerLevelPath = controllerAnnotation.value();
 
             requestMethodScan(controllerLevelPath, controllerClass);
         }
