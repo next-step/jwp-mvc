@@ -10,7 +10,7 @@ public abstract class AbstractTestRunner {
 
     private static final int PARAM_COUNT_DEFAULT_CONSTRUCTOR = 0;
 
-    protected void run(Class<?> testClass) throws Exception {
+    protected void runWith(Class<?> testClass) throws Exception {
         Constructor<?> defaultConstruct = findDefaultConstruct(testClass);
 
         List<Method> testMethods = findTestMethods(testClass);
@@ -27,7 +27,7 @@ public abstract class AbstractTestRunner {
 
     private List<Method> findTestMethods(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredMethods())
-                .filter(this::isTestMethod)
+                .filter(this::supportTest)
                 .collect(Collectors.toList());
     }
 
@@ -39,5 +39,5 @@ public abstract class AbstractTestRunner {
         }
     }
 
-    abstract boolean isTestMethod(Method method);
+    abstract boolean supportTest(Method method);
 }

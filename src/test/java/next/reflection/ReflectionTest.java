@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,44 @@ public class ReflectionTest {
 
     private void line() {
         logger.debug("-----------------------------------------");
+    }
+
+    @Test
+    public void privateFieldAccess() throws Exception {
+        // given
+        Student student = new Student();
+
+        // when
+        setPrivateFields(student, "재성", 30);
+
+        // then
+        Assertions.assertThat(student.getName()).isEqualTo("재성");
+
+        Assertions.assertThat(student.getAge()).isEqualTo(30);
+    }
+
+    private static void setPrivateFields(Student student, String name, int age) throws IllegalAccessException {
+        Class<?> clazz = student.getClass();
+
+        for (Field declaredField : clazz.getDeclaredFields()) {
+            declaredField.setAccessible(true);
+
+            matchTypeAndSetName(student, name, declaredField);
+
+            matchTypeAndSetAge(student, age, declaredField);
+        }
+    }
+
+    private static void matchTypeAndSetName(Student student, String name, Field declaredField) throws IllegalAccessException {
+        if (declaredField.getType().equals(String.class)) {
+            declaredField.set(student, name);
+        }
+    }
+
+    private static void matchTypeAndSetAge(Student student, int age, Field declaredField) throws IllegalAccessException {
+        if (declaredField.getType().equals(int.class)) {
+            declaredField.set(student, age);
+        }
     }
 
     @Test

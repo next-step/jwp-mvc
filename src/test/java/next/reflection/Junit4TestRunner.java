@@ -8,11 +8,11 @@ public class Junit4TestRunner extends AbstractTestRunner {
 
     @Test
     public void run() throws Exception {
-        super.run(Junit4Test.class);
+        super.runWith(Junit4Test.class);
     }
 
     @Override
-    public boolean isTestMethod(Method method) {
+    public boolean supportTest(Method method) {
         return method.isAnnotationPresent(MyTest.class);
     }
 }

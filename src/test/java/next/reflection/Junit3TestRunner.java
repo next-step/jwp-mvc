@@ -10,11 +10,11 @@ public class Junit3TestRunner extends AbstractTestRunner {
 
     @Test
     public void run() throws Exception {
-        super.run(Junit3Test.class);
+        super.runWith(Junit3Test.class);
     }
 
     @Override
-    public boolean isTestMethod(Method method) {
+    public boolean supportTest(Method method) {
         return method.getName().startsWith(PREFIX_TEST_METHOD);
     }
 }
