@@ -1,11 +1,26 @@
 package next.reflection;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Junit3TestRunner {
+class Junit3TestRunner {
+    private static final Logger logger = LoggerFactory.getLogger(Junit3TestRunner.class);
+
     @Test
-    public void run() throws Exception {
+    void run() {
         Class<Junit3Test> clazz = Junit3Test.class;
-        // TODO Junit3Test에서 test로 시작하는 메소드 실행
+        Method[] methods = clazz.getDeclaredMethods();
+        Arrays.stream(methods)
+            .filter(method -> method.getName().startsWith("test"))
+            .forEach(method -> {
+                try {
+                    method.invoke(clazz.newInstance());
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
+            });
     }
 }
