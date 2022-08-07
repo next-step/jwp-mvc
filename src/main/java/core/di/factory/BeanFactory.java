@@ -3,16 +3,20 @@ package core.di.factory;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanCreationException;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BeanFactory {
+
+    private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
     private static final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
-    private Set<Class<?>> preInstanticateBeans;
+    private final Set<Class<?>> preInstanticateBeans;
 
-    private Map<Class<?>, Object> beans = Maps.newHashMap();
+    private final Map<Class<?>, Object> beans = Maps.newHashMap();
 
     public BeanFactory(Set<Class<?>> preInstanticateBeans) {
         this.preInstanticateBeans = preInstanticateBeans;
@@ -24,6 +28,18 @@ public class BeanFactory {
     }
 
     public void initialize() {
+        beans.putAll(preInstanticateBeans
+                .stream()
+                .collect(Collectors.toMap(clazz -> clazz, this::newInstanceFromDefaultConstructor)));
+    }
 
+
+    private Object newInstanceFromDefaultConstructor(Class<?> clazz) {
+        try {
+            return clazz.getDeclaredConstructor(EMPTY_CLASS_ARRAY).newInstance();
+        } catch (Exception e) {
+            logger.error(String.format("failed instance(%s) creation", clazz), e);
+            throw new BeanCreationException(clazz.getName(), String.format("an error occurred during instance(%s) creation", clazz), e);
+        }
     }
 }

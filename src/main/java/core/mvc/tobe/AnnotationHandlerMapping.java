@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.di.factory.BeanFactory;
 import org.reflections.Reflections;
-import org.springframework.beans.factory.BeanCreationException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -15,12 +15,12 @@ import java.util.stream.Stream;
 
 public class AnnotationHandlerMapping {
 
-    private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
-
+    private final BeanFactory beanFactory;
     private final Object[] basePackage;
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
+    public AnnotationHandlerMapping(BeanFactory beanFactory, Object... basePackage) {
+        this.beanFactory = beanFactory;
         this.basePackage = basePackage;
     }
 
@@ -35,27 +35,12 @@ public class AnnotationHandlerMapping {
     }
 
     private Map<HandlerKey, HandlerExecution> handlerKeyExecutionsMap() {
-        Map<Class<?>, Object> controllerClassInstances = controllerClassInstances();
-        return controllerClassInstances.keySet()
+        return new Reflections(basePackage).getTypesAnnotatedWith(Controller.class)
                 .stream()
                 .flatMap(controllerClass -> Stream.of(controllerClass.getDeclaredMethods()))
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toMap(this::toHandlerKey, method ->
-                        new HandlerExecution(controllerClassInstances.get(method.getDeclaringClass()), method)));
-    }
-
-    private Map<Class<?>, Object> controllerClassInstances() {
-        return new Reflections(basePackage).getTypesAnnotatedWith(Controller.class)
-                .stream()
-                .collect(Collectors.toMap(controllerClass -> controllerClass, this::newInstance));
-    }
-
-    private Object newInstance(Class<?> controllerClass) {
-        try {
-            return controllerClass.getDeclaredConstructor(EMPTY_CLASS_ARRAY).newInstance();
-        } catch (Exception e) {
-            throw new BeanCreationException(controllerClass.getName(), String.format("an error occurred during instance(%s) creation", controllerClass), e);
-        }
+                        new HandlerExecution(beanFactory.getBean(method.getDeclaringClass()), method)));
     }
 
     private HandlerKey toHandlerKey(Method method) {

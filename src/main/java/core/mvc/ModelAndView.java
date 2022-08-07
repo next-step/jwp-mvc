@@ -1,34 +1,33 @@
 package core.mvc;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
-    private View view;
-    private Map<String, Object> model = new HashMap<String, Object>();
 
-    public ModelAndView() {
-    }
+    private final Map<String, Object> model;
+    private final View view;
 
-    public ModelAndView(View view) {
+    private ModelAndView(Map<String, Object> model, View view) {
+        this.model = Collections.unmodifiableMap(model);
         this.view = view;
     }
 
-    public ModelAndView addObject(String attributeName, Object attributeValue) {
-        model.put(attributeName, attributeValue);
-        return this;
+    public static ModelAndView of(Map<String, Object> model, View view) {
+        return new ModelAndView(model, view);
+    }
+
+    public static ModelAndView from(View view) {
+        return of(Collections.emptyMap(), view);
     }
 
     public Object getObject(String attributeName) {
         return model.get(attributeName);
     }
 
-    public Map<String, Object> getModel() {
-        return Collections.unmodifiableMap(model);
-    }
-
-    public View getView() {
-        return view;
+    public void viewRender(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        view.render(model, request, response);
     }
 }
