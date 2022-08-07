@@ -6,7 +6,7 @@
 3. [x] @Test 애노테이션 메서드 실행
 4. [x] private field 에 값 할당
 5. [x] 인자를 가진 생성자의 인스턴스 생성
-6. [ ] component scan
+6. [x] component scan
 
 ---
 

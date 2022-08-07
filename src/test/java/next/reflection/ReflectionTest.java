@@ -2,19 +2,23 @@ package next.reflection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.Sets;
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
 
 class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -29,9 +33,49 @@ class ReflectionTest {
     private static final Date TEST_CREATED_DATE = Date.from(Instant.now());
     private static final int TEST_COUNT_OF_COMMENT = 99;
 
+    private Reflections reflections;
+
+    @DisplayName("요구사항 6, 컴포넌트 스캔, @Controller/@Service/@Repository annotation 설정 클래스 출력")
+    @Test
+    void componentScanTest() {
+        this.reflections = new Reflections("core.di.factory");
+
+        Set<Class<?>> classes = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+
+        for (Class<?> clazz : classes) {
+            printClass(clazz);
+        }
+
+        assertThat(classes).hasSize(4);
+    }
+
+    private Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation>... annotations) {
+        Set<Class<?>> beans = Sets.newHashSet();
+        for (Class<? extends Annotation> annotation : annotations) {
+            beans.addAll(this.reflections.getTypesAnnotatedWith(annotation));
+        }
+        return beans;
+    }
+
+    private void printClass(Class<?> clazz) {
+        logger.debug(DEPTH_1 + clazz.getName());
+
+        Annotation[] annotations = clazz.getAnnotations();
+        logger.debug(DEPTH_2 + "Annotations: ");
+        for (Annotation annotation : annotations) {
+            logger.debug(DEPTH_3 + annotation);
+        }
+
+        Method[] methods = clazz.getMethods();
+        logger.debug(DEPTH_2 + "Methods: ");
+        for (Method method : methods) {
+            logger.debug(DEPTH_3 + method.getName());
+        }
+    }
+
     @DisplayName("요구사항 5, 인자를 가진 생성자의 인스턴스 생성")
-   @Test
-    void createConstructorWithArgsTest() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    @Test
+    void createConstructorWithArgsTest() throws Exception {
         Class<Question> clazz = Question.class;
         Question question;
         Constructor<Question>[] constructors = (Constructor<Question>[]) clazz.getConstructors();
@@ -43,7 +87,7 @@ class ReflectionTest {
 
             if (constructor.getParameterCount() == 6) {
                 question = constructor.newInstance(TEST_QUESTION_ID, TEST_WRITER, TEST_TITLE, TEST_CONTENTS, TEST_CREATED_DATE, TEST_COUNT_OF_COMMENT);
-                logger.debug("Constructor paramCount3: " + question);
+                logger.debug("Constructor paramCount6: " + question);
             }
         }
     }
