@@ -1,16 +1,23 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -81,5 +88,37 @@ public class ReflectionTest {
                 logger.debug("Constructor paramCount6: " + question);
             }
         }
+    }
+
+    @DisplayName("@Controller, @Service, @Repository 애노테이션 설정 클래스 출력")
+    @Test
+    void componentScanTest() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        Set<Class<?>> classes = getClassWithAnnotation(reflections, Controller.class, Service.class, Repository.class);
+
+        for (Class<?> clazz : classes) {
+            logger.info("[class name] = {}", clazz.getName());
+
+            logger.info("[class annotation]");
+            for (Annotation annotation : clazz.getAnnotations()) {
+                logger.info("[annotation name] = {}", annotation);
+            }
+
+            logger.info("[class method]");
+            for (Method method : clazz.getDeclaredMethods()) {
+                logger.info("[method name] = {}", method.getName());
+            }
+        }
+
+        assertThat(classes).hasSize(4);
+    }
+
+    private Set<Class<?>> getClassWithAnnotation(Reflections reflections, Class<? extends Annotation>... classes) {
+        return Arrays.stream(classes)
+                .flatMap(aClass -> reflections.getTypesAnnotatedWith(aClass)
+                        .stream().distinct()
+                )
+                .collect(Collectors.toSet());
     }
 }
