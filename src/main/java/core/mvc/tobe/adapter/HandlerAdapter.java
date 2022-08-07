@@ -1,8 +1,6 @@
 package core.mvc.tobe.adapter;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.handler.HandlerMapping;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
