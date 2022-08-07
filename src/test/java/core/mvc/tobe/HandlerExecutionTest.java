@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.di.factory.example.MockView;
 import core.mvc.ModelAndView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,7 +85,7 @@ class HandlerExecutionTest {
     }
 
     private ModelAndView objectTypeParameterMethod(Object object) {
-        return new ModelAndView();
+        return ModelAndView.from(new MockView());
     }
 
     private Object objectReturnTypeMethod(HttpServletRequest request, HttpServletResponse response) {
@@ -94,10 +95,10 @@ class HandlerExecutionTest {
     private ModelAndView requestMappingMethod(HttpServletRequest request, HttpServletResponse response) {
         request.getMethod();
         response.getStatus();
-        return new ModelAndView();
+        return ModelAndView.from(new MockView());
     }
 
     private ModelAndView requestMappingMethod(HttpServletResponse response, HttpServletRequest request) {
-        return new ModelAndView();
+        return ModelAndView.from(new MockView());
     }
 }
