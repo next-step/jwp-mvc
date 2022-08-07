@@ -4,7 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,6 +22,31 @@ class ReflectionTest {
     private static final String DEPTH_1 = "\t\t";
     private static final String DEPTH_2 = "\t\t\t\t";
     private static final String DEPTH_3 = "\t\t\t\t\t\t";
+    private static final long TEST_QUESTION_ID = 123L;
+    private static final String TEST_WRITER = "testWriter";
+    private static final String TEST_TITLE = "testTitle";
+    private static final String TEST_CONTENTS = "testContents";
+    private static final Date TEST_CREATED_DATE = Date.from(Instant.now());
+    private static final int TEST_COUNT_OF_COMMENT = 99;
+
+    @DisplayName("요구사항 5, 인자를 가진 생성자의 인스턴스 생성")
+   @Test
+    void createConstructorWithArgsTest() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        Question question;
+        Constructor<Question>[] constructors = (Constructor<Question>[]) clazz.getConstructors();
+        for (Constructor<Question> constructor : constructors) {
+            if (constructor.getParameterCount() == 3) {
+                question = constructor.newInstance(TEST_WRITER, TEST_TITLE, TEST_CONTENTS);
+                logger.debug("Constructor paramCount3: " + question);
+            }
+
+            if (constructor.getParameterCount() == 6) {
+                question = constructor.newInstance(TEST_QUESTION_ID, TEST_WRITER, TEST_TITLE, TEST_CONTENTS, TEST_CREATED_DATE, TEST_COUNT_OF_COMMENT);
+                logger.debug("Constructor paramCount3: " + question);
+            }
+        }
+    }
 
     @DisplayName("요구사항 4, private field 값 할당")
     @Test
