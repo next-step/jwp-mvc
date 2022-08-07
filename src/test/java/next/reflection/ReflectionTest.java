@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -12,7 +14,18 @@ public class ReflectionTest {
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
-        logger.debug(clazz.getName());
+
+        for (Field field : clazz.getFields()) {
+            logger.info("[Question - All Field]: {}", field);
+        }
+
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            logger.info("[Question - All Constructor]: {}", constructor);
+        }
+
+        for (Method method : clazz.getMethods()) {
+            logger.info("[Question - All Method]: {}", method);
+        }
     }
 
     @Test
