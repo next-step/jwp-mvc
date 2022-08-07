@@ -2,10 +2,10 @@ package core.mvc.resolver;
 
 import core.annotation.Component;
 import core.di.factory.BeanFactory;
+import core.mvc.MethodParameter;
 import core.mvc.exception.NoSuchArgumentResolverException;
 import org.reflections.Reflections;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.MethodParameter;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +41,7 @@ public class ArgumentResolverMapping {
 
         return IntStream.range(0, method.getParameterCount())
                 .mapToObj(idx->{
-                    MethodParameter methodParameter = new MethodParameter(method, idx);
+                    MethodParameter methodParameter = MethodParameter.of(method, idx);
                     MethodArgumentResolver foundResolver = findResolver(methodParameter);
 
                     return foundResolver.resolve(request, response, Objects.requireNonNull(parameterNames)[idx], methodParameter);

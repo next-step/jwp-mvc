@@ -2,7 +2,7 @@ package core.mvc.resolver;
 
 import com.google.common.primitives.Primitives;
 import core.annotation.Component;
-import org.springframework.core.MethodParameter;
+import core.mvc.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,8 +22,6 @@ public class NoAnnotationArgumentResolver implements MethodArgumentResolver {
     }
     @Override
     public boolean support(MethodParameter parameter) {
-
-
         return !parameter.hasParameterAnnotations()
                 && WHITE_LIST.contains(parameter.getParameterType());
     }

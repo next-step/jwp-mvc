@@ -2,8 +2,8 @@ package core.mvc.resolver;
 
 import core.annotation.Component;
 import core.annotation.web.RequestParam;
+import core.mvc.MethodParameter;
 import core.mvc.exception.NoSuchArgumentResolverException;
-import org.springframework.core.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
