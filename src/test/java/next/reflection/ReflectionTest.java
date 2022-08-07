@@ -7,7 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Instant;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,5 +64,22 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo("죠르디");
         assertThat(student.getAge()).isEqualTo(20);
+    }
+
+    @DisplayName("Question 인스턴스 생성")
+    @Test
+    void createQuestionInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+        for (Constructor<Question> constructor : (Constructor<Question>[]) clazz.getDeclaredConstructors()) {
+            if (constructor.getParameterCount() == 3) {
+                Question question = constructor.newInstance("writerId", "title", "content");
+                logger.debug("Constructor paramCount3: " + question);
+            }
+
+            if (constructor.getParameterCount() == 6) {
+                Question question = constructor.newInstance(1L, "writerId", "title", "content", Date.from(Instant.now()), 3);
+                logger.debug("Constructor paramCount6: " + question);
+            }
+        }
     }
 }
