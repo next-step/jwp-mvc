@@ -3,6 +3,7 @@ package core.mvc.resolver;
 import core.annotation.Component;
 import core.di.factory.BeanFactory;
 import core.mvc.MethodParameter;
+import core.mvc.exception.ArgumentResolverException;
 import core.mvc.exception.NoSuchArgumentResolverException;
 import org.reflections.Reflections;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 public class ArgumentResolverMapping {
     private static final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
@@ -36,16 +36,18 @@ public class ArgumentResolverMapping {
         this.resolvers.addAll(founded);
     }
 
-    public Object[] resolve(Method method, HttpServletRequest request, HttpServletResponse response) {
+    public Object[] resolve(Method method, HttpServletRequest request, HttpServletResponse response) throws ArgumentResolverException {
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
+        int pCount = method.getParameterCount();
+        Object[] values = new Object[pCount];
 
-        return IntStream.range(0, method.getParameterCount())
-                .mapToObj(idx->{
-                    MethodParameter methodParameter = MethodParameter.of(method, idx);
-                    MethodArgumentResolver foundResolver = findResolver(methodParameter);
+        for (int idx = 0; idx < pCount; idx++) {
+            MethodParameter methodParameter = MethodParameter.of(method, idx);
+            MethodArgumentResolver foundResolver = findResolver(methodParameter);
+            values[idx] = foundResolver.resolve(request, response, Objects.requireNonNull(parameterNames)[idx], methodParameter);
+        }
 
-                    return foundResolver.resolve(request, response, Objects.requireNonNull(parameterNames)[idx], methodParameter);
-                }).toArray();
+        return values;
     }
 
     private MethodArgumentResolver findResolver(MethodParameter methodParameter) {

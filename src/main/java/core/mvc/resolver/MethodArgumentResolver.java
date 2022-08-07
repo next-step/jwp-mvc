@@ -2,6 +2,7 @@ package core.mvc.resolver;
 
 
 import core.mvc.MethodParameter;
+import core.mvc.exception.ArgumentResolverException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +11,7 @@ public interface MethodArgumentResolver {
 
     boolean support(MethodParameter parameter);
 
-    Object resolve(HttpServletRequest request, HttpServletResponse response, String parameterName, MethodParameter parameter);
+    Object resolve(HttpServletRequest request, HttpServletResponse response, String parameterName, MethodParameter parameter) throws ArgumentResolverException;
 
     default Object cast(Class<?> clazz, String value) {
         if (Boolean.class == clazz || boolean.class == clazz) {

@@ -74,8 +74,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ModelAndView createUser(String userId, String password, String name, String email) {
-        User user = new User(userId, password, name, email);
+    public ModelAndView createUser(User user) {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -93,13 +92,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ModelAndView updateUser(String userId, String password, String name, String email, HttpSession session , HttpServletRequest request) {
+    public ModelAndView updateUser(User updateUser, HttpSession session , HttpServletRequest request) {
         User user = DataBase.findUserById(request.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(session, user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(userId, password, name, email);
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return ModelAndView.newInstance("redirect:/");

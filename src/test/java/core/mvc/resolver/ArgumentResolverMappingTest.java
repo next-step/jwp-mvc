@@ -1,5 +1,6 @@
 package core.mvc.resolver;
 
+import core.mvc.exception.ArgumentResolverException;
 import core.mvc.exception.NoSuchArgumentResolverException;
 import core.mvc.tobe.TestUserController;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,7 +16,6 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ArgumentResolverMappingTest {
     private static ArgumentResolverMapping argumentResolverMapping;
@@ -29,7 +29,7 @@ class ArgumentResolverMappingTest {
 
     @DisplayName("HttpServletRequest와 HttpServletResponse 매개변수를 주입할 수 있다.")
     @Test
-    void injectHttpServletXXXX() {
+    void injectHttpServletXXXX() throws ArgumentResolverException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         Class<TestUserController> clazz = TestUserController.class;
@@ -45,7 +45,7 @@ class ArgumentResolverMappingTest {
 
     @DisplayName("아무 애노테이션이 없는 파라미터를 요구하는 타입에 맞게 주입할 수 있다.")
     @Test
-    void injectNormalArgument() {
+    void injectNormalArgument() throws ArgumentResolverException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("id", "123");
         request.addParameter("age", "45");
@@ -71,7 +71,7 @@ class ArgumentResolverMappingTest {
         class Context_without_attribute {
             @DisplayName("파라미터 이름으로 경로에서 인수를 찾아 주입한다.")
             @Test
-            void injectParameterByParameterName() {
+            void injectParameterByParameterName() throws ArgumentResolverException {
                 MockHttpServletRequest request = new MockHttpServletRequest();
                 request.setRequestURI("/users/123");
 
@@ -93,7 +93,7 @@ class ArgumentResolverMappingTest {
 
             @DisplayName("name속성을 지정하면 해당 속성으로 경로에서 인수를 찾아 주입한다.")
             @Test
-            void injectParameterByNameAttribute() {
+            void injectParameterByNameAttribute() throws ArgumentResolverException {
                 MockHttpServletRequest request = new MockHttpServletRequest();
                 request.setRequestURI("/users/123/catsbi/35");
 
@@ -110,7 +110,7 @@ class ArgumentResolverMappingTest {
 
             @DisplayName("required 속성이 true인 경우 경로에서 인수가 존재할 경우 찾아 주입한다.")
             @Test
-            void injectParameterByRequireTrue() {
+            void injectParameterByRequireTrue() throws ArgumentResolverException {
                 MockHttpServletRequest request = new MockHttpServletRequest();
                 request.setRequestURI("/users/123/catsbi/35");
 
