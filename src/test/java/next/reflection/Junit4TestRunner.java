@@ -14,7 +14,7 @@ class Junit4TestRunner {
             .filter(method -> method.isAnnotationPresent(MyTest.class))
             .forEach(method -> {
                 try {
-                    method.invoke(clazz.newInstance());
+                    method.invoke(clazz.getDeclaredConstructor().newInstance());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -4,7 +4,7 @@
 1. [x] 클래스 정보를 출력한다.
 2. [x] test로 시작하는 메서드 실행
 3. [x] @Test 애노테이션 메서드 실행
-4. [ ] private field 에 값 할당
+4. [x] private field 에 값 할당
 5. [ ] 인자를 가진 생성자의 인스턴스 생성
 6. [ ] component scan
 
