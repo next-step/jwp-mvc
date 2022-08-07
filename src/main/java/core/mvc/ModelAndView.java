@@ -1,5 +1,7 @@
 package core.mvc;
 
+import core.mvc.tobe.JspView;
+import core.mvc.tobe.RedirectView;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +19,14 @@ public class ModelAndView {
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public static ModelAndView jsp(String viewName) {
+        return new ModelAndView(new JspView(viewName));
+    }
+
+    public static ModelAndView redirect(String viewName) {
+        return new ModelAndView(new RedirectView(viewName));
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {

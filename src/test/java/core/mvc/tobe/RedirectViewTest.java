@@ -1,34 +1,31 @@
 package core.mvc.tobe;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.Map;
+import core.mvc.View;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-class JspViewTest {
+class RedirectViewTest {
 
-    @DisplayName("model을 포함하여 페이지로 이동한다.")
+    @DisplayName("다른 위치로 이동시킨다")
     @Test
-    void forward() throws Exception {
-        final Map<String, Object> model = Map.of("hi", "안녕");
-
+    void redirect() throws Exception {
         final MockHttpServletRequest request = new MockHttpServletRequest();
         final MockHttpServletResponse response = new MockHttpServletResponse();
 
-        final JspView jspView = new JspView("/home.jsp");
-        jspView.render(model, request, response);
+        final View redirectView = new RedirectView("redirect:/home.jsp");
+        redirectView.render(null, request, response);
 
         assertAll(
-            () -> assertThat(request.getAttribute("hi")).isEqualTo("안녕"),
-            () -> assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK),
-            () -> assertThat(response.getForwardedUrl()).isEqualTo("/home.jsp")
+            () -> assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND),
+            () -> assertThat(response.getHeader("Location")).isEqualTo("/home.jsp")
         );
 
     }
-
 }

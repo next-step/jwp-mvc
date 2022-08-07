@@ -39,3 +39,47 @@
 - [x] 기존 컨트롤러와 애너테이션이 적용된 컨트롤러가 공존해야 한다.
   - [x] DispatchServlet에서 RequestMapping과 AnnotationHandlerMapping 모두 적용되어야 한다.
   - [x] 기존의 컨트롤러와 동일한 뷰를 처리할 수 있도록 구현한다.
+
+### 2단계 피드백
+- [ ] AnnotationHandlerMapping 에서 컨트롤러를 등록하는 부분을 별도의 클래스로 위임 (3단계의 ControllerScanner?)
+
+
+# 🚀 3단계 - @MVC 구현(힌트)
+
+### 요구사항
+힌트를 참고하여 리팩토링 및 구현하여 신규 MVC 프레임워크로 전환한다.
+
+### TODO LIST
+- [x] ControllerScanner 추가
+  - [x] Reflections 라이브러리를 활용해 @Controller 애노테이션이 적용된 클래스를 찾는다.
+  - [x] 찾은 컨트롤러의 인스턴트를 생성하여 Map 자료 구조에 저장한다. (한 번만 생성해서 재사용할 수 있도록 하기 위함?)
+  - [x] 중복 인스턴스를 방지하기 위해 클래스의 이름으로 구분하여 저장한다.
+  - [x] @Controller 의 값이 있는 경우 컨트롤러의 이름을 @Controller 애노테이션의 값으로 사용한다.
+  - [x] @Controller 의 값이 없는 경우 컨트롤러의 이름을 lowerCamelCase 로 사용한다.
+- [x] RequestMappingScanner 추가
+  - [x] 컨트롤러 인스턴스를 기반으로 @RequestMapping 애너테이션이 적용된 메서드를 찾는다. 
+    - [x] 인스턴스의 클래스에 @Controller 애노테이션이 없으면 예외를 발생시킨다.
+    - [x] @RequestMapping 애노테이션이 적용된 메서드가 없으면 빈 값을 반환한다.
+  - [x] @RequestMapping 정보로 HandlerKeyGenerator 를 활용하여 HandlerKey 를 생성한다. 
+  - [x] 메서드와 컨트롤러 인스턴스로 HandlerExecution 을 생성하여 HandlerKey 를 키로 설정하여 Map 자료 구조로 반환한다. 
+- [x] HandlerKey 목록을 생성하는 HandlerKeysGenerator 추가 
+  - [x] @RequestMapping 의 정보로 HandlerKey 를 생성한다.
+    - [x] 컨트롤러에 적용된 @RequestMapping 의 value 를 메서드 @RequestMapping value 의 prefix 로 적용한다. 
+    - [x] 클래스에 적용된 RequestMethod 와 메서드에 적용된 RequestMethod 를 모두 허용한다.
+      - [x] 컨트롤러에 @RequestMapping 이 없으면 메서드에 적용된 RequestMethod 만 허용한다.
+    - [x] 클래스에 적용된 RequestMethod 는 있지만 메서드에 적용된 RequestMethod 가 없다면 클래스의 RequestMethod 만 허용한다.
+    - [x] 클래스에 적용된 RequestMethod 가 없다면 메서드에 적용된 RequestMethod 만 허용한다. (둘 다 없다면 모든 RequestMethod 를 허용)
+- [x] AnnotationHandlerMapping 에서 ControllerScanner, RequestMappingScanner 활용
+  - [x] ControllerScanner 로 @Controller 애노테이션이 적용된 클래스의 인스턴스들을 찾는다.
+  - [x] RequestMappingScanner 로 HandlerKey 와 HandlerExecutable 쌍을 생성하여 HANDLER_EXECUTIONS 에 저장한다.
+- [x] HandlerMapping 추가
+  - [x] RequestMapping 과 AnnotationHandlerMapping 의 공통부분을 추상화한 HandlerMapping 인터페이스를 생성한다.
+  - [x] RequestMapping 과 AnnotationHandlerMapping 을 HandlerMapping 의 구현체로 변경한다.
+- [x] DispatcherServlet 초기화 변경
+  - [x] 초기화 과정에서 HandlerMapping 의 구현체들을 모두 초기화한다.
+  - [x] 초기화한 HandlerMapping 을 List 자료 구조로 관리한다. 
+  - [x] 클라이언트의 요청을 HandlerMapping 에서 찾아 컨트롤러를 실행한다.
+- [x] 기존 컨트롤러들을 애너테이션 기반으로 모두 변경 후 정상적으로 동작해야한다.
+  - [x] 1개의 컨트롤러를 애너테이션 기반으로 변경 후 테스트한다.
+  - [x] 테스트에 성공하면 모든 컨트롤러를 애너테이션 기반으로 변경하여 테스트한다.
+  - [x] 모든 컨트롤러의 테스트가 성공하면 신규 MVC 프레임워크로 전환한다.
