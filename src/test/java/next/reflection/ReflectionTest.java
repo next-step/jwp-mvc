@@ -68,6 +68,17 @@ public class ReflectionTest {
     }
 
     @Test
+    void 애노테이션이_설정된_클래스_출력() {
+        var reflections = new Reflections("core.di.factory.example");
+
+        var targetClasses = Stream.of(Repository.class, Controller.class, Service.class)
+            .map(reflections::getTypesAnnotatedWith)
+            .reduce(new HashSet<>(), Sets::union);
+
+        System.out.println(targetClasses);
+    }
+
+    @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
