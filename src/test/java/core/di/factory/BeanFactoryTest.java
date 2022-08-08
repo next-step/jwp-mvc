@@ -6,6 +6,7 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
+import java.lang.reflect.InvocationTargetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -18,13 +19,13 @@ import org.reflections.util.FilterBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class BeanFactoryTest {
+class BeanFactoryTest {
     private Reflections reflections;
     private BeanFactory beanFactory;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setup() {
+    public void setup() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         reflections = new Reflections(new ConfigurationBuilder()
             .forPackage("core")
             .filterInputsBy(new FilterBuilder().includePackage("core.di.factory.example"))
