@@ -41,3 +41,16 @@
 
 - `core.di.factory.example` 패키지에서 `@Controller`, `@Service`, `@Repository` 애노테이션 설정된 모든 클래스를 찾아 출력
 
+
+## 2단계 - @MVC 구현
+
+### 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+
+- 새로운 MVC 프레임워크 테스트
+  - `AnnotationHandlerMappingTest` 코드가 통과되도록 구현
+- 실습을 기반 코드 및 라이브러리
+  - (reflections)[https://github.com/ronmamo/reflections] 라이브러리를 활용하여 `@Controller` 클래스를 찾고 요청 url과 메소드 연결 구현 
+
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+
+- 구현되어 있던 컨트롤러를 애노테이션 기반으로 변경
