@@ -18,6 +18,10 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +43,12 @@ class ReflectionTest {
     @DisplayName("요구사항 6, 컴포넌트 스캔, @Controller/@Service/@Repository annotation 설정 클래스 출력")
     @Test
     void componentScanTest() {
-        this.reflections = new Reflections("core.di.factory");
+//        this.reflections = new Reflections("core.di.factory");
+        this.reflections = new Reflections(new ConfigurationBuilder()
+            .forPackage("core")
+            .filterInputsBy(new FilterBuilder().includePackage("core.di.factory.example"))
+            .setScanners(Scanners.TypesAnnotated)
+            .setParallel(true));
 
         Set<Class<?>> classes = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
 
