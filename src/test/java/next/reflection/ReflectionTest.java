@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("클래스 정보 출력")
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
@@ -64,6 +66,7 @@ public class ReflectionTest {
         }
     }
 
+    @DisplayName("private field에 값 할당")
     @Test
     public void privateFieldAccess() throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<Student> clazz = Student.class;

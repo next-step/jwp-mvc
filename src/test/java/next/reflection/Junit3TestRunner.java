@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 public class Junit3TestRunner {
     private static final String RUN_TEST_PREFIX = "test";
 
+    @DisplayName("test로 시작하는 메소드 실행")
     @Test
     public void run() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<Junit3Test> clazz = Junit3Test.class;

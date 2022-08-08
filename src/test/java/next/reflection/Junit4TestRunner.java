@@ -1,5 +1,6 @@
 package next.reflection;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -11,6 +12,7 @@ public class Junit4TestRunner {
 
     private static final Class<MyTest> RUN_TEST_ANNOTATION = MyTest.class;
 
+    @DisplayName("@Test 애노테이션 메소드 실행")
     @Test
     public void run() throws Exception {
         Class<Junit4Test> clazz = Junit4Test.class;
