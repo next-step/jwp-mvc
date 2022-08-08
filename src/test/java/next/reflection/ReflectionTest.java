@@ -5,9 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -57,5 +62,31 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+
+        final Constructor<Student> constructor = clazz.getConstructor();
+        final Student student = constructor.newInstance();
+
+        final Field nameField = clazz.getDeclaredField("name");
+        nameField.setAccessible(true);
+        nameField.set(student, "학생");
+
+        final Field ageField = clazz.getDeclaredField("age");
+        ageField.setAccessible(true);
+        ageField.setInt(student, 14);
+
+        final Method getName = clazz.getDeclaredMethod("getName");
+        final String name = (String) getName.invoke(student);
+
+        final Method getAge = clazz.getDeclaredMethod("getAge");
+        final int age = (int) getAge.invoke(student);
+
+        assertThat(name).isEqualTo("학생");
+        assertThat(age).isEqualTo(14);
     }
 }
