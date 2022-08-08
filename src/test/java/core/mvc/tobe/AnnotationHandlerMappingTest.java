@@ -9,7 +9,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AnnotationHandlerMappingTest {
+class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
@@ -19,7 +19,7 @@ public class AnnotationHandlerMappingTest {
     }
 
     @Test
-    public void create_find() throws Exception {
+    void create_find() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
