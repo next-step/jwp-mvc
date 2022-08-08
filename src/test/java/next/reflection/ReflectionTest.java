@@ -11,6 +11,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
@@ -80,16 +81,31 @@ class ReflectionTest {
         Question question;
         Constructor<Question>[] constructors = (Constructor<Question>[]) clazz.getConstructors();
         for (Constructor<Question> constructor : constructors) {
-            if (constructor.getParameterCount() == 3) {
+            if (isConstructorOf(constructor, TEST_WRITER, TEST_TITLE, TEST_CONTENTS)) {
                 question = constructor.newInstance(TEST_WRITER, TEST_TITLE, TEST_CONTENTS);
                 logger.debug("Constructor paramCount3: " + question);
             }
 
-            if (constructor.getParameterCount() == 6) {
+            if (isConstructorOf(constructor, TEST_QUESTION_ID, TEST_WRITER, TEST_TITLE, TEST_CONTENTS, TEST_CREATED_DATE, TEST_COUNT_OF_COMMENT)) {
                 question = constructor.newInstance(TEST_QUESTION_ID, TEST_WRITER, TEST_TITLE, TEST_CONTENTS, TEST_CREATED_DATE, TEST_COUNT_OF_COMMENT);
                 logger.debug("Constructor paramCount6: " + question);
             }
         }
+    }
+
+    private boolean isConstructorOf(Constructor constructor, Object... objects) {
+        Class[] parameterTypes = constructor.getParameterTypes();
+        if (parameterTypes.length != objects.length) {
+            return false;
+        }
+
+        for (int i = 0; i < parameterTypes.length; ++i) {
+            if (!parameterTypes[i].isInstance(objects[i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @DisplayName("요구사항 4, private field 값 할당")
