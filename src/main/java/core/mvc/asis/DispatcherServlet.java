@@ -40,16 +40,28 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Object handler = handler(req);
+        execute(handler, req, resp);
+    }
+
+    private void execute(Object handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        try {
+            renderView(handler, req, resp);
+        } catch (Throwable e) {
+            logger.error("Exception : {}", e);
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    private void renderView(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (handler instanceof Controller) {
             render(req, resp, (Controller) handler);
             return;
         }
         if (handler instanceof HandlerExecution) {
-//            ((HandlerExecution) handler).handle(req, resp)
-//                    .viewRender(req, resp);
+            ((HandlerExecution) handler).handle(req, resp).viewRender(req, resp);
             return;
         }
-        throw new ServletException();
+        throw new UnsupportedOperationException(String.format("handler(type: %s) is not supported type", handler.getClass()));
     }
 
     private Object handler(HttpServletRequest request) throws ServletException {
@@ -60,23 +72,15 @@ public class DispatcherServlet extends HttpServlet {
                 .orElseThrow(() -> new ServletException(String.format("can not found request mapping: request(%s)", request)));
     }
 
-    private void render(HttpServletRequest req, HttpServletResponse resp, Controller controller) throws ServletException {
-        try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
+    private void render(HttpServletRequest req, HttpServletResponse resp, Controller controller) throws Exception {
+        move(controller.execute(req, resp), req, resp);
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
             resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
             return;
         }
-
         RequestDispatcher rd = req.getRequestDispatcher(viewName);
         rd.forward(req, resp);
     }
