@@ -1,4 +1,4 @@
-package next.controller;
+package next.fixture.controller;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;

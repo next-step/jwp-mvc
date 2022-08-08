@@ -1,4 +1,4 @@
-package next.controller;
+package next.fixture.controller;
 
 public class NotAnnotatedController {
 

@@ -18,7 +18,7 @@ class ControllerScannerTest {
     @DisplayName("@Controller 애노테이션이 적용된 클래스를 찾는다.")
     @Test
     void find_controllers_with_controller_annotation() {
-        reflections = new Reflections("next.controller");
+        reflections = new Reflections("next.fixture.controller");
 
         final Set<Object> controllers = ControllerScanner.getControllers(reflections);
 
@@ -39,7 +39,7 @@ class ControllerScannerTest {
     @DisplayName("@Controller 애노테이션이 적용된 중복된 클래스를 찾는 경우 예외를 발생시킨다")
     @Test
     void cannot_find_duplicated_controllers_with_controller_annotation() {
-        reflections = new Reflections("next.duplicatedcontroller");
+        reflections = new Reflections("next.fixture.duplicatedcontroller");
 
         final ThrowingCallable actual = () -> ControllerScanner.getControllers(reflections);
 

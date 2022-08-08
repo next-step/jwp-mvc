@@ -6,9 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import core.annotation.web.RequestMethod;
 import core.mvc.tobe.exception.UnSupportedControllerInstanceException;
 import java.util.Map;
-import next.controller.AnnotatedController;
-import next.controller.NotAnnotatedController;
-import next.controller.WithoutMethodController;
+import next.fixture.controller.AnnotatedController;
+import next.fixture.controller.NotAnnotatedController;
+import next.fixture.controller.WithoutMethodController;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class RequestMappingScannerTest {
         final ThrowingCallable actual = () -> RequestMappingScanner.getHandlerExecutable(notAnnotatedController);
 
         assertThatThrownBy(actual).isInstanceOf(UnSupportedControllerInstanceException.class)
-            .hasMessage("컨트롤러 애너테이션이 없는 클래스는 지원하지 않습니다: next.controller.NotAnnotatedController");
+            .hasMessage("컨트롤러 애너테이션이 없는 클래스는 지원하지 않습니다: next.fixture.controller.NotAnnotatedController");
     }
 
 

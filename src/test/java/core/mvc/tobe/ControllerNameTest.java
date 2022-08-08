@@ -3,9 +3,9 @@ package core.mvc.tobe;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import next.controller.AnnotatedController;
-import next.controller.NamedAnnotatedController;
-import next.controller.NotAnnotatedController;
+import next.fixture.controller.AnnotatedController;
+import next.fixture.controller.NamedAnnotatedController;
+import next.fixture.controller.NotAnnotatedController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ class ControllerNameTest {
 
         assertThatThrownBy(() -> ControllerName.generate(notAnnotatedController))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Controller 애너테이션이 없습니다 : next.controller.NotAnnotatedController");
+            .hasMessage("Controller 애너테이션이 없습니다 : next.fixture.controller.NotAnnotatedController");
 
     }
 }
