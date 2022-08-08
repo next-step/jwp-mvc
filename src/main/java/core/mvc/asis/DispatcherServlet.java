@@ -1,7 +1,7 @@
 package core.mvc.asis;
 
-import core.mvc.ForwardView;
 import core.mvc.HandlerMapping;
+import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
 import core.mvc.View;
@@ -75,6 +75,6 @@ public class DispatcherServlet extends HttpServlet {
         if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
             return RedirectView.from(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
         }
-        return ForwardView.from(viewName);
+        return JspView.from(viewName);
     }
 }
