@@ -54,3 +54,50 @@
 ### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
 
 - 구현되어 있던 컨트롤러를 애노테이션 기반으로 변경
+
+
+## 3단계 - @MVC 구현(힌트)
+
+### 요구사항 1 힌트
+
+- 힌트1 - `ControllerScanner` 클래스 추가
+  - 각 클래스에 대한 인스턴스 생성을 담당하는 `ControllerScanner` 클래스를 추가
+
+- 힌트 2 - `AnnotationHandlerMapping` 클래스 추가 
+  - `ControllerScanner` 를 통해 찾은 `@Controller` 클래스의 메소드 중 `RequestMapping` 애노테이션이 설정되어 있는 모든 메소드 찾기
+  - `Method` 정보를 바탕으로 `Map<HandlerKey, HandlerExecution>`에 각 요청 URL과 URL과 연결되는 메소드 정보를 값으로 추가
+
+- 힌트 3 - 요청에 대한 `Controller` 반환
+  - `AnnotationHandlerMapping` 클래스에 클라이언트 요청 정보(`HttpServletRequest`)를 전달하면 요청에 해당하는 `HandlerExecution` 반환
+
+
+
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+
+- 기존의 `RequestMapping`을 `LegacyHandlerMapping`로 이름을 리팩토링
+
+- 힌트 1 - HandlerMapping 추가
+  - `RequestMapping`, `AnnotationHandlerMapping` 두 클래스의 공통된 부분을 인터페이스로 추상화
+
+```java
+public interface HandlerMapping {
+    Object getHandler(HttpServletRequest request);
+}
+```
+
+- 힌트 2 - HandlerMapping 초기화
+  - `DispatcherServlet` 의 초기화(`init()` 메소드) 과정에서 `LegacyHandlerMapping`, `AnnotationHandlerMapping` 모두 초기화
+
+- 힌트 3 - Controller 실행
+  - `DispatcherServlet`의 `service()` 메소드에서 앞에서 초기화한 2개의 `HandlerMapping`에서 요청 URL에 해당하는 Controller를 찾아 메소드를 실행
+
+```java
+Object handler = getHandler(req);
+if (handler instanceof Controller) {
+    ModelAndView mav = ((Controller)handler).execute(req, resp);
+} else if (handler instanceof HandlerExecution) {
+    ModelAndView mav = ((HandlerExecution)handler).handle(req, resp);
+} else {
+    // throw exception
+} 
+```
