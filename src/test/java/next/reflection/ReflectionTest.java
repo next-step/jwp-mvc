@@ -38,6 +38,23 @@ public class ReflectionTest {
     }
 
     @Test
+    void privateFieldAccess() throws InstantiationException, IllegalAccessException, NoSuchFieldException {
+        var studentClass = Student.class;
+
+        var name = studentClass.getDeclaredField("name");
+        name.setAccessible(true);
+
+        var age = studentClass.getDeclaredField("age");
+        age.setAccessible(true);
+
+        var student = studentClass.newInstance();
+        name.set(student, "hong");
+        age.set(student, 20);
+
+        assertThat(student.getName()).isEqualTo("hong");
+        assertThat(student.getAge()).isEqualTo(20);
+    }
+
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
