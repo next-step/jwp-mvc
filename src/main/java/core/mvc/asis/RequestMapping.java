@@ -48,6 +48,6 @@ public class RequestMapping implements HandlerMapping {
 
     @Override
     public Object getHandler(HttpServletRequest request) {
-        return mappings.get(request.getRequestURI());
+        return findController(request.getRequestURI());
     }
 }

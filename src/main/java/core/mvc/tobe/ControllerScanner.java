@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 public class ControllerScanner {
 
-    public static final Class<Controller> FOUND_CONTROLLER_ANNOTATION_TARGET = Controller.class;
     private static final Logger logger = LoggerFactory.getLogger(ControllerScanner.class);
     private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
+    private static final Class<Controller> FOUND_CONTROLLER_ANNOTATION = Controller.class;
 
     private final Reflections reflections;
 
@@ -43,7 +43,7 @@ public class ControllerScanner {
     }
 
     private Map<Class<?>, Object> newControllers() {
-        return reflections.getTypesAnnotatedWith(FOUND_CONTROLLER_ANNOTATION_TARGET)
+        return reflections.getTypesAnnotatedWith(FOUND_CONTROLLER_ANNOTATION)
                 .stream()
                 .collect(Collectors.toMap(clazz -> clazz, this::newInstanceFromDefaultConstructor));
     }
