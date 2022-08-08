@@ -3,7 +3,6 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.adapter.*;
 import core.mvc.tobe.handler.*;
-import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
@@ -11,7 +10,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,7 +22,7 @@ public class DispatcherServlet extends HttpServlet {
     private HandlerMappings handlerMappings;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         handlerMappings = new HandlerMappings(createHandlerMappings());
         handlerAdapters = new HandlerAdapters(createHandlerAdapters());
     }
@@ -44,14 +42,14 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Object handler = null;
         try {
-            handler = findHandler(req);
-            HandlerAdapter handlerAdapter = getHandlerAdapter(handler);
+            handler = handlerMappings.findHandler(req);
+            HandlerAdapter handlerAdapter = handlerAdapters.findHandlerAdapter(handler);
             ModelAndView mv = handlerAdapter.handle(req, resp, handler);
 
             mv.getView().render(mv.getModel(), req, resp);
@@ -59,23 +57,5 @@ public class DispatcherServlet extends HttpServlet {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
-    }
-
-    private HandlerAdapter getHandlerAdapter(Object handler) throws NotFoundException {
-        for (HandlerAdapter handlerAdapter : handlerAdapters.getHandlerAdapters()) {
-            if (handlerAdapter.support(handler)) {
-                return handlerAdapter;
-            }
-        }
-
-        throw new NotExistAdapterException("요청에 맞는 어뎁터가 없습니다.");
-    }
-
-    private Object findHandler(HttpServletRequest req) throws NotFoundException {
-        for (HandlerMapping handlerMapping : handlerMappings.getHandlerMappings()) {
-            return handlerMapping.getHandler(req);
-        }
-
-        throw new NotExistHandlerException("요청에 맞는 핸들러가 없습니다.");
     }
 }
