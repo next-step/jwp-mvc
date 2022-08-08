@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.Maps;
 
+import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
@@ -28,13 +29,14 @@ public class AnnotationHandlerMapping {
     }
 
     private void addHandlerExecutions(ControllerScanner controllerScanner, Class<?> controller) {
+        Controller annotation = controller.getAnnotation(Controller.class);
         Object handler = controllerScanner.getHandlerInstance(controller);
         Set<Method> methods = controllerScanner.getMethods(controller);
 
-        methods.forEach(method -> addHandlerExecution(handler, method));
+        methods.forEach(method -> addHandlerExecution(annotation.value(), handler, method));
     }
 
-    private void addHandlerExecution(Object handler, Method method) {
+    private void addHandlerExecution(String value, Object handler, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         RequestMethod[] methods = requestMapping.method();
 
@@ -43,7 +45,7 @@ public class AnnotationHandlerMapping {
         }
 
         for (RequestMethod requestMethod : methods) {
-            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(handler, method));
+            handlerExecutions.put(new HandlerKey(value + requestMapping.value(), requestMethod), new HandlerExecution(handler, method));
         }
     }
 
