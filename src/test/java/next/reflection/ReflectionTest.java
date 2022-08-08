@@ -2,21 +2,17 @@ package next.reflection;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.BinaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
 
@@ -58,13 +54,17 @@ public class ReflectionTest {
     @Test
     void 인자를_가진_인스턴스_생성() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         var questionClass = Question.class;
-        Constructor<?> declaredConstructor = questionClass.getDeclaredConstructors()[0];
+        for (Constructor<?> declaredConstructor : questionClass.getDeclaredConstructors()) {
+            if (declaredConstructor.getParameterCount() == 3) {
+                Question question = (Question)declaredConstructor.newInstance("hong", "제목", "내용");
+                logger.debug("question parameter 3 = {}", question);
+            }
 
-        Question question = (Question)declaredConstructor.newInstance("hong", "제목", "내용");
-
-        assertThat(question.getWriter()).isEqualTo("hong");
-        assertThat(question.getTitle()).isEqualTo("제목");
-        assertThat(question.getContents()).isEqualTo("내용");
+            if (declaredConstructor.getParameterCount() == 5) {
+                Question question = (Question)declaredConstructor.newInstance(1L, "hong", "제목", "내용", new Date(), 0);
+                logger.debug("question parameter 5 = {}", question);
+            }
+        }
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ReflectionTest {
             .map(reflections::getTypesAnnotatedWith)
             .reduce(new HashSet<>(), Sets::union);
 
-        System.out.println(targetClasses);
+        logger.debug("target classes = {}", targetClasses);
     }
 
     @Test
