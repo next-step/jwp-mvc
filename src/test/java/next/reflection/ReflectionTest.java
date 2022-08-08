@@ -92,4 +92,14 @@ public class ReflectionTest {
         assertThat(name).isEqualTo("학생");
         assertThat(age).isEqualTo(14);
     }
+
+    @DisplayName("인자를 가진 생성자의 인스턴스 생성")
+    @Test
+    void constructorWithParameters() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        final Constructor<Question> constructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        final Question question = constructor.newInstance("작성자", "제목", "내용");
+
+        assertThat(question).isNotNull();
+    }
 }
