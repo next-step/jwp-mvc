@@ -55,6 +55,19 @@ public class ReflectionTest {
         assertThat(student.getAge()).isEqualTo(20);
     }
 
+    @Test
+    void 인자를_가진_인스턴스_생성() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        var questionClass = Question.class;
+        Constructor<?> declaredConstructor = questionClass.getDeclaredConstructors()[0];
+
+        Question question = (Question)declaredConstructor.newInstance("hong", "제목", "내용");
+
+        assertThat(question.getWriter()).isEqualTo("hong");
+        assertThat(question.getTitle()).isEqualTo("제목");
+        assertThat(question.getContents()).isEqualTo("내용");
+    }
+
+    @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
