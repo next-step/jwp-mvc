@@ -16,28 +16,28 @@ public class ControllerScanner {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerScanner.class);
 
-    private final Map<String, Object> controllers = new HashMap<>();
-    private final Reflections reflections;
-
-    public ControllerScanner(final Reflections reflections) {
-        this.reflections = reflections;
+    private ControllerScanner() {
+        throw new AssertionError();
     }
 
-    public void instantiateControllers() {
+    public static Set<Object> getControllers(final Reflections reflections) {
         final Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
+        final Map<String, Object> controllers = new HashMap<>();
 
         for (Class<?> clazz : classes) {
             final String name = ControllerName.generate(clazz);
             final Object controller = instantiateController(clazz);
 
-            validateDuplicatedController(name);
+            validateDuplicatedController(controllers, name);
 
             controllers.put(name, controller);
             logger.debug("Controller {} is instantiated", name);
         }
+
+        return new HashSet<>(controllers.values());
     }
 
-    private Object instantiateController(final Class<?> controller) {
+    private static Object instantiateController(final Class<?> controller) {
         try {
             return controller.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -45,13 +45,9 @@ public class ControllerScanner {
         }
     }
 
-    private void validateDuplicatedController(final String name) {
+    private static void validateDuplicatedController(final Map<String, Object> controllers, final String name) {
         if (controllers.containsKey(name)) {
             throw new DuplicatedControllerDefinitionException(name);
         }
-    }
-
-    public Set<Object> getControllers() {
-        return new HashSet<>(controllers.values());
     }
 }
