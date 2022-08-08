@@ -1,8 +1,10 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -42,5 +44,18 @@ public class AnnotationHandlerMappingTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
         execution.handle(request, response);
+    }
+
+    @Test
+    @DisplayName("RequestMapping method 설정하지 않은 경우, 모든 HTTP 메서드 지원 테스트")
+    public void supported_no_declare_method() throws Exception {
+        for (RequestMethod requestMethod : RequestMethod.values()) {
+            MockHttpServletRequest request = new MockHttpServletRequest(requestMethod.name(), "/allMethod");
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            HandlerExecution execution = handlerMapping.getHandler(request);
+            execution.handle(request, response);
+
+            assertThat(request.getAttribute("test")).isEqualTo("test");
+        }
     }
 }
