@@ -20,7 +20,8 @@ public class ArgumentScanner {
     private static final List<ArgumentResolver> argumentResolvers = asList(
             new HttpRequestArgumentResolver(),
             new HttpResponseArgumentResolver(),
-            new RequestParamArgumentResolver()
+            new RequestParamArgumentResolver(),
+            new PathVariableArgumentResolver()
     );
     private static final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
