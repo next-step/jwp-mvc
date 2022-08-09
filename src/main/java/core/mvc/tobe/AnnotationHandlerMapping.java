@@ -68,6 +68,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public Object getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        HandlerKey handlerKey = handlerExecutions.keySet()
+            .stream()
+            .filter(key -> key.matches(new HandlerKey(requestUri, rm)))
+            .findFirst()
+            .orElse(null);
+
+        return handlerExecutions.get(handlerKey);
     }
 }

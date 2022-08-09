@@ -1,16 +1,15 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestParam;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import core.annotation.web.RequestParam;
 
 public class RequestParamMethodArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasAnnotation(RequestParam.class)
-            || BeanUtils.isSimpleValueType(parameter.getType());
+        return parameter.hasAnnotation(RequestParam.class);
     }
 
     @Override

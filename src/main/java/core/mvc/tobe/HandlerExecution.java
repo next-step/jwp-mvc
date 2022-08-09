@@ -1,28 +1,21 @@
 package core.mvc.tobe;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import core.mvc.ModelAndView;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
-import core.mvc.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public class HandlerExecution {
 
     private final Object handler;
     private final Method method;
     private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-    private final List<ArgumentResolver> argumentResolvers = List.of(
-        new HttpServletRequestArgumentResolver(),
-        new HttpServletResponseArgumentResolver(),
-        new RequestParamMethodArgumentResolver()
-    );
+    private final ArgumentResolvers argumentResolvers = new ArgumentResolvers();
 
     public HandlerExecution(Object handler, Method method) {
         this.handler = handler;
@@ -53,10 +46,6 @@ public class HandlerExecution {
     }
 
     private Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
-        return argumentResolvers.stream()
-            .filter(resolver -> resolver.supportsParameter(parameter))
-            .findFirst()
-            .orElseThrow(IllegalStateException::new)
-            .resolveArgument(parameter, request, response);
+        return argumentResolvers.resolve(parameter, request, response);
     }
 }
