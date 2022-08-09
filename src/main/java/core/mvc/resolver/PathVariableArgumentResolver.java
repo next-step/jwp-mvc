@@ -30,7 +30,9 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
                 methodParameter.getAnnotation(PathVariable.class),
                 methodParameter.getParameterName()
         );
-        return getArgument(pattern, path, key);
+        return methodParameter.resolveArgument(
+                getArgument(pattern, path, key)
+        );
     }
 
     private String getPattern(Method method) {
