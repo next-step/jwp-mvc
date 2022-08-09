@@ -13,7 +13,7 @@ public class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws InstantiationException, IllegalAccessException {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         handlerMapping.initialize();
     }
