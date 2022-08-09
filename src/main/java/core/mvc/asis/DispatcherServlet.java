@@ -17,11 +17,11 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private ManualHandlerMapping rm;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
+        rm = new ManualHandlerMapping();
         rm.initMapping();
     }
 
