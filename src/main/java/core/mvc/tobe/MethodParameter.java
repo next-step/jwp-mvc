@@ -18,6 +18,22 @@ public class MethodParameter {
         this.annotations = annotations;
     }
 
+    public <A extends Annotation> boolean hasAnnotation(Class<A> annotationType) {
+        return getAnnotation(annotationType) != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
+        return (A) Arrays.stream(annotations)
+            .filter(annotationType::isInstance)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public boolean isStringType() {
+        return this.type == String.class;
+    }
+
     public Class<?> getType() {
         return type;
     }
@@ -28,21 +44,5 @@ public class MethodParameter {
 
     public String getParameterName() {
         return parameterName;
-    }
-
-    public <A extends Annotation> boolean hasAnnotation(Class<A> annotationType) {
-        return getAnnotation(annotationType) != null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <A extends Annotation> A getAnnotation(Class<A> annotationType) {
-        return (A) Arrays.stream(annotations)
-            .filter(annotationType::isInstance)
-            .findFirst()
-            .orElse(null);
-    }
-
-    public boolean isStringType() {
-        return this.type == String.class;
     }
 }

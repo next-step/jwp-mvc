@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,12 +24,12 @@ class PathVariableMethodArgumentResolverTest extends ArgumentResolverTest {
         request.setRequestURI("/users/100");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        MethodParameter[] methodParameters = getMethodParameters(method);
-        List<Object> argumentValues = Arrays.stream(methodParameters)
-            .map(parameter -> argumentResolver.resolveArgument(parameter, request, response))
-            .collect(Collectors.toList());
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        Annotation annotation = parameterAnnotations[0][0];
 
-        assertThat(argumentValues).hasSize(1);
-        assertThat((long) argumentValues.get(0)).isEqualTo(100L);
+        MethodParameter methodParameter = new MethodParameter(long.class, method, "id", new Annotation[]{annotation});
+        Object argument = argumentResolver.resolveArgument(methodParameter, request, response);
+
+        assertThat((long) argument).isEqualTo(100L);
     }
 }
