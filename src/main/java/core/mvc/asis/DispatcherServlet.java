@@ -1,8 +1,8 @@
 package core.mvc.asis;
 
-import core.mvc.DefaultView;
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
+import core.mvc.resolver.ArgumentResolverMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ public class DispatcherServlet extends HttpServlet {
     public static final String FAILED_INITIALIZE_ANNOTATION_HANDLER_MAPPING_MESSAGE = "애노테이션 핸들러 매핑 초기화에 실패했습니다.";
     public static final String INVALID_HANDLER_MESSAGE = "유효한 핸들러가 아닙니다.";
     private AnnotationHandlerMapping ahm;
+    private ArgumentResolverMapping arm;
 
     private List<HandlerMapping> handlerMappings = new ArrayList<>();
 
@@ -32,6 +33,9 @@ public class DispatcherServlet extends HttpServlet {
     public void init() throws ServletException {
 
         try {
+            arm = new ArgumentResolverMapping();
+            arm.init();
+
             ahm = new AnnotationHandlerMapping("next.controller");
             ahm.initialize();
             handlerMappings.add(ahm);
@@ -67,7 +71,8 @@ public class DispatcherServlet extends HttpServlet {
 
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (handler instanceof HandlerExecution) {
-            return ((HandlerExecution)handler).handle(req,resp);
+            Object[] args = arm.resolve(((HandlerExecution) handler).getMethod(), req, resp);
+            return ((HandlerExecution)handler).handle(args);
         }
         throw new ServletException(INVALID_HANDLER_MESSAGE);
     }

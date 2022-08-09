@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller(path = "/users")
@@ -20,7 +19,7 @@ public class UserController {
 
 
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView users(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView users(HttpServletRequest request) {
         if (!UserSessionUtils.isLogined(request.getSession())) {
 
             return ModelAndView.newInstance("redirect:/users/loginForm");
@@ -31,19 +30,17 @@ public class UserController {
     }
 
     @RequestMapping("/form")
-    public ModelAndView userForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView userForm() {
         return ModelAndView.newInstance("/user/form.jsp");
     }
 
     @RequestMapping("/loginForm")
-    public ModelAndView userLoginForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView userLoginForm() {
         return ModelAndView.newInstance("/user/login.jsp");
     }
 
     @RequestMapping("/login")
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
-        String password = request.getParameter("password");
+    public ModelAndView login(String userId, String password, HttpSession session,  HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
 
         if (user == null) {
@@ -51,7 +48,6 @@ public class UserController {
             return ModelAndView.newInstance("/user/login.jsp");
         }
         if (user.matchPassword(password)) {
-            HttpSession session = request.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
             return ModelAndView.newInstance("redirect:/");
         } else {
@@ -61,8 +57,7 @@ public class UserController {
     }
 
     @RequestMapping("/profile")
-    public ModelAndView profile(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView profile(String userId, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
@@ -72,16 +67,14 @@ public class UserController {
     }
 
     @RequestMapping("/logout")
-    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView logout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return ModelAndView.newInstance("redirect:/");
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
-                request.getParameter("email"));
+    public ModelAndView createUser(User user) {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -89,26 +82,22 @@ public class UserController {
     }
 
     @RequestMapping(value = "/updateForm", method = RequestMethod.GET)
-    public ModelAndView updateUserForm(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView updateUserForm(String userId, HttpSession session, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
-        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
+        if (!UserSessionUtils.isSameUser(session, user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
         request.setAttribute("user", user);
         return ModelAndView.newInstance("/user/updateForm.jsp");
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.PATCH)
-    public ModelAndView updateUser(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public ModelAndView updateUser(User updateUser, HttpSession session , HttpServletRequest request) {
         User user = DataBase.findUserById(request.getParameter("userId"));
-        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
+        if (!UserSessionUtils.isSameUser(session, user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(request.getParameter("userId"), request.getParameter("password"),
-                request.getParameter("name"),
-                request.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return ModelAndView.newInstance("redirect:/");
