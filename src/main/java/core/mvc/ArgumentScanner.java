@@ -1,9 +1,7 @@
 package core.mvc;
 
 import core.mvc.exception.MethodResolverNotSupportedException;
-import core.mvc.resolver.ArgumentResolver;
-import core.mvc.resolver.MethodParameter;
-import core.mvc.resolver.RequestParamArgumentResolver;
+import core.mvc.resolver.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -20,6 +18,8 @@ import static java.util.Arrays.asList;
 public class ArgumentScanner {
 
     private static final List<ArgumentResolver> argumentResolvers = asList(
+            new HttpRequestArgumentResolver(),
+            new HttpResponseArgumentResolver(),
             new RequestParamArgumentResolver()
     );
     private static final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
@@ -35,19 +35,9 @@ public class ArgumentScanner {
     }
 
     public Object[] getArguments() {
-        if (isLegacyMethod()) {
-            return new Object[]{request, response};
-        }
         return getMethodParameters().stream()
                 .map(this::getArgument)
                 .toArray();
-    }
-
-    private boolean isLegacyMethod() {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        return parameterTypes.length == 2
-                && parameterTypes[0].equals(HttpServletRequest.class)
-                && parameterTypes[1].equals(HttpServletResponse.class);
     }
 
     private List<MethodParameter> getMethodParameters() {
