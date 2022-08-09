@@ -29,9 +29,15 @@ public class AnnotationHandlerMapping extends HandlerMapping {
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        HandlerKey key = new HandlerKey(
+                request.getRequestURI(),
+                RequestMethod.valueOf(request.getMethod().toUpperCase())
+        );
+        return handlerExecutions.entrySet().stream()
+                .filter(it -> it.getKey().isMatch(key))
+                .map(it -> it.getValue())
+                .findAny()
+                .orElse(null);
     }
 
     private void putHandlerExecutionsByController(Class<?> controllerClass) {
