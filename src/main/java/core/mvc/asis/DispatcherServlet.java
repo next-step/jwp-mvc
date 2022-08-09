@@ -18,12 +18,12 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String[] BASE_PACKAGES = new String[] {"next.controller"};
 
-    private AnnotationHandlerMapping ahm;
+    private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() {
-        ahm = new AnnotationHandlerMapping(BASE_PACKAGES);
-        ahm.initialize();
+        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGES);
+        annotationHandlerMapping.initialize();
     }
 
     @Override
@@ -31,8 +31,8 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        HandlerExecution handlerExecution = ahm.getHandler(req);
-        if (!Objects.isNull(handlerExecution)) {
+        HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
+        if (Objects.nonNull(handlerExecution)) {
             try {
                 ModelAndView modelAndView = handlerExecution.handle(req, resp);
                 move(modelAndView, req, resp);
