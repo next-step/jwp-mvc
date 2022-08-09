@@ -24,19 +24,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class BeanFactoryTest {
 
     private Reflections reflections;
+    private BeanFactory beanFactory;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setup() {
         reflections = new Reflections("core.di.factory.example");
+        Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+        beanFactory = new BeanFactory(preInstanticateClazz);
+        beanFactory.initialize();
     }
 
     @Test
     void di() throws Exception {
-        Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
-        BeanFactory beanFactory = new BeanFactory(preInstanticateClazz);
-        beanFactory.initialize();
-
         QnaController qnaController = beanFactory.getBean(QnaController.class);
 
         assertNotNull(qnaController);
