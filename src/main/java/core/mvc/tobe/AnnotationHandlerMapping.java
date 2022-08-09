@@ -35,7 +35,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         for (Method method : methods) {
             Class<?> declaringClass = method.getDeclaringClass();
             Controller controllerAnnotation = declaringClass.getAnnotation(Controller.class);
-            addHendlerExecution(controller.get(declaringClass), controllerAnnotation.value(), method);
+            addHandlerExecution(controller.get(declaringClass), controllerAnnotation.value(), method);
         }
     }
 
@@ -47,14 +47,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return methods;
     }
 
-    private void addHendlerExecution(Object controllerInstance, String controllerLevelPath, Method method) {
+    private void addHandlerExecution(Object controllerInstance, String controllerLevelPath, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        String path = requestMapping.value();
-        RequestMethod requestMethod = requestMapping.method();
+        handlerExecutions.put(createHandlerKey(controllerLevelPath, requestMapping), new HandlerExecution(controllerInstance, method));
+    }
 
-        HandlerKey handlerKey = new HandlerKey(controllerLevelPath + path, requestMethod);
-        logger.info("Add RequestMapping URL : {}, method : {}", handlerKey, method);
-        handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
+    private HandlerKey createHandlerKey(String controllerLevelPath, RequestMapping rm) {
+        logger.info("Add RequestMapping URL : {}, method : {}", controllerLevelPath + rm.value(), rm.method());
+        return new HandlerKey(controllerLevelPath + rm.value(), rm.method());
     }
 
     @Override
