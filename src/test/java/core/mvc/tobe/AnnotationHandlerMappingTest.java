@@ -1,7 +1,7 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
-import core.mvc.tobe.handler.AnnotationHandlerMapping;
+import core.mvc.tobe.handler.ComponentScanner;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,12 +10,12 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AnnotationHandlerMappingTest {
-    private AnnotationHandlerMapping handlerMapping;
+public class ComponentScannerTest {
+    private ComponentScanner handlerMapping;
 
     @BeforeEach
     public void setup() {
-        handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        handlerMapping = new ComponentScanner("core.mvc.tobe");
         handlerMapping.initialize();
     }
 
