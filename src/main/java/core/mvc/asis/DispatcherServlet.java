@@ -30,14 +30,14 @@ public class DispatcherServlet extends HttpServlet {
     private List<HandlerAdapter> createHandlerAdapters() {
         return Arrays.asList(
                 new AnnotationHandlerAdapter(),
-                new RequestMappingAdapter()
+                new LegacyHandlerMappingAdapter()
         );
     }
 
     private List<HandlerMapping> createHandlerMappings() {
         return Arrays.asList(
-                new RequestMapping(),
-                new AnnotationHandlerMapping()
+                new AnnotationHandlerMapping(),
+                new LegacyHandlerMapping()
         );
     }
 
