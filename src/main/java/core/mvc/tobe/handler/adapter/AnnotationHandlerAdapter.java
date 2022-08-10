@@ -15,10 +15,6 @@ public class AnnotationHandlerAdapter implements HandlerAdapter {
     @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object target) {
         HandlerExecution invoker = (HandlerExecution) target;
-        try {
-            return invoker.handle(request, response);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return invoker.handle(request, response);
     }
 }
