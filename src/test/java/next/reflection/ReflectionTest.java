@@ -1,6 +1,10 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,5 +75,14 @@ public class ReflectionTest {
         Question question = declaredConstructor.newInstance("tester", "title", "content");
 
         assertThat(question).isNotNull();
+    }
+
+    @Test
+    void componentScan() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        logger.debug("controller: {}", reflections.getTypesAnnotatedWith(Controller.class));
+        logger.debug("service: {}", reflections.getTypesAnnotatedWith(Service.class));
+        logger.debug("repository: {}", reflections.getTypesAnnotatedWith(Repository.class));
     }
 }
