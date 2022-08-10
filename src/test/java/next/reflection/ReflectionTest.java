@@ -11,12 +11,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +43,12 @@ class ReflectionTest {
     @DisplayName("요구사항 6, 컴포넌트 스캔, @Controller/@Service/@Repository annotation 설정 클래스 출력")
     @Test
     void componentScanTest() {
-        this.reflections = new Reflections("core.di.factory");
+//        this.reflections = new Reflections("core.di.factory");
+        this.reflections = new Reflections(new ConfigurationBuilder()
+            .forPackage("core")
+            .filterInputsBy(new FilterBuilder().includePackage("core.di.factory.example"))
+            .setScanners(Scanners.TypesAnnotated)
+            .setParallel(true));
 
         Set<Class<?>> classes = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
 
@@ -80,16 +90,31 @@ class ReflectionTest {
         Question question;
         Constructor<Question>[] constructors = (Constructor<Question>[]) clazz.getConstructors();
         for (Constructor<Question> constructor : constructors) {
-            if (constructor.getParameterCount() == 3) {
+            if (isConstructorOf(constructor, TEST_WRITER, TEST_TITLE, TEST_CONTENTS)) {
                 question = constructor.newInstance(TEST_WRITER, TEST_TITLE, TEST_CONTENTS);
                 logger.debug("Constructor paramCount3: " + question);
             }
 
-            if (constructor.getParameterCount() == 6) {
+            if (isConstructorOf(constructor, TEST_QUESTION_ID, TEST_WRITER, TEST_TITLE, TEST_CONTENTS, TEST_CREATED_DATE, TEST_COUNT_OF_COMMENT)) {
                 question = constructor.newInstance(TEST_QUESTION_ID, TEST_WRITER, TEST_TITLE, TEST_CONTENTS, TEST_CREATED_DATE, TEST_COUNT_OF_COMMENT);
                 logger.debug("Constructor paramCount6: " + question);
             }
         }
+    }
+
+    private boolean isConstructorOf(Constructor constructor, Object... objects) {
+        Class[] parameterTypes = constructor.getParameterTypes();
+        if (parameterTypes.length != objects.length) {
+            return false;
+        }
+
+        for (int i = 0; i < parameterTypes.length; ++i) {
+            if (!parameterTypes[i].isInstance(objects[i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @DisplayName("요구사항 4, private field 값 할당")
