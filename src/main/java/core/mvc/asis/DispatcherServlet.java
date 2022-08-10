@@ -61,8 +61,9 @@ public class DispatcherServlet extends HttpServlet {
 
     private Object getHandler (HttpServletRequest request) {
         return mappings.stream()
-                       .map(mapping -> mapping.getHandler(request))
+                       .filter(mapping -> mapping.isSupported(request))
                        .findFirst()
+                       .map(mapping -> mapping.getHandler(request))
                        .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 handler 입니다."));
     }
 
