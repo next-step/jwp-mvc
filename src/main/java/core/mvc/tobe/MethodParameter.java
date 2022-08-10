@@ -27,7 +27,7 @@ public class MethodParameter {
         return (A) Arrays.stream(annotations)
             .filter(annotationType::isInstance)
             .findFirst()
-            .orElse(null);
+            .orElseThrow(IllegalStateException::new);
     }
 
     public boolean matches(Class<?> type) {
