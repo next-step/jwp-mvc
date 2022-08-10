@@ -2,9 +2,15 @@ package core.mvc.tobe;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+
 public class MethodParameter {
+
+    private static final ParameterNameDiscoverer NAME_DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
 
     private final Class<?> type;
     private final Method method;
@@ -16,6 +22,10 @@ public class MethodParameter {
         this.method = method;
         this.parameterName = parameterName;
         this.annotations = annotations;
+    }
+
+    public MethodParameter(Parameter parameter, Method method, int parameterIndex) {
+        this(parameter.getType(), method, NAME_DISCOVERER.getParameterNames(method)[parameterIndex], parameter.getAnnotations());
     }
 
     public <A extends Annotation> boolean hasAnnotation(Class<A> annotationType) {

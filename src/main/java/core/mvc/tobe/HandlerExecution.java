@@ -1,14 +1,19 @@
 package core.mvc.tobe;
 
-import core.mvc.ModelAndView;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+
+import core.mvc.ModelAndView;
 
 public class HandlerExecution {
 
@@ -32,17 +37,10 @@ public class HandlerExecution {
     }
 
     private MethodParameter[] getMethodParameters() {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        MethodParameter[] methodParameters = new MethodParameter[parameterTypes.length];
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        Parameter[] parameters = method.getParameters();
-
-        for (int index = 0; index < parameterTypes.length; index++) {
-            Annotation[] annotations = parameters[index].getAnnotations();
-            methodParameters[index] = new MethodParameter(parameterTypes[index], method, parameterNames[index], annotations);
-        }
-
-        return methodParameters;
+        List<Parameter> parameters = Stream.of(method.getParameters()).collect(Collectors.toList());
+        return IntStream.range(0, parameters.size())
+            .mapToObj(index -> new MethodParameter(parameters.get(index), method, index))
+            .toArray(MethodParameter[]::new);
     }
 
     private Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
