@@ -12,7 +12,7 @@ import org.reflections.ReflectionUtils;
 public class AnnotationHandlerMapping {
     private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private Map<HandlerKey, HandlerAdapter> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -26,12 +26,12 @@ public class AnnotationHandlerMapping {
             Set<Method> requestMappingMethods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
             for (Method method : requestMappingMethods) {
                 HandlerKey handlerKey = createHandlerKey(method.getAnnotation(RequestMapping.class));
-                handlerExecutions.put(handlerKey, new HandlerExecution(controllers.get(clazz), method));
+                handlerExecutions.put(handlerKey, new HandlerAdapter(controllers.get(clazz), method));
             }
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public HandlerAdapter getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));

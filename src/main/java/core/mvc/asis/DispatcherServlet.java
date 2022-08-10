@@ -2,7 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerAdapter;
 import java.util.Objects;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,10 +31,10 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
-        if (Objects.nonNull(handlerExecution)) {
+        HandlerAdapter handlerAdapter = annotationHandlerMapping.getHandler(req);
+        if (Objects.nonNull(handlerAdapter)) {
             try {
-                ModelAndView modelAndView = handlerExecution.handle(req, resp);
+                ModelAndView modelAndView = handlerAdapter.handle(req, resp);
                 move(modelAndView, req, resp);
             } catch (Exception e) {
                 logger.error("Exception : {}", e);
