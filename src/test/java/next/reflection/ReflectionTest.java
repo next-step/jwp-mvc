@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +52,6 @@ public class ReflectionTest {
 
     @Test
     void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
-
         Student student = new Student();
         Field name = Student.class.getDeclaredField("name");
         name.setAccessible(true);
@@ -62,6 +62,14 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo("test");
         assertThat(student.getAge()).isEqualTo(10);
+    }
 
+    @Test
+    void createConstructor() throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Class<Question> clazz = Question.class;
+        Constructor<Question> declaredConstructor = clazz.getDeclaredConstructor(String.class, String.class, String.class);
+        Question question = declaredConstructor.newInstance("tester", "title", "content");
+
+        assertThat(question).isNotNull();
     }
 }
