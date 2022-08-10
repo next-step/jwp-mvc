@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import core.mvc.HandlerAdapter;
 import core.mvc.HandlerMapping;
-import core.mvc.JspView;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerExecutionHandlerAdapter;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -26,6 +26,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final String BASE_PACKAGE = "next.controller";
 
     private List<HandlerMapping> mappings = new ArrayList<>();
+    private List<HandlerAdapter> handlerAdapters = new ArrayList<>();
 
 
     @Override
@@ -37,6 +38,9 @@ public class DispatcherServlet extends HttpServlet {
 
         mappings.add(legacyHandlerMapping);
         mappings.add(annotationHandlerMapping);
+
+        handlerAdapters.add(new ControllerHandlerAdapter());
+        handlerAdapters.add(new HandlerExecutionHandlerAdapter());
     }
 
     @Override
@@ -44,9 +48,12 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Object handler = getHandler(req);
+        Object mappingHandler = getHandler(req);
+        HandlerAdapter handlerAdapter = getHandlerAdapter(mappingHandler);
+
         try {
-            handle(handler, req, resp);
+            ModelAndView mv = handlerAdapter.handle(req, resp, mappingHandler);
+            render(req, resp, mv);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,15 +66,11 @@ public class DispatcherServlet extends HttpServlet {
                        .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 handler 입니다."));
     }
 
-    private void handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (handler instanceof HandlerExecution) {
-            HandlerExecution handlerException = (HandlerExecution)handler;
-            render(req, resp, handlerException.handle(req, resp));
-        } else if (handler instanceof Controller) {
-            Controller controller = (Controller)handler;
-            String viewName = controller.execute(req, resp);
-            render(req, resp, new ModelAndView(new JspView(viewName)));
-        }
+    private HandlerAdapter getHandlerAdapter(Object handler) {
+        return handlerAdapters.stream()
+                              .filter(handlerAdapter -> handlerAdapter.supports(handler))
+                              .findFirst()
+                              .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 Adapter 입니다."));
     }
 
     private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView modelAndView) throws Exception {
