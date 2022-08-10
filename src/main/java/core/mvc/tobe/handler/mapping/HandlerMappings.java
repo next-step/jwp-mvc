@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handler.mapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

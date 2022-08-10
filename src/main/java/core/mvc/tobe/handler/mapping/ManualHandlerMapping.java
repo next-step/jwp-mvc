@@ -1,6 +1,9 @@
-package core.mvc.asis;
+package core.mvc.tobe.handler.mapping;
 
-import core.mvc.tobe.HandlerMapping;
+import core.mvc.asis.Controller;
+import core.mvc.asis.DispatcherServlet;
+import core.mvc.asis.ForwardController;
+import core.mvc.tobe.handler.mapping.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +16,7 @@ public class ManualHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
-    void initMapping() {
+    public void initMapping() {
         mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));

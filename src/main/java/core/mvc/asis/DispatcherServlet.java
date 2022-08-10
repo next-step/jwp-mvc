@@ -1,7 +1,8 @@
 package core.mvc.asis;
 
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerMappings;
+import core.mvc.tobe.handler.mapping.AnnotationHandlerMapping;
+import core.mvc.tobe.handler.mapping.HandlerMappings;
+import core.mvc.tobe.handler.mapping.ManualHandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
