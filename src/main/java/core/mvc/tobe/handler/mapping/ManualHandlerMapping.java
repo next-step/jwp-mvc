@@ -17,7 +17,6 @@ public class ManualHandlerMapping implements HandlerMapping {
     private Map<String, Controller> mappings = new HashMap<>();
 
     public void initMapping() {
-        mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
         mappings.put("/users", new ListUserController());

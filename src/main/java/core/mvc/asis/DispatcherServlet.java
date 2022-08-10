@@ -36,7 +36,7 @@ public class DispatcherServlet extends HttpServlet {
         ManualHandlerMapping rm = new ManualHandlerMapping();
         rm.initMapping();
 
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
 
         handlerMappings = new HandlerMappings(
