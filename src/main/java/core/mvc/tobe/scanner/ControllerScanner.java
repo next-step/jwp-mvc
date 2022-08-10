@@ -8,7 +8,7 @@ import java.util.Set;
 import org.reflections.Reflections;
 
 import core.annotation.web.Controller;
-import core.mvc.tobe.exception.InstanceInitializedException;
+import core.mvc.tobe.scanner.exception.InstanceInitializedException;
 
 public class ControllerScanner {
 	private final Map<Class<?>, Object> controllers = new HashMap<>();

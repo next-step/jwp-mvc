@@ -1,4 +1,4 @@
-package core.mvc.tobe.exception;
+package core.mvc.tobe.scanner.exception;
 
 public class InstanceInitializedException extends RuntimeException {
 	private static final String EXCEPTION_MESSAGE = "인스턴스 생성을 할 수 없습니다.";
