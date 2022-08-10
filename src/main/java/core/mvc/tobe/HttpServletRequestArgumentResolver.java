@@ -7,7 +7,7 @@ public class HttpServletRequestArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getType() == HttpServletRequest.class;
+        return parameter.matches(HttpServletRequest.class);
     }
 
     @Override

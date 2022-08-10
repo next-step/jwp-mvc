@@ -30,8 +30,8 @@ public class MethodParameter {
             .orElse(null);
     }
 
-    public boolean isStringType() {
-        return this.type == String.class;
+    public boolean matches(Class<?> type) {
+        return this.type == type;
     }
 
     public Class<?> getType() {

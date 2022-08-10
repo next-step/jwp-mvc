@@ -18,7 +18,7 @@ public class RequestParamMethodArgumentResolver implements ArgumentResolver {
         String name = parameter.getParameterName();
         String value = request.getParameter(name);
 
-        if (parameter.isStringType()) {
+        if (parameter.matches(String.class)) {
             return value;
         }
 
