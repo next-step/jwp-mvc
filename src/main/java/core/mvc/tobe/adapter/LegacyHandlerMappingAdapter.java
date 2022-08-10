@@ -6,7 +6,7 @@ import core.mvc.asis.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class RequestMappingAdapter implements HandlerAdapter {
+public class LegacyHandlerMappingAdapter implements HandlerAdapter {
     @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handlerMapping) throws Exception {
         Controller controller = (Controller) handlerMapping;
