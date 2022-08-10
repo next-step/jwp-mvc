@@ -1,20 +1,17 @@
 package core.mvc.tobe;
 
-import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.Maps;
 
-import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
+import core.mvc.tobe.scanner.ControllerScanner;
+import core.mvc.tobe.scanner.RequestMappingScanner;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
-    private static final int EMPTY_METHOD_LENGTH = 0;
     private Object[] basePackage;
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
@@ -24,29 +21,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     public void initialize() {
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
-        for (Class<?> controller : controllerScanner.getControllers()) {
-            addHandlerExecutions(controllerScanner, controller);
-        }
-    }
+        RequestMappingScanner requestMappingScanner = new RequestMappingScanner();
 
-    private void addHandlerExecutions(ControllerScanner controllerScanner, Class<?> controller) {
-        Controller annotation = controller.getAnnotation(Controller.class);
-        Object handler = controllerScanner.getHandlerInstance(controller);
-        Set<Method> methods = controllerScanner.getMethods(controller);
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+        for (Class<?> clazz : controllers.keySet()) {
+            Object instance = controllers.get(clazz);
+            String path = controllerScanner.getControllerUriPath(clazz);
 
-        methods.forEach(method -> addHandlerExecution(annotation.value(), handler, method));
-    }
-
-    private void addHandlerExecution(String value, Object handler, Method method) {
-        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        RequestMethod[] methods = requestMapping.method();
-
-        if (methods.length == EMPTY_METHOD_LENGTH) {
-            methods = RequestMethod.values();
-        }
-
-        for (RequestMethod requestMethod : methods) {
-            handlerExecutions.put(new HandlerKey(value + requestMapping.value(), requestMethod), new HandlerExecution(handler, method));
+            handlerExecutions.putAll(requestMappingScanner.getHandlerExecutions(path, clazz, instance));
         }
     }
 
