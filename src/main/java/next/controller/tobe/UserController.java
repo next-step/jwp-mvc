@@ -4,8 +4,10 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.ErrorView;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import next.controller.UserSessionUtils;
 import next.model.User;
 import org.slf4j.Logger;
@@ -23,8 +25,7 @@ public class UserController {
     @RequestMapping(value = "")
     public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (!UserSessionUtils.isLogined(req.getSession())) {
-
-            return new ModelAndView(new JspView("redirect:/users/loginForm"));
+            return new ModelAndView(new RedirectView("/users/loginForm"));
         }
 
         req.setAttribute("users", DataBase.findAll());
@@ -46,7 +47,7 @@ public class UserController {
             HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
 
-            return new ModelAndView(new JspView("redirect:/"));
+            return new ModelAndView(new RedirectView("/"));
         } else {
             req.setAttribute("loginFailed", true);
 
@@ -59,7 +60,7 @@ public class UserController {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
 
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/form")
@@ -80,7 +81,7 @@ public class UserController {
 
         DataBase.addUser(user);
 
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/updateForm")
@@ -88,7 +89,7 @@ public class UserController {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
-            throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
+            return new ModelAndView(new ErrorView(403, "다른 사용자의 정보를 수정할 수 없습니다."));
         }
         req.setAttribute("user", user);
 
@@ -99,7 +100,7 @@ public class UserController {
     public ModelAndView update(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
-            throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
+            return new ModelAndView(new ErrorView(403, "다른 사용자의 정보를 수정할 수 없습니다."));
         }
 
         User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
@@ -107,7 +108,7 @@ public class UserController {
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
 
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/profile")
@@ -115,7 +116,7 @@ public class UserController {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (user == null) {
-            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+            return new ModelAndView(new ErrorView(404, "사용자를 찾을 수 없습니다."));
         }
         req.setAttribute("user", user);
 
