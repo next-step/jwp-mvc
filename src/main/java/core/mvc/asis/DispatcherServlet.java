@@ -1,5 +1,7 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +20,20 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private ManualHandlerMapping rm;
+    private HandlerMappings handlerMappings;
 
     @Override
     public void init() throws ServletException {
         rm = new ManualHandlerMapping();
         rm.initMapping();
+
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        annotationHandlerMapping.initialize();
+
+        handlerMappings = new HandlerMappings(
+                rm,
+                annotationHandlerMapping
+        );
     }
 
     @Override

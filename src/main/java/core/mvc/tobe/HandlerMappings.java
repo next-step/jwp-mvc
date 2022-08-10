@@ -11,6 +11,10 @@ public class HandlerMappings {
         this.handlerMappings = handlerMappings;
     }
 
+    public HandlerMappings(HandlerMapping... handlerMappings) {
+        this(List.of(handlerMappings));
+    }
+
     public Object getHandler(HttpServletRequest httpServletRequest) {
         for (HandlerMapping handlerMapping : handlerMappings) {
             Object handler = handlerMapping.getHandler(httpServletRequest);
