@@ -89,6 +89,19 @@ public class UserController  {
         return createModelAndView("redirect:/");
     }
 
+    @RequestMapping(value = "/profile", method = GET)
+    public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp) {
+        logging("profile");
+
+        String userId = req.getParameter("userId");
+        User user = DataBase.findUserById(userId);
+        if (user == null) {
+            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+        }
+        req.setAttribute("user", user);
+        return createModelAndView("/user/profile.jsp");
+    }
+
 
     private ModelAndView createModelAndView(String path) {
         return new ModelAndView(new JspView(path));
