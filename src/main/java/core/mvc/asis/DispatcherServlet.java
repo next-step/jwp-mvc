@@ -3,6 +3,7 @@ package core.mvc.asis;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
+import core.mvc.exception.NotFoundHandlerException;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 
@@ -50,9 +52,9 @@ public class DispatcherServlet extends HttpServlet {
         try {
             if (handler instanceof HandlerExecution) {
                 ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
-                move(mav.getView().getPath(), req, resp);
+                mav.getView().render(mav.getModel(), req, resp);
+                return;
             }
-            assert handler != null;
 
             String mav = ((Controller) handler).execute(req, resp);
             move(mav, req, resp);
@@ -73,13 +75,10 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object getHandler(HttpServletRequest req) {
-        for (HandlerMapping handlerMapping : handlerMappings) {
-            Object handler = handlerMapping.getHandler(req);
-            if (handler == null) {
-                continue;
-            }
-            return handler;
-        }
-        return null;
+        return handlerMappings.stream()
+                .map(handler -> handler.getHandler(req))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(NotFoundHandlerException::new);
     }
 }
