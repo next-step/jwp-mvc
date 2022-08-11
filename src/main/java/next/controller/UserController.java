@@ -5,6 +5,7 @@ import static core.annotation.web.RequestMethod.POST;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,27 @@ public class UserController  {
         logging("login form");
 
         return createModelAndView("/user/login.jsp");
+    }
+
+    @RequestMapping(value = "/login", method = POST)
+    public ModelAndView login(HttpServletRequest req, HttpServletResponse resp) {
+        logging("login");
+
+        String userId = req.getParameter("userId");
+        String password = req.getParameter("password");
+        User user = DataBase.findUserById(userId);
+        if (user == null) {
+            req.setAttribute("loginFailed", true);
+            return createModelAndView("/user/login.jsp");
+        }
+        if (user.matchPassword(password)) {
+            HttpSession session = req.getSession();
+            session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
+            return createModelAndView("redirect:/");
+        } else {
+            req.setAttribute("loginFailed", true);
+            return createModelAndView("/user/login.jsp");
+        }
     }
 
     private ModelAndView createModelAndView(String path) {
