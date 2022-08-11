@@ -1,6 +1,7 @@
 package next.controller;
 
-import static core.annotation.web.RequestMethod.*;
+import static core.annotation.web.RequestMethod.GET;
+import static core.annotation.web.RequestMethod.POST;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
@@ -49,6 +49,13 @@ public class UserController  {
 
         req.setAttribute("users", DataBase.findAll());
         return createModelAndView("/user/list.jsp");
+    }
+
+    @RequestMapping(value = "/loginForm", method = GET)
+    public ModelAndView loginForm(HttpServletRequest req, HttpServletResponse resp) {
+        logging("login form");
+
+        return createModelAndView("/user/login.jsp");
     }
 
     private ModelAndView createModelAndView(String path) {
