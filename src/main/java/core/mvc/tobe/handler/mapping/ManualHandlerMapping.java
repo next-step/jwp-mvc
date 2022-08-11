@@ -18,6 +18,8 @@ public class ManualHandlerMapping implements HandlerMapping {
 
     public void initMapping() {
         logger.info("Initialized Request Mapping!");
+        mappings.put("/", new HomeController());
+
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });

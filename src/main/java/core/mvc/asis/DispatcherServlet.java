@@ -35,14 +35,14 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void initHandlerMappings() {
-        ManualHandlerMapping rm = new ManualHandlerMapping();
-        rm.initMapping();
+        ManualHandlerMapping manualHandlerMapping = new ManualHandlerMapping();
+        manualHandlerMapping.initMapping();
 
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
 
         handlerMappings = new HandlerMappings(
-                rm,
+                manualHandlerMapping,
                 annotationHandlerMapping
         );
     }
