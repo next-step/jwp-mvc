@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handler.mapping;
 
 import core.annotation.web.RequestMethod;
 

@@ -1,5 +1,7 @@
-package core.mvc;
+package core.mvc.tobe.view;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,10 @@ public class ModelAndView {
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public void doRender(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        view.render(model, request, response);
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
