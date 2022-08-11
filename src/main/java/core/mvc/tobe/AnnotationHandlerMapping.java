@@ -10,6 +10,7 @@ import org.reflections.ReflectionUtils;
 
 import com.google.common.collect.Maps;
 
+import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
@@ -30,8 +31,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         controllerClass.forEach(clazz -> {
             ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class)).forEach(method -> {
                 try {
+                    Controller controller = clazz.getAnnotation(Controller.class);
                     RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                    HandlerKey handlerKey = createHandlerKey(requestMapping);
+                    HandlerKey handlerKey = createHandlerKey(controller, requestMapping);
                     Object instance = clazz.getConstructor().newInstance();
                     handlerExecutions.put(handlerKey, new HandlerExecution(instance, method));
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -49,7 +51,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private HandlerKey createHandlerKey(RequestMapping rm) {
-        return new HandlerKey(rm.value(), rm.method());
+    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm) {
+        return new HandlerKey(controller.value() + rm.value(), rm.method());
     }
 }

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
+import core.mvc.exception.HandlerMappingServiceException;
 import core.mvc.exception.NotFoundHandlerException;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -26,17 +27,16 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private static final String BASE_PACKAGE = "next.controller";
 
-    private LegacyHandlerMapping lhm;
-    private AnnotationHandlerMapping ahm;
-    private List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
-        lhm = new LegacyHandlerMapping();
+        LegacyHandlerMapping lhm = new LegacyHandlerMapping();
         lhm.initMapping();
 
-        ahm = new AnnotationHandlerMapping();
+        AnnotationHandlerMapping  ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
         ahm.initialize();
 
         handlerMappings.add(ahm);
@@ -49,6 +49,7 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Object handler = getHandler(req);
+
         try {
             if (handler instanceof HandlerExecution) {
                 ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
@@ -56,10 +57,12 @@ public class DispatcherServlet extends HttpServlet {
                 return;
             }
 
+            assert handler != null;
+
             String mav = ((Controller) handler).execute(req, resp);
             move(mav, req, resp);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new HandlerMappingServiceException(e.getMessage());
         }
     }
 

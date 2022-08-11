@@ -13,11 +13,11 @@ import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
 
-@Controller
+@Controller("/")
 public class HomeController {
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         logging("/");
 
