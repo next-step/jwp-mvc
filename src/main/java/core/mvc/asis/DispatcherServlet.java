@@ -1,7 +1,8 @@
 package core.mvc.asis;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -9,7 +10,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -17,12 +25,20 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private LegacyHandlerMapping lhm;
+    private AnnotationHandlerMapping ahm;
+    private List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        lhm = new LegacyHandlerMapping();
+        lhm.initMapping();
+
+        ahm = new AnnotationHandlerMapping();
+        ahm.initialize();
+
+        handlerMappings.add(ahm);
+        handlerMappings.add(lhm);
     }
 
     @Override
@@ -30,13 +46,18 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Object handler = getHandler(req);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
+            if (handler instanceof HandlerExecution) {
+                ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
+                move(mav.getView().getPath(), req, resp);
+            }
+            assert handler != null;
+
+            String mav = ((Controller) handler).execute(req, resp);
+            move(mav, req, resp);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -49,5 +70,16 @@ public class DispatcherServlet extends HttpServlet {
 
         RequestDispatcher rd = req.getRequestDispatcher(viewName);
         rd.forward(req, resp);
+    }
+
+    private Object getHandler(HttpServletRequest req) {
+        for (HandlerMapping handlerMapping : handlerMappings) {
+            Object handler = handlerMapping.getHandler(req);
+            if (handler == null) {
+                continue;
+            }
+            return handler;
+        }
+        return null;
     }
 }
