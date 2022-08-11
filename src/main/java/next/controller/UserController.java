@@ -1,7 +1,6 @@
 package next.controller;
 
-import static core.annotation.web.RequestMethod.GET;
-import static core.annotation.web.RequestMethod.POST;
+import static core.annotation.web.RequestMethod.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -113,6 +112,22 @@ public class UserController  {
         }
         req.setAttribute("user", user);
         return createModelAndView("/user/updateForm.jsp");
+    }
+
+    @RequestMapping(value = "/update", method = POST)
+    public ModelAndView update(HttpServletRequest req, HttpServletResponse resp) {
+        logging("update");
+
+        User user = DataBase.findUserById(req.getParameter("userId"));
+        if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
+            throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
+        }
+
+        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
+                req.getParameter("email"));
+        log.debug("Update User : {}", updateUser);
+        user.update(updateUser);
+        return createModelAndView("redirect:/");
     }
 
     private ModelAndView createModelAndView(String path) {
