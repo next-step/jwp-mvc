@@ -95,8 +95,8 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
 
 
 ### TODO LIST
-- [] HandlerKey의 url 패턴 일치 메서드 추가 
-  - [] PathPattern을 활용하여 url 패턴 일치 여부를 반환한다 
+- [x] HandlerKey의 동등성 비교 변경 
+  - [x] PathPattern을 활용하여 url 패턴 일치 여부에 따라 동등성 비교를 할 수 있도록 변경 
 - [] AnnotationHandlerMapping 
   - [] AnnotationHandlerMapping 에서 PathPattern을 포함하는 HandlerKey와 아닌 경우를 구분한 상태를 추가한다
     - [] PathPattern 있는 Map 을 별도로 추가한다.  
