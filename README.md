@@ -24,3 +24,10 @@
 
 - test로 시작하는 메소드 실행
   - Junit3에서는 test로 시작하는 메소드를 자동으로 실행한다. 이와 같이 Junit3Test 클래스에서 test로 시작하는 메소드만 Java Reflection을 활용해 실행하도록 구현한다.
+
+### 요구사항 3
+
+- @Test 애노테이션 메소드 실행
+  - Junit4에서는 @Test 애노테이션일 설정되어 있는 메소드를 자동으로 실행한다. 이와 같이 Junit4Test 클래스에서 @MyTest 애노테이션으로 설정되어 있는 메소드만 Java Reflection을
+    활용해 실행하도록 구현한다.
+
