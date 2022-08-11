@@ -13,25 +13,25 @@ import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Controller
+@Controller(value = "/users")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
-    @RequestMapping(value = "/users/form", method = RequestMethod.GET)
+    @RequestMapping(value = "/form", method = RequestMethod.GET)
     public ModelAndView usersForm(HttpServletRequest req, HttpServletResponse resp) {
         JspView jspView = new JspView("/user/form.jsp");
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users/loginForm", method = RequestMethod.GET)
+    @RequestMapping(value = "/loginForm", method = RequestMethod.GET)
     public ModelAndView usersLoginForm(HttpServletRequest req, HttpServletResponse resp) {
         JspView jspView = new JspView("/user/login.jsp");
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView users(HttpServletRequest req, HttpServletResponse resp) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             JspView jspView = new JspView("redirect:/users/loginForm");
@@ -43,7 +43,7 @@ public class UserController {
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ModelAndView loginUser(HttpServletRequest req, HttpServletResponse resp) {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");
@@ -65,7 +65,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
+    @RequestMapping(value = "/profile", method = RequestMethod.GET)
     public ModelAndView getProfile(HttpServletRequest req, HttpServletResponse resp) {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
@@ -77,7 +77,7 @@ public class UserController {
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users/logout", method = RequestMethod.POST)
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ModelAndView logoutUser(HttpServletRequest req, HttpServletResponse resp) {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
@@ -85,7 +85,7 @@ public class UserController {
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) {
         User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
             req.getParameter("email"));
@@ -96,7 +96,7 @@ public class UserController {
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
+    @RequestMapping(value = "/updateForm", method = RequestMethod.GET)
     public ModelAndView getUpdateUserForm(HttpServletRequest req, HttpServletResponse resp) {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
@@ -108,7 +108,7 @@ public class UserController {
         return new ModelAndView(jspView);
     }
 
-    @RequestMapping(value = "/users/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ModelAndView updateUser(HttpServletRequest req, HttpServletResponse resp) {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
