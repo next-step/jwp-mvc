@@ -33,9 +33,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 try {
                     Controller controller = clazz.getAnnotation(Controller.class);
                     RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                    HandlerKey handlerKey = createHandlerKey(controller, requestMapping);
-                    Object instance = clazz.getConstructor().newInstance();
-                    handlerExecutions.put(handlerKey, new HandlerExecution(instance, method));
+
+                    RequestMethod[] requestMethods = requestMapping.method();
+
+                    if (requestMethodIsEmpty(requestMapping)) {
+                        requestMethods = RequestMethod.values();
+                    }
+
+                    for (RequestMethod requestMethod : requestMethods) {
+                        HandlerKey handlerKey = createHandlerKey(controller, requestMapping, requestMethod);
+                        Object instance = clazz.getConstructor().newInstance();
+                        handlerExecutions.put(handlerKey, new HandlerExecution(instance, method));
+                    }
+
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -51,7 +61,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm) {
-        return new HandlerKey(controller.value() + rm.value(), rm.method());
+    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm, RequestMethod requestMethod) {
+        return new HandlerKey(controller.value() + rm.value(), requestMethod);
+    }
+
+    private boolean requestMethodIsEmpty(RequestMapping requestMapping) {
+        return requestMapping.method().length == 0;
     }
 }

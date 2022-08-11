@@ -13,9 +13,4 @@ public class MockView implements View {
             throws Exception {
 
     }
-
-    @Override
-    public String getPath() {
-        return null;
-    }
 }
