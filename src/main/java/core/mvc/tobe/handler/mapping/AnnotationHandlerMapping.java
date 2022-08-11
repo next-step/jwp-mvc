@@ -10,6 +10,7 @@ import org.reflections.Reflections;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,20 +53,32 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private void addHandlerExecution(Object invoker, Set<Method> methods) {
         for (Method method : methods) {
-            handlerExecutions.put(getHandlerKey(method), new HandlerExecution(invoker, method));
+            addHandlerExecutionEachMethod(invoker, method);
         }
     }
 
-    private HandlerKey getHandlerKey(Method method) {
+    private void addHandlerExecutionEachMethod(Object invoker, Method method) {
         RequestMapping requestMapping = method.getDeclaredAnnotation(ANNOTATION_CLASS_FOR_METHOD);
-        HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-        return handlerKey;
+        String url = requestMapping.value();
+        List<RequestMethod> requestMethods = getRequestMethods(requestMapping);
+        for (RequestMethod requestMethod : requestMethods) {
+            handlerExecutions.put(new HandlerKey(url, requestMethod), new HandlerExecution(invoker, method));
+        }
+    }
+
+    private List<RequestMethod> getRequestMethods(RequestMapping requestMapping) {
+        List<RequestMethod> methods = List.of(requestMapping.method());
+        if (methods.isEmpty()) {
+            return List.of(RequestMethod.values());
+        }
+
+        return methods;
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
     }
 }

@@ -28,7 +28,7 @@ public class UserController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/users", method = GET)
+    @RequestMapping("/users")
     public String getUsers(HttpServletRequest req, HttpServletResponse resp) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return "redirect:/users/loginForm";
