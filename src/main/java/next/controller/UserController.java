@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import next.model.User;
 
 @Controller("/users")
 public class UserController  {
@@ -20,7 +22,23 @@ public class UserController  {
     public ModelAndView createUserForm(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         logging("create user form");
 
-        return new ModelAndView(new JspView("/user/form.jsp"));
+        return createModelAndView("/user/form.jsp");
+    }
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        logging("create user");
+
+        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
+                req.getParameter("email"));
+        log.debug("User : {}", user);
+
+        DataBase.addUser(user);
+        return createModelAndView("redirect:/");
+    }
+
+    private ModelAndView createModelAndView(String path) {
+        return new ModelAndView(new JspView(path));
     }
 
     private void logging(String requestName) {
