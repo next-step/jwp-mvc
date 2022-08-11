@@ -1,5 +1,7 @@
 package next.controller;
 
+import static core.annotation.web.RequestMethod.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,15 +20,15 @@ import next.model.User;
 public class UserController  {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(value = "/form", method = RequestMethod.GET)
-    public ModelAndView createUserForm(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    @RequestMapping(value = "/form", method = GET)
+    public ModelAndView createForm(HttpServletRequest req, HttpServletResponse resp) {
         logging("create user form");
 
         return createModelAndView("/user/form.jsp");
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    @RequestMapping(value = "/create", method = POST)
+    public ModelAndView create(HttpServletRequest req, HttpServletResponse resp) {
         logging("create user");
 
         User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
@@ -35,6 +37,18 @@ public class UserController  {
 
         DataBase.addUser(user);
         return createModelAndView("redirect:/");
+    }
+
+    @RequestMapping(method = GET)
+    public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) {
+        logging("user list");
+
+        if (!UserSessionUtils.isLogined(req.getSession())) {
+            return createModelAndView("redirect:/users/loginForm");
+        }
+
+        req.setAttribute("users", DataBase.findAll());
+        return createModelAndView("/user/list.jsp");
     }
 
     private ModelAndView createModelAndView(String path) {
