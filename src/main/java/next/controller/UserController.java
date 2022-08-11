@@ -80,6 +80,16 @@ public class UserController  {
         }
     }
 
+    @RequestMapping(value = "/logout", method = GET)
+    public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) {
+        logging("logout");
+
+        HttpSession session = req.getSession();
+        session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
+        return createModelAndView("redirect:/");
+    }
+
+
     private ModelAndView createModelAndView(String path) {
         return new ModelAndView(new JspView(path));
     }
