@@ -101,3 +101,14 @@ if (handler instanceof Controller) {
     // throw exception
 } 
 ```
+
+
+## 4단계 - Controller 메소드 인자 매핑
+
+### 요구사항
+
+- `Controller` 메소드의 인자 타입에 따라 `HttpServletRequest` 에서 값을 꺼내와 자동으로 형 변환을 한 후 매핑
+- `URL`을 통해 동적으로 값을 전달
+
+- Spring 프레임워크 힌트
+  - `HandlerMethodArgumentResolver`

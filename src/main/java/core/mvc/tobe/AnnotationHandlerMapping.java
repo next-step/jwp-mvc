@@ -32,10 +32,29 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
+    public boolean isSupported(HttpServletRequest request) {
+        HandlerKey handlerKey = handlerKey(request);
+        return handlerExecutions.keySet()
+                .stream()
+                .anyMatch(key -> key.matches(handlerKey));
+    }
+
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
+        HandlerKey handlerKey = handlerKey(request);
+        return handlerExecutions.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().matches(handlerKey))
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("unsupported request(%s). isSupported method should be called first", request)));
+    }
+
+    private HandlerKey handlerKey(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        return new HandlerKey(requestUri, rm);
     }
 
     private Map<HandlerKey, HandlerExecution> handlerKeyExecutionsMap() {

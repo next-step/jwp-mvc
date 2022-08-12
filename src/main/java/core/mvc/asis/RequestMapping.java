@@ -47,6 +47,11 @@ public class RequestMapping implements HandlerMapping {
     }
 
     @Override
+    public boolean isSupported(HttpServletRequest request) {
+        return mappings.containsKey(request.getRequestURI());
+    }
+
+    @Override
     public Object getHandler(HttpServletRequest request) {
         return findController(request.getRequestURI());
     }

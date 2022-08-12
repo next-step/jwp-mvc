@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -45,8 +44,8 @@ public class DispatcherServlet extends HttpServlet {
 
     private Object handler(HttpServletRequest request) throws ServletException {
         return mappings.stream()
+                .filter(handlerMapping -> handlerMapping.isSupported(request))
                 .map(handlerMapping -> handlerMapping.getHandler(request))
-                .filter(Objects::nonNull)
                 .findAny()
                 .orElseThrow(() -> new ServletException(String.format("can not found request mapping: request(%s)", request)));
     }

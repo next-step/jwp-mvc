@@ -39,12 +39,6 @@ class HandlerExecutionTest {
     }
 
     @Test
-    @DisplayName("메소드의 파라미터 타입은 반드시 HttpServletRequest, HttpServletResponse")
-    void instance_invalidParameterType_thrownIllegalArgumentException() {
-        assertThatIllegalArgumentException().isThrownBy(() -> new HandlerExecution(INVOKED_INSTANCE, objectTypeParameterMethod()));
-    }
-
-    @Test
     @DisplayName("메소드의 반환 타입은 반드시 ModelAndView")
     void instance_invalidReturnType_thrownIllegalArgumentException() {
         assertThatIllegalArgumentException().isThrownBy(() -> new HandlerExecution(INVOKED_INSTANCE, objectReturnTypeMethod()));
