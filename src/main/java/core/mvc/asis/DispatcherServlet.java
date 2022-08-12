@@ -29,7 +29,6 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
-        annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
     }
 

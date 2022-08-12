@@ -97,12 +97,8 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
 ### TODO LIST
 - [x] HandlerKey의 동등성 비교 변경 
   - [x] PathPattern을 활용하여 url 패턴 일치 여부에 따라 동등성 비교를 할 수 있도록 변경 
-- [] AnnotationHandlerMapping 
-  - [] AnnotationHandlerMapping 에서 PathPattern을 포함하는 HandlerKey와 아닌 경우를 구분한 상태를 추가한다
-    - [] PathPattern 있는 Map 을 별도로 추가한다.  
-    - [] 동일한 패턴을 가진 uri는 추가할 수 없다.
-  - [] requestUri 와 완전일치 하는 기존 Map에서 HandlerExecutable 을 찾는다
-  - [] requestUri 와 일치 하는 PathPattern을 가진 Map에서 HandlerExecutable 을 찾는다
+- [x] AnnotationHandlerMapping 
+  - [x] requestUri 와 일치 하는 PathPattern을 가진 Key를 활용해 HandlerExecutable 을 찾는다
 - [] HandlerMethodArgumentResolver
   - [] 메서드를 인자로 받아 메서드의 파라미터 목록을 구한다.
   - [] 파라미터의 목록 수 만큼 Object 배열을 생성한다.

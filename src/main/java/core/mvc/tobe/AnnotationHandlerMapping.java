@@ -19,9 +19,10 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
+        initialize();
     }
 
-    public void initialize() {
+    private void initialize() {
         final Set<Object> controllers = ControllerScanner.getControllers(new Reflections(basePackage));
 
         for (final Object controller : controllers) {
@@ -36,6 +37,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public HandlerExecutable getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return HANDLER_EXECUTIONS.get(new HandlerKey(requestUri, rm));
+        final HandlerKey key = new HandlerKey(requestUri, rm);
+
+        return HANDLER_EXECUTIONS.keySet().stream()
+            .filter(it -> it.equals(key))
+            .findAny()
+            .map(HANDLER_EXECUTIONS::get)
+            .orElseThrow(IllegalArgumentException::new);
     }
 }
