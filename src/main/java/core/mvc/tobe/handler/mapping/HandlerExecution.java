@@ -1,6 +1,7 @@
 package core.mvc.tobe.handler.mapping;
 
 import core.mvc.tobe.handler.TargetHandlingException;
+import core.mvc.tobe.handler.resolver.ArgumentResolvers;
 import core.mvc.tobe.view.ModelAndView;
 import core.mvc.tobe.view.SimpleNameView;
 
@@ -14,6 +15,8 @@ public class HandlerExecution {
 
     private final Object invoker;
     private final Method method;
+
+    private ArgumentResolvers argumentResolvers = new ArgumentResolvers();
 
     public HandlerExecution(Object invoker, Method method) {
         this.invoker = invoker;
@@ -35,8 +38,9 @@ public class HandlerExecution {
     }
 
     private ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InvocationTargetException {
-        // TODO: 2022/08/12 컨트롤러의 argument 동적 바인딩 필요
-        Object invokeResult = method.invoke(invoker, request, response);
+        Object[] arguments = argumentResolvers.resolveParameters(method, request, response);
+        Object invokeResult = method.invoke(invoker, arguments);
+
         if (invokeResult instanceof String) {
             return new ModelAndView(new SimpleNameView((String) invokeResult));
         }
