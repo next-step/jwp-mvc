@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.db.DataBase;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -18,6 +19,7 @@ class AnnotationHandlerMappingTest {
         handlerMapping.initialize();
     }
 
+    @DisplayName("MyController 의 save(), findUserId() 성공 테스트")
     @Test
     void create_find() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
