@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class PathVariableArgumentResolver implements ArgumentResolver {
+public class PathVariableArgumentResolver extends AbstractAnnotationArgumentResolver {
 
     private static final PathPatternParser pathPatternParser = new PathPatternParser();
 
     @Override
     public boolean supports(MethodParameter methodParameter) {
-        return methodParameter.supportAnnotation(PathVariable.class);
+        return supportAnnotation(methodParameter, PathVariable.class);
     }
 
     @Override
@@ -27,10 +27,11 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
         String pattern = getPattern(methodParameter.getMethod());
         String path = request.getRequestURI();
         String key = getPathVariableKey(
-                methodParameter.getAnnotation(PathVariable.class),
+                getAnnotation(methodParameter, PathVariable.class),
                 methodParameter.getParameterName()
         );
-        return methodParameter.resolveArgument(
+        return resolve(
+                methodParameter,
                 getArgument(pattern, path, key)
         );
     }

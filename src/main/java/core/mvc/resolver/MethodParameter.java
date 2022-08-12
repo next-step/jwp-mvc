@@ -1,11 +1,7 @@
 package core.mvc.resolver;
 
-import core.mvc.exception.InvalidParameterAnnotation;
-import core.mvc.exception.MethodArgumentTypeNotSupportedException;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class MethodParameter {
 
@@ -32,40 +28,19 @@ public class MethodParameter {
         return type;
     }
 
+    public Annotation[] getAnnotations() {
+        return annotations;
+    }
+
     public String getParameterName() {
         return parameterName;
     }
 
-    public boolean supportAnnotation(Class<?> annotationClass) {
-        return Arrays.stream(annotations).anyMatch(
-                annotation -> annotation.annotationType() == annotationClass
-        );
-    }
-
-    public <T> T getAnnotation(Class<T> annotationClass) {
-        return Arrays.stream(annotations)
-                .filter(annotation -> annotation.annotationType() == annotationClass)
-                .findAny()
-                .map(annotationClass::cast)
-                .orElseThrow(() -> new InvalidParameterAnnotation(annotationClass));
-    }
-
-    public Object resolveArgument(Object argument) {
-        if (isString()) {
-            return argument;
-        }
-        if (isInteger()) {
-            return Integer.valueOf(argument.toString());
-        }
-
-        throw new MethodArgumentTypeNotSupportedException(getType(), argument);
-    }
-
-    private boolean isString() {
+    public boolean isString() {
         return type == String.class;
     }
 
-    private boolean isInteger() {
+    public boolean isInteger() {
         return type == int.class
                 || type == Integer.class;
     }

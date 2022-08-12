@@ -7,21 +7,21 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class RequestParamArgumentResolver implements ArgumentResolver {
+public class RequestParamArgumentResolver extends AbstractAnnotationArgumentResolver {
     @Override
     public boolean supports(MethodParameter methodParameter) {
-        return methodParameter.supportAnnotation(RequestParam.class);
+        return supportAnnotation(methodParameter, RequestParam.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
         String paramKey = getParamKey(methodParameter);
         Object argument = request.getParameter(paramKey);
-        return methodParameter.resolveArgument(argument);
+        return resolve(methodParameter, argument);
     }
 
     private String getParamKey(MethodParameter methodParameter) {
-        RequestParam requestParam = methodParameter.getAnnotation(RequestParam.class);
+        RequestParam requestParam = getAnnotation(methodParameter, RequestParam.class);
         if (StringUtils.isNotBlank(requestParam.name())) {
             return requestParam.name();
         }
