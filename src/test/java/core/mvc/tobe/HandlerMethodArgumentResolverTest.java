@@ -1,6 +1,11 @@
 package core.mvc.tobe;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import core.mvc.ModelAndView;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,13 +13,10 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+class HandlerMethodArgumentResolverTest {
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class HandlerMethodArgumentResolverTest {
     private static final Logger logger = LoggerFactory.getLogger(HandlerMethodArgumentResolverTest.class);
+    private final HandlerMethodArgumentResolver handlerMethodArgumentResolver = new HandlerMethodArgumentResolver();
 
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
@@ -26,7 +28,7 @@ public class HandlerMethodArgumentResolverTest {
         request.addParameter("userId", userId);
         request.addParameter("password", password);
 
-        Class clazz = TestUserController.class;
+        Class<?> clazz = TestUserController.class;
         Method method = getMethod("create_string", clazz.getDeclaredMethods());
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
         Object[] values = new Object[parameterNames.length];
@@ -43,8 +45,48 @@ public class HandlerMethodArgumentResolverTest {
 
     private Method getMethod(String name, Method[] methods) {
         return Arrays.stream(methods)
-                .filter(method -> method.getName().equals(name))
-                .findFirst()
-                .get();
+            .filter(method -> method.getName().equals(name))
+            .findFirst()
+            .get();
+    }
+
+    @DisplayName("메소드의 파라미터 타입의 Object 배열을 반환한다")
+    @Test
+    void returns_an_object_array_of_parameter_types_of_method() {
+        // given
+        final HandlerMethodArgumentResolver handlerMethodArgumentResolver = new HandlerMethodArgumentResolver();
+
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users");
+        request.addParameter("userId", "admin");
+        request.addParameter("password", "pass");
+
+        final Class<?> clazz = TestUserController.class;
+        final Method method = getMethod("create_string", clazz.getDeclaredMethods());
+
+        // when
+        final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
+
+        // then
+        assertThat(actual).containsExactly("admin", "pass");
+
+    }
+
+    @DisplayName("메소드의 파라미터가 없으면 빈 Object 배열을 반환한다")
+    @Test
+    void returns_an_empty_object_array_of_does_not_have_parameters_method() {
+        // given
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/empty-parameters");
+        request.addParameter("userId", "admin");
+        request.addParameter("password", "pass");
+
+        final Class<?> clazz = TestUserController.class;
+        final Method method = getMethod("notParameters", clazz.getDeclaredMethods());
+
+        // when
+        final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
+
+        // then
+        assertThat(actual).isEmpty();
+
     }
 }

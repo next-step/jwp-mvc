@@ -44,4 +44,9 @@ public class TestUserController {
         mav.addObject("id", id);
         return mav;
     }
+
+    @RequestMapping(value = "/empty-parameters", method = RequestMethod.GET)
+    public ModelAndView notParameters() {
+        return new ModelAndView();
+    }
 }
