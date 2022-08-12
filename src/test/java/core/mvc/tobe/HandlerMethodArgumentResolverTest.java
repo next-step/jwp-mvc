@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import core.mvc.ModelAndView;
 import java.lang.reflect.Method;
@@ -18,7 +19,7 @@ class HandlerMethodArgumentResolverTest {
     private static final Logger logger = LoggerFactory.getLogger(HandlerMethodArgumentResolverTest.class);
     private final HandlerMethodArgumentResolver handlerMethodArgumentResolver = new HandlerMethodArgumentResolver();
 
-    private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+    private final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     @Test
     void string() throws Exception {
@@ -88,5 +89,26 @@ class HandlerMethodArgumentResolverTest {
         // then
         assertThat(actual).isEmpty();
 
+    }
+
+    @DisplayName("메소드의 파라미터가 원시 타입인 Object 배열을 반환한다")
+    @Test
+    void returns_an_object_array_of_primitive_types_of_method() throws Exception {
+        // given
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/empty-parameters");
+        request.addParameter("id", String.valueOf(Long.MAX_VALUE));
+        request.addParameter("age", String.valueOf(Integer.MAX_VALUE));
+
+        final Class<?> clazz = TestUserController.class;
+        final Method method = getMethod("create_int_long", clazz.getDeclaredMethods());
+
+        // when
+        final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
+
+        // then
+        assertAll(
+            () -> assertThat(actual[0]).isEqualTo(Long.MAX_VALUE),
+            () -> assertThat(actual[1]).isEqualTo(Integer.MAX_VALUE)
+        );
     }
 }

@@ -100,13 +100,13 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
 - [x] AnnotationHandlerMapping 
   - [x] requestUri 와 일치 하는 PathPattern을 가진 Key를 활용해 HandlerExecutable 을 찾는다
 - [] HandlerMethodArgumentResolver
-  - [ ] 메서드를 인자로 받아 메서드의 파라미터 목록을 구한다.
   - [x] 파라미터의 목록 수 만큼 Object 배열을 생성한다.
     - [x] 스프링의 LocalVariableTableParameterNameDiscoverer 를 활용
   - [x] 파라미터의 이름으로 request.getParameter() 를 활용해 값을 꺼내온다
     - [x] 파라미터 이름이 없다면 아무 작업도 수행하지 않는다
-  - [] 파라미터 타입에 맞춰 형 변환 후 전달할 Object 배열에 추가한다.
-    - [] 원시 타입
+  - [x] 메서드를 인자로 받아 메서드의 파라미터 목록을 구한다.
+  - [x] 파라미터 타입에 맞춰 형 변환 후 전달할 Object 배열에 추가한다.
+    - [x] 원시 타입
     - [] Warpper 타입
     - [] 클래스 타입
     - [] @PathVariable 애노테이션이 적용된 파라미터 
