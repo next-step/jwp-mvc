@@ -35,6 +35,7 @@ public class HandlerExecution {
     }
 
     private ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InvocationTargetException {
+        // TODO: 2022/08/12 컨트롤러의 argument 동적 바인딩 필요
         Object invokeResult = method.invoke(invoker, request, response);
         if (invokeResult instanceof String) {
             return new ModelAndView(new SimpleNameView((String) invokeResult));
