@@ -36,4 +36,10 @@ public class MyController {
         DataBase.addUser(user);
         return null;
     }
+
+    @RequestMapping(value = "/testAllMethods")
+    public ModelAndView testAllMethod(HttpServletRequest request, HttpServletResponse response) {
+        request.setAttribute("test", "ok");
+        return null;
+    }
 }

@@ -22,3 +22,15 @@
   - [x] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
 - [x] component scan
   - [x] core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+### 2단계
+- [x] 2단계 다시 구현
+  - [x] 애노테이션 기반 MVC 프레임워크 구현
+    - [x] ControllerScanner 구현
+    - [x] AnnotationHandlerMappingTest 테스트가 잘 동작 하는지 확인
+    - [x] 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아니라 메소드를 추가되도록 개발한다.
+      - [x] @Controller 애노테이션이 설정되어 있는 클래스를 찾은 후 @RequestMapping 설정에 따라 요청 URL과 메소드를 연결하도록 구현
+    - [x] HTTP 메소드에 대해 URL은 같지만 다른 메소드로 매핑되도록 한다.
+  - [x] 레거시 MVC와 애노테이션 기반 MVC 통합
+    - [x] 지금까지 사용한 MVC 프레임워크와 새롭게 구현한 애노테이션 기반 MVC 프레임워크가 공존하도록 함
+      - [x] 기존에 사용하던 프레임워크를 주석 처리 해도 잘 동작하는지 체크
