@@ -1,49 +1,34 @@
 package core.mvc.tobe.handler.mapping;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.tobe.ControllerScanner;
 import org.reflections.ReflectionUtils;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
-    private static final Class<Controller> ANNOTATION_CLASS_FOR_CONTROLLER = Controller.class;
     private static final Class<RequestMapping> ANNOTATION_CLASS_FOR_METHOD = RequestMapping.class;
-    private final Reflections reflections;
+    private static final List<RequestMethod> DEFAULT_REQUEST_METHODS = List.of(RequestMethod.values());
+
+    private ControllerScanner controllerScanner;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
-        this.reflections = new Reflections(basePackage);
+    public AnnotationHandlerMapping(ControllerScanner controllerScanner) {
+        this.controllerScanner = controllerScanner;
     }
 
     public void initialize() {
-        Set<Class<?>> invokerClasses = getInvokerClasses();
-        for (Class<?> invokerClass : invokerClasses) {
-            Object invoker = getInvokerObjectWithDefaultConstructor(invokerClass);
-            Set<Method> allMethods = getHandlerMethods(invokerClass);
-            addHandlerExecution(invoker, allMethods);
-        }
-    }
-
-    private Set<Class<?>> getInvokerClasses() {
-        return reflections.getTypesAnnotatedWith(ANNOTATION_CLASS_FOR_CONTROLLER);
-    }
-
-    private Object getInvokerObjectWithDefaultConstructor(Class<?> controllerClass) {
-        try {
-            return controllerClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | NoSuchMethodException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException("Controller 인스턴스 생성중 예외 발생", e);
+        controllerScanner.initialize();
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+        for (Class<?> aClass : controllers.keySet()) {
+            addHandlerExecution(controllers.get(aClass), getHandlerMethods(aClass));
         }
     }
 
@@ -69,7 +54,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private List<RequestMethod> getRequestMethods(RequestMapping requestMapping) {
         List<RequestMethod> methods = List.of(requestMapping.method());
         if (methods.isEmpty()) {
-            return List.of(RequestMethod.values());
+            return DEFAULT_REQUEST_METHODS;
         }
 
         return methods;

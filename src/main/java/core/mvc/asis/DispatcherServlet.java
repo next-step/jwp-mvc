@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.ControllerScanner;
 import core.mvc.tobe.handler.adapter.AnnotationHandlerAdapter;
 import core.mvc.tobe.handler.adapter.ControllerHandlerAdapter;
 import core.mvc.tobe.handler.adapter.HandlerAdapters;
@@ -38,7 +39,8 @@ public class DispatcherServlet extends HttpServlet {
         ManualHandlerMapping manualHandlerMapping = new ManualHandlerMapping();
         manualHandlerMapping.initMapping();
 
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        ControllerScanner controllerScanner = new ControllerScanner("next.controller");
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(controllerScanner);
         annotationHandlerMapping.initialize();
 
         handlerMappings = new HandlerMappings(
