@@ -3,6 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
+import core.mvc.view.JspView;
 import core.mvc.view.ModelAndView;
 import next.model.User;
 
@@ -19,7 +20,7 @@ public class UpdateFormUserController {
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
-        ModelAndView modelAndView = ModelAndView.from("/user/updateForm.jsp");
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/updateForm.jsp"));
         modelAndView.addObject("user", user);
         return modelAndView;
     }

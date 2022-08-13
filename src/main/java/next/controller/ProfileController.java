@@ -3,6 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
+import core.mvc.view.JspView;
 import core.mvc.view.ModelAndView;
 import next.model.User;
 
@@ -18,7 +19,7 @@ public class ProfileController {
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
-        ModelAndView modelAndView = ModelAndView.from("/user/profile.jsp");
+        ModelAndView modelAndView = new ModelAndView(new JspView("/user/profile.jsp"));
         modelAndView.addObject("user", user);
         return modelAndView;
     }

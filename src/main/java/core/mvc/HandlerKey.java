@@ -1,14 +1,24 @@
 package core.mvc;
 
 import core.annotation.web.RequestMethod;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 public class HandlerKey {
+    private static final PathPatternParser parser = new PathPatternParser();
     private String url;
     private RequestMethod requestMethod;
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
+    }
+
+    public boolean isMatch(HandlerKey handlerKey) {
+        return requestMethod.equals(handlerKey.requestMethod)
+                && parser.parse(url).matches(
+                PathContainer.parsePath(handlerKey.url)
+        );
     }
 
     @Override

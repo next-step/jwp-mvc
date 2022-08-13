@@ -4,6 +4,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
 import core.mvc.view.ModelAndView;
+import core.mvc.view.RedirectView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,6 @@ public class UpdateUserController {
                 req.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
-        return ModelAndView.from("redirect:/");
+        return new ModelAndView(new RedirectView("/"));
     }
 }

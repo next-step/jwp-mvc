@@ -29,15 +29,21 @@ public class AnnotationHandlerMapping extends HandlerMapping {
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        HandlerKey key = new HandlerKey(
+                request.getRequestURI(),
+                RequestMethod.valueOf(request.getMethod().toUpperCase())
+        );
+        return handlerExecutions.entrySet().stream()
+                .filter(it -> it.getKey().isMatch(key))
+                .map(it -> it.getValue())
+                .findAny()
+                .orElse(null);
     }
 
     private void putHandlerExecutionsByController(Class<?> controllerClass) {
-        Object declaredObject;
+        Object target;
         try {
-            declaredObject = controllerClass.getDeclaredConstructor().newInstance();
+            target = controllerClass.getDeclaredConstructor().newInstance();
         } catch (InstantiationException |
                  IllegalAccessException |
                  InvocationTargetException |
@@ -48,10 +54,10 @@ public class AnnotationHandlerMapping extends HandlerMapping {
         ReflectionUtils.getAllMethods(
                 controllerClass,
                 ReflectionUtils.withAnnotation(RequestMapping.class)
-        ).forEach(method -> putHandlerExecutionsByMethod(declaredObject, method));
+        ).forEach(method -> putHandlerExecutionsByMethod(target, method));
     }
 
-    private void putHandlerExecutionsByMethod(Object declaredObject, Method method) {
+    private void putHandlerExecutionsByMethod(Object target, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         String url = requestMapping.value();
         RequestMethod[] requestMethods = requestMapping.method().length > 0
@@ -60,7 +66,7 @@ public class AnnotationHandlerMapping extends HandlerMapping {
         for (RequestMethod requestMethod : requestMethods) {
             handlerExecutions.put(
                     new HandlerKey(url, requestMethod),
-                    new HandlerExecution(declaredObject, method)
+                    new HandlerExecution(target, method)
             );
         }
     }
