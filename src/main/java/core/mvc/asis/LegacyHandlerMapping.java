@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
+import core.mvc.tobe.Controller;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 public class LegacyHandlerMapping implements HandlerMapping {
-    private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private Map<String, Controller> mappings = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(LegacyHandlerMapping.class);
+    private final Map<String, Controller> mappings = new HashMap<>();
 
     void initMapping() {
         mappings.put("/", new LegacyHomeController());
@@ -27,9 +28,7 @@ public class LegacyHandlerMapping implements HandlerMapping {
         mappings.put("/users/update", new UpdateUserController());
 
         logger.info("Initialized Request Mapping!");
-        mappings.keySet().forEach(path -> {
-            logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
-        });
+        mappings.keySet().forEach(path -> logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass()));
     }
 
     public Controller findController(String url) {
