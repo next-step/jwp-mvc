@@ -36,7 +36,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
                     RequestMethod[] requestMethods = requestMapping.method();
 
-                    if (requestMethodIsEmpty(requestMapping)) {
+                    if (isRequestMethodEmpty(requestMapping)) {
                         requestMethods = RequestMethod.values();
                     }
 
@@ -65,7 +65,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return new HandlerKey(controller.value() + rm.value(), requestMethod);
     }
 
-    private boolean requestMethodIsEmpty(RequestMapping requestMapping) {
+    private boolean isRequestMethodEmpty(RequestMapping requestMapping) {
         return requestMapping.method().length == 0;
     }
 }
