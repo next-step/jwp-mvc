@@ -37,10 +37,14 @@ public class HandlerMethodArgumentResolver {
     }
 
     private Object getParameter(final Class<?> parameterType, final String parameterName, final HttpServletRequest request) {
-        if (parameterType.isPrimitive() || String.class == parameterType) {
+        if (parameterType.isPrimitive() || String.class == parameterType || isPrimitiveWrapper(parameterType)) {
             return getValueWithMatchingType(parameterType, request.getParameter(parameterName));
         }
         return getNewInstance(parameterType, request);
+    }
+
+    private boolean isPrimitiveWrapper(final Class<?> parameterType) {
+        return Integer.class == parameterType || Long.class == parameterType;
     }
 
     private Object getNewInstance(final Class<?> parameterType, final HttpServletRequest request) {
@@ -71,10 +75,10 @@ public class HandlerMethodArgumentResolver {
         if (Objects.isNull(parameter) || parameter.isBlank()) {
             return getDefaultValue(parameterType);
         }
-        if (parameterType.equals(int.class)) {
+        if (int.class == parameterType || Integer.class == parameterType) {
             return Integer.parseInt(parameter);
         }
-        if (parameterType.equals(long.class)) {
+        if (long.class == parameterType || Long.class == parameterType) {
             return Long.parseLong(parameter);
         }
         return parameter;

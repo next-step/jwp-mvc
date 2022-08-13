@@ -29,6 +29,15 @@ public class TestUserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_wrapper_int_long(Long id, Integer age) {
+        logger.debug("id: {}, age: {}", id, age);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("id", id);
+        mav.addObject("age", age);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_javabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
