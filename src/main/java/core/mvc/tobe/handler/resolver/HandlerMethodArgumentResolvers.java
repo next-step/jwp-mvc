@@ -13,13 +13,25 @@ public class HandlerMethodArgumentResolvers {
 
     private final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    private final List<HandlerMethodArgumentResolver> argumentResolvers = List.of(
-            new HttpServletArgumentResolver(),
-            new StringTypeRequestParameterArgumentResolver(),
-            new IntegerTypeRequestParameterArgumentResolver(),
-            new LongTypeRequestParameterArgumentResolver(),
-            new BeanTypeArgumentResolver()
-    );
+    private final List<HandlerMethodArgumentResolver> argumentResolvers;
+
+    {
+        CompositeSimpleTypeArgumentResolver compositeSimpleTypeArgumentResolver = new CompositeSimpleTypeArgumentResolver(
+                List.of(
+                        new StringTypeRequestParameterArgumentResolver(),
+                        new IntegerTypeRequestParameterArgumentResolver(),
+                        new LongTypeRequestParameterArgumentResolver()
+                )
+        );
+        argumentResolvers = List.of(
+                new HttpServletArgumentResolver(),
+                compositeSimpleTypeArgumentResolver,
+                new BeanTypeArgumentResolver(
+                        parameterNameDiscoverer,
+                        compositeSimpleTypeArgumentResolver
+                )
+        );
+    }
 
     public Object[] resolveParameters(Method method, HttpServletRequest request, HttpServletResponse response) {
         Parameter[] parameters = method.getParameters();
@@ -30,7 +42,6 @@ public class HandlerMethodArgumentResolvers {
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             String parameterName = parameterNames[i];
-            String value = request.getParameter(parameterName);
 
             NamedParameter namedParameter = new NamedParameter(parameter, parameterName);
 

@@ -5,9 +5,6 @@ public class TestUser {
     private String password;
     private int age;
 
-    private TestUser() {
-    }
-
     public TestUser(String userId, String password, int age) {
         this.userId = userId;
         this.password = password;
