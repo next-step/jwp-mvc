@@ -25,6 +25,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final HandlerExecutable NOT_FOUND_EXECUTION = new NotFoundExecution();
+    private static final HandlerMethodArgumentResolver HANDLER_METHOD_ARGUMENT_RESOLVER = new HandlerMethodArgumentResolver();
 
     private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
@@ -41,8 +42,7 @@ public class DispatcherServlet extends HttpServlet {
 
         final HandlerExecutable handlerExecutable = getHandlerExecutable(request);
         final Method method = handlerExecutable.getMethod();
-        final HandlerMethodArgumentResolver handlerMethodArgumentResolver = new HandlerMethodArgumentResolver();
-        final Object[] arguments = handlerMethodArgumentResolver.resolve(method, request);
+        final Object[] arguments = HANDLER_METHOD_ARGUMENT_RESOLVER.resolve(method, request);
 
         try {
             final ModelAndView modelAndView = handlerExecutable.handle(arguments);
