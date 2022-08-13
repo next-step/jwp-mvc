@@ -15,6 +15,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
+    @DisplayName("private 필드에 값을 할당하고 getter 메소드를 통해 값이 정상적으로 할당 되었는지 확인한다.")
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+
+        Student student = new Student();
+        Field name = clazz.getDeclaredField("name");
+        name.setAccessible(true);
+        name.set(student, "user");
+        Field age = clazz.getDeclaredField("age");
+        age.setAccessible(true);
+        age.set(student, 20);
+
+        assertThat(student.getName()).isEqualTo("user");
+        assertThat(student.getAge()).isEqualTo(20);
+
+        logger.debug(clazz.getName());
+    }
+
     @DisplayName("reflection을 통해 Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력합니다.")
     @Test
     public void showClass() {
