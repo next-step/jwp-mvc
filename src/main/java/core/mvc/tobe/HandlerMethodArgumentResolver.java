@@ -47,6 +47,10 @@ public class HandlerMethodArgumentResolver {
     private Object getParameter(final Method method, final Parameter parameter, final String parameterName, final HttpServletRequest request) {
         final Class<?> parameterType = parameter.getType();
 
+        if (HttpServletRequest.class == parameterType) {
+            return request;
+        }
+
         if (parameter.isAnnotationPresent(PathVariable.class)) {
             return getPathVariableValue(method, parameter, parameterName, request);
         }

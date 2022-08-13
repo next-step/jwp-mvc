@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import core.mvc.ModelAndView;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -166,6 +167,25 @@ class HandlerMethodArgumentResolverTest {
         assertAll(
             () -> assertThat(actual).hasSize(1),
             () -> assertThat(actual[0]).isEqualTo(100L)
+        );
+    }
+
+    @DisplayName("메소드의 파라미터가 HttpServletRequest 타입인 Object 배열을 반환한다")
+    @Test
+    void returns_an_object_array_of_http_servlet_request_type_of_method() {
+        // given
+        final MockHttpServletRequest request = new MockHttpServletRequest();
+
+        final Method method = getMethodOfTestUserController("httpServletRequest");
+
+        // when
+        final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
+
+        // then
+        assertAll(
+            () -> assertThat(actual).hasSize(1),
+            () -> assertThat(actual[0]).isInstanceOf(HttpServletRequest.class),
+            () -> assertThat(actual[0]).isEqualTo(request)
         );
     }
 

@@ -110,6 +110,7 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
     - [x] Warpper 타입
     - [x] 커스텀 클래스 타입
     - [x] @PathVariable 애노테이션이 적용된 파라미터 
+    - [x] HttpServletRequest 타입 
   - [x] Object 배열을 반환한다.
 - [x] HandlerExecutable 변경
   - [x] 메서드를 반환하는 인터페이스를 추가한다 (수행될 메서드의 파라미터 정보를 얻기 위해 필요)

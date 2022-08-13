@@ -4,6 +4,7 @@ import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,13 @@ public class TestUserController {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ModelAndView httpServletRequest(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("request", request);
         return mav;
     }
 
