@@ -151,6 +151,24 @@ class HandlerMethodArgumentResolverTest {
         );
     }
 
+    @DisplayName("PathVariable 애너테이션이 적용된 파라미터를 타입에 맞춰 Object 배열을 반환한다")
+    @Test
+    void returns_an_object_array_of_parameters_with_path_variable_types_of_method() {
+        // given
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/100");
+
+        final Method method = getMethodOfTestUserController("show_pathvariable");
+
+        // when
+        final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
+
+        // then
+        assertAll(
+            () -> assertThat(actual).hasSize(1),
+            () -> assertThat(actual[0]).isEqualTo(100L)
+        );
+    }
+
     private Method getMethodOfTestUserController(final String methodName) {
         final Class<?> clazz = TestUserController.class;
         return getMethod(methodName, clazz.getDeclaredMethods());

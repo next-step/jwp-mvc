@@ -1,16 +1,24 @@
 package core.mvc.tobe;
 
+import core.annotation.web.PathVariable;
+import core.annotation.web.RequestMapping;
 import core.mvc.tobe.exception.InvalidInstanceException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPattern.PathMatchInfo;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 public class HandlerMethodArgumentResolver {
 
@@ -22,25 +30,48 @@ public class HandlerMethodArgumentResolver {
         if (parameterNames == null) {
             return EMPTY_PARAMETERS;
         }
-
-        return getParameters(method.getParameterTypes(), parameterNames, request);
+        return getParameters(method, parameterNames, request);
     }
 
-    private Object[] getParameters(final Class<?>[] parameterTypes, final String[] parameterNames, final HttpServletRequest request) {
-        final Object[] parameters = new Object[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            final Class<?> parameterType = parameterTypes[i];
-            parameters[i] = getParameter(parameterType, parameterNames[i], request);
+    private Object[] getParameters(final Method method, final String[] parameterNames, final HttpServletRequest request) {
+
+        final Parameter[] parameters = method.getParameters();
+        final Object[] params = new Object[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            params[i] = getParameter(method, parameters[i], parameterNames[i], request);
         }
 
-        return parameters;
+        return params;
     }
 
-    private Object getParameter(final Class<?> parameterType, final String parameterName, final HttpServletRequest request) {
+    private Object getParameter(final Method method, final Parameter parameter, final String parameterName, final HttpServletRequest request) {
+        final Class<?> parameterType = parameter.getType();
+
+        if (parameter.isAnnotationPresent(PathVariable.class)) {
+            return getPathVariableValue(method, parameter, parameterName, request);
+        }
+
         if (parameterType.isPrimitive() || String.class == parameterType || isPrimitiveWrapper(parameterType)) {
             return getValueWithMatchingType(parameterType, request.getParameter(parameterName));
         }
         return getNewInstance(parameterType, request);
+    }
+
+    private Object getPathVariableValue(final Method method, final Parameter parameter, final String parameterName, final HttpServletRequest request) {
+        final PathVariable pathVariable = parameter.getAnnotation(PathVariable.class);
+        final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        final PathPatternParser parser = new PathPatternParser();
+        final PathPattern pathPattern = parser.parse(requestMapping.value());
+        final PathMatchInfo pathMatchInfo = pathPattern.matchAndExtract(PathContainer.parsePath(request.getRequestURI()));
+        if (Objects.isNull(pathMatchInfo)) {
+            return getValueWithMatchingType(parameter.getType(), null);
+        }
+        final Map<String, String> uriVariables = pathMatchInfo.getUriVariables();
+        final String pathValue = pathVariable.value();
+        if (Objects.nonNull(pathValue) && !pathValue.isBlank()) {
+            return getValueWithMatchingType(parameter.getType(), uriVariables.get(pathValue));
+        }
+        return getValueWithMatchingType(parameter.getType(), uriVariables.get(parameterName));
     }
 
     private boolean isPrimitiveWrapper(final Class<?> parameterType) {
@@ -87,7 +118,7 @@ public class HandlerMethodArgumentResolver {
     private static Object getNewInstance(final Class<?> parameterType) {
         final Constructor<?>[] declaredConstructors = parameterType.getDeclaredConstructors();
         if (declaredConstructors.length == 0) {
-            throw new InvalidInstanceException(new NoSuchMethodException());
+            return null;
         }
 
         final Constructor<?> declaredConstructor = declaredConstructors[0];
