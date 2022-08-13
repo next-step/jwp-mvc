@@ -27,6 +27,11 @@ public class HandlerExecution implements HandlerExecutable {
     }
 
     @Override
+    public Method getMethod() {
+        return method;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
