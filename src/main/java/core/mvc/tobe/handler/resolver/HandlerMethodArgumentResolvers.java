@@ -13,14 +13,14 @@ public class HandlerMethodArgumentResolvers {
 
     private final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    private final List<HandlerMethodArgumentResolver> argumentResolvers;
+    private final List<ArgumentResolver> argumentResolvers;
 
     {
         CompositeSimpleTypeArgumentResolver compositeSimpleTypeArgumentResolver = new CompositeSimpleTypeArgumentResolver(
                 List.of(
-                        new StringTypeRequestParameterArgumentResolver(),
-                        new IntegerTypeRequestParameterArgumentResolver(),
-                        new LongTypeRequestParameterArgumentResolver()
+                        new StringTypeArgumentResolver(),
+                        new IntegerTypeArgumentResolver(),
+                        new LongTypeArgumentResolver()
                 )
         );
         argumentResolvers = List.of(

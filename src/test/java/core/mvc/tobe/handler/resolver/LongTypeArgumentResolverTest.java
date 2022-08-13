@@ -15,12 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class LongTypeRequestParameterArgumentResolverTest {
+class LongTypeArgumentResolverTest {
     private static final NamedParameter WRAPPED_LONG_TYPE_PARAMETER;
     private static final NamedParameter PRIMITIVE_LONG_TYPE_PARAMETER;
     private static final NamedParameter OTHER_TYPE_PARAMETER;
 
-    private final LongTypeRequestParameterArgumentResolver argumentResolver = new LongTypeRequestParameterArgumentResolver();
+    private final LongTypeArgumentResolver argumentResolver = new LongTypeArgumentResolver();
 
     static {
         Method testClassMethod = TestClass.class.getDeclaredMethods()[0];

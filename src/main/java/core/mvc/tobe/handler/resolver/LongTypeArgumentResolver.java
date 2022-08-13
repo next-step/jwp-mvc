@@ -1,6 +1,6 @@
 package core.mvc.tobe.handler.resolver;
 
-public class LongTypeRequestParameterArgumentResolver extends AbstractSimpleTypeRequestParameterArgumentResolver {
+public class LongTypeArgumentResolver extends AbstractSimpleTypeArgumentResolver {
 
     @Override
     public boolean support(NamedParameter parameter) {

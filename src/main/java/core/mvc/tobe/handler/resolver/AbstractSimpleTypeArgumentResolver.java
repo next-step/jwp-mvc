@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
-public abstract class AbstractSimpleTypeRequestParameterArgumentResolver implements HandlerMethodArgumentResolver {
+public abstract class AbstractSimpleTypeArgumentResolver implements ArgumentResolver {
 
     @Override
     public Object resolve(NamedParameter parameter, HttpServletRequest request, HttpServletResponse response) {

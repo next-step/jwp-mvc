@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 
-public class BeanTypeArgumentResolver implements HandlerMethodArgumentResolver {
+public class BeanTypeArgumentResolver implements ArgumentResolver {
 
     private final ParameterNameDiscoverer parameterNameDiscoverer;
     private final CompositeSimpleTypeArgumentResolver compositeSimpleTypeArgumentResolver;

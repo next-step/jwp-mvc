@@ -1,7 +1,6 @@
 package core.mvc.tobe.handler.resolver;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,12 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class IntegerTypeRequestParameterArgumentResolverTest {
+class IntegerTypeArgumentResolverTest {
     private static final NamedParameter INTEGER_TYPE_PARAMETER;
     private static final NamedParameter INT_TYPE_PARAMETER;
     private static final NamedParameter OTHER_TYPE_PARAMETER;
 
-    private final IntegerTypeRequestParameterArgumentResolver argumentResolver = new IntegerTypeRequestParameterArgumentResolver();
+    private final IntegerTypeArgumentResolver argumentResolver = new IntegerTypeArgumentResolver();
 
     static {
         Method testClassMethod = TestClass.class.getDeclaredMethods()[0];

@@ -29,9 +29,9 @@ class BeanTypeArgumentResolverTest {
             new LocalVariableTableParameterNameDiscoverer(),
             new CompositeSimpleTypeArgumentResolver(
                     List.of(
-                            new StringTypeRequestParameterArgumentResolver(),
-                            new IntegerTypeRequestParameterArgumentResolver(),
-                            new LongTypeRequestParameterArgumentResolver()
+                            new StringTypeArgumentResolver(),
+                            new IntegerTypeArgumentResolver(),
+                            new LongTypeArgumentResolver()
                     )
             )
     );

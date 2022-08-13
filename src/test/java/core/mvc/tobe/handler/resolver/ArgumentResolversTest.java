@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class HandlerMethodArgumentResolversTest {
+class ArgumentResolversTest {
     private static final HttpServletRequest REQUEST = new MockHttpServletRequest();
     private static final HttpServletResponse RESPONSE = new MockHttpServletResponse();
 

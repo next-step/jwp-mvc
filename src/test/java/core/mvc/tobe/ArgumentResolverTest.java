@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HandlerMethodArgumentResolverTest {
+public class ArgumentResolverTest {
     private static final Class<?> CLAZZ = TestUserController.class;
 
     private HandlerExecution handlerExecution;

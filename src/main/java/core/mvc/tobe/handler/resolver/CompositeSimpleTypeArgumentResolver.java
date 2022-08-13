@@ -4,10 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-public class CompositeSimpleTypeArgumentResolver implements HandlerMethodArgumentResolver {
-    private final List<AbstractSimpleTypeRequestParameterArgumentResolver> parameterArgumentResolvers;
+public class CompositeSimpleTypeArgumentResolver implements ArgumentResolver {
+    private final List<AbstractSimpleTypeArgumentResolver> parameterArgumentResolvers;
 
-    public CompositeSimpleTypeArgumentResolver(List<AbstractSimpleTypeRequestParameterArgumentResolver> parameterArgumentResolvers) {
+    public CompositeSimpleTypeArgumentResolver(List<AbstractSimpleTypeArgumentResolver> parameterArgumentResolvers) {
         this.parameterArgumentResolvers = parameterArgumentResolvers;
     }
 

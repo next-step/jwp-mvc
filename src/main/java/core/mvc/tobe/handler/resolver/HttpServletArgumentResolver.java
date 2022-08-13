@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-public class HttpServletArgumentResolver implements HandlerMethodArgumentResolver {
+public class HttpServletArgumentResolver implements ArgumentResolver {
     private static final Class<HttpServletRequest> REQUEST_CLASS = HttpServletRequest.class;
     private static final Class<HttpServletResponse> RESPONSE_CLASS = HttpServletResponse.class;
     private static final List<Class<?>> SUPPORT_CLASSES = List.of(REQUEST_CLASS, RESPONSE_CLASS);
