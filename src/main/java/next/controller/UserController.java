@@ -19,9 +19,8 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = "/users/create", method = POST)
-    public String createUser(HttpServletRequest req, HttpServletResponse resp) {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
+    public String createUser(String userId, String password, String name, String email) {
+        User user = new User(userId, password, name, email);
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
