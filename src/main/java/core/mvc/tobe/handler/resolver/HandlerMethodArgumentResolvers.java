@@ -9,11 +9,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 
-public class ArgumentResolvers {
+public class HandlerMethodArgumentResolvers {
 
     private final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
-    private final List<ArgumentResiolver> argumentResolvers = List.of(
+    private final List<HandlerMethodArgumentResolver> argumentResolvers = List.of(
             new HttpServletArgumentResolver(),
             new StringTypeRequestParameterArgumentResolver(),
             new IntegerTypeRequestParameterArgumentResolver(),
