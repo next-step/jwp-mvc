@@ -1,9 +1,7 @@
 package core.mvc.tobe.handler;
 
 import core.mvc.asis.Controller;
-import core.mvc.asis.DispatcherServlet;
 import core.mvc.asis.ForwardController;
-import core.mvc.tobe.handler.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestMapping implements HandlerMapping {
-    private static final Logger logger = LoggerFactory.getLogger(RequestMapping.class);
+public class LegacyHandlerMapping implements HandlerMapping {
+    private static final Logger logger = LoggerFactory.getLogger(LegacyHandlerMapping.class);
     private static Map<String, Controller> mappings = new HashMap<>();
 
     static {
@@ -44,7 +42,7 @@ public class RequestMapping implements HandlerMapping {
 
     @Override
     public Object getHandler(HttpServletRequest request) {
-        logger.info("RequestMapping getHandler");
+        logger.info("LegacyHandlerMapping getHandler");
         return findController(request.getRequestURI());
     }
 }
