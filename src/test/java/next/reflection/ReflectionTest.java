@@ -7,13 +7,25 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    @DisplayName("Question 클래스는 생성자에 인자를 가지는데, 인자를 가진 생성자의 인스턴스 생성")
+    @Test
+    void construct() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        Constructor<?> constructor = clazz.getConstructors()[0];
+        Object object = constructor.newInstance("writer1", "title1", "contents1");
+        assertThat(object).isInstanceOf(Question.class);
+        assertThat((Question) object).isEqualTo(new Question("writer1", "title1", "contents1"));
+    }
 
     @DisplayName("private 필드에 값을 할당하고 getter 메소드를 통해 값이 정상적으로 할당 되었는지 확인한다.")
     @Test
