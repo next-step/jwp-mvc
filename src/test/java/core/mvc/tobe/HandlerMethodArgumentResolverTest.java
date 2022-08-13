@@ -61,6 +61,33 @@ public class HandlerMethodArgumentResolverTest {
         assertThat(result.getObject("age")).isEqualTo(20);
     }
 
+    @DisplayName("숫자형 인자에 requestParameter 값을 할당받은 Controller 메소드를 실행한다.")
+    @Test
+    void create_javabean() throws Exception {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addParameter("userId", "321");
+        request.addParameter("password", "비밀번호");
+        request.addParameter("age", "20");
+
+        Object invoker = CLAZZ.getDeclaredConstructor().newInstance();
+        String testMethodName = "create_javabean";
+        Method method = getMethod(testMethodName, CLAZZ.getDeclaredMethods());
+        handlerExecution = new HandlerExecution(invoker, method);
+
+        // when
+        ModelAndView result = handlerExecution.handle(request, new MockHttpServletResponse());
+
+        // then
+        assertThat(result.getObject("testUser"))
+                .usingRecursiveComparison()
+                .isEqualTo(new TestUser(
+                        "321",
+                        "비밀번호",
+                        20
+                ));
+    }
+
     private Method getMethod(String name, Method[] methods) {
         return Arrays.stream(methods)
                 .filter(method -> method.getName().equals(name))

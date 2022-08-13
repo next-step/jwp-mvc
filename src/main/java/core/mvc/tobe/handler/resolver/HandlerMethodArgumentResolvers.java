@@ -17,7 +17,8 @@ public class HandlerMethodArgumentResolvers {
             new HttpServletArgumentResolver(),
             new StringTypeRequestParameterArgumentResolver(),
             new IntegerTypeRequestParameterArgumentResolver(),
-            new LongTypeRequestParameterArgumentResolver()
+            new LongTypeRequestParameterArgumentResolver(),
+            new BeanTypeArgumentResolver()
     );
 
     public Object[] resolveParameters(Method method, HttpServletRequest request, HttpServletResponse response) {
