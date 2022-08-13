@@ -1,5 +1,6 @@
 package core.mvc.tobe.handler.resolver;
 
+import core.mvc.tobe.TestUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,7 +62,7 @@ class ArgumentResolversTest {
     @Test
     void resolveParameters_exception() {
         ArgumentResolvers argumentResolvers = new ArgumentResolvers();
-        Method methodWithRequestOrResponse = findByClassAndMethodName("methodWithoutRequestAndResponse", Tester.class);
+        Method methodWithRequestOrResponse = findByClassAndMethodName("cannotResolveMethod", Tester.class);
 
         assertThatThrownBy(() -> argumentResolvers.resolveParameters(methodWithRequestOrResponse, REQUEST, RESPONSE))
                 .isInstanceOf(NoExistsArgumentResolverException.class)
@@ -79,6 +80,20 @@ class ArgumentResolversTest {
 
         Object[] actual = argumentResolvers.resolveParameters(methodWithRequestOrResponse, requestWithParameter, RESPONSE);
         assertThat(actual).containsExactly("jordy");
+    }
+
+    @DisplayName("메서드의 인자가 requestParameter에 동일한 이름으로 저장된 int또는 long형인 경우 해당 requestParameter 값을 바인딩한다.")
+    @Test
+    void resolveParameters_int_long_value() {
+        MockHttpServletRequest requestWithParameter = new MockHttpServletRequest();
+        requestWithParameter.addParameter("id", "3000000000");
+        requestWithParameter.addParameter("age", "50");
+
+        ArgumentResolvers argumentResolvers = new ArgumentResolvers();
+        Method methodWithRequestOrResponse = findByClassAndMethodName("create_int_long", Tester.class);
+
+        Object[] actual = argumentResolvers.resolveParameters(methodWithRequestOrResponse, requestWithParameter, RESPONSE);
+        assertThat(actual).containsExactly(3000000000L, 50);
     }
 
     private Method findByClassAndMethodName(String noArgumentMethod, Class<?> clazz) {
@@ -109,8 +124,10 @@ class ArgumentResolversTest {
 
         }
 
-        public void methodWithoutRequestAndResponse(int number) {
+        public void cannotResolveMethod(TestUser testUser) {
 
         }
+
+        public void create_int_long(Long id, int age) {}
     }
 }
