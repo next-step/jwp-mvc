@@ -2,10 +2,23 @@ package next.reflection;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Junit3TestRunner {
+    private static final String PREFIX_METHOD_NAME = "test";
+
     @Test
     public void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
-        // TODO Junit3Test에서 test로 시작하는 메소드 실행
+        Junit3Test junit3Test = clazz.newInstance();
+        List<String> methodNames = Arrays.stream(clazz.getDeclaredMethods()).map(Method::getName)
+                .filter(name -> name.startsWith(PREFIX_METHOD_NAME)).collect(Collectors.toList());
+        for (String methodName : methodNames) {
+            Method declaredMethod = clazz.getDeclaredMethod(methodName);
+            declaredMethod.invoke(junit3Test);
+        }
     }
 }
