@@ -26,6 +26,9 @@ public class HandlerMethodArgumentResolver {
     private static final Object[] EMPTY_PARAMETERS = new Object[0];
 
     public Object[] resolve(final Method method, final HttpServletRequest request) {
+        if (method == null) {
+            return EMPTY_PARAMETERS;
+        }
         final String[] parameterNames = DISCOVERER.getParameterNames(method);
         if (parameterNames == null) {
             return EMPTY_PARAMETERS;

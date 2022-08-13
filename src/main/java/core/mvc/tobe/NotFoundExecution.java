@@ -12,7 +12,7 @@ public class NotFoundExecution implements HandlerExecutable {
 
     @Override
     public ModelAndView handle(Object... arguments) throws Exception {
-        return ModelAndView.jsp("404.jsp");
+        return ModelAndView.jsp("/404.jsp");
     }
 
     @Override

@@ -72,4 +72,13 @@ class AnnotationHandlerMappingTest {
 
         assertThat(mav.getObject("path")).isEqualTo("pattern");
     }
+
+    @DisplayName("유효한 handler가 없는 경우 NotFoundExecution을 반환한다 ")
+    @Test
+    void not_found_execution() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/존재하지않는주소");
+        HandlerExecutable actual = handlerMapping.getHandler(request);
+
+        assertThat(actual).isInstanceOf(NotFoundExecution.class);
+    }
 }

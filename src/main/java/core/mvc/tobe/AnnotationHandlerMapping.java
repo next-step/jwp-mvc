@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+    private static final HandlerExecutable NOT_FOUND_EXECUTION = new NotFoundExecution();
 
     private final Object[] basePackage;
 
@@ -43,6 +44,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
             .filter(it -> it.equals(key))
             .findAny()
             .map(HANDLER_EXECUTIONS::get)
-            .orElseThrow(IllegalArgumentException::new);
+            .orElse(NOT_FOUND_EXECUTION);
     }
 }
