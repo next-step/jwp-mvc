@@ -5,6 +5,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.tobe.view.ModelAndView;
+import core.mvc.tobe.view.SimpleNameView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class MyController {
         logger.debug("Find UserId : {}", userId);
         User user = DataBase.findUserById(userId);
         request.setAttribute("user", user);
-        return null;
+        return new ModelAndView(new SimpleNameView("/user/list.jsp"));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
@@ -34,6 +35,6 @@ public class MyController {
                 request.getParameter("email"));
         logger.debug("User : {}", user);
         DataBase.addUser(user);
-        return null;
+        return new ModelAndView(new SimpleNameView("redirect:/"));
     }
 }

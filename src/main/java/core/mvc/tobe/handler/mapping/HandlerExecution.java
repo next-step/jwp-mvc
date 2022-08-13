@@ -1,5 +1,6 @@
 package core.mvc.tobe.handler.mapping;
 
+import core.mvc.tobe.handler.TargetHandlingException;
 import core.mvc.tobe.view.ModelAndView;
 import core.mvc.tobe.view.SimpleNameView;
 
@@ -7,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class HandlerExecution {
 
@@ -21,8 +23,14 @@ public class HandlerExecution {
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
         try {
             return handleRequest(request, response);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("요청 처리를 위한 핸들러 실행중 알수없는 예외가 발생했습니다.", e);
+        } catch (IllegalAccessException e) {
+            throw new TargetHandlingException(e.getMessage(), e);
+        } catch (InvocationTargetException e) {
+            Throwable rootCauseException = e.getCause();
+            if (Objects.nonNull(rootCauseException)) {
+                throw new TargetHandlingException(rootCauseException.getMessage(), rootCauseException);
+            }
+            throw new Error(e);
         }
     }
 

@@ -1,8 +1,9 @@
 package core.mvc.tobe.handler.adapter;
 
+import core.mvc.asis.Controller;
+import core.mvc.tobe.handler.TargetHandlingException;
 import core.mvc.tobe.view.ModelAndView;
 import core.mvc.tobe.view.SimpleNameView;
-import core.mvc.asis.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +21,7 @@ public class ControllerHandlerAdapter implements HandlerAdapter {
             String viewName = invoker.execute(request, response);
             return new ModelAndView(new SimpleNameView(viewName));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new TargetHandlingException(e.getMessage(), e);
         }
     }
 }

@@ -1,7 +1,8 @@
-package core.mvc.tobe;
+package study.reflections;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.mvc.tobe.MyController;
 import org.junit.jupiter.api.Test;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
