@@ -108,7 +108,7 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
   - [x] 파라미터 타입에 맞춰 형 변환 후 전달할 Object 배열에 추가한다.
     - [x] 원시 타입
     - [] Warpper 타입
-    - [] 클래스 타입
+    - [x] 커스텀 클래스 타입
     - [] @PathVariable 애노테이션이 적용된 파라미터 
   - [x] Object 배열을 반환한다.
 - [] HandlerExecutable 변경

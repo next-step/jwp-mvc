@@ -60,7 +60,7 @@ class HandlerMethodArgumentResolverTest {
         request.addParameter("userId", "admin");
         request.addParameter("password", "pass");
 
-        final Method method = getTestMethod("create_string");
+        final Method method = getMethodOfTestUserController("create_string");
 
         // when
         final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
@@ -78,7 +78,7 @@ class HandlerMethodArgumentResolverTest {
         request.addParameter("userId", "admin");
         request.addParameter("password", "pass");
 
-        final Method method = getTestMethod("notParameters");
+        final Method method = getMethodOfTestUserController("notParameters");
 
         // when
         final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
@@ -96,7 +96,7 @@ class HandlerMethodArgumentResolverTest {
         request.addParameter("id", String.valueOf(Long.MAX_VALUE));
         request.addParameter("age", String.valueOf(Integer.MAX_VALUE));
 
-        final Method method = getTestMethod("create_int_long");
+        final Method method = getMethodOfTestUserController("create_int_long");
 
         // when
         final Object[] actual = handlerMethodArgumentResolver.resolve(method, request);
@@ -108,8 +108,32 @@ class HandlerMethodArgumentResolverTest {
         );
     }
 
-    private Method getTestMethod(final String methodName) {
+    @DisplayName("메소드의 파라미터가 커스텀 클래스 타입인 Object 배열을 반환한다")
+    @Test
+    void returns_an_object_array_of_custom_class_types_of_method() {
+        // given
+        final MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        request.addParameter("userId", "admin");
+        request.addParameter("password", "pass");
+
+        final Method method = getMethodOfTestUserController("create_javabean");
+
+        // when
+        final Object[] resolved = handlerMethodArgumentResolver.resolve(method, request);
+        final TestUser actual = (TestUser) resolved[0];
+
+        // then
+        assertAll(
+            () -> assertThat(resolved[0]).isInstanceOf(TestUser.class),
+            () -> assertThat(actual.getUserId()).isEqualTo("admin"),
+            () -> assertThat(actual.getPassword()).isEqualTo("pass"),
+            () -> assertThat(actual.getAge()).isZero()
+        );
+    }
+
+    private Method getMethodOfTestUserController(final String methodName) {
         final Class<?> clazz = TestUserController.class;
         return getMethod(methodName, clazz.getDeclaredMethods());
     }
+
 }
