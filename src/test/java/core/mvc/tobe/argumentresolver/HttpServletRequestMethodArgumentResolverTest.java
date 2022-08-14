@@ -20,8 +20,8 @@ class HttpServletRequestMethodArgumentResolverTest extends AbstractMethodArgumen
         final Method httpServletRequestMethod = getMethodOfTestUserController("httpServletRequest");
         final Method pathVariableMethod = getMethodOfTestUserController("show_pathvariable");
 
-        final Parameter[] parameters = httpServletRequestMethod.getParameters();
-        final String[] parameterNames = getParameterNames(pathVariableMethod);
+        final Parameter[] parameters = pathVariableMethod.getParameters();
+        final String[] parameterNames = getParameterNames(httpServletRequestMethod);
         final MethodParameter methodParameter = new MethodParameter(httpServletRequestMethod, parameters[0], parameterNames[0]);
 
         final boolean actual = resolver.resolvable(methodParameter);

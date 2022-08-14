@@ -11,6 +11,6 @@ public class HttpServletRequestMethodArgumentResolver implements MethodArgumentR
 
     @Override
     public Object resolve(final MethodParameter methodParameter, final HttpServletRequest request) {
-        return null;
+        return request;
     }
 }
