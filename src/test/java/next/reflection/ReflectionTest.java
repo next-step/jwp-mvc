@@ -1,7 +1,12 @@
 package next.reflection;
 
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +15,29 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    @Test
+    void findStereoType() {
+        Reflections reflections = new Reflections("core.di.factory.example", Scanners.TypesAnnotated);
+        Set<Class<?>> controllerAnnotatedClass = reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> serviceAnnotatedClass = reflections.getTypesAnnotatedWith(Service.class);
+        Set<Class<?>> repositoryAnnotatedClass = reflections.getTypesAnnotatedWith(Repository.class);
+
+        assertThat(controllerAnnotatedClass).hasSize(1);
+        assertThat(serviceAnnotatedClass).hasSize(1);
+        assertThat(repositoryAnnotatedClass).hasSize(2);
+
+        logger.info("Controller Annotated Class: {}", controllerAnnotatedClass);
+        logger.info("Service Annotated Class: {}", serviceAnnotatedClass);
+        logger.info("Repository Annotated Class: {}", repositoryAnnotatedClass);
+
+    }
 
     @DisplayName("Question 클래스는 생성자에 인자를 가지는데, 인자를 가진 생성자의 인스턴스 생성")
     @Test
