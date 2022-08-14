@@ -17,9 +17,10 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
+        initialize();
     }
 
-    public void initialize() {
+    private void initialize() {
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
         RequestMappingScanner requestMappingScanner = new RequestMappingScanner();
 

@@ -22,7 +22,13 @@ public class LegacyHandlerMapping implements HandlerMapping {
 	private static final Logger logger = LoggerFactory.getLogger(LegacyHandlerMapping.class);
 	private Map<String, Controller> mappings = new HashMap<>();
 
-	public void initMapping() {
+	public LegacyHandlerMapping() {
+		initMapping();
+	}
+
+	private void initMapping() {
+		logger.info("Initialized Request Mapping!");
+
 		mappings.put("/", new HomeController());
 		mappings.put("/users/form", new ForwardController("/user/form.jsp"));
 		mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
@@ -34,7 +40,6 @@ public class LegacyHandlerMapping implements HandlerMapping {
 		mappings.put("/users/updateForm", new UpdateFormUserController());
 		mappings.put("/users/update", new UpdateUserController());
 
-		logger.info("Initialized Request Mapping!");
 		mappings.keySet().forEach(path -> {
 			logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
 		});
