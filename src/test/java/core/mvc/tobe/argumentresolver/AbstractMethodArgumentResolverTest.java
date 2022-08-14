@@ -11,19 +11,19 @@ public abstract class AbstractMethodArgumentResolverTest {
 
     private static final ParameterNameDiscoverer DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
 
-    Method getMethodOfTestUserController(final String methodName) {
+    static Method getMethodOfTestUserController(final String methodName) {
         final Class<?> clazz = TestUserController.class;
         return getMethod(methodName, clazz.getDeclaredMethods());
     }
 
-    Method getMethod(final String name, final Method[] methods) {
+    static Method getMethod(final String name, final Method[] methods) {
         return Arrays.stream(methods)
             .filter(method -> method.getName().equals(name))
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    String[] getParameterNames(final Method method) {
+    static String[] getParameterNames(final Method method) {
         final String[] parameterNames = DISCOVERER.getParameterNames(method);
         if (parameterNames == null) {
             Assertions.fail();

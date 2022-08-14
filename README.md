@@ -115,4 +115,5 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
 - [x] HandlerExecutable 변경
   - [x] 메서드를 반환하는 인터페이스를 추가한다 (수행될 메서드의 파라미터 정보를 얻기 위해 필요)
   - [x] 인터페이스에서 HttpServeltRequeset, HttpServletResponse 인자를 Object... 가변 인자로 변경한다
-   
+- [x] MethodParameter (Value Object)
+  - [x] 메서드와 파라미터, 파라미터 네임과 관련된 정보를 가진다
