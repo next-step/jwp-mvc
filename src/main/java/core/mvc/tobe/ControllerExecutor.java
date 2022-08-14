@@ -7,11 +7,11 @@ import core.mvc.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ControllerExcutor implements Controller {
+public class ControllerExecutor implements Controller {
     private final Object declaredObject;
     private final Method method;
 
-    public ControllerExcutor(Object declaredObject, Method method) {
+    public ControllerExecutor(Object declaredObject, Method method) {
         this.declaredObject = declaredObject;
         this.method = method;
     }

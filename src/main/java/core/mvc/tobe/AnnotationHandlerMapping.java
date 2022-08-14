@@ -18,7 +18,7 @@ import core.mvc.HandlerMapping;
 public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
 
-    private final Map<HandlerKey, ControllerExcutor> handlerExecutions = Maps.newHashMap();
+    private final Map<HandlerKey, ControllerExecutor> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -43,7 +43,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                     for (RequestMethod requestMethod : requestMethods) {
                         HandlerKey handlerKey = createHandlerKey(controller, requestMapping, requestMethod);
                         Object instance = clazz.getConstructor().newInstance();
-                        handlerExecutions.put(handlerKey, new ControllerExcutor(instance, method));
+                        handlerExecutions.put(handlerKey, new ControllerExecutor(instance, method));
                     }
 
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -55,7 +55,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public ControllerExcutor getHandler(HttpServletRequest request) {
+    public ControllerExecutor getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
