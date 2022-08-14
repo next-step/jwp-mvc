@@ -51,7 +51,7 @@ class HttpServletRequestMethodArgumentResolverTest extends AbstractMethodArgumen
 
         final MockHttpServletRequest request = new MockHttpServletRequest();
 
-        final Object actual = resolver.resolve(httpServletRequestMethod, request);
+        final Object actual = resolver.resolve(httpServletRequestMethod, httpServletRequestMethod.getParameters()[0], "request", request);
 
         assertAll(
             () -> assertThat(actual).isInstanceOf(HttpServletRequest.class),
