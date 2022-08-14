@@ -4,6 +4,7 @@ import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +30,10 @@ public class TestUserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView create_javabean(TestUser testUser) {
-        logger.debug("testUser: {}", testUser);
+    public ModelAndView create_javabean(User user) {
+        logger.debug("user: {}", user);
         ModelAndView mav = new ModelAndView();
-        mav.addObject("testUser", testUser);
+        mav.addObject("user", user);
         return mav;
     }
 
