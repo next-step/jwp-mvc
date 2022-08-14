@@ -8,11 +8,7 @@ public class PrimitiveTypeMethodArgumentResolver implements MethodArgumentResolv
     @Override
     public boolean resolvable(final MethodParameter methodParameter) {
         final Class<?> parameterType = methodParameter.getParameterType();
-        return parameterType.isPrimitive() || String.class == parameterType || isPrimitiveWrapper(parameterType);
-    }
-
-    private boolean isPrimitiveWrapper(final Class<?> parameterType) {
-        return Integer.class == parameterType || Long.class == parameterType;
+        return PrimitiveParameter.isPrimitive(parameterType);
     }
 
     @Override
@@ -23,13 +19,9 @@ public class PrimitiveTypeMethodArgumentResolver implements MethodArgumentResolv
         if (isBlank(requestParameter)) {
             return getDefaultValue(parameterType);
         }
-        if (int.class == parameterType || Integer.class == parameterType) {
-            return Integer.parseInt(requestParameter);
-        }
-        if (long.class == parameterType || Long.class == parameterType) {
-            return Long.parseLong(requestParameter);
-        }
-        return requestParameter;
+
+        final PrimitiveParameter primitiveParameter = PrimitiveParameter.from(parameterType);
+        return primitiveParameter.convert(requestParameter);
     }
 
     private static boolean isBlank(final String requestParameter) {
