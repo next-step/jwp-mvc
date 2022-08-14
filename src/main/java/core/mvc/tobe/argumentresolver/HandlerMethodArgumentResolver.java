@@ -12,6 +12,7 @@ public class HandlerMethodArgumentResolver {
 
     private static final ParameterNameDiscoverer DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
     private static final List<MethodArgumentResolver> ARGUMENT_RESOLVERS = List.of(
+        new HttpSessionMethodArgumentResolver(),
         new HttpServletRequestMethodArgumentResolver(),
         new PathVariableMethodArgumentResolver(),
         new PrimitiveTypeMethodArgumentResolver(),
