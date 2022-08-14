@@ -12,23 +12,29 @@ import core.annotation.web.RequestMethod;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerKey;
 
-public class RequestMappingScanner {
+public class ControllerMethods {
 
 	private static final int EMPTY_METHOD_LENGTH = 0;
 
-	public RequestMappingScanner() {
+	private Map<Class<?>, Set<Method>> controllerMethods = new HashMap<>();
+
+	public ControllerMethods(Set<Class<?>> controllerWithAnnotation) {
+		controllerWithAnnotation.forEach(controller -> {
+			Set<Method> methods = ReflectionUtils.getAllMethods(controller, ReflectionUtils.withAnnotation(RequestMapping.class));
+			controllerMethods.put(controller, methods);
+		});
 	}
 
-	public Map<HandlerKey, HandlerExecution> getHandlerExecutions(String path, Class<?> clazz, Object instance) {
+	public Map<HandlerKey, HandlerExecution> getHandlerExecutions(Class<?> clazz, Object instance, String path) {
 		Map<HandlerKey, HandlerExecution> result = new HashMap<>();
 
-		Set<Method> allMethods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
-		allMethods.forEach(method -> result.putAll(addHandlerExecution(path, instance, method)));
+		Set<Method> methods = controllerMethods.get(clazz);
+		methods.forEach(method -> result.putAll(getHandlerExecution(instance, method, path)));
 
 		return result;
 	}
 
-	private Map<HandlerKey, HandlerExecution> addHandlerExecution(String path, Object handler, Method method) {
+	private Map<HandlerKey, HandlerExecution> getHandlerExecution(Object handler, Method method, String path) {
 		Map<HandlerKey, HandlerExecution> result = new HashMap<>();
 
 		RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
@@ -43,5 +49,9 @@ public class RequestMappingScanner {
 		}
 
 		return result;
+	}
+
+	public Set<Method> getMethods(Class<?> clazz) {
+		return controllerMethods.get(clazz);
 	}
 }
