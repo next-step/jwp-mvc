@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
@@ -11,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static core.annotation.web.RequestMethod.GET;
 
 @Controller
 public class MyController {
@@ -30,5 +33,10 @@ public class MyController {
         logger.debug("User : {}", user);
         DataBase.addUser(user);
         return new ModelAndView(new SimpleNameView("redirect:/"));
+    }
+
+    @RequestMapping(value = "/users/{id}", method = GET)
+    public String pathPatternMethod(@PathVariable Long id) {
+        return "redirect:/";
     }
 }
