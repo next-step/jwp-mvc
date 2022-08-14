@@ -14,24 +14,17 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
 
     private final MethodArgumentResolver resolver = new PrimitiveTypeMethodArgumentResolver();
 
-
-    @DisplayName("Parameter 가 없으면 변환할 수 없다")
-    @Test
-    void no_parameter() {
-        final Method httpServletRequestMethod = getMethodOfTestUserController("create_int_long");
-
-        final boolean actual = resolver.resolvable(httpServletRequestMethod, null);
-
-        assertThat(actual).isFalse();
-    }
-
     @DisplayName("원시 타입 파라미터가 아니면 변환할 수 없다")
     @Test
     void cannot_resolve_when_not_primitive_type() {
         final Method javaBeanMethod = getMethodOfTestUserController("create_javabean");
         final Method primitiveMethod = getMethodOfTestUserController("create_int_long");
 
-        final boolean actual = resolver.resolvable(primitiveMethod, javaBeanMethod.getParameters()[0]);
+        final Parameter[] parameters = javaBeanMethod.getParameters();
+        final String[] parameterNames = getParameterNames(primitiveMethod);
+        final MethodParameter methodParameter = new MethodParameter(primitiveMethod, parameters[0], parameterNames[0]);
+
+        final boolean actual = resolver.resolvable(methodParameter);
 
         assertThat(actual).isFalse();
     }
@@ -40,8 +33,11 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
     @Test
     void resolvable_when_primitive_type() {
         final Method primitiveMethod = getMethodOfTestUserController("create_int_long");
+        final Parameter[] parameters = primitiveMethod.getParameters();
+        final String[] parameterNames = getParameterNames(primitiveMethod);
+        final MethodParameter methodParameter = new MethodParameter(primitiveMethod, parameters[0], parameterNames[0]);
 
-        final boolean actual = resolver.resolvable(primitiveMethod, primitiveMethod.getParameters()[0]);
+        final boolean actual = resolver.resolvable(methodParameter);
 
         assertThat(actual).isTrue();
     }
@@ -50,8 +46,11 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
     @Test
     void resolvable_when_primitive_wrapper_type() {
         final Method primitiveWrapperMethod = getMethodOfTestUserController("create_wrapper_int_long");
+        final Parameter[] parameters = primitiveWrapperMethod.getParameters();
+        final String[] parameterNames = getParameterNames(primitiveWrapperMethod);
+        final MethodParameter methodParameter = new MethodParameter(primitiveWrapperMethod, parameters[0], parameterNames[0]);
 
-        final boolean actual = resolver.resolvable(primitiveWrapperMethod, primitiveWrapperMethod.getParameters()[0]);
+        final boolean actual = resolver.resolvable(methodParameter);
 
         assertThat(actual).isTrue();
     }
@@ -60,8 +59,11 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
     @Test
     void resolvable_when_string_type() {
         final Method stringMethod = getMethodOfTestUserController("create_string");
+        final Parameter[] parameters = stringMethod.getParameters();
+        final String[] parameterNames = getParameterNames(stringMethod);
+        final MethodParameter methodParameter = new MethodParameter(stringMethod, parameters[0], parameterNames[0]);
 
-        final boolean actual = resolver.resolvable(stringMethod, stringMethod.getParameters()[0]);
+        final boolean actual = resolver.resolvable(methodParameter);
 
         assertThat(actual).isTrue();
     }
@@ -70,15 +72,15 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
     @Test
     void returns_the_type_of_http_servlet_request() {
         final Method primitiveMethod = getMethodOfTestUserController("create_int_long");
-        final String[] parameterNames = getParameterNames(primitiveMethod);
         final Parameter[] parameters = primitiveMethod.getParameters();
+        final String[] parameterNames = getParameterNames(primitiveMethod);
 
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("id", String.valueOf(Long.MAX_VALUE));
         request.addParameter("age", String.valueOf(Integer.MAX_VALUE));
 
         final Object[] actual = IntStream.range(0, parameters.length)
-            .mapToObj(i -> resolver.resolve(primitiveMethod, parameters[i], parameterNames[i], request))
+            .mapToObj(i -> resolver.resolve(new MethodParameter(primitiveMethod, parameters[i], parameterNames[i]), request))
             .toArray();
 
         assertAll(

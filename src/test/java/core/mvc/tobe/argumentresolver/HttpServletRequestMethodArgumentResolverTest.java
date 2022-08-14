@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,23 +14,17 @@ class HttpServletRequestMethodArgumentResolverTest extends AbstractMethodArgumen
 
     private final MethodArgumentResolver resolver = new HttpServletRequestMethodArgumentResolver();
 
-    @DisplayName("Parameter 가 없으면 변환할 수 없다")
-    @Test
-    void no_parameter() {
-        final Method httpServletRequestMethod = getMethodOfTestUserController("httpServletRequest");
-
-        final boolean actual = resolver.resolvable(httpServletRequestMethod, null);
-
-        assertThat(actual).isFalse();
-    }
-
     @DisplayName("HttpServletRequest 타입이 아니면 변환할 수 없다")
     @Test
     void returns_false_when_not_type_of_http_servlet_request() {
         final Method httpServletRequestMethod = getMethodOfTestUserController("httpServletRequest");
         final Method pathVariableMethod = getMethodOfTestUserController("show_pathvariable");
 
-        final boolean actual = resolver.resolvable(httpServletRequestMethod, pathVariableMethod.getParameters()[0]);
+        final Parameter[] parameters = httpServletRequestMethod.getParameters();
+        final String[] parameterNames = getParameterNames(pathVariableMethod);
+        final MethodParameter methodParameter = new MethodParameter(httpServletRequestMethod, parameters[0], parameterNames[0]);
+
+        final boolean actual = resolver.resolvable(methodParameter);
 
         assertThat(actual).isFalse();
     }
@@ -38,8 +33,11 @@ class HttpServletRequestMethodArgumentResolverTest extends AbstractMethodArgumen
     @Test
     void resolvable_type_of_http_servlet_request() {
         final Method httpServletRequestMethod = getMethodOfTestUserController("httpServletRequest");
+        final Parameter[] parameters = httpServletRequestMethod.getParameters();
+        final String[] parameterNames = getParameterNames(httpServletRequestMethod);
+        final MethodParameter methodParameter = new MethodParameter(httpServletRequestMethod, parameters[0], parameterNames[0]);
 
-        final boolean actual = resolver.resolvable(httpServletRequestMethod, httpServletRequestMethod.getParameters()[0]);
+        final boolean actual = resolver.resolvable(methodParameter);
 
         assertThat(actual).isTrue();
     }
@@ -48,15 +46,17 @@ class HttpServletRequestMethodArgumentResolverTest extends AbstractMethodArgumen
     @Test
     void returns_the_type_of_http_servlet_request() {
         final Method httpServletRequestMethod = getMethodOfTestUserController("httpServletRequest");
+        final Parameter[] parameters = httpServletRequestMethod.getParameters();
+        final String[] parameterNames = getParameterNames(httpServletRequestMethod);
+        final MethodParameter methodParameter = new MethodParameter(httpServletRequestMethod, parameters[0], parameterNames[0]);
 
         final MockHttpServletRequest request = new MockHttpServletRequest();
 
-        final Object actual = resolver.resolve(httpServletRequestMethod, httpServletRequestMethod.getParameters()[0], "request", request);
+        final Object actual = resolver.resolve(methodParameter, request);
 
         assertAll(
             () -> assertThat(actual).isInstanceOf(HttpServletRequest.class),
             () -> assertThat(actual).isEqualTo(request)
         );
     }
-
 }
