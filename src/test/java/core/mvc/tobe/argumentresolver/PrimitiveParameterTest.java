@@ -2,7 +2,9 @@ package core.mvc.tobe.argumentresolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import core.mvc.tobe.TestUser;
 import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -72,6 +74,27 @@ class PrimitiveParameterTest {
             Arguments.of(long.class, "100", Long.class, 100L),
             Arguments.of(Long.class, "200", Long.class, 200L),
             Arguments.of(String.class, "value", String.class, "value")
+        );
+    }
+
+    @DisplayName("원시 타입 여부를 확인할 수 있다")
+    @ParameterizedTest
+    @MethodSource
+    void is_primitive_type(final Class<?> clazz, final boolean expected) {
+        final boolean actual = PrimitiveParameter.isPrimitive(clazz);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> is_primitive_type() {
+        return Stream.of(
+            Arguments.of(int.class, true),
+            Arguments.of(Integer.class, true),
+            Arguments.of(long.class, true),
+            Arguments.of(Long.class, true),
+            Arguments.of(String.class, true),
+            Arguments.of(TestUser.class, false),
+            Arguments.of(HttpServletRequest.class, false)
         );
     }
 }

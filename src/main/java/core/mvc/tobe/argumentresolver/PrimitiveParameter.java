@@ -7,7 +7,8 @@ public enum PrimitiveParameter {
 
     INTEGER(int.class, Integer.class, 0, Integer::parseInt),
     LONG(long.class, Long.class, 0L, Long::parseLong),
-    STRING(String.class, String.class, null, s -> s);
+    STRING(String.class, String.class, null, s -> s),
+    NOT_PRIMITIVE(Object.class, Object.class, null, o -> o);
 
     private final Class<?> primitiveType;
     private final Class<?> wrapperType;
@@ -25,7 +26,11 @@ public enum PrimitiveParameter {
         return Arrays.stream(values())
             .filter(parameter -> parameter.primitiveType == parameterType || parameter.wrapperType == parameterType)
             .findAny()
-            .orElseThrow(IllegalArgumentException::new);
+            .orElse(NOT_PRIMITIVE);
+    }
+
+    public static boolean isPrimitive(Class<?> parameterType) {
+        return from(parameterType) != NOT_PRIMITIVE;
     }
 
     public Object getDefaultValue() {
@@ -36,4 +41,4 @@ public enum PrimitiveParameter {
         return parseFunction.apply(value);
     }
 
-}
+    }
