@@ -45,7 +45,6 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                         Object instance = clazz.getConstructor().newInstance();
                         handlerExecutions.put(handlerKey, new ControllerExecutor(instance, method));
                     }
-
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);
