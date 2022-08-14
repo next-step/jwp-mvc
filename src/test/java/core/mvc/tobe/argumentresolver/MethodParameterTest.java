@@ -3,6 +3,7 @@ package core.mvc.tobe.argumentresolver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import core.annotation.web.PathVariable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.stream.Stream;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class MethodParameterTest extends AbstractMethodArgumentResolverTest {
@@ -59,6 +61,24 @@ class MethodParameterTest extends AbstractMethodArgumentResolverTest {
 
         final Class<?> actual = methodParameter.getParameterType();
 
-        assertThat(actual).isInstanceOf(String.class);
+        assertThat(actual).isEqualTo(String.class);
+    }
+
+    @DisplayName("파라미터에 애너테이션이 적용되어 있는지 확인할 수 있다")
+    @ParameterizedTest
+    @CsvSource(value = {
+        "create_string, false",
+        "show_pathvariable, true"
+    })
+    void annotation_present(final String methodName, final boolean expected) {
+        final Method method = getMethodOfTestUserController(methodName);
+        final Parameter parameter = method.getParameters()[0];
+        final String parameterName = getParameterNames(method)[0];
+
+        final MethodParameter methodParameter = new MethodParameter(method, parameter, parameterName);
+
+        final boolean actual = methodParameter.hasParameterAnnotationPresent(PathVariable.class);
+
+        assertThat(actual).isEqualTo(expected);
     }
 }

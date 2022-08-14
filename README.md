@@ -117,6 +117,7 @@ Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 
   - [x] 인터페이스에서 HttpServeltRequeset, HttpServletResponse 인자를 Object... 가변 인자로 변경한다
 - [x] MethodParameter (Value Object)
   - [x] 메서드와 파라미터, 파라미터 네임과 관련된 정보를 가진다
+  - [x] 파라미터에 특정 애너테이션이 적용되었는지 알 수 있다 
 - [x] PrimitiveParameter 
   - [x] 원시 타입의 기본 값을 반환할 수 있다
   - [x] 원시 wrapper 타입의 기본 값을 반환할 수 있다
