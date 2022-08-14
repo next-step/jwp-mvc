@@ -27,7 +27,7 @@ public class HandlerMappings {
 
 	public Object getHandler(HttpServletRequest request) {
 		return mappings.stream()
-					   .filter(mapping -> mapping.isSupported(request))
+					   .filter(mapping -> mapping.supports(request))
 					   .findFirst()
 					   .map(mapping -> mapping.getHandler(request))
 					   .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_HANDLER));

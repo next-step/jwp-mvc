@@ -8,7 +8,7 @@ public interface HandlerMapping {
 
 	Object getHandler(HttpServletRequest request);
 
-	default Boolean isSupported(HttpServletRequest request) {
+	default boolean supports(HttpServletRequest request) {
 		return !Objects.isNull(getHandler(request));
 	}
 }
