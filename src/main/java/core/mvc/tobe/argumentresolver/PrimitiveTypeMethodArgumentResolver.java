@@ -16,11 +16,11 @@ public class PrimitiveTypeMethodArgumentResolver implements MethodArgumentResolv
         final Class<?> parameterType = methodParameter.getParameterType();
         final String requestParameter = request.getParameter(methodParameter.getParameterName());
 
-        if (isBlank(requestParameter)) {
-            return getDefaultValue(parameterType);
-        }
-
         final PrimitiveParameter primitiveParameter = PrimitiveParameter.from(parameterType);
+
+        if (isBlank(requestParameter)) {
+            return primitiveParameter.getDefaultValue();
+        }
         return primitiveParameter.convert(requestParameter);
     }
 

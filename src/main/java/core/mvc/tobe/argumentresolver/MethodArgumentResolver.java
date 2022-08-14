@@ -9,7 +9,4 @@ public interface MethodArgumentResolver {
 
     Object resolve(MethodParameter methodParameter, HttpServletRequest request);
 
-    default Object getDefaultValue(Class<?> clazz) {
-        return Array.get(Array.newInstance(clazz, 1), 0);
-    }
 }
