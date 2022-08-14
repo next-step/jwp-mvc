@@ -8,14 +8,12 @@ import java.lang.reflect.Parameter;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentResolverTest {
 
     private final MethodArgumentResolver resolver = new PrimitiveTypeMethodArgumentResolver();
-    private static final ParameterNameDiscoverer DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
+
 
     @DisplayName("Parameter 가 없으면 변환할 수 없다")
     @Test
@@ -72,7 +70,7 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
     @Test
     void returns_the_type_of_http_servlet_request() {
         final Method primitiveMethod = getMethodOfTestUserController("create_int_long");
-        final String[] parameterNames = DISCOVERER.getParameterNames(primitiveMethod);
+        final String[] parameterNames = getParameterNames(primitiveMethod);
         final Parameter[] parameters = primitiveMethod.getParameters();
 
         final MockHttpServletRequest request = new MockHttpServletRequest();
@@ -89,4 +87,5 @@ class PrimitiveTypeMethodArgumentResolverTest extends AbstractMethodArgumentReso
             () -> assertThat(actual[1]).isEqualTo(Integer.MAX_VALUE)
         );
     }
+
 }
