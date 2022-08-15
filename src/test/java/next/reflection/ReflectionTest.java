@@ -29,6 +29,23 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("private field 에 값을 할당한다.")
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+        Field ageField = clazz.getDeclaredField("age");
+        Field nameField = clazz.getDeclaredField("name");
+        ageField.setAccessible(true);
+        nameField.setAccessible(true);
+
+        Student student = new Student();
+        ageField.set(student, 19);
+        nameField.set(student, "wu2ee");
+
+        logger.debug("----> Student age  : {}", student.getAge());
+        logger.debug("----> Student name : {}", student.getName());
+    }
+
+    @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
