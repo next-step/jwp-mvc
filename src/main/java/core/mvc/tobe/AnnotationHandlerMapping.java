@@ -21,9 +21,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        Set<Class<?>> controllers = findControllers();
+        Set<Class<?>> controllerTypes = findControllerTypes();
 
-        Set<Method> methods = findRequestMappingMethods(controllers);
+        Set<Method> methods = findRequestMappingMethods(controllerTypes);
 
         initHandlerExecutions(methods);
     }
@@ -36,7 +36,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Class<?>> findControllers() {
+    private Set<Class<?>> findControllerTypes() {
         return Arrays.stream(basePackage)
                 .map(Reflections::new)
                 .map(reflection -> reflection.getTypesAnnotatedWith(Controller.class))
