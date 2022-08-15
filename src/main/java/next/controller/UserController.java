@@ -2,6 +2,7 @@ package next.controller;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestParam;
 import core.db.DataBase;
 import next.model.User;
 import org.slf4j.Logger;
@@ -19,8 +20,7 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = "/users/create", method = POST)
-    public String createUser(String userId, String password, String name, String email) {
-        User user = new User(userId, password, name, email);
+    public String createUser(User user) {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @RequestMapping("/users")
-    public String getUsers(HttpServletRequest req, HttpServletResponse resp) {
+    public String getUsers(HttpServletRequest req) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return "redirect:/users/loginForm";
         }
@@ -37,7 +37,7 @@ public class UserController {
         return "/user/list.jsp";
     }
     @RequestMapping(value = "/users/profile", method = GET)
-    public String profileInfo(HttpServletRequest req, HttpServletResponse resp) {
+    public String profileInfo(HttpServletRequest req) {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (user == null) {
@@ -48,20 +48,18 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/loginForm", method = GET)
-    public String loginForm(HttpServletRequest req, HttpServletResponse resp) {
+    public String loginForm() {
         return "/user/login.jsp";
     }
 
     @RequestMapping(value = "/users/login", method = POST)
-    public String login(HttpServletRequest req, HttpServletResponse resp) {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
+    public String login(@RequestParam String userId, @RequestParam("password") String pw, HttpServletRequest req) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             req.setAttribute("loginFailed", true);
             return "/user/login.jsp";
         }
-        if (user.matchPassword(password)) {
+        if (user.matchPassword(pw)) {
             HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
             return "redirect:/";
@@ -72,20 +70,19 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/logout", method = GET)
-    public String logout(HttpServletRequest req, HttpServletResponse resp) {
+    public String logout(HttpServletRequest req) {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return "redirect:/";
     }
 
     @RequestMapping(value = "/users/form", method = GET)
-    public String joinForm(HttpServletRequest req, HttpServletResponse resp) {
+    public String joinForm() {
         return "/user/form.jsp";
     }
 
     @RequestMapping(value = "/users/updateForm", method = GET)
-    public String userUpdateForm(HttpServletRequest req, HttpServletResponse resp) {
-        String userId = req.getParameter("userId");
+    public String userUpdateForm(String userId, HttpServletRequest req) {
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
@@ -95,16 +92,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/update", method = POST)
-    public String updateUserInfo(HttpServletRequest req, HttpServletResponse resp) {
-        User user = DataBase.findUserById(req.getParameter("userId"));
+    public String updateUserInfo(HttpServletRequest req, User updateRequestUser) {
+        User user = DataBase.findUserById(updateRequestUser.getUserId());
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
-        log.debug("Update User : {}", updateUser);
-        user.update(updateUser);
+        log.debug("Update User : {}", updateRequestUser);
+        user.update(updateRequestUser);
         return "redirect:/";
     }
 }
