@@ -8,6 +8,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.Instant;
+import java.util.Date;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -48,14 +52,21 @@ public class ReflectionTest {
     @Test
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
+        // given
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+        Constructor<Question> declaredConstructor = clazz.getDeclaredConstructor(Long.TYPE, String.class, String.class, String.class, Date.class, Integer.TYPE);
+
+        long questionId = 1;
+        String writer = "wu2ee";
+        String title = "만들면서 배우는 Spring";
+        String content = "@MVC 프레임워크 구현";
+        Date date = Date.from(Instant.now());
+        int countOfComment = 3;
+
+        // when
+        Question question = declaredConstructor.newInstance(questionId, writer, title, content, date, countOfComment);
+
+        // then
+        assertThat(question).isEqualTo(new Question(questionId, writer, title, content, date, countOfComment));
     }
 }
