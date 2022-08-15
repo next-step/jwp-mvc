@@ -2,10 +2,8 @@ package next.reflection;
 
 import org.junit.jupiter.api.Test;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class Junit4TestRunner {
     @Test
@@ -20,14 +18,12 @@ public class Junit4TestRunner {
     }
 
     private void executeTest(Class<Junit4Test> clazz, Method method) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Annotation[] annotations = method.getDeclaredAnnotations();
-        if (hasMyTest(annotations)) {
+        if (hasMyTest(method)) {
             method.invoke(clazz.getDeclaredConstructor().newInstance());
         }
     }
 
-    private boolean hasMyTest(Annotation[] annotations) {
-        return Arrays.stream(annotations)
-                .anyMatch(annotation -> annotation.annotationType().equals(MyTest.class));
+    private boolean hasMyTest(Method method) {
+        return method.isAnnotationPresent(MyTest.class);
     }
 }
