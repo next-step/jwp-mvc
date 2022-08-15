@@ -47,18 +47,20 @@ public class BeanFactoryTest {
 
     @Test
     void showComponents() {
-        showComponent(Controller.class);
-
-        showComponent(Service.class);
-
-        showComponent(Repository.class);
+        showComponentsAnnotatedWith(Controller.class, Service.class, Repository.class);
     }
 
-    private void showComponent(Class<? extends Annotation> clazz) {
-        Set<Class<?>> controllerTypes = reflections.getTypesAnnotatedWith(clazz);
+    private void showComponentsAnnotatedWith(Class<? extends Annotation>... annotations) {
+        for (Class<? extends Annotation> annotation : annotations) {
+            showComponentAnnotatedWith(annotation);
+        }
+    }
 
-        for (Class<?> controllerType : controllerTypes) {
-            log.debug("{}: {}", clazz.getName(), controllerType.getName());
+    private void showComponentAnnotatedWith(Class<? extends Annotation> annotation) {
+        Set<Class<?>> types = reflections.getTypesAnnotatedWith(annotation);
+
+        for (Class<?> type : types) {
+            log.debug("{}: {}", annotation.getName(), type.getName());
         }
     }
 
