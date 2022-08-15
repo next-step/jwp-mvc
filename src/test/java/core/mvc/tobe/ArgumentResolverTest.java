@@ -1,14 +1,24 @@
 package core.mvc.tobe;
 
 import core.mvc.tobe.handler.mapping.HandlerExecution;
+import core.mvc.tobe.handler.resolver.BeanTypeRequestParameterArgumentResolver;
+import core.mvc.tobe.handler.resolver.HandlerMethodArgumentResolvers;
+import core.mvc.tobe.handler.resolver.HttpServletArgumentResolver;
+import core.mvc.tobe.handler.resolver.PathVariableArgumentResolver;
+import core.mvc.tobe.handler.resolver.SimpleTypeRequestParameterArgumentResolver;
+import core.mvc.tobe.handler.resolver.utils.PatternMatcher;
+import core.mvc.tobe.handler.resolver.utils.SimpleTypeConverter;
 import core.mvc.tobe.view.ModelAndView;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +26,36 @@ public class ArgumentResolverTest {
     private static final Class<?> CLAZZ = TestUserController.class;
 
     private HandlerExecution handlerExecution;
+
+    private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers;
+
+    @BeforeEach
+    void setUp() {
+        LocalVariableTableParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
+        PatternMatcher patternMatcher = new PatternMatcher();
+
+        SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver = new SimpleTypeRequestParameterArgumentResolver(simpleTypeConverter);
+        HttpServletArgumentResolver httpServletArgumentResolver = new HttpServletArgumentResolver();
+        PathVariableArgumentResolver pathVariableArgumentResolver = new PathVariableArgumentResolver(
+                simpleTypeConverter,
+                patternMatcher
+        );
+        BeanTypeRequestParameterArgumentResolver beanTypeRequestParameterArgumentResolver = new BeanTypeRequestParameterArgumentResolver(
+                parameterNameDiscoverer,
+                simpleTypeRequestParameterArgumentResolver
+        );
+
+        handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers(
+                parameterNameDiscoverer,
+                List.of(
+                        httpServletArgumentResolver,
+                        pathVariableArgumentResolver,
+                        simpleTypeRequestParameterArgumentResolver,
+                        beanTypeRequestParameterArgumentResolver
+                )
+        );
+    }
 
     @DisplayName("문자열 인자에 requestParameter 값을 할당받은 Controller 메소드를 실행한다.")
     @Test
@@ -31,6 +71,7 @@ public class ArgumentResolverTest {
         String testMethodName = "create_string";
         Method method = getMethod(testMethodName, CLAZZ.getDeclaredMethods());
         handlerExecution = new HandlerExecution(invoker, method);
+        handlerExecution.setHandlerMethodArgumentResolvers(handlerMethodArgumentResolvers);
 
         // when
         ModelAndView result = handlerExecution.handle(request, new MockHttpServletResponse());
@@ -52,6 +93,7 @@ public class ArgumentResolverTest {
         String testMethodName = "create_int_long";
         Method method = getMethod(testMethodName, CLAZZ.getDeclaredMethods());
         handlerExecution = new HandlerExecution(invoker, method);
+        handlerExecution.setHandlerMethodArgumentResolvers(handlerMethodArgumentResolvers);
 
         // when
         ModelAndView result = handlerExecution.handle(request, new MockHttpServletResponse());
@@ -74,6 +116,7 @@ public class ArgumentResolverTest {
         String testMethodName = "create_javabean";
         Method method = getMethod(testMethodName, CLAZZ.getDeclaredMethods());
         handlerExecution = new HandlerExecution(invoker, method);
+        handlerExecution.setHandlerMethodArgumentResolvers(handlerMethodArgumentResolvers);
 
         // when
         ModelAndView result = handlerExecution.handle(request, new MockHttpServletResponse());
@@ -98,6 +141,7 @@ public class ArgumentResolverTest {
         String testMethodName = "show_pathvariable";
         Method method = getMethod(testMethodName, CLAZZ.getDeclaredMethods());
         handlerExecution = new HandlerExecution(invoker, method);
+        handlerExecution.setHandlerMethodArgumentResolvers(handlerMethodArgumentResolvers);
 
         // when
         ModelAndView result = handlerExecution.handle(request, new MockHttpServletResponse());

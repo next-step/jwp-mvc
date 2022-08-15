@@ -16,11 +16,15 @@ public class HandlerExecution {
     private final Object invoker;
     private final Method method;
 
-    private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
+    private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers;
 
     public HandlerExecution(Object invoker, Method method) {
         this.invoker = invoker;
         this.method = method;
+    }
+
+    public void setHandlerMethodArgumentResolvers(HandlerMethodArgumentResolvers handlerMethodArgumentResolvers) {
+        this.handlerMethodArgumentResolvers = handlerMethodArgumentResolvers;
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {

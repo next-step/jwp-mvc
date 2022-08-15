@@ -2,11 +2,15 @@ package core.mvc.tobe.handler.resolver;
 
 import core.annotation.web.PathVariable;
 import core.mvc.tobe.TestUser;
+import core.mvc.tobe.handler.resolver.utils.PatternMatcher;
+import core.mvc.tobe.handler.resolver.utils.SimpleTypeConverter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -18,14 +22,41 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class ArgumentResolversTest {
     private static final HttpServletRequest REQUEST = new MockHttpServletRequest();
     private static final HttpServletResponse RESPONSE = new MockHttpServletResponse();
 
-    private final HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
+    private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers;
+
+    @BeforeEach
+    void setUp() {
+        LocalVariableTableParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
+        PatternMatcher patternMatcher = new PatternMatcher();
+
+        SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver = new SimpleTypeRequestParameterArgumentResolver(simpleTypeConverter);
+        HttpServletArgumentResolver httpServletArgumentResolver = new HttpServletArgumentResolver();
+        PathVariableArgumentResolver pathVariableArgumentResolver = new PathVariableArgumentResolver(
+                simpleTypeConverter,
+                patternMatcher
+        );
+        BeanTypeRequestParameterArgumentResolver beanTypeRequestParameterArgumentResolver = new BeanTypeRequestParameterArgumentResolver(
+                parameterNameDiscoverer,
+                simpleTypeRequestParameterArgumentResolver
+        );
+
+        handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers(
+                parameterNameDiscoverer,
+                List.of(
+                        httpServletArgumentResolver,
+                        pathVariableArgumentResolver,
+                        simpleTypeRequestParameterArgumentResolver,
+                        beanTypeRequestParameterArgumentResolver
+                )
+        );
+    }
 
     @DisplayName("메서드의 인자가 HttpServletRequest 또는 HttpServletResponse로 이뤄진 경우, 인자들을 순서대로 반환한다.")
     @ParameterizedTest
@@ -50,7 +81,6 @@ class ArgumentResolversTest {
     @DisplayName("메서드의 인자가 없는 경우, 빈 배열을 반환한다.")
     @Test
     void resolveParameters_if_empty_parameters() {
-        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
         Method methodWithRequestOrResponse = findByClassAndMethodName("noArgumentMethod", Tester.class);
 
         Object[] actual = handlerMethodArgumentResolvers.resolveParameters(methodWithRequestOrResponse, REQUEST, RESPONSE);
@@ -65,7 +95,6 @@ class ArgumentResolversTest {
         MockHttpServletRequest requestWithParameter = new MockHttpServletRequest();
         requestWithParameter.addParameter("name", "jordy");
 
-        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
         Method methodWithRequestOrResponse = findByClassAndMethodName("stringArgumentMethod", Tester.class);
 
         Object[] actual = handlerMethodArgumentResolvers.resolveParameters(methodWithRequestOrResponse, requestWithParameter, RESPONSE);
@@ -79,7 +108,6 @@ class ArgumentResolversTest {
         requestWithParameter.addParameter("id", "3000000000");
         requestWithParameter.addParameter("age", "50");
 
-        HandlerMethodArgumentResolvers handlerMethodArgumentResolvers = new HandlerMethodArgumentResolvers();
         Method methodWithRequestOrResponse = findByClassAndMethodName("create_int_long", Tester.class);
 
         Object[] actual = handlerMethodArgumentResolvers.resolveParameters(methodWithRequestOrResponse, requestWithParameter, RESPONSE);

@@ -3,27 +3,66 @@ package core.mvc.tobe.handler.mapping;
 import core.db.DataBase;
 import core.mvc.tobe.ControllerScanner;
 import core.mvc.tobe.MyController;
+import core.mvc.tobe.handler.resolver.BeanTypeRequestParameterArgumentResolver;
+import core.mvc.tobe.handler.resolver.HandlerMethodArgumentResolvers;
+import core.mvc.tobe.handler.resolver.HttpServletArgumentResolver;
+import core.mvc.tobe.handler.resolver.PathVariableArgumentResolver;
+import core.mvc.tobe.handler.resolver.SimpleTypeRequestParameterArgumentResolver;
+import core.mvc.tobe.handler.resolver.utils.PatternMatcher;
+import core.mvc.tobe.handler.resolver.utils.SimpleTypeConverter;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
+    private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers;
 
     @BeforeEach
     public void setup() {
         handlerMapping = new AnnotationHandlerMapping(
-                new ControllerScanner("core.mvc.tobe")
-        );
+                new ControllerScanner("core.mvc.tobe"),
+                new PatternMatcher());
         handlerMapping.initialize();
+
+        handlerMethodArgumentResolvers = initArgumentResolvers();
+    }
+
+    private HandlerMethodArgumentResolvers initArgumentResolvers() {
+        LocalVariableTableParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
+        PatternMatcher patternMatcher = new PatternMatcher();
+
+        SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver = new SimpleTypeRequestParameterArgumentResolver(simpleTypeConverter);
+        HttpServletArgumentResolver httpServletArgumentResolver = new HttpServletArgumentResolver();
+        PathVariableArgumentResolver pathVariableArgumentResolver = new PathVariableArgumentResolver(
+                simpleTypeConverter,
+                patternMatcher
+        );
+        BeanTypeRequestParameterArgumentResolver beanTypeRequestParameterArgumentResolver = new BeanTypeRequestParameterArgumentResolver(
+                parameterNameDiscoverer,
+                simpleTypeRequestParameterArgumentResolver
+        );
+
+        return new HandlerMethodArgumentResolvers(
+                parameterNameDiscoverer,
+                List.of(
+                        httpServletArgumentResolver,
+                        pathVariableArgumentResolver,
+                        simpleTypeRequestParameterArgumentResolver,
+                        beanTypeRequestParameterArgumentResolver
+                )
+        );
     }
 
     @Test
@@ -36,6 +75,8 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.setHandlerMethodArgumentResolvers(handlerMethodArgumentResolvers);
+
         execution.handle(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
@@ -49,6 +90,8 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
+        execution.setHandlerMethodArgumentResolvers(handlerMethodArgumentResolvers);
+
         execution.handle(request, response);
     }
 

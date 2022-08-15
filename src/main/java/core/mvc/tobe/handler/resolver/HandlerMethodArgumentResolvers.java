@@ -1,7 +1,5 @@
 package core.mvc.tobe.handler.resolver;
 
-import core.mvc.tobe.handler.resolver.utils.SimpleTypeConverter;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,21 +10,12 @@ import java.util.List;
 
 public class HandlerMethodArgumentResolvers {
 
-    private final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-
+    private final ParameterNameDiscoverer parameterNameDiscoverer;
     private final List<ArgumentResolver> argumentResolvers;
 
-    {
-        SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver = new SimpleTypeRequestParameterArgumentResolver(new SimpleTypeConverter());
-        argumentResolvers = List.of(
-                new HttpServletArgumentResolver(),
-                new PathVariableArgumentResolver(new SimpleTypeConverter()),
-                simpleTypeRequestParameterArgumentResolver,
-                new BeanTypeRequestParameterArgumentResolver(
-                        parameterNameDiscoverer,
-                        simpleTypeRequestParameterArgumentResolver
-                )
-        );
+    public HandlerMethodArgumentResolvers(ParameterNameDiscoverer parameterNameDiscoverer, List<ArgumentResolver> argumentResolvers) {
+        this.parameterNameDiscoverer = parameterNameDiscoverer;
+        this.argumentResolvers = argumentResolvers;
     }
 
     public Object[] resolveParameters(Method method, HttpServletRequest request, HttpServletResponse response) {

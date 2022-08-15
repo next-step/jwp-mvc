@@ -1,5 +1,6 @@
 package core.mvc.tobe.handler.resolver;
 
+import core.mvc.tobe.handler.resolver.utils.TypeUtils;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 
 public class BeanTypeRequestParameterArgumentResolver implements ArgumentResolver {
 
@@ -32,20 +34,9 @@ public class BeanTypeRequestParameterArgumentResolver implements ArgumentResolve
     private boolean isConstructorAllSimpleTypeArguments(NamedParameter parameter) {
         Constructor<?> constructor = getConstructor(parameter);
 
-        Parameter[] parameters = constructor.getParameters();
-        String[] parameterNames = parameterNameDiscoverer.getParameterNames(constructor);
-
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter innerParameter = parameters[i];
-            String parameterName = parameterNames[i];
-            NamedParameter namedParameter = new NamedParameter(innerParameter, parameterName);
-            boolean support = simpleTypeRequestParameterArgumentResolver.support(namedParameter);
-            if (!support) {
-                return false;
-            }
-        }
-
-        return true;
+        return Arrays.stream(constructor.getParameters())
+                .map(Parameter::getType)
+                .allMatch(type -> TypeUtils.isSimpleType(type));
     }
 
     private Constructor<?> getConstructor(NamedParameter parameter) {

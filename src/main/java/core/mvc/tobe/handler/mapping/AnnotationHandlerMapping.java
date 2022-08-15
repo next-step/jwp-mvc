@@ -4,10 +4,8 @@ import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.tobe.ControllerScanner;
+import core.mvc.tobe.handler.resolver.utils.PatternMatcher;
 import org.reflections.ReflectionUtils;
-import org.springframework.http.server.PathContainer;
-import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -24,8 +22,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(ControllerScanner controllerScanner) {
+    private final PatternMatcher patternMatcher;
+
+    public AnnotationHandlerMapping(ControllerScanner controllerScanner, PatternMatcher patternMatcher) {
         this.controllerScanner = controllerScanner;
+        this.patternMatcher = patternMatcher;
     }
 
     public void initialize() {
@@ -82,8 +83,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         Set<HandlerKey> savedHandlerKeys = handlerExecutions.keySet();
         for (HandlerKey savedHandlerKey : savedHandlerKeys) {
             String urlPattern = savedHandlerKey.getUrl();
-            PathPattern parse = parse(urlPattern);
-            boolean matches = parse.matches(toPathContainer(handlerKey.getUrl()));
+            boolean matches = patternMatcher.matches(urlPattern, handlerKey.getUrl());
 
             if (matches && (handlerKey.sameMethod(savedHandlerKey))) {
                 return handlerExecutions.get(savedHandlerKey);
@@ -91,18 +91,5 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
 
         return null;
-    }
-
-    private PathPattern parse(String path) {
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        return pp.parse(path);
-    }
-
-    private static PathContainer toPathContainer(String path) {
-        if (path == null) {
-            return null;
-        }
-        return PathContainer.parsePath(path);
     }
 }
