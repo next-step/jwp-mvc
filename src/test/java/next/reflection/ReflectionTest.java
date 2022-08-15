@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +54,26 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo("재성");
         assertThat(student.getAge()).isEqualTo(20);
+    }
+
+    @Test
+    public void constructorWithParameters() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        Constructor constructor = findConstructorThreeParameters(clazz);
+
+        Question question = (Question) constructor.newInstance("writer", "title", "contents");
+
+        assertThat(question.getWriter()).isEqualTo("writer");
+        assertThat(question.getTitle()).isEqualTo("title");
+        assertThat(question.getContents()).isEqualTo("contents");
+    }
+
+    private Constructor findConstructorThreeParameters(Class<Question> clazz) {
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+        return Arrays.stream(constructors)
+                .filter(constructor -> constructor.getParameterTypes().length == 3)
+                .findAny()
+                .get();
     }
 
 }
