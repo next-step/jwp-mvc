@@ -12,28 +12,21 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class BeanTypeArgumentResolverTest {
+class BeanTypeSimpleTypeRequestParameterArgumentResolverTest {
     private static final NamedParameter BEAN_TYPE_PARAMETER;
     private static final NamedParameter OTHER_TYPE_PARAMETER;
 
     private static final NamedParameter MULTIPLE_CONSTRUCTOR_TYPE_PARAMETER;
     private static final NamedParameter COMPLEX_OBJECT_TYPE_PARAMETER;
 
-    private final BeanTypeArgumentResolver argumentResolver = new BeanTypeArgumentResolver(
+    private final BeanTypeRequestParameterArgumentResolver argumentResolver = new BeanTypeRequestParameterArgumentResolver(
             new LocalVariableTableParameterNameDiscoverer(),
-            new CompositeSimpleTypeArgumentResolver(
-                    List.of(
-                            new StringTypeArgumentResolver(),
-                            new IntegerTypeArgumentResolver(),
-                            new LongTypeArgumentResolver()
-                    )
-            )
+            new SimpleTypeRequestParameterArgumentResolver()
     );
 
     static {

@@ -2,6 +2,8 @@ package core.mvc.tobe.handler.resolver;
 
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
+import core.mvc.tobe.handler.resolver.utils.SimpleTypeConverter;
+import core.mvc.tobe.handler.resolver.utils.TypeUtils;
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
@@ -16,11 +18,8 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean support(NamedParameter parameter) {
-        return parameter.isEqualsType(Integer.class) ||
-                parameter.isEqualsType(Integer.TYPE) ||
-                parameter.isEqualsType(Long.class) ||
-                parameter.isEqualsType(Long.TYPE) ||
-                parameter.isEqualsType(String.class);
+        return TypeUtils.isSimpleType(parameter.getType()) &&
+                parameter.getParameter().isAnnotationPresent(PathVariable.class);
     }
 
     @Override
@@ -44,15 +43,9 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
 
         String valueAsString = variables.get(name);
 
-        if (parameter.isEqualsType(Integer.class) || parameter.isEqualsType(Integer.TYPE)) {
-            return Integer.parseInt(valueAsString);
-        }
+        Object convertedValue = new SimpleTypeConverter().convert(valueAsString, parameter.getType());
 
-        if (parameter.isEqualsType(Long.class) || parameter.isEqualsType(Long.TYPE)) {
-            return Long.parseLong(valueAsString);
-        }
-
-        return valueAsString;
+        return convertedValue;
     }
 
     private String getRequestUrlPattern(Parameter parameter) {

@@ -8,14 +8,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 
-public class BeanTypeArgumentResolver implements ArgumentResolver {
+public class BeanTypeRequestParameterArgumentResolver implements ArgumentResolver {
 
     private final ParameterNameDiscoverer parameterNameDiscoverer;
-    private final CompositeSimpleTypeArgumentResolver compositeSimpleTypeArgumentResolver;
+    private final SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver;
 
-    public BeanTypeArgumentResolver(ParameterNameDiscoverer parameterNameDiscoverer, CompositeSimpleTypeArgumentResolver compositeSimpleTypeArgumentResolver) {
+    public BeanTypeRequestParameterArgumentResolver(ParameterNameDiscoverer parameterNameDiscoverer, SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver) {
         this.parameterNameDiscoverer = parameterNameDiscoverer;
-        this.compositeSimpleTypeArgumentResolver = compositeSimpleTypeArgumentResolver;
+        this.simpleTypeRequestParameterArgumentResolver = simpleTypeRequestParameterArgumentResolver;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class BeanTypeArgumentResolver implements ArgumentResolver {
             Parameter innerParameter = parameters[i];
             String parameterName = parameterNames[i];
             NamedParameter namedParameter = new NamedParameter(innerParameter, parameterName);
-            boolean support = compositeSimpleTypeArgumentResolver.support(namedParameter);
+            boolean support = simpleTypeRequestParameterArgumentResolver.support(namedParameter);
             if (!support) {
                 return false;
             }
@@ -80,7 +80,7 @@ public class BeanTypeArgumentResolver implements ArgumentResolver {
             Parameter innerParameter = parameters[i];
             String parameterName = parameterNames[i];
             NamedParameter namedParameter = new NamedParameter(innerParameter, parameterName);
-            Object argument = compositeSimpleTypeArgumentResolver.resolve(namedParameter, request, response);
+            Object argument = simpleTypeRequestParameterArgumentResolver.resolve(namedParameter, request, response);
 
             arguments[i] = argument;
         }

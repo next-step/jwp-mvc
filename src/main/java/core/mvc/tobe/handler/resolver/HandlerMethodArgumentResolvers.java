@@ -16,20 +16,14 @@ public class HandlerMethodArgumentResolvers {
     private final List<ArgumentResolver> argumentResolvers;
 
     {
-        CompositeSimpleTypeArgumentResolver compositeSimpleTypeArgumentResolver = new CompositeSimpleTypeArgumentResolver(
-                List.of(
-                        new StringTypeArgumentResolver(),
-                        new IntegerTypeArgumentResolver(),
-                        new LongTypeArgumentResolver()
-                )
-        );
+        SimpleTypeRequestParameterArgumentResolver simpleTypeRequestParameterArgumentResolver = new SimpleTypeRequestParameterArgumentResolver();
         argumentResolvers = List.of(
                 new HttpServletArgumentResolver(),
                 new PathVariableArgumentResolver(),
-                compositeSimpleTypeArgumentResolver,
-                new BeanTypeArgumentResolver(
+                simpleTypeRequestParameterArgumentResolver,
+                new BeanTypeRequestParameterArgumentResolver(
                         parameterNameDiscoverer,
-                        compositeSimpleTypeArgumentResolver
+                        simpleTypeRequestParameterArgumentResolver
                 )
         );
     }
