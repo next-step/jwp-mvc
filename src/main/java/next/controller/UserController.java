@@ -51,7 +51,7 @@ public class UserController  {
     }
 
     @RequestMapping(value = "/loginForm", method = GET)
-    public ModelAndView loginForm(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView loginForm() {
         logging("login form");
 
         return createModelAndView("/user/login.jsp");
