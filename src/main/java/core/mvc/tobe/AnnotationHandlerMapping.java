@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
