@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import core.mvc.ModelAndView;
 
@@ -19,5 +20,22 @@ public class HandlerExecution {
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return (ModelAndView) method.invoke(instance, request, response);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        HandlerExecution that = (HandlerExecution) o;
+        return Objects.equals(instance, that.instance) && Objects.equals(method, that.method);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(instance, method);
     }
 }

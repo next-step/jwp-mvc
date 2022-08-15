@@ -47,3 +47,19 @@
   - 기존의 모든 Controller가 새로운 MVC 프레임워크로 전환이 완료된 후 기존의 레거시 MVC 프레임워크를 삭제
 
 <hr/>
+
+## 3단계 - @MVC 구현(힌트)
+### 요구사항 1 - 힌트
+- ControllerScanner 클래스를 추가 
+  - 각 클래스에 대한 인스턴스 생성을 담당
+- AnnotationHandlerMapping 클래스 추가
+  - 애노테이션 기반 매핑을 담당
+- AnnotationHandlerMapping 클래스에 클라이언트 요청 정보(HttpServletRequest)를 전달하면 요청에 해당하는 HandlerExecution을 반환하는 메소드를 구현
+
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+- 새로운 MVC 프레임워크도 추가했으니 이전에 구현되어 있던 컨트롤러를 애노테이션 기반으로 변경
+- 점진적으로 리팩토링이 가능한 구조로 개발
+- 지금까지 사용한 MVC 프레임워크와 새롭게 구현한 애노테이션 기반 MVC 프레임워크 공존
+- 기존의 모든 Controller가 새로운 MVC 프레임워크로 전환이 완료된 후 기존의 레거시 MVC 프레임워크를 삭제
+
+<hr/>

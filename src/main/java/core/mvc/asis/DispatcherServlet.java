@@ -1,8 +1,5 @@
 package core.mvc.asis;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,10 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.mvc.JspView;
+import core.mvc.HandlerAdapter;
+import core.mvc.HandlerAdapters;
 import core.mvc.ModelAndView;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.HandlerMappings;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -22,38 +19,29 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String BASE_PACKAGE = "next.controller";
 
-    private RequestMapping rm;
-    private AnnotationHandlerMapping annotationHandlerMapping;
+    private HandlerMappings handlerMappings;
+    private HandlerAdapters handlerAdapters;
 
 
     @Override
     public void init() {
-        rm = new RequestMapping();
-        // rm.initMapping();
-        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
-        annotationHandlerMapping.initialize();
+        handlerMappings = new HandlerMappings(BASE_PACKAGE);
+        handlerAdapters = new HandlerAdapters();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Object mappingHandler = handlerMappings.getHandler(req);
+        HandlerAdapter handlerAdapter = handlerAdapters.getHandlerAdapter(mappingHandler);
+
         try {
-            handle(controller, req, resp);
+            ModelAndView mv = handlerAdapter.handle(req, resp, mappingHandler);
+            render(req, resp, mv);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void handle(Controller controller, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (controller != null) {
-            String viewName = controller.execute(req, resp);
-            render(req, resp, new ModelAndView(new JspView(viewName)));
-        } else {
-            HandlerExecution handler = annotationHandlerMapping.getHandler(req);
-            render(req, resp, handler.handle(req, resp));
         }
     }
 
