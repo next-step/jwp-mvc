@@ -22,4 +22,8 @@ public class NamedParameter {
     public String getName() {
         return name;
     }
+
+    public Parameter getParameter() {
+        return parameter;
+    }
 }

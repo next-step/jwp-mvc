@@ -88,6 +88,26 @@ public class ArgumentResolverTest {
                 ));
     }
 
+    @DisplayName("요청 URI에 @PathVariable 애노테이션이 붙은 인자값에 할당받은 Controller 메소드를 실행한다.")
+    @Test
+    void show_pathvariable() throws Exception {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/2");
+
+        Object invoker = CLAZZ.getDeclaredConstructor().newInstance();
+        String testMethodName = "show_pathvariable";
+        Method method = getMethod(testMethodName, CLAZZ.getDeclaredMethods());
+        handlerExecution = new HandlerExecution(invoker, method);
+
+        // when
+        ModelAndView result = handlerExecution.handle(request, new MockHttpServletResponse());
+
+        // then
+        assertThat(result.getObject("id"))
+                .usingRecursiveComparison()
+                .isEqualTo(2L);
+    }
+
     private Method getMethod(String name, Method[] methods) {
         return Arrays.stream(methods)
                 .filter(method -> method.getName().equals(name))

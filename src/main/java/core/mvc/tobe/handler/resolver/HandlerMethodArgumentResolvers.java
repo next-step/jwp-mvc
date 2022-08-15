@@ -25,6 +25,7 @@ public class HandlerMethodArgumentResolvers {
         );
         argumentResolvers = List.of(
                 new HttpServletArgumentResolver(),
+                new PathVariableArgumentResolver(),
                 compositeSimpleTypeArgumentResolver,
                 new BeanTypeArgumentResolver(
                         parameterNameDiscoverer,
