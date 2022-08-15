@@ -39,7 +39,7 @@ public class UserController  {
     }
 
     @RequestMapping(method = GET)
-    public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView list(HttpServletRequest req) {
         logging("user list");
 
         if (!UserSessionUtils.isLogined(req.getSession())) {
