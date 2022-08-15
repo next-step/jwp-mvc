@@ -21,3 +21,10 @@
    1. Question 클래스의 인스턴스를 생성한다.
 6. component scan
    1. @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+## 2단계 - MVC 구현
+1. 애노테이션 기반 MVC 프레임워크
+   1. reflection 라이브러리를 사용하여, @Controller 애노테이션이 붙은 클래스를 찾는다.
+   2. @RequestMapping 설정에 따라 요청 URL과 메소드를 연결한다. (@RequestMapping에 method 설정이 되어있지 않으면 모든 HTTP method 지원)
+2. 레거시 MVC와 애노테이션 기반 MVC 통합
+   1. 점진적인 리팩토링이 가능한 구조로 개발한다. (기존 코드와 신규 코드가 공존)
