@@ -49,7 +49,8 @@ public class PathVariableArgumentResolver extends AbstractNamedSimpleTypeArgumen
 
         boolean matches = patternMatcher.matches(urlPattern, actualUrl);
         if (!matches) {
-            throw new RuntimeException("패턴이 일치하지 않는단다!");
+            throw new ArgumentResolveFailException("URL 패턴이 일치하지 않아 인자값을 매핑할 수 없습니다. urlPattern= ["
+                    + urlPattern + "], actualUrl= [" + actualUrl + "]");
         }
 
         Map<String, String> variables = patternMatcher.getUrlVariables(urlPattern, actualUrl);

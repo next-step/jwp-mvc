@@ -1,5 +1,6 @@
 package core.mvc.tobe.handler.resolver;
 
+import core.mvc.tobe.handler.TargetHandlingException;
 import core.mvc.tobe.handler.resolver.utils.TypeUtils;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -9,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class BeanTypeRequestParameterArgumentResolver implements ArgumentResolver {
 
@@ -54,7 +56,11 @@ public class BeanTypeRequestParameterArgumentResolver implements ArgumentResolve
             constructor.setAccessible(true);
             return constructor.newInstance(arguments);
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            Throwable rootCauseException = e.getCause();
+            if (Objects.nonNull(rootCauseException)) {
+                throw new TargetHandlingException(rootCauseException.getMessage(), rootCauseException);
+            }
+            throw new Error(e);
         }
     }
 
