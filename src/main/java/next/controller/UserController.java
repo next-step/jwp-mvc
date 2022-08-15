@@ -28,11 +28,10 @@ public class UserController  {
     }
 
     @RequestMapping(value = "/create", method = POST)
-    public ModelAndView create(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView create(String userId, String password, String name, String email) {
         logging("create user");
 
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
+        User user = new User(userId, password, name, email);
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
