@@ -1,8 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 public class NotFoundExecution implements HandlerExecutable {
 
@@ -12,7 +11,12 @@ public class NotFoundExecution implements HandlerExecutable {
     }
 
     @Override
-    public ModelAndView handle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        return ModelAndView.jsp("404.jsp");
+    public ModelAndView handle(Object... arguments) throws Exception {
+        return ModelAndView.jsp("/404.jsp");
+    }
+
+    @Override
+    public Method getMethod() {
+        return null;
     }
 }

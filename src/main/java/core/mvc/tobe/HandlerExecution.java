@@ -3,8 +3,6 @@ package core.mvc.tobe;
 import core.mvc.ModelAndView;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class HandlerExecution implements HandlerExecutable {
 
@@ -17,13 +15,18 @@ public class HandlerExecution implements HandlerExecutable {
     }
 
     @Override
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(handler, request, response);
+    public ModelAndView handle(Object... arguments) throws Exception {
+        return (ModelAndView) method.invoke(handler, arguments);
     }
 
     @Override
     public boolean executable() {
         return handler != null && method != null;
+    }
+
+    @Override
+    public Method getMethod() {
+        return method;
     }
 
     @Override

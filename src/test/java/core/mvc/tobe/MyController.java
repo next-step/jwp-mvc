@@ -51,4 +51,11 @@ public class MyController {
         return mav;
     }
 
+    @RequestMapping("/welcome/{id}")
+    public ModelAndView welcomePathPattern(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mav = new ModelAndView(new JspView("/home.jsp"));
+        mav.addObject("path", "pattern");
+        return mav;
+    }
+
 }

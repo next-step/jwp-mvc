@@ -5,7 +5,9 @@ import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecutable;
 import core.mvc.tobe.HandlerMapping;
 import core.mvc.tobe.NotFoundExecution;
+import core.mvc.tobe.argumentresolver.HandlerMethodArgumentResolver;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,13 +25,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final HandlerExecutable NOT_FOUND_EXECUTION = new NotFoundExecution();
+    private static final HandlerMethodArgumentResolver HANDLER_METHOD_ARGUMENT_RESOLVER = new HandlerMethodArgumentResolver();
 
     private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
-        annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
     }
 
@@ -38,10 +40,12 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        HandlerExecutable handlerExecutable = getHandlerExecutable(request);
+        final HandlerExecutable handlerExecutable = getHandlerExecutable(request);
+        final Method method = handlerExecutable.getMethod();
+        final Object[] arguments = HANDLER_METHOD_ARGUMENT_RESOLVER.resolve(method, request);
 
         try {
-            final ModelAndView modelAndView = handlerExecutable.handle(request, response);
+            final ModelAndView modelAndView = handlerExecutable.handle(arguments);
             modelAndView.render(request, response);
         } catch (Exception e) {
             logger.error("Exception : {}", e.getMessage(), e);

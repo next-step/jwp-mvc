@@ -21,7 +21,6 @@ class AnnotationHandlerMappingTest {
     @BeforeEach
     public void setup() {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
     }
 
     @Test
@@ -61,5 +60,25 @@ class AnnotationHandlerMappingTest {
 
         assertThat(mav.getObject("thank")).isEqualTo("you");
 
+    }
+
+    @DisplayName("PathPattenr이 일치하는 handler를 반환한다")
+    @Test
+    void find_handler_with_path_pattern() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/welcome/1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        HandlerExecutable execution = handlerMapping.getHandler(request);
+        final ModelAndView mav = execution.handle(request, response);
+
+        assertThat(mav.getObject("path")).isEqualTo("pattern");
+    }
+
+    @DisplayName("유효한 handler가 없는 경우 NotFoundExecution을 반환한다 ")
+    @Test
+    void not_found_execution() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/존재하지않는주소");
+        HandlerExecutable actual = handlerMapping.getHandler(request);
+
+        assertThat(actual).isInstanceOf(NotFoundExecution.class);
     }
 }

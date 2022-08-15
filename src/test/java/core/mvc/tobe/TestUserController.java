@@ -4,6 +4,8 @@ import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,15 @@ public class TestUserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_wrapper_int_long(Long id, Integer age) {
+        logger.debug("id: {}, age: {}", id, age);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("id", id);
+        mav.addObject("age", age);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_javabean(TestUser testUser) {
         logger.debug("testUser: {}", testUser);
         ModelAndView mav = new ModelAndView();
@@ -36,12 +47,30 @@ public class TestUserController {
         return mav;
     }
 
-
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public ModelAndView show_pathvariable(@PathVariable long id) {
         logger.debug("userId: {}", id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
         return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ModelAndView httpServletRequest(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("request", request);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ModelAndView httpSession(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("session", session);
+        return mav;
+    }
+
+    @RequestMapping(value = "/empty-parameters", method = RequestMethod.GET)
+    public ModelAndView notParameters() {
+        return new ModelAndView();
     }
 }

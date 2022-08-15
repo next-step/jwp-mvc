@@ -1,12 +1,13 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 
 public interface HandlerExecutable {
 
     boolean executable();
 
-    ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    ModelAndView handle(Object... arguments) throws Exception;
+
+    Method getMethod();
 }

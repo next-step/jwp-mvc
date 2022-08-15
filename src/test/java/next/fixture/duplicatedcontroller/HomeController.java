@@ -1,4 +1,4 @@
-package next.duplicatedcontroller;
+package next.fixture.duplicatedcontroller;
 
 import core.annotation.web.Controller;
 

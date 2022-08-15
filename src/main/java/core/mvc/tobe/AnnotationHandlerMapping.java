@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 public class AnnotationHandlerMapping implements HandlerMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+    private static final HandlerExecutable NOT_FOUND_EXECUTION = new NotFoundExecution();
 
     private final Object[] basePackage;
 
@@ -19,13 +20,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
+        initialize();
     }
 
-    public void initialize() {
-        final Reflections reflections = new Reflections(basePackage);
-        final ControllerScanner controllerScanner = new ControllerScanner(reflections);
-        controllerScanner.instantiateControllers();
-        final Set<Object> controllers = controllerScanner.getControllers();
+    private void initialize() {
+        final Set<Object> controllers = ControllerScanner.getControllers(new Reflections(basePackage));
 
         for (final Object controller : controllers) {
             final Map<HandlerKey, HandlerExecutable> handlerExecutable = RequestMappingScanner.getHandlerExecutable(controller);
@@ -39,6 +38,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public HandlerExecutable getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return HANDLER_EXECUTIONS.get(new HandlerKey(requestUri, rm));
+        final HandlerKey key = new HandlerKey(requestUri, rm);
+
+        return HANDLER_EXECUTIONS.keySet().stream()
+            .filter(it -> it.equals(key))
+            .findAny()
+            .map(HANDLER_EXECUTIONS::get)
+            .orElse(NOT_FOUND_EXECUTION);
     }
 }
