@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
+import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
@@ -32,9 +34,9 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
         ControllerExecutor execution = handlerMapping.getHandler(request);
-        execution.execute(request, response);
+        Map<String, Object> model = execution.execute(request, response).getModel();
 
-        assertThat(request.getAttribute("user")).isEqualTo(user);
+        assertThat(model.get("user")).isEqualTo(user);
     }
 
     @DisplayName("RequestMethod 없을 경우 모든 method를 지원해야 한다.")
@@ -46,12 +48,11 @@ public class AnnotationHandlerMappingTest {
             ControllerExecutor execution = handlerMapping.getHandler(request);
 
             try {
-                execution.execute(request, response);
+                Map<String, Object> model = execution.execute(request, response).getModel();
+                assertThat(model.get("status")).isEqualTo("ok");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
-            assertThat(request.getAttribute("test")).isEqualTo("ok");
         });
     }
 

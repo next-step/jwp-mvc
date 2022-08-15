@@ -1,12 +1,18 @@
 package core.mvc.tobe;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.reflections.ReflectionUtils;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import com.google.common.collect.Maps;
 
@@ -36,12 +42,16 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
                     RequestMethod[] requestMethods = requestMapping.method();
 
+
                     if (isRequestMethodEmpty(requestMapping)) {
                         requestMethods = RequestMethod.values();
                     }
 
+                    ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+                    List<String> parameterNames = Arrays.stream(nameDiscoverer.getParameterNames(method)).collect(Collectors.toList());
+
                     for (RequestMethod requestMethod : requestMethods) {
-                        HandlerKey handlerKey = createHandlerKey(controller, requestMapping, requestMethod);
+                        HandlerKey handlerKey = createHandlerKey(controller, requestMapping, requestMethod, parameterNames);
                         Object instance = clazz.getConstructor().newInstance();
                         handlerExecutions.put(handlerKey, new ControllerExecutor(instance, method));
                     }
@@ -57,11 +67,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public ControllerExecutor getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+
+        List<String> collect = new ArrayList<>(request.getParameterMap().keySet());
+
+        return handlerExecutions.get(new HandlerKey(requestUri, rm, collect));
     }
 
-    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm, RequestMethod requestMethod) {
-        return new HandlerKey(controller.value() + rm.value(), requestMethod);
+    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm, RequestMethod requestMethod, List<String> parameterNames) {
+        return new HandlerKey(controller.value() + rm.value(), requestMethod, parameterNames);
     }
 
     private boolean isRequestMethodEmpty(RequestMapping requestMapping) {
