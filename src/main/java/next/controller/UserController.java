@@ -21,7 +21,7 @@ public class UserController  {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = "/form", method = GET)
-    public ModelAndView createForm(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView createForm() {
         logging("create user form");
 
         return createModelAndView("/user/form.jsp");
