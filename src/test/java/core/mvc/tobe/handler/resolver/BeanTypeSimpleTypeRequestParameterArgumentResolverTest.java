@@ -1,6 +1,7 @@
 package core.mvc.tobe.handler.resolver;
 
 import core.mvc.tobe.TestUser;
+import core.mvc.tobe.handler.resolver.utils.SimpleTypeConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +27,7 @@ class BeanTypeSimpleTypeRequestParameterArgumentResolverTest {
 
     private final BeanTypeRequestParameterArgumentResolver argumentResolver = new BeanTypeRequestParameterArgumentResolver(
             new LocalVariableTableParameterNameDiscoverer(),
-            new SimpleTypeRequestParameterArgumentResolver()
+            new SimpleTypeRequestParameterArgumentResolver(new SimpleTypeConverter())
     );
 
     static {

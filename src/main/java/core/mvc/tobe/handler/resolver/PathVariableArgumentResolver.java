@@ -9,12 +9,15 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-public class PathVariableArgumentResolver implements ArgumentResolver {
+public class PathVariableArgumentResolver extends AbstractNamedSimpleTypeArgumentResolver implements ArgumentResolver {
+
+    public PathVariableArgumentResolver(SimpleTypeConverter simpleTypeConverter) {
+        super(simpleTypeConverter);
+    }
 
     @Override
     public boolean support(NamedParameter parameter) {
@@ -23,12 +26,24 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object resolve(NamedParameter parameter, HttpServletRequest request, HttpServletResponse response) {
+    protected String getParameterName(NamedParameter parameter) {
         PathVariable pathVariable = parameter.getParameter().getAnnotation(PathVariable.class);
-        String name = getParameterName(parameter, pathVariable);
+        String parameterName = getParameterName(parameter, pathVariable);
+        return parameterName;
+    }
 
+    private String getParameterName(NamedParameter parameter, PathVariable pathVariable) {
+        String name = pathVariable.name();
+        if (!name.isEmpty()) {
+            return name;
+        }
+        String argumentName = parameter.getName();
+        return argumentName;
+    }
+
+    @Override
+    protected String getNamedValue(NamedParameter parameter, HttpServletRequest request, String parameterName) {
         String urlPattern = getRequestUrlPattern(parameter.getParameter());
-
         String actualUrl = request.getRequestURI();
 
         PathPattern parse = parse(urlPattern);
@@ -41,11 +56,8 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
                 .matchAndExtract(toPathContainer(actualUrl))
                 .getUriVariables();
 
-        String valueAsString = variables.get(name);
-
-        Object convertedValue = new SimpleTypeConverter().convert(valueAsString, parameter.getType());
-
-        return convertedValue;
+        String value = variables.get(parameterName);
+        return value;
     }
 
     private String getRequestUrlPattern(Parameter parameter) {
@@ -55,19 +67,10 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
         return urlPattern;
     }
 
-    private String getParameterName(NamedParameter parameter, PathVariable pathVariable) {
-        String name = pathVariable.name();
-        if (!name.isEmpty()) {
-            return name;
-        }
-        String argumentName = parameter.getName();
-        return argumentName;
-    }
-
     private PathPattern parse(String path) {
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        return pp.parse(path);
+        PathPatternParser patternParser = new PathPatternParser();
+        patternParser.setMatchOptionalTrailingSeparator(true);
+        return patternParser.parse(path);
     }
 
     private static PathContainer toPathContainer(String path) {
