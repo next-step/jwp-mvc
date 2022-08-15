@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -42,14 +43,19 @@ public class ReflectionTest {
         nameField.setAccessible(true);
 
         Student student = new Student();
-        ageField.set(student, 19);
-        nameField.set(student, "wu2ee");
+        int age = 19;
+        String name = "wu2ee";
+        ageField.set(student, age);
+        nameField.set(student, name);
 
-        logger.debug("----> Student age  : {}", student.getAge());
-        logger.debug("----> Student name : {}", student.getName());
+        assertAll(
+                () -> assertThat(student.getAge()).isEqualTo(age),
+                () -> assertThat(student.getName()).isEqualTo(name)
+        );
     }
 
     @Test
+    @DisplayName("인자를 가진 생성자의 인스턴스를 생성한다.")
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         // given
