@@ -26,7 +26,7 @@ public class SimpleTypeRequestParameterArgumentResolver extends AbstractNamedSim
             return argumentName;
         }
 
-        String name = requestParam.name();
+        String name = requestParam.value();
         if (!name.isEmpty()) {
             return name;
         }

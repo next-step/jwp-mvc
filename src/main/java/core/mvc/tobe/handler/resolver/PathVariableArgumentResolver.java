@@ -34,7 +34,7 @@ public class PathVariableArgumentResolver extends AbstractNamedSimpleTypeArgumen
     }
 
     private String getParameterName(NamedParameter parameter, PathVariable pathVariable) {
-        String name = pathVariable.name();
+        String name = pathVariable.value();
         if (!name.isEmpty()) {
             return name;
         }
