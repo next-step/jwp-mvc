@@ -1,11 +1,34 @@
 package next.reflection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class Junit3TestRunner {
+
+    private static final String START_METHOD_NAME = "test";
+
+    @DisplayName("JUnit3Test 클래스의 메서드 중에서 'test'로 시작하는 메서드만 실행한다.")
     @Test
-    public void run() throws Exception {
+    void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
-        // TODO Junit3Test에서 test로 시작하는 메소드 실행
+
+        Constructor<Junit3Test> constructor = clazz.getConstructor();
+
+        List<Method> methods = Arrays.stream(clazz.getDeclaredMethods())
+            .filter(method -> method.getName().startsWith(START_METHOD_NAME))
+            .collect(Collectors.toList());
+
+        for (Method method : methods) {
+            method.invoke(constructor.newInstance());
+        }
+
+        assertThat(methods).hasSize(2);
     }
 }
