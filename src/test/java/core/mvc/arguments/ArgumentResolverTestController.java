@@ -38,13 +38,17 @@ public class ArgumentResolverTestController {
                 request.getParameter("name"),
                 request.getParameter("email"));
         DataBase.addUser(user);
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView createUser(String userId, String password, String name, String email) {
         User user = new User(userId, password, name, email);
         DataBase.addUser(user);
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("user", user);
+        return modelAndView;
     }
 }

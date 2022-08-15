@@ -5,7 +5,10 @@ import next.model.User;
 import javax.servlet.http.HttpSession;
 
 public class UserSessionUtils {
+    private UserSessionUtils() {}
+
     public static final String USER_SESSION_KEY = "user";
+    public static final String USER_DELETE_KEY = "delete";
 
     public static User getUserFromSession(HttpSession session) {
         Object user = session.getAttribute(USER_SESSION_KEY);

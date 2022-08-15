@@ -9,6 +9,7 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import core.mvc.ModelAndView;
+import next.controller.UserSessionUtils;
 
 public class ControllerExecutor implements Controller {
     private final Object declaredObject;
@@ -31,6 +32,16 @@ public class ControllerExecutor implements Controller {
             params[index++] = request.getParameter(parameterName);
         }
 
-        return (ModelAndView) method.invoke(declaredObject, params);
+        ModelAndView mav = (ModelAndView) method.invoke(declaredObject, params);
+
+        mav.getModel().forEach((key, value) -> {
+            request.getSession().setAttribute(key, value);
+
+            if (key.equals(UserSessionUtils.USER_DELETE_KEY) && (boolean) value) {
+                request.getSession().removeAttribute(UserSessionUtils.USER_SESSION_KEY);
+            }
+        });
+
+        return mav;
     }
 }

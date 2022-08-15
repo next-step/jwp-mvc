@@ -1,16 +1,14 @@
 package core.mvc.tobe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
 import next.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class MyController {
@@ -29,7 +27,8 @@ public class MyController {
         User user = new User(userId, password, name, email);
         logger.debug("User : {}", user);
         DataBase.addUser(user);
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        return modelAndView.addObject("user", user);
     }
 
     @RequestMapping(value = "/testAllMethods")

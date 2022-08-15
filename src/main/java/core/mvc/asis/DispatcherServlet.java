@@ -1,11 +1,9 @@
 package core.mvc.asis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,14 +24,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String BASE_PACKAGE = "next.controller";
-
     private final List<HandlerMapping> handlerMappings = new ArrayList<>();
 
     public DispatcherServlet() {
         LegacyHandlerMapping lhm = new LegacyHandlerMapping();
         lhm.initMapping();
 
-        AnnotationHandlerMapping  ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
+        AnnotationHandlerMapping ahm = new AnnotationHandlerMapping(BASE_PACKAGE);
         ahm.initialize();
 
         handlerMappings.add(ahm);

@@ -1,10 +1,12 @@
 package next.controller;
 
-import static core.annotation.web.RequestMethod.*;
+import static core.annotation.web.RequestMethod.GET;
+import static core.annotation.web.RequestMethod.POST;
+
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,7 @@ import core.mvc.ModelAndView;
 import next.model.User;
 
 @Controller("/users")
-public class UserController  {
+public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = "/form", method = GET)
@@ -58,33 +60,25 @@ public class UserController  {
     }
 
     @RequestMapping(value = "/login", method = POST)
-    public ModelAndView login(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView login(String userId, String password) {
         logging("login");
 
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
         User user = DataBase.findUserById(userId);
+
         if (user == null) {
-            req.setAttribute("loginFailed", true);
-            return createModelAndView("/user/login.jsp");
+            return createModelAndView("/user/login.jsp", Map.of("loginFailed", true));
         }
         if (user.matchPassword(password)) {
-            HttpSession session = req.getSession();
-            session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return createModelAndView("redirect:/");
-        } else {
-            req.setAttribute("loginFailed", true);
-            return createModelAndView("/user/login.jsp");
+            return createModelAndView("redirect:/", Map.of(UserSessionUtils.USER_SESSION_KEY, user));
         }
+        return createModelAndView("/user/login.jsp", Map.of("loginFailed", true));
     }
 
     @RequestMapping(value = "/logout", method = GET)
-    public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView logout() {
         logging("logout");
 
-        HttpSession session = req.getSession();
-        session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return createModelAndView("redirect:/");
+        return createModelAndView("redirect:/", Map.of(UserSessionUtils.USER_DELETE_KEY, true));
     }
 
     @RequestMapping(value = "/profile", method = GET)
@@ -131,6 +125,12 @@ public class UserController  {
 
     private ModelAndView createModelAndView(String path) {
         return new ModelAndView(new JspView(path));
+    }
+
+    private ModelAndView createModelAndView(String path, Map<String, Object> attributes) {
+        ModelAndView modelAndView = new ModelAndView(new JspView(path));
+        attributes.forEach(modelAndView::addObject);
+        return modelAndView;
     }
 
     private void logging(String requestName) {
