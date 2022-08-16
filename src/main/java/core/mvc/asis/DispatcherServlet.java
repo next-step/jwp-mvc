@@ -1,6 +1,8 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,18 +27,41 @@ public class DispatcherServlet extends HttpServlet {
     public void init() {
         requestMapping = new RequestMapping();
         requestMapping.initMapping();
+
+        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        annotationHandlerMapping.initialize();
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        String requestUri = request.getRequestURI();
+        final String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
-        Controller controller = requestMapping.findController(requestUri);
+        final HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(request);
+        if (handlerExecution != null) {
+            executeAnnotationHandler(request, response, handlerExecution);
+            return;
+        }
+
+        final Controller controller = requestMapping.findController(requestUri);
+        executeController(request, response, controller);
+    }
+
+    private void executeAnnotationHandler(HttpServletRequest request, HttpServletResponse response, HandlerExecution handlerExecution) throws ServletException {
+        try {
+            final ModelAndView modelAndView = handlerExecution.handle(request, response);
+            modelAndView.render(request, response);
+        } catch (Exception e) {
+            logger.error("Exception : {}", e.getMessage(), e);
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    private void executeController(HttpServletRequest request, HttpServletResponse response, Controller controller) throws ServletException {
         try {
             String viewName = controller.execute(request, response);
             move(viewName, request, response);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("Exception : {}", e.getMessage(), e);
             throw new ServletException(e.getMessage());
         }
@@ -49,7 +74,7 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
 
-        RequestDispatcher rd = request.getRequestDispatcher(viewName);
-        rd.forward(request, response);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewName);
+        requestDispatcher.forward(request, response);
     }
 }
