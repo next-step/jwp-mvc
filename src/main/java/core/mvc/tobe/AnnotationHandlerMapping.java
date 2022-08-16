@@ -36,15 +36,23 @@ public class AnnotationHandlerMapping {
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return getHandlerExecution(requestUri, requestMethod);
     }
 
     private Set<Method> getRequestMappingMethods(Reflections reflections) {
         return reflections.getTypesAnnotatedWith(Controller.class)
                 .stream()
-                .flatMap(aClass -> Arrays.stream(aClass.getMethods()))
+                .flatMap(clazz -> Arrays.stream(clazz.getMethods()))
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toSet());
+    }
+
+    private HandlerExecution getHandlerExecution(String requestUri, RequestMethod requestMethod) {
+        final HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
+        if (handlerExecution != null) {
+            return handlerExecution;
+        }
+        return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.ALL));
     }
 }
