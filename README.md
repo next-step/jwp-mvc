@@ -17,3 +17,12 @@
 4. Student 클래스 private 필드에 값 할당
 5. Reflection API 를 통해 Question 인스턴스 생성
 6. core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력
+
+
+## Step2 - @MVC 구현
+
+1. @Contoller 어노테이션을 가진 클래스들을 찾아본다.
+2. @RequestMapping 어노테이션을 가진 메서드들을 찾아본다.
+3. @RequestMapping 메서드들의 요청 정보를 키로 핸들러를 저장해본다.
+4. RequestMapping 방식에서 AnnotationHandlerMapping 방식으로 점진적으로 넘어가기 위해, Adapter 인터페이스 구현
+5. viewName 을 보고 어떤 View 객체가 필요한지 정하는 ViewResolver 구현

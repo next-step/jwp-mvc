@@ -21,7 +21,7 @@ public class ReflectionTest {
         line();
         showFields(clazz.getDeclaredFields());
         line();
-        showConstructors(clazz.getConstructors());
+        showConstructors(clazz.getDeclaredConstructors());
         line();
         showMethods(clazz.getDeclaredMethods());
     }
@@ -68,9 +68,11 @@ public class ReflectionTest {
         setPrivateFields(student, "재성", 30);
 
         // then
-        Assertions.assertThat(student.getName()).isEqualTo("재성");
+        Assertions.assertThat(student.getName())
+                .isEqualTo("재성");
 
-        Assertions.assertThat(student.getAge()).isEqualTo(30);
+        Assertions.assertThat(student.getAge())
+                .isEqualTo(30);
     }
 
     private static void setPrivateFields(Student student, String name, int age) throws IllegalAccessException {
@@ -103,9 +105,12 @@ public class ReflectionTest {
         Question question = createInstance(Question.class, "재성", "질문입니다.", "내용입니다.");
 
         // then
-        Assertions.assertThat(question.getWriter()).isEqualTo("재성");
-        Assertions.assertThat(question.getTitle()).isEqualTo("질문입니다.");
-        Assertions.assertThat(question.getContents()).isEqualTo("내용입니다.");
+        Assertions.assertThat(question.getWriter())
+                .isEqualTo("재성");
+        Assertions.assertThat(question.getTitle())
+                .isEqualTo("질문입니다.");
+        Assertions.assertThat(question.getContents())
+                .isEqualTo("내용입니다.");
     }
 
     private Question createInstance(Class<Question> clazz, Object... args) throws Exception {
