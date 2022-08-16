@@ -63,3 +63,9 @@
 - 기존의 모든 Controller가 새로운 MVC 프레임워크로 전환이 완료된 후 기존의 레거시 MVC 프레임워크를 삭제
 
 <hr/>
+
+## 4단계 - Controller 메소드 인자 매핑
+- Controller 메소드의 인자 타입에 따른 HttpServletRequest 값 자동 형 변환 및 매핑 작업
+- URL 을 통한 동적 값 전달
+
+<hr/>
