@@ -27,25 +27,20 @@ public class DefaultMethodArgumentResolver implements HandlerMethodArgumentResol
             return Long.parseLong(value);
         }
 
+        if (parameterType.equals(double.class)) {
+            return Double.parseDouble(value);
+        }
+
+        if (parameterType.equals(float.class)) {
+            return Float.parseFloat(value);
+        }
+
         return value;
     }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        Class<?> parameterType = methodParameter.getParameterType();
-
-        if (parameterType.equals(HttpServletRequest.class)
-            || parameterType.equals(HttpServletResponse.class)) {
-            return true;
-        }
-
-        if (!methodParameter.hasAnnotation()
-            && (parameterType.equals(int.class)
-            || parameterType.equals(long.class))) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
 }

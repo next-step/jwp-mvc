@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 public class HandlerMethodArgumentResolverComposite {
 
     private static final List<HandlerMethodArgumentResolver> RESOLVER_LIST = new ArrayList<>();
+    private static final DefaultMethodArgumentResolver DEFAULT_RESOLVER = new DefaultMethodArgumentResolver();
     static {
-        RESOLVER_LIST.add(new DefaultMethodArgumentResolver());
         RESOLVER_LIST.add(new UserMethodArgumentResolver());
         RESOLVER_LIST.add(new PathVariableMethodArgumentResolver());
     }
@@ -25,14 +25,11 @@ public class HandlerMethodArgumentResolverComposite {
         for (int i = 0; i < length; ++i) {
             MethodParameter methodParameter = new MethodParameter(method, i, parameters[i].getAnnotations());
 
-            for (HandlerMethodArgumentResolver resolver : RESOLVER_LIST) {
-                if (resolver.supportsParameter(methodParameter)) {
-                    values[i] = resolver.resolveArgument(methodParameter, request, null);
-                    break;
-                }
-                values[i] = request.getParameter(methodParameter.getParameterName());
-            }
-
+            values[i] = RESOLVER_LIST.stream()
+                .filter(r -> r.supportsParameter(methodParameter))
+                .findFirst()
+                .orElse(DEFAULT_RESOLVER)
+                .resolveArgument(methodParameter, request, response);
         }
 
         return values;

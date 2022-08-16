@@ -10,7 +10,7 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 public class MethodParameter {
 
-    private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+    private static final ParameterNameDiscoverer NAME_DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
 
     private Method method;
     private int parameterIndex;
@@ -56,11 +56,7 @@ public class MethodParameter {
     }
 
     public String getParameterName() {
-        return this.nameDiscoverer.getParameterNames(this.method)[parameterIndex];
-    }
-
-    public boolean hasAnnotation() {
-        return method.getDeclaredAnnotations().length > 0;
+        return NAME_DISCOVERER.getParameterNames(this.method)[parameterIndex];
     }
 
     public boolean hasPathVariableAnnotation() {

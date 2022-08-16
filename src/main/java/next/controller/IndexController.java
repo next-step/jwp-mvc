@@ -14,20 +14,15 @@ public class IndexController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView base(HttpServletRequest req, HttpServletResponse resp) {
-        req.setAttribute("users", DataBase.findAll());
-        JspView jspView = new JspView("home.jsp");
-        return new ModelAndView(jspView);
+        return goToHomeJsp(req);
     }
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public ModelAndView index(HttpServletRequest req, HttpServletResponse resp) {
-        req.setAttribute("users", DataBase.findAll());
-        JspView jspView = new JspView("home.jsp");
-        return new ModelAndView(jspView);
+        return goToHomeJsp(req);
     }
 
-    @RequestMapping(value = "/index.html", method = RequestMethod.GET)
-    public ModelAndView indexHtml(HttpServletRequest req, HttpServletResponse resp) {
+    private ModelAndView goToHomeJsp(HttpServletRequest req) {
         req.setAttribute("users", DataBase.findAll());
         JspView jspView = new JspView("home.jsp");
         return new ModelAndView(jspView);
