@@ -21,3 +21,10 @@
 - [X] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성 Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성한다.
 - [X] 요구사항 6 - component scan src/test/java 폴더의 core.di.factory.example 패키지를 보면 DI 테스트를 위한 샘플 코드가 있다.
   core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+## STEP2
+
+### 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+
+> 지금까지 나만의 MVC 프레임워크를 구현해 잘 활용해 왔다. 그런데 새로운 컨트롤러가 추가될 때마다 매번 RequestMapping 클래스에 요청 URL과 컨트롤러를 추가하는 작업이 귀찮다. 귀찮지만 이 정도는 그래도 참을 수 있다. 하지만 유지보수 차원에서 봤을 때 컨트롤러의 수가 계속해서 증가하고 있으며, 각 컨트롤러의 execute() 메소드를 보니 10라인이 넘어가는 경우도 거의 없다. 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아니라 메소드를 추가하는 방식이면 좋겠다. 또 한 가지 아쉬운 점은 요청 URL을 매핑할 때 HTTP 메소드(GET, POST, PUT, DELETE 등)도 매핑에 활용할 수 있으면 좋겠다. HTTP 메소드에 대한 지원이 가능하다면 URL은 같지만 다른 메소드로 매핑하는 것도 가능할 것이다.
+> 이 같은 단점을 보완하기 위해 다음과 같이 Controller를 구현할 수 있도록 지원하는 프레임워크 구현하려고 한다. @RequestMapping()에 method 설정이 되어 있지 않으면 모든 HTTP method를 지원해야 한다.
