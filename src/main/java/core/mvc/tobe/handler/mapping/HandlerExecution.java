@@ -1,6 +1,7 @@
 package core.mvc.tobe.handler.mapping;
 
 import core.mvc.tobe.handler.TargetHandlingException;
+import core.mvc.tobe.handler.resolver.HandlerMethodArgumentResolvers;
 import core.mvc.tobe.view.ModelAndView;
 import core.mvc.tobe.view.SimpleNameView;
 
@@ -15,9 +16,15 @@ public class HandlerExecution {
     private final Object invoker;
     private final Method method;
 
+    private HandlerMethodArgumentResolvers handlerMethodArgumentResolvers;
+
     public HandlerExecution(Object invoker, Method method) {
         this.invoker = invoker;
         this.method = method;
+    }
+
+    public void setHandlerMethodArgumentResolvers(HandlerMethodArgumentResolvers handlerMethodArgumentResolvers) {
+        this.handlerMethodArgumentResolvers = handlerMethodArgumentResolvers;
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) {
@@ -35,7 +42,9 @@ public class HandlerExecution {
     }
 
     private ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws IllegalAccessException, InvocationTargetException {
-        Object invokeResult = method.invoke(invoker, request, response);
+        Object[] arguments = handlerMethodArgumentResolvers.resolveParameters(method, request, response);
+        Object invokeResult = method.invoke(invoker, arguments);
+
         if (invokeResult instanceof String) {
             return new ModelAndView(new SimpleNameView((String) invokeResult));
         }
