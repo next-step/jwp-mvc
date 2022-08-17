@@ -18,6 +18,17 @@ public class HandlerExecution {
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Constructor<?> constructor = controllerClass.getConstructor();
-        return (ModelAndView) declaredMethods.invoke(constructor.newInstance(), request, response);
+        return getModelAndView(declaredMethods.invoke(constructor.newInstance(), request, response));
+    }
+
+    private ModelAndView getModelAndView(Object invokeObject) {
+        if (invokeObject instanceof ModelAndView) {
+            return (ModelAndView) invokeObject;
+        }
+
+        if (invokeObject instanceof String) {
+            return new ModelAndView((String) invokeObject);
+        }
+        return null;
     }
 }

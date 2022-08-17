@@ -29,29 +29,20 @@ class AbstractDispatcherServletTest {
         request.setParameter("email", user.getEmail());
     }
 
-    @DisplayName("asis 패키지의 기존 MVC 프레임워크와 tobe 패키지의 새로운 MVC 프레임워크의 동작으로 생성된 결과값이 같은지 확인한다.")
+    @DisplayName("tobe 패키지의 새로운 MVC 프레임워크가 정상적으로 동작하는지 확인한다.")
     @Test
-    void checkSameResponse() throws ServletException, IOException {
-        MockHttpServletResponse asisResponse = new MockHttpServletResponse();
-        AbstractDispatcherServlet dispatcherServlet = new DispatcherServlet();
-        dispatcherServlet.init();
-        dispatcherServlet.service(request, asisResponse);
-
+    void tobeMVCFramework() throws ServletException, IOException {
         MockHttpServletResponse tobeResponse = new MockHttpServletResponse();
         AbstractDispatcherServlet newDispatcherServlet = new NewDispatcherServlet();
         newDispatcherServlet.init();
-        dispatcherServlet.service(request, tobeResponse);
+        newDispatcherServlet.service(request, tobeResponse);
 
         assertAll(
-                () -> assertThat(asisResponse.getHeader("Location")).isEqualTo(tobeResponse.getHeader("Location")),
-                () -> assertThat(asisResponse.getStatus()).isEqualTo(tobeResponse.getStatus()),
-                () -> assertThat(asisResponse.getErrorMessage()).isEqualTo(tobeResponse.getErrorMessage()),
-                () -> assertThat(asisResponse.getForwardedUrl()).isEqualTo(tobeResponse.getForwardedUrl()),
-                () -> assertThat(asisResponse.getIncludedUrl()).isEqualTo(tobeResponse.getIncludedUrl())
+                () -> assertThat(tobeResponse.getHeader("Location")).isEqualTo("/"),
+                () -> assertThat(tobeResponse.getStatus()).isEqualTo(302),
+                () -> assertThat(tobeResponse.getErrorMessage()).isNull(),
+                () -> assertThat(tobeResponse.getForwardedUrl()).isNull(),
+                () -> assertThat(tobeResponse.getIncludedUrl()).isNull()
         );
     }
-
-
-
-
 }

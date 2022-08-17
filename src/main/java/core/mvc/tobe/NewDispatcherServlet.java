@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Deprecated
 public class NewDispatcherServlet extends AbstractDispatcherServlet {
     private static final Logger logger = LoggerFactory.getLogger(NewDispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
@@ -17,17 +18,20 @@ public class NewDispatcherServlet extends AbstractDispatcherServlet {
     private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        String requestUri = req.getRequestURI();
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+
         HandlerExecution handler = annotationHandlerMapping.getHandler(req);
         try {
             ModelAndView modelAndView = handler.handle(req, resp);
-            move(modelAndView.getView().toString(), req, resp);
+            move(modelAndView.getViewName(), req, resp);
         } catch (Exception e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
