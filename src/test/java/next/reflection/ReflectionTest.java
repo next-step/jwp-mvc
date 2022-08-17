@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Date;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -33,12 +34,19 @@ public class ReflectionTest {
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
+        Constructor[] constructors = clazz.getDeclaredConstructors();
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
+            logger.debug(constructor.toString());
+
+            if (parameterTypes.length == 3) {
+                Object question = constructor.newInstance("작성자", "제목", "내용");
+                logger.debug(question.toString());
+            }
+
+            if (parameterTypes.length == 6) {
+                Object question = constructor.newInstance(1, "작성자", "제목", "내용", new Date(), 1);
+                logger.debug(question.toString());
             }
         }
     }

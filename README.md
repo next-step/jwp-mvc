@@ -20,4 +20,4 @@
 
 ## 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
 
-- [ ] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성
+- [x] Question 클래스의 인스턴스를 자바 Reflection API를 활용해 Question 인스턴스를 생성
