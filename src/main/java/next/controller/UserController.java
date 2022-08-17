@@ -20,13 +20,13 @@ public class UserController {
 
 
     @RequestMapping(value = "/form", method = RequestMethod.GET)
-    public ModelAndView usersForm(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView usersForm() {
         JspView jspView = new JspView("/user/form.jsp");
         return new ModelAndView(jspView);
     }
 
     @RequestMapping(value = "/loginForm", method = RequestMethod.GET)
-    public ModelAndView usersLoginForm(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView usersLoginForm() {
         JspView jspView = new JspView("/user/login.jsp");
         return new ModelAndView(jspView);
     }
@@ -44,9 +44,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView loginUser(HttpServletRequest req, HttpServletResponse resp) {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
+    public ModelAndView loginUser(String userId, String password, HttpServletRequest req) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             req.setAttribute("loginFailed", true);
@@ -66,8 +64,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public ModelAndView getProfile(HttpServletRequest req, HttpServletResponse resp) {
-        String userId = req.getParameter("userId");
+    public ModelAndView getProfile(String userId, HttpServletRequest req) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
@@ -78,7 +75,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ModelAndView logoutUser(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView logoutUser(HttpServletRequest req) {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         JspView jspView = new JspView("redirect:/");
@@ -86,9 +83,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-            req.getParameter("email"));
+    public ModelAndView createUser(User user) {
         logger.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -97,8 +92,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/updateForm", method = RequestMethod.GET)
-    public ModelAndView getUpdateUserForm(HttpServletRequest req, HttpServletResponse resp) {
-        String userId = req.getParameter("userId");
+    public ModelAndView getUpdateUserForm(String userId, HttpServletRequest req) {
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
@@ -109,14 +103,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ModelAndView updateUser(HttpServletRequest req, HttpServletResponse resp) {
-        User user = DataBase.findUserById(req.getParameter("userId"));
+    public ModelAndView updateUser(User updateUser, HttpServletRequest req) {
+        User user = DataBase.findUserById(updateUser.getUserId());
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-            req.getParameter("email"));
         logger.debug("Update User : {}", updateUser);
         user.update(updateUser);
         JspView jspView = new JspView("redirect:/");

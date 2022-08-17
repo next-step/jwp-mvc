@@ -18,7 +18,7 @@ public class AnnotationHandlerMapping {
 
     private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerAdapter> handlerExecutions = Maps.newHashMap();
+    private Map<String, HandlerAdapter> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -34,17 +34,25 @@ public class AnnotationHandlerMapping {
             Set<Method> requestMappingMethods
                 = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
             for (Method method : requestMappingMethods) {
-                HandlerKey handlerKey = createHandlerKey(controllerPath, method.getAnnotation(RequestMapping.class));
-                logger.info(handlerKey.toString());
-                handlerExecutions.put(handlerKey, new HandlerAdapter(controllers.get(clazz), method));
+                HandlerKey handlerKey = getHandlerKey(controllerPath, method);
+                handlerExecutions.put(handlerKey.toString(), new HandlerAdapter(controllers.get(clazz), method));
             }
         }
+    }
+
+    private HandlerKey getHandlerKey(String controllerPath, Method method) {
+        HandlerKey handlerKey = createHandlerKey(controllerPath, method.getAnnotation(RequestMapping.class));
+        logger.info(handlerKey.toString());
+        if (handlerExecutions.containsKey(handlerKey.toString())) {
+            throw new IllegalArgumentException("중복된 핸들러어댑터키");
+        }
+        return handlerKey;
     }
 
     public HandlerAdapter getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
+        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod).toString());
     }
 
     private HandlerKey createHandlerKey(String controllerPath, RequestMapping requestMapping) {

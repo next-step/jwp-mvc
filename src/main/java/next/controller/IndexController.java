@@ -13,7 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 public class IndexController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ModelAndView base(HttpServletRequest req, HttpServletResponse resp) {
+        return goToHomeJsp(req);
+    }
+
+    @RequestMapping(value = "/index", method = RequestMethod.GET)
     public ModelAndView index(HttpServletRequest req, HttpServletResponse resp) {
+        return goToHomeJsp(req);
+    }
+
+    private ModelAndView goToHomeJsp(HttpServletRequest req) {
         req.setAttribute("users", DataBase.findAll());
         JspView jspView = new JspView("home.jsp");
         return new ModelAndView(jspView);
