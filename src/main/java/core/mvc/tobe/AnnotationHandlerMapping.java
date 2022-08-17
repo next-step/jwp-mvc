@@ -26,19 +26,27 @@ public class AnnotationHandlerMapping {
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
 
         for (Class<?> controllerClazz : controllers) {
-            try {
-                Object controller = controllerClazz.getDeclaredConstructor().newInstance();
-                Method[] methods = controllerClazz.getMethods();
-                for (Method method : methods) {
-                    if (method.isAnnotationPresent(RequestMapping.class)) {
-                        RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-                        handlerExecutions.put(new HandlerKey(mapping.value(), mapping.method()), new HandlerExecution(controller, method));
-                    }
-                }
+            addHandlerExecutions(controllerClazz);
+        }
+    }
 
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
+    private void addHandlerExecutions(Class<?> clazz) {
+        try {
+            Object controller = clazz.getDeclaredConstructor().newInstance();
+            for (Method method : clazz.getMethods()) {
+                addHandlerExecutions(controller, method);
             }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addHandlerExecutions(Object controller, Method method) {
+        if (method.isAnnotationPresent(RequestMapping.class)) {
+            RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+            final HandlerKey handlerKey = new HandlerKey(mapping.value(), mapping.method());
+            final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
+            handlerExecutions.put(handlerKey, handlerExecution);
         }
     }
 
