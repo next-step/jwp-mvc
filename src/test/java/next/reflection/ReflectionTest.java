@@ -5,8 +5,8 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -24,18 +24,17 @@ public class ReflectionTest {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
         logger.debug("*** Fields ***");
-        Arrays.stream(clazz.getDeclaredFields()).forEach(field ->
-                logger.debug("Name: {}, Modifier: {}, Type: {}", field.getName(), Modifier.toString(field.getModifiers()), field.getType())
-        );
+        for (Field field : clazz.getDeclaredFields()) {
+            logger.debug("Name: {}, Modifier: {}, Type: {}", field.getName(), Modifier.toString(field.getModifiers()), field.getType());
+        }
         logger.debug("*** Constructors ***");
-        Arrays.stream(clazz.getDeclaredConstructors()).forEach(constructor ->
-                logger.debug("Modifier: {}, Parameters: {}", Modifier.toString(constructor.getModifiers()), constructor.getParameterTypes())
-        );
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            logger.debug("Modifier: {}, Parameters: {}", Modifier.toString(constructor.getModifiers()), constructor.getParameterTypes());
+        }
         logger.debug("*** Methods ***");
-        Arrays.stream(clazz.getDeclaredMethods()).forEach(method ->
-                logger.debug("Name: {}, Return Type: {}, Modifier: {}, Parameters: {}", method.getName(), method.getReturnType(), Modifier.toString(method.getModifiers()), method.getParameterTypes())
-        );
-        logger.debug(Arrays.toString(clazz.getDeclaredMethods()));
+        for (Method method : clazz.getMethods()) {
+            logger.debug("Name: {}, Return Type: {}, Modifier: {}, Parameters: {}", method.getName(), method.getReturnType(), Modifier.toString(method.getModifiers()), method.getParameterTypes());
+        }
     }
 
     @Test
