@@ -11,15 +11,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
-public class ProfileController {
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView profille(HttpServletRequest request, HttpServletResponse response) throws Exception {
+public class UpdateUserFormController {
+    @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
+    public ModelAndView form(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String userId = request.getParameter("userId");
         User user = DataBase.findUserById(userId);
-        if (user == null) {
-            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
+            throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
         request.setAttribute("user", user);
-        return ModelAndView.fromJspView("/user/profile.jsp");
+        return ModelAndView.fromJspView("/user/updateForm.jsp");
     }
 }

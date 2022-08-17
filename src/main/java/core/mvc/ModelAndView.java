@@ -17,6 +17,10 @@ public class ModelAndView {
         this.view = view;
     }
 
+    public static ModelAndView fromJspView(String viewName) {
+        return new ModelAndView(new JspView(viewName));
+    }
+
     public ModelAndView addObject(String attributeName, Object attributeValue) {
         model.put(attributeName, attributeValue);
         return this;
