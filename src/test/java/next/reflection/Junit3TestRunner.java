@@ -3,6 +3,7 @@ package next.reflection;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -21,13 +22,16 @@ public class Junit3TestRunner {
 
         Constructor<Junit3Test> constructor = clazz.getConstructor();
 
-        List<Method> methods = Arrays.stream(clazz.getDeclaredMethods())
+        List<Object> methods = Arrays.stream(clazz.getDeclaredMethods())
             .filter(method -> method.getName().startsWith(START_METHOD_NAME))
+            .map(method -> {
+                try {
+                    return method.invoke(constructor.newInstance());
+                } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                    throw new RuntimeException(e);
+                }
+            })
             .collect(Collectors.toList());
-
-        for (Method method : methods) {
-            method.invoke(constructor.newInstance());
-        }
 
         assertThat(methods).hasSize(2);
     }
