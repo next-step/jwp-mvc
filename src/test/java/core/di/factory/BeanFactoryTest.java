@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,5 +48,12 @@ public class BeanFactoryTest {
             beans.addAll(reflections.getTypesAnnotatedWith(annotation));
         }
         return beans;
+    }
+
+    @Test
+    public void componentScan() {
+        getTypesAnnotatedWith(Controller.class, Service.class, Repository.class).forEach(clazz ->
+            System.out.println(clazz.getName() +" 클래스의 어노테이션: "+ Arrays.toString(clazz.getAnnotations()))
+        );
     }
 }
