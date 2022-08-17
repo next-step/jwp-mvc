@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class ReflectionTest {
@@ -40,5 +41,22 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+
+        Field ageField = clazz.getDeclaredField("age");
+        ageField.setAccessible(true);
+        Field nameField = clazz.getDeclaredField("name");
+        nameField.setAccessible(true);
+
+        Student student = new Student();
+        ageField.set(student, 27);
+        nameField.set(student, "jason");
+
+        logger.debug(student.toString());
+        logger.debug(clazz.getName());
     }
 }

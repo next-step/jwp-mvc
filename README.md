@@ -16,4 +16,4 @@
 
 ## 요구사항4 - private field에 값 할당
 
-- [ ] Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인 
+- [x] Student 클래스의 name과 age 필드에 값을 할당한 후 getter 메소드를 통해 값을 확인 
