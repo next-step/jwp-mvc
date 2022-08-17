@@ -1,6 +1,7 @@
 package next.reflection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
@@ -41,19 +43,19 @@ public class ReflectionTest {
     void printAllByQuestion() {
         Class<Question> questionClass = Question.class;
 
-        String constructors = extractAndJoining(questionClass.getDeclaredConstructors(), DELIMITER);
-        String methods = extractAndJoining(questionClass.getDeclaredMethods(), DELIMITER);
-        String fields = extractAndJoining(questionClass.getDeclaredFields(), DELIMITER);
+        List<String> constructors = extractAndJoining(questionClass.getDeclaredConstructors());
+        List<String> methods = extractAndJoining(questionClass.getDeclaredMethods());
+        List<String> fields = extractAndJoining(questionClass.getDeclaredFields());
 
-        assertThat(constructors).isEqualTo("next.reflection.Question,next.reflection.Question");
-        assertThat(methods).isEqualTo("equals,toString,hashCode,update,getContents,getQuestionId,getCreatedDate,getTimeFromCreateDate,getCountOfComment,getWriter,getTitle");
-        assertThat(fields).isEqualTo("questionId,writer,title,contents,createdDate,countOfComment");
+        logger.info("생성자 목록: {}", constructors);
+        logger.info("메서드 목록: {}", methods);
+        logger.info("필드 목록: {}", fields);
     }
 
-    private static String extractAndJoining(Member[] objects, String delimiter) {
+    private List<String> extractAndJoining(Member[] objects) {
         return Arrays.stream(objects)
             .map(Member::getName)
-            .collect(Collectors.joining(delimiter));
+            .collect(Collectors.toList());
     }
 
     @DisplayName("Reflection API를 이용해 private field에 값을 할당할 수 있다.")
@@ -95,11 +97,18 @@ public class ReflectionTest {
             .toArray();
 
 
-        Question question1 = (Question) constructor.newInstance(params);
-        Question question2 = (Question) constructors[1].newInstance(1L, "nextstep", "리플렉션", "리플렉션은 어떻게사용하나요?", now, 10);
+        Question question = (Question) constructor.newInstance(params);
+        Question questionAllConstruct = (Question) constructors[1].newInstance(1L, "nextstep", "리플렉션", "리플렉션은 어떻게사용하나요?", now, 10);
 
-        assertThat(question1).isEqualTo(new Question("nextstep", "리플렉션", "리플렉션 어떻게 하나요?"));
-        assertThat(question2).isEqualTo(new Question(1L, "nextstep", "리플렉션", "리플렉션은 어떻게사용하나요?", now, 10));
+        Question compareQuestion = (Question) new Question("nextstep", "리플렉션", "리플렉션 어떻게 하나요?");
+        Question compareQuestionAllConstruct = (Question) new Question(1L, "nextstep", "리플렉션", "리플렉션은 어떻게사용하나요?", now, 10);
+
+        validateEqulasQuestion(question, compareQuestion);
+        validateEqulasQuestion(questionAllConstruct, compareQuestionAllConstruct);
+    }
+
+    private void validateEqulasQuestion(Question question, Question compareQuestion) {
+        assertThat(question).isEqualTo(compareQuestion);
     }
 
 }
