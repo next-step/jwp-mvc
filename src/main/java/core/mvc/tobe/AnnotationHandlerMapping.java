@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -21,12 +21,29 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
         final Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
 
         for (Class<?> controllerClazz : controllers) {
             addHandlerExecutions(controllerClazz);
+        }
+    }
+
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    private void addHandlerExecutions(Object controller, Method method) {
+        if (method.isAnnotationPresent(RequestMapping.class)) {
+            RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+            final HandlerKey handlerKey = new HandlerKey(mapping.value(), mapping.method());
+            final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
+            handlerExecutions.put(handlerKey, handlerExecution);
         }
     }
 
@@ -39,20 +56,5 @@ public class AnnotationHandlerMapping {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    private void addHandlerExecutions(Object controller, Method method) {
-        if (method.isAnnotationPresent(RequestMapping.class)) {
-            RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-            final HandlerKey handlerKey = new HandlerKey(mapping.value(), mapping.method());
-            final HandlerExecution handlerExecution = new HandlerExecution(controller, method);
-            handlerExecutions.put(handlerKey, handlerExecution);
-        }
-    }
-
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 }
