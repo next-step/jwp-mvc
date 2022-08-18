@@ -11,6 +11,10 @@ public class ModelAndView {
     public ModelAndView() {
     }
 
+    public ModelAndView(String viewName) {
+        this(new ViewImplement(viewName));
+    }
+
     public ModelAndView(View view) {
         this.view = view;
     }
@@ -30,5 +34,9 @@ public class ModelAndView {
 
     public View getView() {
         return view;
+    }
+
+    public String getViewName() {
+        return view.getViewName();
     }
 }
