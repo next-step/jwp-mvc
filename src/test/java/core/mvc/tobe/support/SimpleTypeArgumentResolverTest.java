@@ -14,7 +14,7 @@ import org.springframework.web.method.HandlerMethod;
 import core.mvc.tobe.TestUserController;
 
 public class SimpleTypeArgumentResolverTest {
-	private ArgumentResolver argumentResolver = new SimpleTypeArgumentResolver();
+	private final ArgumentResolver argumentResolver = new SimpleTypeArgumentResolver();
 
 	@Test
 	@DisplayName("Simple Type 인 경우, 지원 성공 테스트")

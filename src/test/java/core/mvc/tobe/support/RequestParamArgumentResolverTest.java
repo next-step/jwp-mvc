@@ -16,7 +16,7 @@ import core.mvc.tobe.TestUserController;
 
 public class RequestParamArgumentResolverTest {
 
-	ArgumentResolver argumentResolver = new RequestParamArgumentResolver();
+	private final ArgumentResolver argumentResolver = new RequestParamArgumentResolver();
 
 	@Test
 	@DisplayName("@RequestParam 어노테이션 선언 하지 않을 경우, 지원 실패 테스트")

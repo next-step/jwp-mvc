@@ -18,8 +18,8 @@ import core.mvc.tobe.TestUserController;
 
 public class HttpServletArgumentResolverTest {
 
-	private HttpRequestArgumentResolver httpRequestArgumentResolver = new HttpRequestArgumentResolver();
-	private HttpResponseArgumentResolver httpResponseArgumentResolver = new HttpResponseArgumentResolver();
+	private final HttpRequestArgumentResolver httpRequestArgumentResolver = new HttpRequestArgumentResolver();
+	private final HttpResponseArgumentResolver httpResponseArgumentResolver = new HttpResponseArgumentResolver();
 
 	@Test
 	@DisplayName("Argument HttpServlet Request/Response 지원 여부 테스트")

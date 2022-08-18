@@ -15,7 +15,7 @@ import core.mvc.tobe.TestUser;
 import core.mvc.tobe.TestUserController;
 
 public class BeanTypeArgumentResolverTest {
-	private ArgumentResolver argumentResolver = new BeanTypeArgumentResolver();
+	private final ArgumentResolver argumentResolver = new BeanTypeArgumentResolver();
 
 	@Test
 	@DisplayName("Bean Type 인 경우, 지원 성공 테스트")
