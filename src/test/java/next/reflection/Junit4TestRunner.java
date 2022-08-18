@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-public class Junit4TestRunner {
+class Junit4TestRunner {
 
     @DisplayName("Junit4Test에서 @MyTest 어노테이션이 있는 메서드만 실행")
     @Test

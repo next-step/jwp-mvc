@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-public class Junit3TestRunner {
+class Junit3TestRunner {
 
     @DisplayName("Junit3Test에서 test로 시작하는 메서드 만을 실행")
     @Test
