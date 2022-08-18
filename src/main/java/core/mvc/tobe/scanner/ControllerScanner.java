@@ -18,6 +18,7 @@ import core.mvc.tobe.support.ArgumentResolver;
 import core.mvc.tobe.support.BeanTypeArgumentResolver;
 import core.mvc.tobe.support.HttpRequestArgumentResolver;
 import core.mvc.tobe.support.HttpResponseArgumentResolver;
+import core.mvc.tobe.support.PathVariableArgumentResolver;
 import core.mvc.tobe.support.RequestParamArgumentResolver;
 import core.mvc.tobe.support.SimpleTypeArgumentResolver;
 
@@ -28,7 +29,8 @@ public class ControllerScanner {
 																		   new HttpResponseArgumentResolver(),
 																		   new RequestParamArgumentResolver(),
 																		   new SimpleTypeArgumentResolver(),
-																		   new BeanTypeArgumentResolver());
+																		   new BeanTypeArgumentResolver(),
+																		   new PathVariableArgumentResolver());
 
 	public ControllerScanner(Object... basePackage) {
 		Set<Class<?>> controllerWithAnnotation = new Reflections(basePackage).getTypesAnnotatedWith(Controller.class);
