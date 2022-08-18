@@ -1,4 +1,4 @@
-package core.mvc.tobe.support;
+package core.mvc.tobe.support.utils;
 
 public class ParameterTypeUtils {
 	public static Object cast(Class<?> parameterType, Object value) {
