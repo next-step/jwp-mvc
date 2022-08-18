@@ -30,7 +30,8 @@ public class ReflectionTest {
 
         // 생성자 정보 출력
         for (Constructor<?> constructor : clazz.getConstructors()) {
-            logger.debug("constructor {} ", constructor.getName());
+            logger.debug("constructor name: {} ", constructor.getName());
+            logger.debug("constructor parameter type: {} ", constructor.getParameterTypes());
         }
 
         // 메소드에 대한 정보를 출력

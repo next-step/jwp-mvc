@@ -1,13 +1,22 @@
 package core.mvc.asis;
 
-import next.controller.*;
+import core.mvc.tobe.HandlerMapping;
+import next.controller.CreateUserController;
+import next.controller.HomeController;
+import next.controller.ListUserController;
+import next.controller.LoginController;
+import next.controller.LogoutController;
+import next.controller.ProfileController;
+import next.controller.UpdateFormUserController;
+import next.controller.UpdateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestMapping {
+public class RequestMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
@@ -27,6 +36,16 @@ public class RequestMapping {
         mappings.keySet().forEach(path -> {
             logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
         });
+    }
+
+    @Override
+    public void initialize() {
+        initMapping();
+    }
+
+    @Override
+    public Object getHandler(HttpServletRequest request) {
+        return findController(request.getRequestURI());
     }
 
     public Controller findController(String url) {

@@ -1,5 +1,7 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,20 +19,18 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private HandlerMappings handlerMappings;
 
     @Override
-    public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+    public void init() {
+        handlerMappings = new HandlerMappings(new RequestMapping(), new AnnotationHandlerMapping());
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        Controller controller = rm.findController(requestUri);
+        Controller controller = handlerMappings.findController(req);
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
