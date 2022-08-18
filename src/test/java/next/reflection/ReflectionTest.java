@@ -7,8 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -40,8 +41,7 @@ public class ReflectionTest {
 
     @DisplayName("private field에 값 할당")
     @Test
-    void private_field_access() throws NoSuchMethodException, NoSuchFieldException,
-            InvocationTargetException, InstantiationException, IllegalAccessException {
+    void private_field_access() throws Exception {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
         Student student = clazz.getConstructor().newInstance();
@@ -60,17 +60,19 @@ public class ReflectionTest {
         );
     }
 
+    @DisplayName("인자를 가진 Question 클래스의 인스턴스를 생성")
     @Test
     @SuppressWarnings("rawtypes")
-    void constructor() throws Exception {
+    void init_question() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        for (Constructor constructor : constructors) {
-            Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
-            for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
-            }
-        }
+        Constructor<?> targetConstructor = Stream.of(clazz.getDeclaredConstructors())
+                .filter(constructor -> Arrays.asList(constructor.getParameterTypes())
+                        .equals(Arrays.asList(String.class, String.class, String.class)))
+                .findAny()
+                .get();
+
+        Object target = targetConstructor.newInstance("박재성", "NextStep", "JAVA");
+
+        assertThat(target).isEqualTo(new Question("박재성", "NextStep", "JAVA"));
     }
 }
