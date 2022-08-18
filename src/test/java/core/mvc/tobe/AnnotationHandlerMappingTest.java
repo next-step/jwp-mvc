@@ -19,7 +19,7 @@ public class AnnotationHandlerMappingTest {
     }
 
     @Test
-    public void create_find() throws Exception {
+    public void createFind() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
         createUser(user);
         assertThat(DataBase.findUserById(user.getUserId())).isEqualTo(user);
