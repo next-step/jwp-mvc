@@ -27,6 +27,12 @@ public class RequestParamArgumentResolver extends AbstractAnnotationArgumentReso
 		if (methodParameter.getParameterType().equals(Integer.class)) {
 			return Integer.valueOf(parameter.toString());
 		}
+		if (methodParameter.getParameterType().equals(int.class)) {
+			return Integer.parseInt(parameter.toString());
+		}
+		if (methodParameter.getParameterType().equals(long.class)) {
+			return Long.parseLong(parameter.toString());
+		}
 
 		return new RuntimeException("Not Support Argument");
 	}

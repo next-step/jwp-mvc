@@ -54,4 +54,21 @@ public class RequestParamArgumentResolverTest {
 		assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo("javajigi");
 		assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo("password");
 	}
+
+
+	@Test
+	@DisplayName("@RequestParam Primitive Type 타입 변환 테스트")
+	public void resolvePrimitiveTypeArgument() throws NoSuchMethodException {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		request.addParameter("id", "1");
+		request.addParameter("age", "12");
+
+		Method method = TestUserController.class.getDeclaredMethod("create_int_long", long.class, int.class);
+		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
+		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
+
+		assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo(1L);
+		assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo(12);
+	}
 }
