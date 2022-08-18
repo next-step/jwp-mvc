@@ -19,7 +19,7 @@ public class RequestParamArgumentResolverTest {
 	ArgumentResolver argumentResolver = new RequestParamArgumentResolver();
 
 	@Test
-	@DisplayName("@RequestParam 어노테이션 선언 하지 않을 경우, 지원 여부 테스트")
+	@DisplayName("@RequestParam 어노테이션 선언 하지 않을 경우, 지원 실패 테스트")
 	public void notSupportsParameter() throws NoSuchMethodException {
 		Method method = TestUserController.class.getDeclaredMethod("create_javabean", TestUser.class);
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
@@ -29,7 +29,7 @@ public class RequestParamArgumentResolverTest {
 	}
 
 	@Test
-	@DisplayName("@RequestParam 어노테이션 선언 한 경우, 지원 여부 테스트")
+	@DisplayName("@RequestParam 어노테이션 선언 한 경우, 지원 성공 테스트")
 	public void supportsParameter() throws NoSuchMethodException {
 		Method method = TestUserController.class.getDeclaredMethod("create_string", String.class, String.class);
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
@@ -54,7 +54,6 @@ public class RequestParamArgumentResolverTest {
 		assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo("javajigi");
 		assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo("password");
 	}
-
 
 	@Test
 	@DisplayName("@RequestParam Primitive Type 타입 변환 테스트")
