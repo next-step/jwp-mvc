@@ -1,6 +1,5 @@
 package next.reflection;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -8,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -19,7 +18,7 @@ public class ReflectionTest {
 
     @DisplayName("Question 클래스의 모든 필드, 생성자, 메서드 정보 확인")
     @Test
-    public void show_class() {
+    void show_class() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
 
@@ -39,9 +38,31 @@ public class ReflectionTest {
         );
     }
 
+    @DisplayName("private field에 값 할당")
+    @Test
+    void private_field_access() throws NoSuchMethodException, NoSuchFieldException,
+            InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Student> clazz = Student.class;
+        logger.debug(clazz.getName());
+        Student student = clazz.getConstructor().newInstance();
+
+        Field nameField = clazz.getDeclaredField("name");
+        nameField.setAccessible(true);
+        nameField.set(student, "산하");
+
+        Field ageField = clazz.getDeclaredField("age");
+        ageField.setAccessible(true);
+        ageField.set(student, 25);
+
+        assertAll(
+                () -> assertThat(clazz.getDeclaredMethod("getName").invoke(student)).isEqualTo("산하"),
+                () -> assertThat(clazz.getDeclaredMethod("getAge").invoke(student)).isEqualTo(25)
+        );
+    }
+
     @Test
     @SuppressWarnings("rawtypes")
-    public void constructor() throws Exception {
+    void constructor() throws Exception {
         Class<Question> clazz = Question.class;
         Constructor[] constructors = clazz.getConstructors();
         for (Constructor constructor : constructors) {

@@ -16,7 +16,7 @@ public class Junit3TestRunner {
 
     @DisplayName("Junit3Test에서 test로 시작하는 메서드 만을 실행")
     @Test
-    public void run() throws Exception {
+    void run() throws Exception {
         Class<Junit3Test> clazz = Junit3Test.class;
         Junit3Test junit3Test = clazz.getDeclaredConstructor().newInstance();
         List<Method> methodsStartWithTest = Stream.of(clazz.getDeclaredMethods())
