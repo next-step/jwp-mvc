@@ -14,7 +14,7 @@ public class BeanTypeArgumentResolver extends AbstractArgumentResolver {
 	@Override
 	public boolean supportsParameter(MethodParameter methodParameter) {
 		Class<?> parameterType = methodParameter.getParameterType();
-		return CharSequence.class.isAssignableFrom(parameterType) && !BeanUtils.isSimpleProperty(parameterType);
+		return !BeanUtils.isSimpleProperty(parameterType);
 	}
 
 	@Override

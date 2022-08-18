@@ -4,9 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
@@ -45,17 +42,6 @@ public class BeanTypeArgumentResolverTest {
 	@DisplayName("Bean Type 이 아닌 경우, 지원 실패 테스트2")
 	public void notSupportsParameter2() throws NoSuchMethodException {
 		Method method = TestUserController.class.getDeclaredMethod("create_int_long2", long.class, int.class);
-		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
-		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
-
-		assertThat(argumentResolver.supportsParameter(methodParameters[0])).isFalse();
-		assertThat(argumentResolver.supportsParameter(methodParameters[1])).isFalse();
-	}
-
-	@Test
-	@DisplayName("Bean Type 이 아닌 경우, 지원 실패 테스트3")
-	public void notSupportsParameter3() throws NoSuchMethodException {
-		Method method = TestUserController.class.getDeclaredMethod("index", HttpServletRequest.class, HttpServletResponse.class);
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
