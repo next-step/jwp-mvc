@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
+    private static final int REQUEST_METHOD_ZERO = 0;
+
     private Object[] basePackage;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -33,9 +35,21 @@ public class AnnotationHandlerMapping {
         try {
             Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
             List<Method> methods = getRequestMappingMethods(controllerClass);
-            methods.forEach(method -> handlerExecutions.put(createHandlerKey(method.getAnnotation(RequestMapping.class)), new HandlerExecution(controllerInstance, method)));
+            methods.forEach(method -> setHandlerExecutionsPerMethod(controllerInstance, method));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void setHandlerExecutionsPerMethod(Object controllerInstance, Method method) {
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        RequestMethod[] requestMethods = requestMapping.method();
+        if (requestMethods.length == REQUEST_METHOD_ZERO) {
+            requestMethods = RequestMethod.values();
+        }
+
+        for (RequestMethod requestMethod : requestMethods) {
+            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(controllerInstance, method));
         }
     }
 
@@ -43,10 +57,6 @@ public class AnnotationHandlerMapping {
         return Arrays.stream(controllerClass.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toList());
-    }
-
-    private HandlerKey createHandlerKey(RequestMapping requestMapping) {
-        return new HandlerKey(requestMapping.value(), requestMapping.method());
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
