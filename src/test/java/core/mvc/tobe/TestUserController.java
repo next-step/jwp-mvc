@@ -33,7 +33,25 @@ public class TestUserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_string2(String userId, String password) {
+        logger.debug("userId: {}, password: {}", userId, password);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("userId", userId);
+        mav.addObject("password", password);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView create_int_long(@RequestParam long id, @RequestParam int age) {
+        logger.debug("id: {}, age: {}", id, age);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("id", id);
+        mav.addObject("age", age);
+        return mav;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_int_long2(long id, int age) {
         logger.debug("id: {}, age: {}", id, age);
         ModelAndView mav = new ModelAndView();
         mav.addObject("id", id);
