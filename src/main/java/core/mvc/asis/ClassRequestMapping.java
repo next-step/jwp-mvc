@@ -1,6 +1,6 @@
 package core.mvc.asis;
 
-import core.mvc.tobe.RequestMappingInterface;
+import core.mvc.tobe.RequestMapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestMapping implements RequestMappingInterface {
+public class ClassRequestMapping implements RequestMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 

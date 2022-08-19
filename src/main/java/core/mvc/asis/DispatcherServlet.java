@@ -3,7 +3,7 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.RequestMappingInterface;
+import core.mvc.tobe.RequestMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +22,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final String BASE_PACKAGE_PATH = "next.controller";
 
-    private RequestMappingInterface requestMapping;
+    private RequestMapping requestMapping;
 
-    private RequestMappingInterface annotationHandlerMapping;
+    private RequestMapping annotationHandlerMapping;
 
     @Override
     public void init() {
-        requestMapping = new RequestMapping();
+        requestMapping = new ClassRequestMapping();
         requestMapping.initialize();
 
         annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE_PATH);
@@ -41,17 +41,17 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            if (tobeHandlerMapping(req, resp)) {
+            if (annotationHandle(req, resp)) {
                 return;
             }
-            asisHandlerMapping(req, resp);
+            controllerHandle(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private boolean tobeHandlerMapping(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private boolean annotationHandle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HandlerExecution handlerExecution = (HandlerExecution) annotationHandlerMapping.findHandler(req);
         if (handlerExecution != null) {
             ModelAndView modelAndView = handlerExecution.handle(req, resp);
@@ -61,7 +61,7 @@ public class DispatcherServlet extends HttpServlet {
         return false;
     }
 
-    private void asisHandlerMapping(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void controllerHandle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Controller controller = (Controller) requestMapping.findHandler(req);
         String viewName = controller.execute(req, resp);
         move(viewName, req, resp);

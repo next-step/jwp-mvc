@@ -6,13 +6,13 @@ import java.util.Map;
 
 public class ModelAndView {
     private View view;
-    private Map<String, Object> model = new HashMap<String, Object>();
+    private final Map<String, Object> model = new HashMap<>();
 
     public ModelAndView() {
     }
 
     public ModelAndView(String viewName) {
-        this(new ViewImplement(viewName));
+        this(new HandleBarsView(viewName));
     }
 
     public ModelAndView(View view) {

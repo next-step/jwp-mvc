@@ -2,19 +2,16 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
-import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.net.http.HttpRequest;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping implements RequestMappingInterface {
+public class AnnotationHandlerMapping implements RequestMapping {
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -32,7 +29,7 @@ public class AnnotationHandlerMapping implements RequestMappingInterface {
 
     private void setHandlerExecutions(Class<?> controllerClass) {
         Arrays.stream(controllerClass.getDeclaredMethods()).forEach(declaredMethod -> {
-            RequestMapping requestMapping = declaredMethod.getAnnotation(RequestMapping.class);
+            core.annotation.web.RequestMapping requestMapping = declaredMethod.getAnnotation(core.annotation.web.RequestMapping.class);
             handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(controllerClass, declaredMethod));
         });
     }

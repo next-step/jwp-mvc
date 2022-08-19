@@ -4,14 +4,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-public class ViewImplement implements View {
+public class HandleBarsView implements View {
 
-    private String viewName;
+    private final String viewName;
 
-    public ViewImplement() {
-    }
-
-    public ViewImplement(String viewName) {
+    public HandleBarsView(String viewName) {
         this.viewName = viewName;
     }
 
