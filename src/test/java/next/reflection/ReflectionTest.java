@@ -1,10 +1,14 @@
 package next.reflection;
 
+import org.assertj.core.internal.bytebuddy.dynamic.ClassFileLocator;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -12,7 +16,27 @@ public class ReflectionTest {
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
-        logger.debug(clazz.getName());
+        Arrays.stream(clazz.getDeclaredFields())
+                .forEach(field -> {
+                    final int modifiers = field.getModifiers();
+                    logger.info("{} {} {}", Modifier.toString(modifiers), field.getType().getSimpleName(), field.getName());
+                });
+        Arrays.stream(clazz.getDeclaredConstructors())
+                .forEach(constructor -> {
+                    final int modifiers = constructor.getModifiers();
+                    final String parameterTypeNames = Arrays.stream(constructor.getParameterTypes())
+                            .map(Class::getSimpleName)
+                            .collect(Collectors.joining(","));
+                    logger.info("{} {} {}", Modifier.toString(modifiers), constructor.getName(), parameterTypeNames);
+                });
+        Arrays.stream(clazz.getDeclaredMethods())
+                .forEach(method -> {
+                    final int modifiers = method.getModifiers();
+                    final String parameterTypeNames = Arrays.stream(method.getParameterTypes())
+                            .map(Class::getSimpleName)
+                            .collect(Collectors.joining(","));
+                    logger.info("{} {} {}", Modifier.toString(modifiers), method.getName(), parameterTypeNames);
+                });
     }
 
     @Test
