@@ -9,6 +9,8 @@ import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -16,6 +18,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BeanFactoryTest {
+    private static final Logger logger = LoggerFactory.getLogger(BeanFactoryTest.class);
     private Reflections reflections;
     private BeanFactory beanFactory;
 
@@ -47,5 +50,25 @@ public class BeanFactoryTest {
             beans.addAll(reflections.getTypesAnnotatedWith(annotation));
         }
         return beans;
+    }
+
+    @Test
+    void componentScan() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+        for (Class<?> controller : controllers) {
+            logger.info("controller name : {}", controller.getName());
+        }
+
+        Set<Class<?>> services = reflections.getTypesAnnotatedWith(Service.class);
+        for (Class<?> service : services) {
+            logger.info("service name : {}", service.getName());
+        }
+
+        Set<Class<?>> repositories = reflections.getTypesAnnotatedWith(Repository.class);
+        for (Class<?> repository : repositories) {
+            logger.info("repository name : {}", repository.getName());
+        }
+
     }
 }
