@@ -1,72 +1,53 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
-    private final Object[] basePackage;
+    private final ControllerScanner controllerScanner;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
     public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
+        this.controllerScanner = new ControllerScanner(basePackage);
     }
 
     public void initialize() {
-        Set<Class<?>> controllerTypes = findControllerTypes();
-
-        Set<Method> methods = findRequestMappingMethods(controllerTypes);
-
-        initHandlerExecutions(methods);
+        initHandlerExecutions(controllerScanner.scanControllers());
     }
 
-    private Set<Method> findRequestMappingMethods(Set<Class<?>> controllers) {
-        return controllers.stream()
-                .map(Class::getDeclaredMethods)
-                .flatMap(Arrays::stream)
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toSet());
-    }
+    private void initHandlerExecutions(ControllerRegistry controllerRegistry) {
+        for (Class<?> controllerType : controllerRegistry.getAllTypes()) {
+            Object controller = controllerRegistry.getInstanceByType(controllerType);
 
-    private Set<Class<?>> findControllerTypes() {
-        return Arrays.stream(basePackage)
-                .map(Reflections::new)
-                .map(reflection -> reflection.getTypesAnnotatedWith(Controller.class))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
-    }
+            Set<Method> requestMappingMethods = getAllMethods(controllerType, withAnnotation(RequestMapping.class));
 
-    private void initHandlerExecutions(Set<Method> methods) {
-        for (Method method : methods) {
-            putHandlerExecution(method);
+            saveRequestMappings(controller, requestMappingMethods);
         }
     }
 
-    private void putHandlerExecution(Method method) {
-        RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+    private void saveRequestMappings(Object controller, Set<Method> requestMappingMethods) {
+        for (Method requestMappingMethod : requestMappingMethods) {
+            saveRequestMappingAsHandlerExecution(requestMappingMethod, controller);
+        }
+    }
+
+    private void saveRequestMappingAsHandlerExecution(Method requestMappingMethod, Object handler) {
+        RequestMapping requestMapping = requestMappingMethod.getDeclaredAnnotation(RequestMapping.class);
 
         HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
 
-        HandlerExecution handlerExecution = new HandlerExecution(createHandlerInstance(method), method);
+        HandlerExecution handlerExecution = new HandlerExecution(handler, requestMappingMethod);
 
         this.handlerExecutions.put(handlerKey, handlerExecution);
-    }
-
-    private Object createHandlerInstance(Method method) {
-        Class<?> declaringClass = method.getDeclaringClass();
-        try {
-            return declaringClass.newInstance();
-        } catch (Exception e) {
-            return new RuntimeException(e);
-        }
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {

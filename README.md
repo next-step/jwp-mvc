@@ -26,3 +26,14 @@
 3. @RequestMapping 메서드들의 요청 정보를 키로 핸들러를 저장해본다.
 4. RequestMapping 방식에서 AnnotationHandlerMapping 방식으로 점진적으로 넘어가기 위해, Adapter 인터페이스 구현
 5. viewName 을 보고 어떤 View 객체가 필요한지 정하는 ViewResolver 구현
+
+## Step3 - @MVC 구현 (힌트)
+
+### 
+* ControllerScanner 추가
+  * Controller 를 스캔하고 인스턴스를 담당하는 ControllerScanner 추가
+* AnnotationHandlerMapping 추가
+  * 이미 추가 되어 있으므로 AnnotationHandlerMapping 에서 ControllerScanner 를 사용하는 로직으로 수정
+* 요청에 대한 Controller 반환
+* HandlerMapping 초기화
+* Controller 실행
