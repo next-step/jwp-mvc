@@ -15,6 +15,8 @@
 ### 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
 - [ ] Question클래스의 인스턴스를 자바 Reflection API를 활용해 Question인스턴스를 생성한다.
 
+### 요구사항 6 - Component Scan
+- [ ] @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력
 
 ## 진행 방법
 * 프레임워크 구현에 대한 요구사항을 파악한다.
