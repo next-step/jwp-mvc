@@ -20,13 +20,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping requestMapping;
+    private LegacyHandlerMapping legacyHandlerMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
     public void init() {
-        requestMapping = new RequestMapping();
-        requestMapping.initMapping();
+        legacyHandlerMapping = new LegacyHandlerMapping();
+        legacyHandlerMapping.initMapping();
 
         annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
@@ -43,7 +43,7 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
 
-        final Controller controller = requestMapping.findController(requestUri);
+        final Controller controller = legacyHandlerMapping.findController(requestUri);
         executeController(request, response, controller);
     }
 
