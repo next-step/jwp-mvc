@@ -25,7 +25,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        requestMapping = new ClassRequestMapping();
+        requestMapping = new LegacyRequestMapping();
         requestMapping.initialize();
 
         annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE_PATH);

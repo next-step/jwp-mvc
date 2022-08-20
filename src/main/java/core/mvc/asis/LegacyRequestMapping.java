@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClassRequestMapping implements RequestMapping {
+public class LegacyRequestMapping implements RequestMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
