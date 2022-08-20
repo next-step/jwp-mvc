@@ -1,58 +1,53 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
+import org.reflections.ReflectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
-    private final Object[] basePackage;
+	private final Object[] basePackages;
 
-    private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+	private Map<HandlerKey, HandlerExecution> handlerExecutions;
 
-    public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
-    }
+	public AnnotationHandlerMapping(Object... basePackages) {
+		this.basePackages = basePackages;
+	}
 
-    public void initialize() {
-        final Reflections reflections = new Reflections(basePackage);
-        final Set<Method> methods = getRequestMappingMethods(reflections);
+	public void initialize() {
+		ControllerScanner controllerScanner = new ControllerScanner(basePackages);
+		Map<Class<?>, Object> controllers = controllerScanner.getControllers();
 
-        for (Method method : methods) {
-            final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-            final HandlerKey handlerKey = new HandlerKey(requestMapping.value(), requestMapping.method());
-            final HandlerExecution handlerExecution = new HandlerExecution(method);
-            handlerExecutions.put(handlerKey, handlerExecution);
-        }
-    }
+		handlerExecutions = controllers.keySet()
+			.stream()
+			.flatMap(clazz -> getRequestMappingMethod(clazz).stream())
+			.collect(Collectors.toMap(
+				HandlerKey::of,
+				method -> new HandlerExecution(controllers.get(method.getDeclaringClass()), method))
+			);
+	}
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return getHandlerExecution(requestUri, requestMethod);
-    }
+	@SuppressWarnings("unchecked")
+	private static Set<Method> getRequestMappingMethod(Class<?> clazz) {
+		return ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
+	}
 
-    private Set<Method> getRequestMappingMethods(Reflections reflections) {
-        return reflections.getTypesAnnotatedWith(Controller.class)
-                .stream()
-                .flatMap(clazz -> Arrays.stream(clazz.getMethods()))
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toSet());
-    }
+	public HandlerExecution getHandler(HttpServletRequest request) {
+		String requestUri = request.getRequestURI();
+		RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+		return getHandlerExecution(requestUri, requestMethod);
+	}
 
-    private HandlerExecution getHandlerExecution(String requestUri, RequestMethod requestMethod) {
-        final HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
-        if (handlerExecution != null) {
-            return handlerExecution;
-        }
-        return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.ALL));
-    }
+	private HandlerExecution getHandlerExecution(String requestUri, RequestMethod requestMethod) {
+		final HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
+		if (handlerExecution != null) {
+			return handlerExecution;
+		}
+		return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.ALL));
+	}
 }

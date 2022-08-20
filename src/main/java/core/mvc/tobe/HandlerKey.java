@@ -1,14 +1,22 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
+import java.lang.reflect.Method;
+
 public class HandlerKey {
-    private String url;
-    private RequestMethod requestMethod;
+    private final String url;
+    private final RequestMethod requestMethod;
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
+    }
+
+    public static HandlerKey of(Method method) {
+        RequestMapping annotation = method.getAnnotation(RequestMapping.class);
+        return new HandlerKey(annotation.value(), annotation.method());
     }
 
     @Override

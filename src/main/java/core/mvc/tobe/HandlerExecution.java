@@ -8,9 +8,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
+    private final Object declaredObject;
     private final Method method;
 
-    public HandlerExecution(Method method) {
+    public HandlerExecution(Object declaredObject, Method method) {
+        this.declaredObject = declaredObject;
         this.method = method;
     }
 
