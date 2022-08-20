@@ -12,6 +12,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -19,17 +21,11 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String BASE_PACKAGE_PATH = "next.controller";
 
-    private RequestMapping requestMapping;
-
-    private RequestMapping annotationHandlerMapping;
-
+    private List<RequestMapping> requestMappings;
     @Override
     public void init() {
-        requestMapping = new LegacyRequestMapping();
-        requestMapping.initialize();
-
-        annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE_PATH);
-        annotationHandlerMapping.initialize();
+        requestMappings = Arrays.asList(new LegacyRequestMapping(), new AnnotationHandlerMapping(BASE_PACKAGE_PATH));
+        requestMappings.forEach(RequestMapping::initialize);
     }
 
     @Override
@@ -38,18 +34,28 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            if (annotationHandle(req, resp)) {
-                return;
-            }
-            controllerHandle(req, resp);
+            handleRequestMapping(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private boolean annotationHandle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        HandlerExecution handlerExecution = (HandlerExecution) annotationHandlerMapping.findHandler(req);
+    private void handleRequestMapping(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        for (RequestMapping requestMapping : requestMappings) {
+            if (availableAnnotationHandle(req, resp, requestMapping)) {
+                return;
+            }
+            controllerHandle(requestMapping, req, resp);
+        }
+    }
+
+    private boolean availableAnnotationHandle(HttpServletRequest req, HttpServletResponse resp, RequestMapping requestMapping) throws Exception {
+        return requestMapping instanceof AnnotationHandlerMapping && annotationHandle(requestMapping, req, resp);
+    }
+
+    private boolean annotationHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        HandlerExecution handlerExecution = (HandlerExecution) requestMapping.findHandler(req);
         if (handlerExecution != null) {
             ModelAndView modelAndView = handlerExecution.handle(req, resp);
             modelAndView.render(req, resp);
@@ -58,7 +64,7 @@ public class DispatcherServlet extends HttpServlet {
         return false;
     }
 
-    private void controllerHandle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void controllerHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Controller controller = (Controller) requestMapping.findHandler(req);
         ModelAndView modelAndView = new ModelAndView(controller.execute(req, resp));
         modelAndView.render(req, resp);
