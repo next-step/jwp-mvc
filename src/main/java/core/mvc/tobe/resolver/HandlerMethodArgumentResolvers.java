@@ -12,6 +12,9 @@ public class HandlerMethodArgumentResolvers {
         handlerMethodArgumentResolvers.add(basicArgumentResolver);
         handlerMethodArgumentResolvers.add(new ModelAttributeMethodProcessor(basicArgumentResolver));
         handlerMethodArgumentResolvers.add(new PathArgumentResolver());
-        handlerMethodArgumentResolvers.add(new Argument);
+    }
+
+    public List<HandlerMethodArgumentResolver> getHandlerMethodArgumentResolvers() {
+        return handlerMethodArgumentResolvers;
     }
 }
