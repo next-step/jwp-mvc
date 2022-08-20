@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.exception.NotExistHandlerException;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -43,25 +44,23 @@ public class DispatcherServlet extends HttpServlet {
 
     private void handleRequestMapping(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         for (RequestMapping requestMapping : requestMappings) {
-            if (availableAnnotationHandle(req, resp, requestMapping)) {
+            Object handler = requestMapping.findHandler(req);
+            if (handler instanceof Controller) {
+                controllerHandle(requestMapping, req, resp);
                 return;
+            } else if (handler instanceof HandlerExecution) {
+                annotationHandle(requestMapping, req, resp);
+                return;
+            } else {
+                throw new NotExistHandlerException("Handler is not exist");
             }
-            controllerHandle(requestMapping, req, resp);
         }
     }
 
-    private boolean availableAnnotationHandle(HttpServletRequest req, HttpServletResponse resp, RequestMapping requestMapping) throws Exception {
-        return requestMapping instanceof AnnotationHandlerMapping && annotationHandle(requestMapping, req, resp);
-    }
-
-    private boolean annotationHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void annotationHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HandlerExecution handlerExecution = (HandlerExecution) requestMapping.findHandler(req);
-        if (handlerExecution != null) {
-            ModelAndView modelAndView = handlerExecution.handle(req, resp);
-            modelAndView.render(req, resp);
-            return true;
-        }
-        return false;
+        ModelAndView modelAndView = handlerExecution.handle(req, resp);
+        modelAndView.render(req, resp);
     }
 
     private void controllerHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
