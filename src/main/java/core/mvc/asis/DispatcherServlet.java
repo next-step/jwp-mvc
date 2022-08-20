@@ -34,8 +34,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        final String requestUri = request.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
 
         final HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(request);
         if (handlerExecution != null) {
@@ -43,7 +42,7 @@ public class DispatcherServlet extends HttpServlet {
             return;
         }
 
-        final Controller controller = legacyHandlerMapping.findController(requestUri);
+        final Controller controller = legacyHandlerMapping.getHandler(request);
         executeController(request, response, controller);
     }
 

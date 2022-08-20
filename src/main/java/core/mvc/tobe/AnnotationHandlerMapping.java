@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.HandlerMapping;
 import org.reflections.ReflectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 	private final Object[] basePackages;
 
 	private Map<HandlerKey, HandlerExecution> handlerExecutions;
@@ -37,6 +38,7 @@ public class AnnotationHandlerMapping {
 		return ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
 	}
 
+	@Override
 	public HandlerExecution getHandler(HttpServletRequest request) {
 		String requestUri = request.getRequestURI();
 		RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());

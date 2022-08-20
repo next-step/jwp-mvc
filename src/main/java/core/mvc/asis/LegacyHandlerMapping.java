@@ -1,12 +1,14 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LegacyHandlerMapping {
+public class LegacyHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private final Map<String, Controller> mappings = new HashMap<>();
 
@@ -26,8 +28,10 @@ public class LegacyHandlerMapping {
         mappings.keySet().forEach(path -> logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass()));
     }
 
-    public Controller findController(String url) {
-        return mappings.get(url);
+    @Override
+    public Controller getHandler(HttpServletRequest request) {
+        final String requestUri = request.getRequestURI();
+        return mappings.get(requestUri);
     }
 
     void put(String url, Controller controller) {
