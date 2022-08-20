@@ -32,7 +32,7 @@ public class ControllerScanner {
             try {
                 classMap.put(controllerClass, constructor.newInstance());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                logger.error("@Controller has been annotated an inappropriate class.");
+                logger.warn("@Controller has been annotated an inappropriate class.");
             }
         }
         return classMap;

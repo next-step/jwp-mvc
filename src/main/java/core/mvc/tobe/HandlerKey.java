@@ -1,10 +1,15 @@
 package core.mvc.tobe;
 
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
 public class HandlerKey {
-    private String url;
-    private RequestMethod requestMethod;
+    private final String url;
+    private final RequestMethod requestMethod;
+
+    public HandlerKey(RequestMapping requestMapping) {
+        this(requestMapping.value(), requestMapping.method());
+    }
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;

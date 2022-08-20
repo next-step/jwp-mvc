@@ -2,12 +2,14 @@ package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMethod;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 public class AnnotationHandlerMapping implements RequestMapping {
     private final Object[] basePackage;
@@ -26,10 +28,12 @@ public class AnnotationHandlerMapping implements RequestMapping {
         controllers.keySet().forEach(key -> setHandlerExecutions(key, controllers.get(key)));
     }
 
+    @SuppressWarnings("unchecked")
     private void setHandlerExecutions(Class<?> controllerClass, Object ControllerObject) {
-        for (Method declaredMethod : controllerClass.getDeclaredMethods()) {
-            core.annotation.web.RequestMapping requestMapping = declaredMethod.getAnnotation(core.annotation.web.RequestMapping.class);
-            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(ControllerObject, declaredMethod));
+        Set<Method> allMethods = ReflectionUtils.getAllMethods(controllerClass, ReflectionUtils.withAnnotation(core.annotation.web.RequestMapping.class));
+        for (Method method : allMethods) {
+            core.annotation.web.RequestMapping requestMapping = method.getAnnotation(core.annotation.web.RequestMapping.class);
+            handlerExecutions.put(new HandlerKey(requestMapping), new HandlerExecution(ControllerObject, method));
         }
     }
 
