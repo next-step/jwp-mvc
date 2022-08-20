@@ -6,9 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.*;
+
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -51,5 +56,23 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    void private_field_access() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+        Class<Student> clazz = Student.class;
+        Student student = clazz.getConstructor().newInstance();
+
+        Field nameField = clazz.getDeclaredField("name");
+        Field ageField = clazz.getDeclaredField("age");
+
+        nameField.setAccessible(true);
+        ageField.setAccessible(true);
+
+        nameField.set(student,"임정택");
+        ageField.setInt(student, 30);
+
+        assertThat(nameField.get(student)).isEqualTo("임정택");
+        assertThat(ageField.get(student)).isEqualTo(30);
     }
 }
