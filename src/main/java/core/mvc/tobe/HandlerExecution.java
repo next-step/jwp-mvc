@@ -11,6 +11,12 @@ public class HandlerExecution {
     private final Class<?> controllerClass;
     private final Method declaredMethods;
 
+    // 임시 생성자 생성
+    public HandlerExecution(Object controllerClass, Method declaredMethods) {
+        this.controllerClass = null;
+        this.declaredMethods = declaredMethods;
+    }
+
     public HandlerExecution(Class<?> controllerClass, Method declaredMethods) {
         this.controllerClass = controllerClass;
         this.declaredMethods = declaredMethods;

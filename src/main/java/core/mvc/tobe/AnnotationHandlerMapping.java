@@ -1,15 +1,13 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.Set;
 
 public class AnnotationHandlerMapping implements RequestMapping {
     private final Object[] basePackage;
@@ -23,15 +21,16 @@ public class AnnotationHandlerMapping implements RequestMapping {
     @Override
     public void initialize() {
         Reflections reflections = new Reflections(basePackage, Scanners.TypesAnnotated);
-        Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
-        controllerClasses.forEach(this::setHandlerExecutions);
+        ControllerScanner controllerScanner = new ControllerScanner(reflections);
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+        controllers.keySet().forEach(key -> setHandlerExecutions(key, controllers.get(key)));
     }
 
-    private void setHandlerExecutions(Class<?> controllerClass) {
-        Arrays.stream(controllerClass.getDeclaredMethods()).forEach(declaredMethod -> {
+    private void setHandlerExecutions(Class<?> controllerClass, Object ControllerObject) {
+        for (Method declaredMethod : controllerClass.getDeclaredMethods()) {
             core.annotation.web.RequestMapping requestMapping = declaredMethod.getAnnotation(core.annotation.web.RequestMapping.class);
-            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(controllerClass, declaredMethod));
-        });
+            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(ControllerObject, declaredMethod));
+        }
     }
 
     @Override
