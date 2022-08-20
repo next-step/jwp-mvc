@@ -6,13 +6,14 @@ import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -36,44 +37,30 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), request.getRequestURI());
 
-        final HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(request);
-        if (handlerExecution != null) {
-            executeAnnotationHandler(request, response, handlerExecution);
-            return;
-        }
-
-        final Controller controller = legacyHandlerMapping.getHandler(request);
-        executeController(request, response, controller);
+        final Object handler = findHandler(request);
+        final ModelAndView mav = executeHandler(request, response, handler);
+        mav.render(request, response);
     }
 
-    private void executeAnnotationHandler(HttpServletRequest request, HttpServletResponse response, HandlerExecution handlerExecution) throws ServletException {
-        try {
-            final ModelAndView modelAndView = handlerExecution.handle(request, response);
-            modelAndView.render(request, response);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e.getMessage(), e);
-            throw new ServletException(e.getMessage());
-        }
+    private Object findHandler(HttpServletRequest request) throws ServletException {
+        List<Object> handlers = new ArrayList<>();
+        handlers.add(annotationHandlerMapping.getHandler(request));
+        handlers.add(legacyHandlerMapping.getHandler(request));
+        return handlers.stream()
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow((() -> new ServletException("요청한 URI를 처리할 수 있는 핸들러가 없습니다.")));
     }
 
-    private void executeController(HttpServletRequest request, HttpServletResponse response, Controller controller) throws ServletException {
-        try {
-            String viewName = controller.execute(request, response);
-            move(viewName, request, response);
-        } catch (Exception e) {
-            logger.error("Exception : {}", e.getMessage(), e);
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    private void move(String viewName, HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            response.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private ModelAndView executeHandler(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException {
+        if (handler instanceof Controller) {
+            return ((Controller) handler).execute(request, response);
         }
 
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewName);
-        requestDispatcher.forward(request, response);
+        if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution) handler).handle(request, response);
+        }
+
+        throw new ServletException("처리할 수 없는 핸들러 유형입니다.");
     }
 }
