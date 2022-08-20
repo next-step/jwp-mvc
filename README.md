@@ -12,6 +12,9 @@
 ### 요구사항 4 - private field에 값 할당
 - [ ] Student클래스의 name과 age 필드에 값을 할당한 후 getter메소드를 통해 값을 확인한다.
 
+### 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
+- [ ] Question클래스의 인스턴스를 자바 Reflection API를 활용해 Question인스턴스를 생성한다.
+
 
 ## 진행 방법
 * 프레임워크 구현에 대한 요구사항을 파악한다.
