@@ -1,6 +1,7 @@
 package core.mvc.tobe.scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Set;
 
@@ -21,9 +22,11 @@ public class ControllerHandlersTest {
 		Set<Class<?>> controllerWithAnnotation = new Reflections(BASE_PACKAGE).getTypesAnnotatedWith(Controller.class);
 		ControllerHandlers controllerHandlers = new ControllerHandlers(controllerWithAnnotation);
 
-		assertThat(controllerHandlers.getControllerHandler(MyController.class)).isNotNull();
-		assertThat(controllerHandlers.getControllerHandlerInstance(MyController.class)).isNotNull();
-		assertThat(controllerHandlers.getControllerHandler(TestUserController.class)).isNotNull();
-		assertThat(controllerHandlers.getControllerHandlerInstance(TestUserController.class)).isNotNull();
+		assertAll(
+				() -> assertThat(controllerHandlers.getControllerHandler(MyController.class)).isNotNull(),
+				() -> assertThat(controllerHandlers.getControllerHandlerInstance(MyController.class)).isNotNull(),
+				() -> assertThat(controllerHandlers.getControllerHandler(TestUserController.class)).isNotNull(),
+				() -> assertThat(controllerHandlers.getControllerHandlerInstance(TestUserController.class)).isNotNull()
+		);
 	}
 }
