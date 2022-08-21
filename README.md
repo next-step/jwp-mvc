@@ -47,5 +47,14 @@
   - src/test/java 폴더의 core.di.factory.example 패키지를 보면 DI 테스트를 위한 샘플 코드가 있다.
   - core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
 
+## Step2
+
+### 요구사항 1
+
+- 어노테이션 기반의 Http Servlet Controller를 구현하기
+  - 해당 URL에 대응되는 서블릿 엔드포인트를 @RequestMapping이 선언된 메소드로 구현한다
+  - `@RequestMapping(value="/users/show", method=RequestMethod.GET)`
+  - 단, method 설정이 되어있지 않다면 모든 HTTP method를 지원해야 한다
+
 
 
