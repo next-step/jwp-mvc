@@ -27,24 +27,27 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Object[] arguments = getArguments(request, response);
+        return (ModelAndView) method.invoke(instance, arguments);
+    }
+
+    private Object[] getArguments(HttpServletRequest request, HttpServletResponse response) {
         MethodParameter[] methodParameters = new MethodParameter[method.getParameterCount()];
         Object[] arguments = new Object[methodParameters.length];
 
         for (int i = 0; i < methodParameters.length; i++) {
-            methodParameters[i] = new MethodParameter(method, i);
+            MethodParameter methodParameter = new MethodParameter(method, i);
+            arguments[i] = getArgument(methodParameter, request, response);
         }
+        return arguments;
+    }
 
-        for (int i = 0; i < methodParameters.length; i++) {
-            MethodParameter methodParameter = methodParameters[i];
-            arguments[i] = argumentResolvers.stream()
-                                            .filter(resolver -> resolver.supportsParameter(methodParameter))
-                                            .findFirst()
-                                            .map(resolver -> resolver.resolveArgument(methodParameter, request, response))
-                                            .orElseThrow(() -> new RuntimeException(NOT_FOUND_RESOLVER));
-        }
-
-        // 메소드에 전달
-        return (ModelAndView) method.invoke(instance, arguments);
+    private Object getArgument(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
+        return argumentResolvers.stream()
+                .filter(resolver -> resolver.supportsParameter(methodParameter))
+                .findFirst()
+                .map(resolver -> resolver.resolveArgument(methodParameter, request, response))
+                .orElseThrow(() -> new RuntimeException(NOT_FOUND_RESOLVER));
     }
 
     @Override
