@@ -73,3 +73,22 @@ public class MyController {
 - 따라서, 점진적으로 리팩토링이 가능한 구조로 개발한다.
 - 즉, 레거시 MVC 프레임워크와 새롭게 구현한 애노테이션 MVC 프레임워크가 공존해야 한다.
 - 레거시 MVC 프레임워크가 새로운 애노테이션 MVC 프레임워크로 전환이 완료된 후, 기존의 레거시 MVC 프레임워크를 삭제한다.
+
+
+## 기능 목록
+- HandlerMapping 인터페이스
+  - LegacyRequestMapping 구현체
+    - path 에 대한 Controller 구현체들을 mapping
+  - AnnotationHandlerMapping 구현체
+    - Reflections 라이브러리 이용하여 @Controller 의 @RequestMapping path & request method 를 mapping 하도록 구현한다.
+- HandlerExecution
+  - handler(request 에 해당하는 controller)의 method 를 실행시킨다.
+- HandlerKey
+  - Request Mapping 을 위한 unique handler key (url & request method)
+- View 인터페이스
+  - render 추상 메서드를 통해 화면에 보여줄 페이지를 동적으로 생성할 수 있도록 한다.
+  - ResourceView 구현체
+    - page 에 대한 render 처리를 진행한다. (RequestDispatcher 활용)
+- ModelAndView
+  - 화면에 보여줄 view (path) 와 데이터 (model)을 관리한다.
+>Legacy 네이밍으로 시작하는 클래스들은 애노테이션 기반 MVC 패턴이 적용 된 후 삭제한다.
