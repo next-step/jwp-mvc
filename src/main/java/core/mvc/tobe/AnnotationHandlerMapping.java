@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.HandlerMapping;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final int REQUEST_METHOD_ZERO = 0;
 
     private Object[] basePackage;
@@ -34,14 +35,15 @@ public class AnnotationHandlerMapping {
     private void setHandlerExecutions(Class<?> controllerClass) {
         try {
             Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
+            String controllerPath = controllerClass.getAnnotation(Controller.class).path();
             List<Method> methods = getRequestMappingMethods(controllerClass);
-            methods.forEach(method -> setHandlerExecutionsPerMethod(controllerInstance, method));
+            methods.forEach(method -> setHandlerExecutionsPerMethod(controllerInstance, method, controllerPath));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setHandlerExecutionsPerMethod(Object controllerInstance, Method method) {
+    private void setHandlerExecutionsPerMethod(Object controllerInstance, Method method, String controllerPath) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         RequestMethod[] requestMethods = requestMapping.method();
         if (requestMethods.length == REQUEST_METHOD_ZERO) {
@@ -49,7 +51,7 @@ public class AnnotationHandlerMapping {
         }
 
         for (RequestMethod requestMethod : requestMethods) {
-            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMethod), new HandlerExecution(controllerInstance, method));
+            handlerExecutions.put(new HandlerKey(controllerPath + requestMapping.value(), requestMethod), new HandlerExecution(controllerInstance, method));
         }
     }
 
@@ -61,7 +63,7 @@ public class AnnotationHandlerMapping {
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
     }
 }
