@@ -5,6 +5,7 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +35,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
     }
 
-    private void initializeHandlerExecution(Reflections reflections) throws InstantiationException, IllegalAccessException {
+    private void initializeHandlerExecution(Reflections reflections)
+        throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> controllerClass : controllerClasses) {
             Controller controllerAnnotation = controllerClass.getAnnotation(Controller.class);
@@ -44,8 +46,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         }
     }
 
-    private void requestMethodScan(String controllerLevelPath, Class<?> controllerClass) throws InstantiationException, IllegalAccessException {
-        Object controllerInstance = controllerClass.newInstance();
+    private void requestMethodScan(String controllerLevelPath, Class<?> controllerClass)
+        throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
         Method[] methods = controllerClass.getDeclaredMethods();
         for (Method method : methods) {
             addHendlerExecution(controllerInstance, controllerLevelPath, method);
@@ -53,17 +56,24 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private void addHendlerExecution(Object controllerInstance, String controllerLevelPath, Method method) {
-        if(method.isAnnotationPresent(RequestMapping.class)) {
-            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-            String path = requestMapping.value();
-            RequestMethod requestMethod = requestMapping.method();
-
-            HandlerKey handlerKey = new HandlerKey(controllerLevelPath + path, requestMethod);
-            logger.info("Add RequestMapping URL : {}, method : {}", handlerKey, method);
-            handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
+        if(isExistAnnotaionPresent(method)) {
+            RequestMapping requestMapping = getRequestMapping(method);
+            addHandlerExecution(controllerInstance, controllerLevelPath, method, requestMapping);
         }
     }
 
+    private boolean isExistAnnotaionPresent(Method method) {
+        return method.isAnnotationPresent(RequestMapping.class);
+    }
+
+    private RequestMapping getRequestMapping(Method method) {
+        return method.getAnnotation(RequestMapping.class);
+    }
+
+    private void addHandlerExecution(Object controllerInstance, String controllerLevelPath, Method method, RequestMapping requestMapping) {
+        HandlerKey handlerKey = new HandlerKey(controllerLevelPath + requestMapping.value(), requestMapping.method());
+        handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
+    }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
