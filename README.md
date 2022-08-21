@@ -56,5 +56,9 @@
   - `@RequestMapping(value="/users/show", method=RequestMethod.GET)`
   - 단, method 설정이 되어있지 않다면 모든 HTTP method를 지원해야 한다
 
+### 요구사항 2
+
+- 레거시 MVC와 애노테이션 기반 MVC 통합
+- 지금까지 사용한 MVC 프레임워크와 새롭게 구현한 애노테이션 기반 MVC 프레임워크가 공존할 수 있도록 구현
 
 
