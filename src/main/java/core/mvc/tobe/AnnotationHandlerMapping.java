@@ -21,7 +21,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        initHandlerExecutions(controllerScanner.scanControllers());
+        initHandlerExecutions(controllerScanner.getControllerRegistry());
     }
 
     private void initHandlerExecutions(ControllerRegistry controllerRegistry) {

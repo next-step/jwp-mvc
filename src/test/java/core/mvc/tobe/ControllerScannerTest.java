@@ -14,7 +14,7 @@ class ControllerScannerTest {
         ControllerScanner controllerScanner = new ControllerScanner("core.mvc.tobe");
 
         // when
-        ControllerRegistry registry = controllerScanner.scanControllers();
+        ControllerRegistry registry = controllerScanner.getControllerRegistry();
 
         // then
         assertThat(registry.getInstanceByType(MyController.class))

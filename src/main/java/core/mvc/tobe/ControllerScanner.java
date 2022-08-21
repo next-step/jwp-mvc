@@ -17,7 +17,7 @@ class ControllerScanner {
         this.registry = new ControllerRegistry(new HashMap<>());
     }
 
-    ControllerRegistry scanControllers() {
+    ControllerRegistry getControllerRegistry() {
         if (registry.isEmpty()) {
             registerControllers(findControllers());
         }
