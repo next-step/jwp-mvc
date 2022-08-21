@@ -5,6 +5,7 @@ import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.HandlerMappings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,11 +26,9 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private static final String NOT_FOUND_URL = "존재하지 않는 URL입니다.";
-
     private RequestMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
-    private List<HandlerMapping> mappings = new ArrayList<>();
+    private HandlerMappings mappings = new HandlerMappings();
 
     @Override
     public void init() throws ServletException {
@@ -39,8 +38,7 @@ public class DispatcherServlet extends HttpServlet {
         annotationHandlerMapping = new AnnotationHandlerMapping();
         annotationHandlerMapping.initialize();
 
-        mappings.add(rm);
-        mappings.add(annotationHandlerMapping);
+        mappings.addAll((List.of(rm, annotationHandlerMapping)));
     }
 
     @Override
@@ -48,8 +46,7 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        rm.findController(requestUri);
-        Object handler = getHandler(req);
+        Object handler = mappings.getHandler(req);
         try {
             ModelAndView mav = execute(handler, req, resp);
             View view = mav.getView();
@@ -76,14 +73,6 @@ public class DispatcherServlet extends HttpServlet {
             return ((Controller) handler).execute(req, resp);
         }
         return ((HandlerExecution) handler).handle(req, resp);
-    }
-
-    private Object getHandler(HttpServletRequest req) {
-        return mappings.stream()
-            .map(handlerMapping -> handlerMapping.getHandler(req))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_URL));
     }
 
 }
