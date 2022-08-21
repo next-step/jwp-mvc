@@ -1,5 +1,12 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerAdapter;
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecutionHandlerAdapter;
+import core.mvc.tobe.RequestControllerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Set;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -17,12 +26,25 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private Set<HandlerAdapter> handlerAdapters = Set.of(
+            new ControllerHandlerAdapter(),
+            new HandlerExecutionHandlerAdapter()
+    );
+
+    private Set<HandlerMapping> handlerMappings;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        RequestMapping requestMapping = new RequestMapping();
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping();
+
+        requestMapping.initMapping();
+        annotationHandlerMapping.initialize();
+
+        handlerMappings = Set.of(
+                new RequestControllerMapping(requestMapping),
+                annotationHandlerMapping
+        );
     }
 
     @Override
@@ -30,14 +52,28 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Object handler = handlerMappings.stream()
+                .map(it -> it.getHandler(req))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException());
+
+        HandlerAdapter handlerAdapter = handlerAdapters.stream().filter(it -> it.support(handler))
+                .findFirst()
+                .orElseThrow();
+
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            ModelAndView modelAndView = handlerAdapter.handle(req, resp, handler);
+            render(modelAndView, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private void render(ModelAndView modelAndView, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), request, response);
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
