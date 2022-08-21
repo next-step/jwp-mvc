@@ -3,7 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.JspView;
+import core.mvc.ResourceView;
 import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +14,6 @@ public class HomeController {
     @RequestMapping("/")
     public ModelAndView homePage(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         req.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("home.jsp"));
+        return new ModelAndView(new ResourceView("home.jsp"));
     }
 }

@@ -3,7 +3,7 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.JspView;
+import core.mvc.ResourceView;
 import core.mvc.ModelAndView;
 import next.model.User;
 import org.slf4j.Logger;
@@ -24,17 +24,17 @@ public class UserController {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new ResourceView("redirect:/"));
     }
 
     @RequestMapping("/")
     public ModelAndView showUsers(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (!UserSessionUtils.isLogined(req.getSession())) {
-            return new ModelAndView(new JspView("redirect:/users/loginForm"));
+            return new ModelAndView(new ResourceView("redirect:/users/loginForm"));
         }
 
         req.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new JspView("/user/list.jsp"));
+        return new ModelAndView(new ResourceView("/user/list.jsp"));
     }
 
     @RequestMapping("/users/login")
@@ -44,11 +44,11 @@ public class UserController {
         User user = DataBase.findUserById(userId);
         if (isLoginFail(password, user)) {
             req.setAttribute("loginFailed", true);
-            return new ModelAndView(new JspView("/user/login.jsp"));
+            return new ModelAndView(new ResourceView("/user/login.jsp"));
         }
         HttpSession session = req.getSession();
         session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new ResourceView("redirect:/"));
     }
 
     private static boolean isLoginFail(String password, User user) {
@@ -59,7 +59,7 @@ public class UserController {
     public ModelAndView userLogout(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new ResourceView("redirect:/"));
     }
 
     @RequestMapping("/users/profile")
@@ -67,7 +67,7 @@ public class UserController {
         String userId = req.getParameter("userId");
         User user = Optional.ofNullable(DataBase.findUserById(userId)).orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다."));
         req.setAttribute("user", user);
-        return new ModelAndView(new JspView("/user/profile.jsp"));
+        return new ModelAndView(new ResourceView("/user/profile.jsp"));
     }
 
     @RequestMapping("/users/updateForm")
@@ -76,7 +76,7 @@ public class UserController {
         User user = DataBase.findUserById(userId);
         validateSameUser(req, user);
         req.setAttribute("user", user);
-        return new ModelAndView(new JspView("/user/updateForm.jsp"));
+        return new ModelAndView(new ResourceView("/user/updateForm.jsp"));
     }
 
     @RequestMapping("/users/update")
@@ -88,7 +88,7 @@ public class UserController {
                 req.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new ResourceView("redirect:/"));
     }
 
     private static void validateSameUser(HttpServletRequest req, User user) {
