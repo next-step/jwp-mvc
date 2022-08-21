@@ -18,7 +18,7 @@ public class HandlerMappings {
 		LegacyHandlerMapping legacyHandlerMapping = new LegacyHandlerMapping();
 		AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(basePackage);
 
-//		mappings.add(legacyHandlerMapping);
+		mappings.add(legacyHandlerMapping);
 		mappings.add(annotationHandlerMapping);
 	}
 
