@@ -1,6 +1,7 @@
 package core.mvc.tobe.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.lang.reflect.Method;
 
@@ -34,8 +35,9 @@ public class BeanTypeArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(argumentResolver.supportsParameter(methodParameters[0])).isFalse();
-		assertThat(argumentResolver.supportsParameter(methodParameters[1])).isFalse();
+		assertAll(
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[0])).isFalse(),
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[1])).isFalse());
 	}
 
 	@Test
@@ -45,8 +47,9 @@ public class BeanTypeArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(argumentResolver.supportsParameter(methodParameters[0])).isFalse();
-		assertThat(argumentResolver.supportsParameter(methodParameters[1])).isFalse();
+		assertAll(
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[0])).isFalse(),
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[1])).isFalse());
 	}
 
 	@Test

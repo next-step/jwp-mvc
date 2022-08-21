@@ -1,6 +1,7 @@
 package core.mvc.tobe.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.lang.reflect.Method;
 
@@ -28,8 +29,9 @@ public class HttpServletArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(httpRequestArgumentResolver.supportsParameter(methodParameters[0])).isTrue();
-		assertThat(httpResponseArgumentResolver.supportsParameter(methodParameters[1])).isTrue();
+		assertAll(
+				() -> assertThat(httpRequestArgumentResolver.supportsParameter(methodParameters[0])).isTrue(),
+				() -> assertThat(httpResponseArgumentResolver.supportsParameter(methodParameters[1])).isTrue());
 	}
 
 	@Test
@@ -42,7 +44,8 @@ public class HttpServletArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(httpRequestArgumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo(request);
-		assertThat(httpResponseArgumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo(response);
+		assertAll(
+				() -> assertThat(httpRequestArgumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo(request),
+				() -> assertThat(httpResponseArgumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo(response));
 	}
 }

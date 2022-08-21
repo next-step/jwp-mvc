@@ -26,7 +26,6 @@ public class ControllerHandlersTest {
 				() -> assertThat(controllerHandlers.getControllerHandler(MyController.class)).isNotNull(),
 				() -> assertThat(controllerHandlers.getControllerHandlerInstance(MyController.class)).isNotNull(),
 				() -> assertThat(controllerHandlers.getControllerHandler(TestUserController.class)).isNotNull(),
-				() -> assertThat(controllerHandlers.getControllerHandlerInstance(TestUserController.class)).isNotNull()
-		);
+				() -> assertThat(controllerHandlers.getControllerHandlerInstance(TestUserController.class)).isNotNull());
 	}
 }

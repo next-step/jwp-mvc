@@ -1,6 +1,7 @@
 package core.mvc.tobe.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.lang.reflect.Method;
 
@@ -23,8 +24,9 @@ public class SimpleTypeArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(argumentResolver.supportsParameter(methodParameters[0])).isTrue();
-		assertThat(argumentResolver.supportsParameter(methodParameters[1])).isTrue();
+		assertAll(
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[0])).isTrue(),
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[1])).isTrue());
 	}
 
 	@Test
@@ -34,8 +36,9 @@ public class SimpleTypeArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(argumentResolver.supportsParameter(methodParameters[0])).isTrue();
-		assertThat(argumentResolver.supportsParameter(methodParameters[1])).isTrue();
+		assertAll(
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[0])).isTrue(),
+				() -> assertThat(argumentResolver.supportsParameter(methodParameters[1])).isTrue());
 	}
 
 
@@ -51,8 +54,9 @@ public class SimpleTypeArgumentResolverTest {
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
 
-		assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo("javajigi");
-		assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo("password");
+		assertAll(
+				() -> assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo("javajigi"),
+				() -> assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo("password"));
 	}
 
 	@Test
@@ -66,8 +70,8 @@ public class SimpleTypeArgumentResolverTest {
 		Method method = TestUserController.class.getDeclaredMethod("create_int_long", long.class, int.class);
 		HandlerMethod handlerMethod = new HandlerMethod(new TestUserController(), method);
 		MethodParameter[] methodParameters = handlerMethod.getMethodParameters();
-
-		assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo(1L);
-		assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo(12);
+		assertAll(
+				() -> assertThat(argumentResolver.resolveArgument(methodParameters[0], request, response)).isEqualTo(1L),
+				() -> assertThat(argumentResolver.resolveArgument(methodParameters[1], request, response)).isEqualTo(12));
 	}
 }
