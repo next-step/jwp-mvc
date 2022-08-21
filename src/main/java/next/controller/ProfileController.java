@@ -7,7 +7,7 @@ import next.model.User;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ProfileController implements Controller {
+public class ProfileController extends Controller {
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");

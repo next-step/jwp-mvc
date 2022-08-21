@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class HandlerExecution {
+public class HandlerExecution implements ExecuteHandler {
     private final Object declaredObject;
     private final Method method;
 
@@ -15,6 +15,7 @@ public class HandlerExecution {
         this.method = method;
     }
 
+    @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return getModelAndView(method.invoke(declaredObject, request, response));
     }

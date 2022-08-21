@@ -1,10 +1,9 @@
 package core.mvc.asis;
 
-import core.exception.NotExistHandlerException;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.RequestMapping;
+import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.ExecuteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +21,11 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String BASE_PACKAGE_PATH = "next.controller";
 
-    private List<RequestMapping> requestMappings;
+    private List<HandlerMapping> handlerMappings;
     @Override
     public void init() {
-        requestMappings = Arrays.asList(new LegacyRequestMapping(), new AnnotationHandlerMapping(BASE_PACKAGE_PATH));
-        requestMappings.forEach(RequestMapping::initialize);
+        handlerMappings = Arrays.asList(new LegacyHandlerMapping(), new AnnotationHandlerMapping(BASE_PACKAGE_PATH));
+        handlerMappings.forEach(HandlerMapping::initialize);
     }
 
     @Override
@@ -43,29 +42,14 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void handleRequestMapping(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        for (RequestMapping requestMapping : requestMappings) {
-            Object handler = requestMapping.findHandler(req);
-            if (handler instanceof Controller) {
-                controllerHandle(requestMapping, req, resp);
-                return;
-            } else if (handler instanceof HandlerExecution) {
-                annotationHandle(requestMapping, req, resp);
-                return;
-            } else {
-                throw new NotExistHandlerException("Handler is not exist");
+        for (HandlerMapping handlerMapping : handlerMappings) {
+            ExecuteHandler executeHandler = handlerMapping.findHandler(req);
+            if (executeHandler == null) {
+                continue;
             }
+            ModelAndView modelAndView = executeHandler.handle(req, resp);
+            modelAndView.render(req, resp);
+            break;
         }
-    }
-
-    private void annotationHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        HandlerExecution handlerExecution = (HandlerExecution) requestMapping.findHandler(req);
-        ModelAndView modelAndView = handlerExecution.handle(req, resp);
-        modelAndView.render(req, resp);
-    }
-
-    private void controllerHandle(RequestMapping requestMapping, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        Controller controller = (Controller) requestMapping.findHandler(req);
-        ModelAndView modelAndView = new ModelAndView(controller.execute(req, resp));
-        modelAndView.render(req, resp);
     }
 }

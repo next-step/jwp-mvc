@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
@@ -11,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping implements RequestMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -30,15 +31,15 @@ public class AnnotationHandlerMapping implements RequestMapping {
 
     @SuppressWarnings("unchecked")
     private void setHandlerExecutions(Class<?> controllerClass, Object ControllerObject) {
-        Set<Method> allMethods = ReflectionUtils.getAllMethods(controllerClass, ReflectionUtils.withAnnotation(core.annotation.web.RequestMapping.class));
+        Set<Method> allMethods = ReflectionUtils.getAllMethods(controllerClass, ReflectionUtils.withAnnotation(RequestMapping.class));
         for (Method method : allMethods) {
-            core.annotation.web.RequestMapping requestMapping = method.getAnnotation(core.annotation.web.RequestMapping.class);
-            handlerExecutions.put(new HandlerKey(requestMapping), new HandlerExecution(ControllerObject, method));
+            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(ControllerObject, method));
         }
     }
 
     @Override
-    public Object findHandler(HttpServletRequest request) {
+    public ExecuteHandler findHandler(HttpServletRequest request) {
         return getHandler(request);
     }
 
