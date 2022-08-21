@@ -1,9 +1,13 @@
 package core.mvc.tobe;
 
 import core.db.DataBase;
+import core.mvc.ModelAndView;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -31,6 +35,22 @@ public class AnnotationHandlerMappingTest {
         execution.handle(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
+    }
+
+    @DisplayName("@RequestMapping 에 method가 설정이 되어 있지 않으면 모든 HTTP method를 지원해야 한다.")
+    @ValueSource(strings = {"GET", "POST", "PUT", "DELETE"})
+    @ParameterizedTest
+    void defaultRequestMappingTest(String method) throws Exception {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest(method, "/default-method-test");
+
+        // when
+        HandlerExecution handler = handlerMapping.getHandler(request);
+        ModelAndView modelAndView = handler.handle(request, new MockHttpServletResponse());
+
+        // then
+        assertThat(modelAndView.getViewName())
+                .isEqualTo(method);
     }
 
     private void createUser(User user) throws Exception {

@@ -36,4 +36,10 @@ public class MyController {
         DataBase.addUser(user);
         return null;
     }
+
+    @RequestMapping("/default-method-test")
+    public ModelAndView defaultMethodTest(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(request.getMethod());
+    }
+
 }
