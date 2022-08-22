@@ -5,7 +5,6 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +16,7 @@ public class AnnotationHandlerMapping extends AbstractHandlerMapping {
         this.basePackage = basePackage;
     }
 
-    public void initialize() throws InvocationTargetException, NoSuchMethodException,
-            InstantiationException, IllegalAccessException {
+    public void initialize() {
         Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> controller : controllers) {
@@ -27,9 +25,14 @@ public class AnnotationHandlerMapping extends AbstractHandlerMapping {
         }
     }
 
-    private void detectHandlerExecution(String path, Class<?> controller) throws NoSuchMethodException,
-            InvocationTargetException, InstantiationException, IllegalAccessException {
-        Object controllerInstance = controller.getConstructor().newInstance();
+    private void detectHandlerExecution(String path, Class<?> controller) {
+        Object controllerInstance = null;
+        try {
+            controllerInstance = controller.getConstructor().newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("detectHandlerExecution Exception : {}", e.getMessage());
+        }
         List<Method> methods = List.of(controller.getDeclaredMethods());
         for (Method method : methods) {
             addHandlerExecution(controllerInstance, path, method);
