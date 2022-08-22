@@ -18,11 +18,7 @@ public class ModelAttributeProcessorTest {
     @Test
     @DisplayName("javaBean 데이터 매핑")
     void java_bean_value() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-
-        request.addParameter("userId", "user");
-        request.addParameter("password", "password");
-        request.addParameter("age", "45");
+        MockHttpServletRequest request = HttpRequestHelper.helper();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         Class<TestUserController> testUserControllerClass = TestUserController.class;
@@ -36,7 +32,7 @@ public class ModelAttributeProcessorTest {
         TestUser user = (TestUser) modelArgumentResolver.resolveArgument(methodParameter, request, response);
 
         Assertions.assertAll(
-                () -> assertThat(user.getUserId()).isEqualTo("user"),
+                () -> assertThat(user.getUserId()).isEqualTo("javajigi"),
                 () -> assertThat(user.getPassword()).isEqualTo("password"),
                 () -> assertThat(user.getAge()).isEqualTo(45)
         );

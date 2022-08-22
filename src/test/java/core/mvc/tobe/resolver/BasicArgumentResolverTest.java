@@ -15,9 +15,7 @@ public class BasicArgumentResolverTest {
     @Test
     @DisplayName("해당 String value가 잘 들어오는 확인 ")
     void resolver_value_confirm() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("userId", "javajigi");
-        request.addParameter("password", "password");
+        MockHttpServletRequest request = HttpRequestHelper.helper();
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
