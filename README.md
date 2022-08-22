@@ -38,3 +38,24 @@
 ### 요구사항 6 - component scan
 
 * `core.di.factory.exaple` 패키지에서 `@Controller`, `@Service`, `@Repository` 어노테이션이 설정되어 있는 모든 클래스를 찾아 출력.
+
+## 2단계 - @MVC 구현
+
+### 요구사항 1 - 어노테이션 기반 MVC 프레임워크
+
+* `RequestMapping` 클래스에 매번 url과 컨트롤러를 매핑해주는 방식을 개선한다.
+  * 기능 추가시 매번 컨트롤러를 추가하는게 아닌 메서드를 추가하는 방식으로 수정
+  * 요청 URL을 매핑할때 HTTP Method `GET`, `POST`, `PUT`, `DELETE`도 매핑하도록 수정
+    * URL은 같지만 다른 HTTP Method로 매핑하는것도 가능
+  * `@RequestMapping`에 method 설정 안돼있으면 모든 HTTP method를 지원.
+
+* 클래스패스로 설정되어있는 클래스 중에 `@Controller`어노테이션이 설정된 클래스를 찾는다.
+  * `RequestMapping` 설정에 따라 요청 URL과 메서드를 연결하도록 구현.
+  * Java reflection을 사용하여 어노테이션 붙은 클래스 찾는다.
+
+### 요구사항 2 - 레거시 MVC와 어노테이션 기반 MVC 통합
+
+* 기존 MVC 프레임워크를 어노테이션 기반 프레임워크로 점진적으로 개선 시킨다.
+  * 점진적 리팩토링 도입
+    * 기존 MVC와 새로운 MVC가 공존.
+    * 모든 Controller가 새로운 MVC로 전환되면 기존 레거시 MVC 삭제.
