@@ -2,9 +2,9 @@ package core.mvc.tobe;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface RequestMappingInterface {
+public interface HandlerMapping {
 
     void initialize();
 
-    Object findHandler(HttpServletRequest request);
+    ExecuteHandler findHandler(HttpServletRequest request);
 }

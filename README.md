@@ -28,3 +28,23 @@
    2. @RequestMapping 설정에 따라 요청 URL과 메소드를 연결한다. (@RequestMapping에 method 설정이 되어있지 않으면 모든 HTTP method 지원)
 2. 레거시 MVC와 애노테이션 기반 MVC 통합
    1. 점진적인 리팩토링이 가능한 구조로 개발한다. (기존 코드와 신규 코드가 공존)
+
+## 3단계 - MVC 구현(힌트)
+1. 새로 생성한 MVC 프레임워크 리팩토링
+   1. ControllerScanner 클래스 추가
+      1. reflection 라이브러리를 활용해 @Controller 애노테이션이 설정되어있는 모든 클래스를 찾고, ControllerScanner 클래스에서 인스턴스를 생성한다.
+      2. 생성한 인스턴스를 Map<Class<?>, Object>에 추가한다.
+   2. AnnotationHandlerMapping 클래스 추가
+      1. @Controller 클래스의 메소드 중 RequestMapping 애노테이션이 설정되어있는 모든 메소드를 찾는다.
+      2. 찾은 메소드를 Map<HandlerKey, HandlerExecution>에 추가한다.
+   3. 요청에 대한 Controller 반환
+      1. AnnotationHandlerMapping 클래스에 HttpServletRequest를 전달하여 요청에 해당하는 HandlerExecution을 반환한다.
+      2. HandlerExecution getHandler(HttpServletRequest request); 메소드를 구현한다.
+2. 레거시 MVC와 애노테이션 기반 MVC 통합
+   1. HandlerMapping 추가
+      1. AnnotationHandlerMapping, asis 패키지 하위의 HandlerMapping 의 공통부분을 추출하여 인터페이스를 만든다.
+   2. HandlerMapping 초기화
+      1. DispatcherServlet의 초기화(init() 메소드) 과정에서 LegactyHandlerMapping, AnnotationHandlerMapping 모두 초기화한다.
+      2. 초기화한 2개의 HandlerMapping을 List로 관리한다.
+   3. Controller 실행
+      1. DispatcherServlet의 service() 메소드는 HttpServletRequest에 해당하는 Controller를 찾아 메소드를 실행한다.

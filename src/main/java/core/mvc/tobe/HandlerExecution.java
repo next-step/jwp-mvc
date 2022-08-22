@@ -4,21 +4,20 @@ import core.mvc.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-public class HandlerExecution {
-    private final Class<?> controllerClass;
-    private final Method declaredMethods;
+public class HandlerExecution implements ExecuteHandler {
+    private final Object declaredObject;
+    private final Method method;
 
-    public HandlerExecution(Class<?> controllerClass, Method declaredMethods) {
-        this.controllerClass = controllerClass;
-        this.declaredMethods = declaredMethods;
+    public HandlerExecution(Object declaredObject, Method method) {
+        this.declaredObject = declaredObject;
+        this.method = method;
     }
 
+    @Override
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Constructor<?> constructor = controllerClass.getConstructor();
-        return getModelAndView(declaredMethods.invoke(constructor.newInstance(), request, response));
+        return getModelAndView(method.invoke(declaredObject, request, response));
     }
 
     private ModelAndView getModelAndView(Object invokeObject) {

@@ -3,7 +3,7 @@ package core.mvc.asis;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ForwardController implements Controller {
+public class ForwardController extends Controller {
     private String forwardUrl;
 
     public ForwardController(String forwardUrl) {

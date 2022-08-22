@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @core.annotation.web.Controller
-public class CreateUserController implements Controller {
+public class CreateUserController extends Controller {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @Override

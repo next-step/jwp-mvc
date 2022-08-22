@@ -1,20 +1,18 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.net.http.HttpRequest;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping implements RequestMappingInterface {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
@@ -26,19 +24,22 @@ public class AnnotationHandlerMapping implements RequestMappingInterface {
     @Override
     public void initialize() {
         Reflections reflections = new Reflections(basePackage, Scanners.TypesAnnotated);
-        Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
-        controllerClasses.forEach(this::setHandlerExecutions);
+        ControllerScanner controllerScanner = new ControllerScanner(reflections);
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+        controllers.keySet().forEach(key -> setHandlerExecutions(key, controllers.get(key)));
     }
 
-    private void setHandlerExecutions(Class<?> controllerClass) {
-        Arrays.stream(controllerClass.getDeclaredMethods()).forEach(declaredMethod -> {
-            RequestMapping requestMapping = declaredMethod.getAnnotation(RequestMapping.class);
-            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(controllerClass, declaredMethod));
-        });
+    @SuppressWarnings("unchecked")
+    private void setHandlerExecutions(Class<?> controllerClass, Object ControllerObject) {
+        Set<Method> allMethods = ReflectionUtils.getAllMethods(controllerClass, ReflectionUtils.withAnnotation(RequestMapping.class));
+        for (Method method : allMethods) {
+            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+            handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(ControllerObject, method));
+        }
     }
 
     @Override
-    public Object findHandler(HttpServletRequest request) {
+    public ExecuteHandler findHandler(HttpServletRequest request) {
         return getHandler(request);
     }
 
