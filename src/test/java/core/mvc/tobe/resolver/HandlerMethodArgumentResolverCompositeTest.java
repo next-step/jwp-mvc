@@ -10,15 +10,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class HandlerMethodArgumentResolverCompositeTest {
 
 
     @Test
     @DisplayName("path variable resolver 찾기")
     void find_pathVariable() throws Exception {
-        HandlerMethodArgumentResolverComposite composite = new HandlerMethodArgumentResolverComposite(new HandlerMethodArgumentResolvers());
+        HandlerMethodArgumentResolverComposite composite = new HandlerMethodArgumentResolverComposite();
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setServletPath("/users/123");
