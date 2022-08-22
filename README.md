@@ -48,3 +48,9 @@
       2. 초기화한 2개의 HandlerMapping을 List로 관리한다.
    3. Controller 실행
       1. DispatcherServlet의 service() 메소드는 HttpServletRequest에 해당하는 Controller를 찾아 메소드를 실행한다.
+
+## 4단계 - Controller 메소드 인자 매핑
+1. Controller 메소드 인자 타입에 따라 HttpServletRequest에서 값을 꺼내와 자동으로 형변환 및 매핑
+   1. HttpServletRequest에 값 전달하여, HttpServletRequest로 부터 실행할 메서드를 찾는다.
+   2. ParameterNameDiscoverer를 활용해 메소드의 인자 타입과 이름을 구해오고, 해당 메서드에 인자를 넣어 실행한다.
+   3. PathVariable 구현을 위해 URL 매칭과 값 추출.
