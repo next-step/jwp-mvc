@@ -69,7 +69,7 @@ public class DispatcherServlet extends HttpServlet {
         return handlerMappings.stream()
                 .map(handlerMapping -> handlerMapping.getHandler(request))
                 .findAny()
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("요청을 처리할 핸들러가 존재하지 않습니다."));
     }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
