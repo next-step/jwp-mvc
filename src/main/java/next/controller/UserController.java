@@ -3,8 +3,8 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.ResourceView;
 import core.mvc.ModelAndView;
+import core.mvc.ResourceView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class UserController {
         return new ModelAndView(new ResourceView("redirect:/"));
     }
 
-    @RequestMapping("/")
+    @RequestMapping
     public ModelAndView showUsers(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return new ModelAndView(new ResourceView("redirect:/users/loginForm"));
@@ -37,7 +37,7 @@ public class UserController {
         return new ModelAndView(new ResourceView("/user/list.jsp"));
     }
 
-    @RequestMapping("/users/login")
+    @RequestMapping("/login")
     public ModelAndView userLogin(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");
@@ -55,44 +55,44 @@ public class UserController {
         return user == null || !user.matchPassword(password);
     }
 
-    @RequestMapping("/users/logout")
-    public ModelAndView userLogout(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        HttpSession session = req.getSession();
+    @RequestMapping("/logout")
+    public ModelAndView userLogout(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return new ModelAndView(new ResourceView("redirect:/"));
     }
 
-    @RequestMapping("/users/profile")
-    public ModelAndView showUserProfile(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
+    @RequestMapping("/profile")
+    public ModelAndView showUserProfile(HttpServletRequest request, HttpServletResponse response) {
+        String userId = request.getParameter("userId");
         User user = Optional.ofNullable(DataBase.findUserById(userId)).orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다."));
-        req.setAttribute("user", user);
+        request.setAttribute("user", user);
         return new ModelAndView(new ResourceView("/user/profile.jsp"));
     }
 
-    @RequestMapping("/users/updateForm")
-    public ModelAndView showUserUpdateForm(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
+    @RequestMapping("/updateForm")
+    public ModelAndView showUserUpdateForm(HttpServletRequest request, HttpServletResponse response) {
+        String userId = request.getParameter("userId");
         User user = DataBase.findUserById(userId);
-        validateSameUser(req, user);
-        req.setAttribute("user", user);
+        validateSameUser(request, user);
+        request.setAttribute("user", user);
         return new ModelAndView(new ResourceView("/user/updateForm.jsp"));
     }
 
-    @RequestMapping("/users/update")
-    public ModelAndView userUpdate(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        User user = DataBase.findUserById(req.getParameter("userId"));
-        validateSameUser(req, user);
+    @RequestMapping("/update")
+    public ModelAndView userUpdate(HttpServletRequest request, HttpServletResponse response) {
+        User user = DataBase.findUserById(request.getParameter("userId"));
+        validateSameUser(request, user);
 
-        User updateUser = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
+        User updateUser = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
+                request.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return new ModelAndView(new ResourceView("redirect:/"));
     }
 
-    private static void validateSameUser(HttpServletRequest req, User user) {
-        if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
+    private static void validateSameUser(HttpServletRequest request, User user) {
+        if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
     }
