@@ -35,7 +35,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void setHandlerExecutions(Class<?> controllerClass) {
         try {
             Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
-            String controllerPath = controllerClass.getAnnotation(Controller.class).path();
+            String controllerPath = controllerClass.getAnnotation(Controller.class).value();
             List<Method> methods = getRequestMappingMethods(controllerClass);
             methods.forEach(method -> setHandlerExecutionsPerMethod(controllerInstance, method, controllerPath));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
