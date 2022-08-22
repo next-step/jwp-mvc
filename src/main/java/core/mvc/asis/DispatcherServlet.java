@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -26,7 +27,7 @@ public class DispatcherServlet extends HttpServlet {
     private RequestMapping requestMapping;
     private HandlerAdapterImpl handlerAdapters;
 
-    private AnnotationHandlerMapping handlerMapping;
+    private AnnotationHandlerMapping AnnotationHandlerMapping;
     private final List<HandlerMapping> mappings = new ArrayList<>();
 
     @Override
@@ -36,22 +37,21 @@ public class DispatcherServlet extends HttpServlet {
         requestMapping.initMapping();
         handlerAdapters.initHandlerAdapters();
 
-        handlerMapping = new AnnotationHandlerMapping();
-        handlerMapping.initialize();
+        AnnotationHandlerMapping = new AnnotationHandlerMapping();
+        AnnotationHandlerMapping.initialize();
         mappings.add(requestMapping);
-        mappings.add(handlerMapping);
-
+        mappings.add(AnnotationHandlerMapping);
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) {
-        Controller controller = getController(request);
-        if (controller == null) {
+        Object handler = getHandler(request);
+        if (handler == null) {
             throw new NotFoundException(HttpStatus.NOT_FOUND);
         }
-        HandlerAdapter adapter = handlerAdapters.getHandlerAdapter(controller);
+        HandlerAdapter adapter = handlerAdapters.getHandlerAdapter(handler);
         try {
-            ModelAndView modelAndView = adapter.handle(request, response, controller);
+            ModelAndView modelAndView = adapter.handle(request, response, handler);
             View view = modelAndView.getView();
             view.render(modelAndView.getModel(), request, response);
         } catch (Exception e) {
@@ -59,9 +59,11 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Controller getController(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestURI);
-        return requestMapping.findController(requestURI);
+    private Object getHandler(HttpServletRequest request) {
+        return mappings.stream()
+                .map(handlerMapping -> handlerMapping.getHandler(request))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 URL 주소입니다."));
     }
 }

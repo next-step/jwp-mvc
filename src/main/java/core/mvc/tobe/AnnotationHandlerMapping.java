@@ -20,7 +20,7 @@ public class AnnotationHandlerMapping extends AbstractHandlerMapping {
         Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> controller : controllers) {
-            String path = controller.getAnnotation(Controller.class).path();
+            String path = controller.getAnnotation(Controller.class).value();
             detectHandlerExecution(path, controller);
         }
     }

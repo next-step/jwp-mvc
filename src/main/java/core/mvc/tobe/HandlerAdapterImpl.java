@@ -1,7 +1,5 @@
 package core.mvc.tobe;
 
-import core.mvc.asis.Controller;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +14,12 @@ public class HandlerAdapterImpl {
         handlerAdapters.add(new ForwardControllerAdapter());
     }
 
-    public HandlerAdapter getHandlerAdapter(Controller controller) {
+    public HandlerAdapter getHandlerAdapter(Object handler) {
         for (HandlerAdapter adapter : handlerAdapters) {
-            if (adapter.supports(controller)) {
+            if (adapter.supports(handler)) {
                 return adapter;
             }
         }
-        throw new IllegalArgumentException("매칭되는 handler adapter를 찾지 못했습니다. controller = " + controller);
+        throw new IllegalArgumentException("매칭되는 handler adapter를 찾지 못했습니다. handler = " + handler);
     }
 }
