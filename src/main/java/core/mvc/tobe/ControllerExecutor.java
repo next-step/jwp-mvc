@@ -9,15 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import core.mvc.ModelAndView;
-import core.mvc.exception.NotFoundResolverException;
 import next.controller.UserSessionUtils;
 
 public class ControllerExecutor implements Controller {
     private static final List<HandlerMethodArgumentResolver> RESOLVER_LIST = new ArrayList<>();
 
     static {
+        RESOLVER_LIST.add(new HttpServletRequestMethodArgumentResolver());
+        RESOLVER_LIST.add(new PrimitiveMethodArgumentResolver());
+        RESOLVER_LIST.add(new WrapperMethodArgumentResolver());
         RESOLVER_LIST.add(new PathVariableMethodArgumentResolver());
-        RESOLVER_LIST.add(new DefaultMethodArgumentResolver());
     }
 
     private final Object declaredObject;
@@ -56,7 +57,7 @@ public class ControllerExecutor implements Controller {
             values[i] = RESOLVER_LIST.stream()
                     .filter(r -> r.supportsParameter(methodParameter))
                     .findFirst()
-                    .orElseThrow(() -> new NotFoundResolverException("paramter type에 해당하는 Resolser가 없습니다."))
+                    .orElse(new DefaultMethodArgumentResolver())
                     .resolveArgument(methodParameter, request);
         }
 

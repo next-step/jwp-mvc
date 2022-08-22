@@ -26,7 +26,7 @@ class PathVariableMethodArgumentResolverTest {
         MethodParameter longType = new MethodParameter(method, 0, method.getAnnotations());
         MethodParameter strType = new MethodParameter(method, 1, method.getAnnotations());
 
-        DefaultMethodArgumentResolver resolver = new DefaultMethodArgumentResolver();
+        PrimitiveMethodArgumentResolver resolver = new PrimitiveMethodArgumentResolver();
         Object param1 = resolver.resolveArgument(longType, request);
         Object param2 = resolver.resolveArgument(strType, request);
 

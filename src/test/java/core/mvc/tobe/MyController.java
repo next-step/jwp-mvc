@@ -38,7 +38,10 @@ public class MyController {
         return modelAndView;
     }
 
-    public void defaultMethodArgumentResolverTest(String strType, int intType, long longType, double doubleType) {
+    public void primitiveMethodArgumentResolverTest(String strType, int intType, long longType, double doubleType) {
+    }
+
+    public void wrapperMethodArgumentResolverTest(String strType, Integer intType, Long longType, Double doubleType) {
     }
 
     @RequestMapping("/test/{id}/{name}")
