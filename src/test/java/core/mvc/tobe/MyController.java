@@ -37,4 +37,11 @@ public class MyController {
         modelAndView.addObject("status", "ok");
         return modelAndView;
     }
+
+    public void defaultMethodArgumentResolverTest(String strType, int intType, long longType, double doubleType) {
+    }
+
+    @RequestMapping("/test/{id}/{name}")
+    public void pathVariableMethodArgumentResolverTest(long id, String name) {
+    }
 }

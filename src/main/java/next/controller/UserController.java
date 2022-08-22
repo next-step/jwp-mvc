@@ -6,7 +6,6 @@ import static core.annotation.web.RequestMethod.POST;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile", method = GET)
-    public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView profile(HttpServletRequest req) {
         logging("profile");
 
         String userId = req.getParameter("userId");
@@ -95,7 +94,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/updateForm", method = GET)
-    public ModelAndView updateForm(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView updateForm(HttpServletRequest req) {
         logging("update form");
 
         String userId = req.getParameter("userId");
@@ -108,7 +107,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = POST)
-    public ModelAndView update(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView update(HttpServletRequest req) {
         logging("update");
 
         User user = DataBase.findUserById(req.getParameter("userId"));

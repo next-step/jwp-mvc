@@ -47,11 +47,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                         requestMethods = RequestMethod.values();
                     }
 
-                    ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
-                    List<String> parameterNames = Arrays.stream(nameDiscoverer.getParameterNames(method)).collect(Collectors.toList());
-
                     for (RequestMethod requestMethod : requestMethods) {
-                        HandlerKey handlerKey = createHandlerKey(controller, requestMapping, requestMethod, parameterNames);
+                        HandlerKey handlerKey = createHandlerKey(controller, requestMapping, requestMethod);
                         Object instance = clazz.getConstructor().newInstance();
                         handlerExecutions.put(handlerKey, new ControllerExecutor(instance, method));
                     }
@@ -68,13 +65,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
 
-        List<String> collect = new ArrayList<>(request.getParameterMap().keySet());
-
-        return handlerExecutions.get(new HandlerKey(requestUri, rm, collect));
+        return handlerExecutions.get(new HandlerKey(requestUri, rm));
     }
 
-    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm, RequestMethod requestMethod, List<String> parameterNames) {
-        return new HandlerKey(controller.value() + rm.value(), requestMethod, parameterNames);
+    private HandlerKey createHandlerKey(Controller controller, RequestMapping rm, RequestMethod requestMethod) {
+        return new HandlerKey(controller.value() + rm.value(), requestMethod);
     }
 
     private boolean isRequestMethodEmpty(RequestMapping requestMapping) {

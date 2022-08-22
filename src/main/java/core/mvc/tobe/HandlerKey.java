@@ -8,12 +8,10 @@ import core.annotation.web.RequestMethod;
 public class HandlerKey {
     private final String url;
     private final RequestMethod requestMethod;
-    private final List<String> parameterNames;
 
-    public HandlerKey(String url, RequestMethod requestMethod, List<String> parameterNames) {
+    public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
-        this.parameterNames = parameterNames;
     }
 
     @Override
@@ -26,11 +24,11 @@ public class HandlerKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HandlerKey that = (HandlerKey) o;
-        return Objects.equals(url, that.url) && requestMethod == that.requestMethod && parameterNames.equals(that.parameterNames);
+        return Objects.equals(url, that.url) && requestMethod == that.requestMethod;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, requestMethod, parameterNames);
+        return Objects.hash(url, requestMethod);
     }
 }

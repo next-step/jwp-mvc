@@ -1,17 +1,25 @@
 package core.mvc.tobe;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
-
 import core.mvc.ModelAndView;
+import core.mvc.exception.NotFoundResolverException;
 import next.controller.UserSessionUtils;
 
 public class ControllerExecutor implements Controller {
+    private static final List<HandlerMethodArgumentResolver> RESOLVER_LIST = new ArrayList<>();
+
+    static {
+        RESOLVER_LIST.add(new PathVariableMethodArgumentResolver());
+        RESOLVER_LIST.add(new DefaultMethodArgumentResolver());
+    }
+
     private final Object declaredObject;
     private final Method method;
 
@@ -22,17 +30,9 @@ public class ControllerExecutor implements Controller {
 
     @Override
     public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+        Object[] parameters = resolveParameters(this.method, request);
 
-        String[] parameterNames = nameDiscoverer.getParameterNames(method);
-        Object[] params = new Object[parameterNames.length];
-        int index = 0;
-
-        for (String parameterName : parameterNames) {
-            params[index++] = request.getParameter(parameterName);
-        }
-
-        ModelAndView mav = (ModelAndView) method.invoke(declaredObject, params);
+        ModelAndView mav = (ModelAndView) method.invoke(declaredObject, parameters);
 
         mav.getModel().forEach((key, value) -> {
             request.getSession().setAttribute(key, value);
@@ -43,5 +43,23 @@ public class ControllerExecutor implements Controller {
         });
 
         return mav;
+    }
+
+    private Object[] resolveParameters(Method method, HttpServletRequest request) {
+        Parameter[] parameters = method.getParameters();
+        final int length = parameters.length;
+        Object[] values = new Object[length];
+
+        for (int i = 0; i < length; i++) {
+            MethodParameter methodParameter = new MethodParameter(method, i, parameters[i].getAnnotations());
+
+            values[i] = RESOLVER_LIST.stream()
+                    .filter(r -> r.supportsParameter(methodParameter))
+                    .findFirst()
+                    .orElseThrow(() -> new NotFoundResolverException("paramter type에 해당하는 Resolser가 없습니다."))
+                    .resolveArgument(methodParameter, request);
+        }
+
+        return values;
     }
 }
