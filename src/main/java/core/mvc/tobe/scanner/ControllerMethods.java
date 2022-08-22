@@ -2,56 +2,39 @@ package core.mvc.tobe.scanner;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.reflections.ReflectionUtils;
 
 import core.annotation.web.RequestMapping;
-import core.annotation.web.RequestMethod;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerKey;
+import core.mvc.tobe.support.ArgumentResolver;
 
 public class ControllerMethods {
-
-	private static final int EMPTY_METHOD_LENGTH = 0;
-
-	private Map<Class<?>, Set<Method>> controllerMethods = new HashMap<>();
+	private Map<Class<?>, ControllerMethod> controllerMethods = new HashMap<>();
 
 	public ControllerMethods(Set<Class<?>> controllerWithAnnotation) {
 		controllerWithAnnotation.forEach(controller -> {
 			Set<Method> methods = ReflectionUtils.getAllMethods(controller, ReflectionUtils.withAnnotation(RequestMapping.class));
-			controllerMethods.put(controller, methods);
+			controllerMethods.put(controller, new ControllerMethod(methods));
 		});
 	}
 
-	public Map<HandlerKey, HandlerExecution> getHandlerExecutions(Class<?> clazz, Object instance, String path) {
+	public Map<HandlerKey, HandlerExecution> getHandlerExecutions(ControllerHandlers controllerHandlers, List<ArgumentResolver> argumentResolvers) {
 		Map<HandlerKey, HandlerExecution> result = new HashMap<>();
 
-		Set<Method> methods = controllerMethods.get(clazz);
-		methods.forEach(method -> result.putAll(getHandlerExecution(instance, method, path)));
-
-		return result;
-	}
-
-	private Map<HandlerKey, HandlerExecution> getHandlerExecution(Object handler, Method method, String path) {
-		Map<HandlerKey, HandlerExecution> result = new HashMap<>();
-
-		RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-		RequestMethod[] methods = requestMapping.method();
-
-		if (methods.length == EMPTY_METHOD_LENGTH) {
-			methods = RequestMethod.values();
+		for (ControllerHandler controllerHandler : controllerHandlers.getControllerHandlers()) {
+			ControllerMethod controllerMethod = controllerMethods.get(controllerHandler.getClazz());
+			result.putAll(controllerMethod.getHandlerExecutions(argumentResolvers, controllerHandler));
 		}
 
-		for (RequestMethod requestMethod : methods) {
-			result.put(new HandlerKey(path + requestMapping.value(), requestMethod), new HandlerExecution(handler, method));
-		}
-
-		return result;
+		return 	result;
 	}
 
 	public Set<Method> getMethods(Class<?> clazz) {
-		return controllerMethods.get(clazz);
+		return controllerMethods.get(clazz).getMethods();
 	}
 }
