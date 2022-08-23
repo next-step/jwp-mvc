@@ -9,6 +9,8 @@ import java.util.Map;
 
 public class RedirectView implements View {
 
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+
     private final String redirectPath;
 
     public RedirectView(String redirectPath) {
@@ -22,6 +24,6 @@ public class RedirectView implements View {
     }
 
     private void render(HttpServletResponse response) throws IOException {
-        response.sendRedirect(redirectPath);
+        response.sendRedirect(redirectPath.substring(DEFAULT_REDIRECT_PREFIX.length()));
     }
 }
