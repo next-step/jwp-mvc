@@ -96,4 +96,11 @@ public class MyController {
     - page 에 대한 render 처리를 진행한다. (RequestDispatcher 활용)
 - ModelAndView
   - 화면에 보여줄 view (path) 와 데이터 (model)을 관리한다.
+- HandlerAdapter 인터페이스
+  - Legacy Controller 와 Annotation 기반 Controller 의 handler 를 처리 하기 위한 어댑터 인터페이스 (처리할 Controller or HandlerExecution 을 찾는 지원 메서드 & handler 를 실행할 메서드)
+  - 레거시 MVC 와 애노테이션 기반 MVC 의 Controller 를 통합하여 관리한다.
+  - ControllerHandlerAdapter 구현체
+    - Legacy Controller 에 대한 지원 메서드를 구현한다.
+  - HandlerExecutionHandlerAdapter 구현체
+    - Annotation 기반 Controller 에 대한 지원 메서드를 구현한다.
 >Legacy 네이밍으로 시작하는 클래스들은 애노테이션 기반 MVC 패턴이 적용 된 후 삭제한다.
