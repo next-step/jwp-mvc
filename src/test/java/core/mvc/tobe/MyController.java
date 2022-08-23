@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller
 public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 

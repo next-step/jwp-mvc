@@ -52,6 +52,7 @@ public class DispatcherServlet extends HttpServlet {
             if (handler instanceof Controller) {
                 String viewName = ((Controller) handler).execute(req, resp);
                 ViewRenderer.getInstance().render(viewName, req, resp);
+                return;
             }
 
             ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
@@ -66,16 +67,11 @@ public class DispatcherServlet extends HttpServlet {
         RequestMethod requestMethod = RequestMethod.getRequestMethod(methodType);
         HandlerKey handlerKey = new HandlerKey(url, requestMethod);
 
-        Object handler = null;
-        for (HandlerMapping handlerMapping : handlerMappings) {
-            handler = handlerMapping.getHandler(handlerKey);
-        }
-
-        if (Objects.isNull(handler)) {
-            throw new ServletException();
-        }
-
-        return handler;
+        return handlerMappings.stream()
+                .map(handlerMapping -> handlerMapping.getHandler(handlerKey))
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElseThrow(ServletException::new);
     }
 
 }

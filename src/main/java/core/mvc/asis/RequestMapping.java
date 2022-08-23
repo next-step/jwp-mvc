@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class RequestMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private Map<String, Controller> mappings = new HashMap<>();
+    private final Map<String, Controller> mappings = new HashMap<>();
 
     public Controller findController(String url) {
         return mappings.get(url);
@@ -20,15 +20,15 @@ public class RequestMapping implements HandlerMapping {
     @Override
     public void init() {
         // mappings.put("/", new LegacyHomeController());
-        mappings.put("/users/form", new ForwardController("/user/form.jsp"));
-        mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
-        mappings.put("/users", new ListUserController());
-        mappings.put("/users/login", new LoginController());
-        mappings.put("/users/profile", new ProfileController());
-        mappings.put("/users/logout", new LogoutController());
-        mappings.put("/users/create", new CreateUserController());
-        mappings.put("/users/updateForm", new UpdateFormUserController());
-        mappings.put("/users/update", new UpdateUserController());
+        // mappings.put("/users/form", new LegacyForwardController("/user/form.jsp"));
+        // mappings.put("/users/loginForm", new LegacyForwardController("/user/login.jsp"));
+        // mappings.put("/users", new LegacyListUserController());
+        // mappings.put("/users/login", new LegacyLoginController());
+        // mappings.put("/users/profile", new LegacyProfileController());
+        // mappings.put("/users/logout", new LegacyLogoutController());
+        // mappings.put("/users/create", new LogoutCreateUserController());
+        // mappings.put("/users/updateForm", new LegacyUpdateFormUserController());
+        // mappings.put("/users/update", new LegacyUpdateUserController());
 
         logger.info("Initialized Request Mapping!");
         mappings.keySet().forEach(path -> {

@@ -21,6 +21,11 @@ public class ModelAndView {
         return new ModelAndView(new JspView(viewName));
     }
 
+    public static ModelAndView redirectHome() {
+
+        return new ModelAndView(new JspView("redirect:/"));
+    }
+
     public ModelAndView addObject(String attributeName, Object attributeValue) {
         model.put(attributeName, attributeValue);
         return this;

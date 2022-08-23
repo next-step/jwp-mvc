@@ -8,7 +8,6 @@ import core.web.view.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller
 public class QnaController {
     private MyQnaService qnaService;
 

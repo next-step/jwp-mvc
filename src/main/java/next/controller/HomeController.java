@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class HomeController {
-
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView index(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView modelAndView = ModelAndView.getJspModelAndView("home.jsp");
