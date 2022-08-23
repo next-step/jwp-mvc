@@ -79,8 +79,13 @@ public class MyController {
 - HandlerMapping 인터페이스
   - LegacyRequestMapping 구현체
     - path 에 대한 Controller 구현체들을 mapping
+    - mapping 된 Controller 를 반환한다.
   - AnnotationHandlerMapping 구현체
     - Reflections 라이브러리 이용하여 @Controller 의 @RequestMapping path & request method 를 mapping 하도록 구현한다.
+    - mapping 된 HandlerExecution 을 반환한다.
+- ControllerScanner
+  - @Controller 애노테이션이 설정되어 있는 모든 클래스를 찾는다.
+  - 찾은 클래스와 그 인스턴스를 가지는 `Map<Class<?>, Object>` 를 반환하는 메서드를 구현한다.
 - HandlerExecution
   - handler(request 에 해당하는 controller)의 method 를 실행시킨다.
 - HandlerKey
