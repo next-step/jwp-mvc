@@ -1,9 +1,10 @@
 package core.mvc;
 
-import core.mvc.asis.Controller;
+import core.mvc.adapter.ControllerHandlerAdapter;
+import core.mvc.adapter.HandlerAdapter;
+import core.mvc.adapter.HandlerExecutionHandlerAdapter;
 import core.mvc.asis.LegacyRequestMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import core.mvc.view.ModelAndView;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
@@ -25,17 +26,18 @@ public class DispatcherServlet extends HttpServlet {
     private static final String BASE_PACKAGE = "next.controller";
 
     private List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private List<HandlerAdapter> handlerAdapters = new ArrayList<>();
 
     @Override
     public void init() throws ServletException {
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
-
         LegacyRequestMapping legacyRequestMapping = new LegacyRequestMapping();
         legacyRequestMapping.initMapping();
-
         handlerMappings.add(annotationHandlerMapping);
         handlerMappings.add(legacyRequestMapping);
+        handlerAdapters.add(new HandlerExecutionHandlerAdapter());
+        handlerAdapters.add(new ControllerHandlerAdapter());
     }
 
     @Override
@@ -53,15 +55,12 @@ public class DispatcherServlet extends HttpServlet {
 
     private void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Object handler = getHandler(request);
-        if (handler instanceof HandlerExecution) {
-            ModelAndView modelAndView = ((HandlerExecution) handler).handle(request, response);
-            modelAndView.render(request, response);
-            return;
-        }
-        if (handler instanceof Controller) {
-            ModelAndView modelAndView = ((Controller) handler).execute(request, response);
-            modelAndView.render(request, response);
-        }
+        HandlerAdapter handlerAdapter = handlerAdapters.stream()
+                .filter(adapter -> adapter.supports(handler))
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("핸들러 처리를 지원하는 어댑터가 존재하지 않습니다."));
+        ModelAndView handle = handlerAdapter.handle(request, response, handler);
+        handle.render(request, response);
     }
 
     private Object getHandler(HttpServletRequest request) throws NotFoundException {
