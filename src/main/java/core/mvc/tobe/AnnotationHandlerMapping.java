@@ -10,6 +10,7 @@ import org.reflections.scanners.Scanners;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
@@ -44,8 +45,9 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        String requestURI = request.getRequestURI();
+        return Optional.ofNullable(handlerExecutions.get(new HandlerKey(requestURI, RequestMethod.valueOf(request.getMethod().toUpperCase()))))
+                .orElseGet(() -> handlerExecutions.keySet().stream().filter(handlerKey -> handlerKey.matchedHandler(requestURI))
+                        .map(handlerExecutions::get).findFirst().orElse(null));
     }
 }
