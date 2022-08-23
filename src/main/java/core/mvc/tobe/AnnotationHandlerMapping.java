@@ -1,17 +1,25 @@
 package core.mvc.tobe;
 
+import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class AnnotationHandlerMapping extends AbstractHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
+    protected static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private final Object[] basePackage;
+    private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
@@ -23,6 +31,13 @@ public class AnnotationHandlerMapping extends AbstractHandlerMapping {
             String path = controller.getAnnotation(Controller.class).value();
             detectHandlerExecution(path, controller);
         }
+    }
+
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
+        return handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
     }
 
     private void detectHandlerExecution(String path, Class<?> controller) {
