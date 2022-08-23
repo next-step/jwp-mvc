@@ -36,4 +36,10 @@ public class MyController {
         DataBase.addUser(user);
         return null;
     }
+
+    @RequestMapping(value = "/all/method")
+    public ModelAndView allMethod(HttpServletRequest request, HttpServletResponse response) {
+        request.setAttribute("method", "all");
+        return null;
+    }
 }

@@ -60,7 +60,7 @@ public class ReflectionTest {
     public void constructor() throws Exception {
         // given
         Class<Question> clazz = Question.class;
-        Constructor<Question> declaredConstructor = clazz.getDeclaredConstructor(Long.TYPE, String.class, String.class, String.class, Date.class, Integer.TYPE);
+        Constructor<Question> declaredConstructor = clazz.getDeclaredConstructor(long.class, String.class, String.class, String.class, Date.class, int.class);
 
         long questionId = 1;
         String writer = "wu2ee";

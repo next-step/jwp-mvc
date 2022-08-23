@@ -36,7 +36,7 @@ public class BeanFactoryTest {
 
     @Test
     @DisplayName("core.di.factory.example 패키지에 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾는다.")
-    void find_Controller_Service_Repository_Annotation_Class() {
+    void findControllerServiceRepositoryAnnotationClass() {
         List<Class<? extends Annotation>> annotatedClasses = List.of(Controller.class, Service.class, Repository.class);
         annotatedClasses.forEach(annotatedClass -> {
             Set<Class<?>> typesAnnotatedWith = reflections.getTypesAnnotatedWith(annotatedClass);

@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class UpdateUserController implements Controller {
-    private static final Logger log = LoggerFactory.getLogger(UpdateUserController.class);
+public class LegacyUpdateUserController implements Controller {
+    private static final Logger log = LoggerFactory.getLogger(LegacyUpdateUserController.class);
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {

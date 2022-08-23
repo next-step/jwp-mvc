@@ -30,3 +30,65 @@
 ## 요구사항 6 - component scan
 >src/test/java 폴더의 core.di.factory.example 패키지를 보면 DI 테스트를 위한 샘플 코드가 있다.<br>
 >core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+# 기능 요구사항 (@MVC 구현)
+
+> 지금까지 나만의 MVC 프레임워크를 구현해 잘 활용해 왔다. 그런데 새로운 컨트롤러가 추가될 때마다 매번 RequestMapping 클래스에 요청 URL 과 컨트롤러를 추가하는 작업이 귀찮다.<br>
+> 이는 유지보수 차원에서 봤을 때 컨트롤러의 수가 계속해서 증가하고 있어서 좋지 않다. 또, 각 컨트롤러의 execute() 메소드는 10라인이 넘어가는 경우도 거의 없다. (메소드의 복잡도가 낮지만 계속해서 객체를 생성하는 것은 부담이다.)
+
+이와 같은 단점을 보완하기 위해 다음과 같이 Controller 를 구현할 수 있도록 지원하는 **애노테이션 기반의 새로운 MVC 프레임워크**를 구현한다.
+```java
+@Controller
+public class MyController {
+    private static final Logger logger = LoggerFactory.getLogger(MyController.class);
+
+    @RequestMapping("/users")
+    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users findUserId");
+        return new ModelAndView(new JspView("/users/list.jsp"));
+    }
+    
+    @RequestMapping(value="/users/show", method=RequestMethod.GET)
+    public ModelAndView show(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users findUserId");
+        return new ModelAndView(new JspView("/users/show.jsp"));
+    }
+    
+    @RequestMapping(value="/users", method=RequestMethod.POST)
+    public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("users create");
+        return new ModelAndView(new JspView("redirect:/users"));
+    }
+}
+```
+## 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+- 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아닌, 메소드를 추가하는 방식으로 구현한다.
+- 요청 URL 을 매핑 할 때 HTTP 메소드(GET, POST, PUT, DELETE 등)도 매핑에 활용하도록 한다. (같은 URL 이지만, 다른 메소드로 매핑하는 것이 가능하도록 한다.)
+- @RequestMapping() 에 method 설정이 되어 있지 않으면 모든 HTTP method 를 지원해야 한다.
+
+
+## 요구사항 2 - 레거시 MVC 와 애노테이션 기반 MVC 통합
+- 새로운 MVC 프레임워크를 추가했으니 이전에 구현되어 있던 레거시 MVC 컨트롤러를 애노테이션 기반 MVC 으로 변경한다.
+>그런데 새로운 MVC 프레임워크를 적용하기 위해 한 번에 기존의 모든 컨트롤러를 변경하려면 변경 과정 동안 새로운 기능을 추가하거나 변경하는 작업을 중단해야 한다.
+- 따라서, 점진적으로 리팩토링이 가능한 구조로 개발한다.
+- 즉, 레거시 MVC 프레임워크와 새롭게 구현한 애노테이션 MVC 프레임워크가 공존해야 한다.
+- 레거시 MVC 프레임워크가 새로운 애노테이션 MVC 프레임워크로 전환이 완료된 후, 기존의 레거시 MVC 프레임워크를 삭제한다.
+
+
+## 기능 목록
+- HandlerMapping 인터페이스
+  - LegacyRequestMapping 구현체
+    - path 에 대한 Controller 구현체들을 mapping
+  - AnnotationHandlerMapping 구현체
+    - Reflections 라이브러리 이용하여 @Controller 의 @RequestMapping path & request method 를 mapping 하도록 구현한다.
+- HandlerExecution
+  - handler(request 에 해당하는 controller)의 method 를 실행시킨다.
+- HandlerKey
+  - Request Mapping 을 위한 unique handler key (url & request method)
+- View 인터페이스
+  - render 추상 메서드를 통해 화면에 보여줄 페이지를 동적으로 생성할 수 있도록 한다.
+  - ResourceView 구현체
+    - page 에 대한 render 처리를 진행한다. (RequestDispatcher 활용)
+- ModelAndView
+  - 화면에 보여줄 view (path) 와 데이터 (model)을 관리한다.
+>Legacy 네이밍으로 시작하는 클래스들은 애노테이션 기반 MVC 패턴이 적용 된 후 삭제한다.
