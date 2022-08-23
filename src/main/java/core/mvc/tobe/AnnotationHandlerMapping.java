@@ -5,10 +5,8 @@ import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
-import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -27,20 +25,14 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        new Reflections(this.basePackage)
-                .getTypesAnnotatedWith(Controller.class)
-                .forEach(this::setHandlerExecutions);
+        ControllerScanner controllerScanner = new ControllerScanner(this.basePackage);
+        controllerScanner.getControllers().forEach(this::setHandlerExecutions);
     }
 
-    private void setHandlerExecutions(Class<?> controllerClass) {
-        try {
-            Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
-            String controllerPath = controllerClass.getAnnotation(Controller.class).value();
-            List<Method> methods = getRequestMappingMethods(controllerClass);
-            methods.forEach(method -> setHandlerExecutionsPerMethod(controllerInstance, method, controllerPath));
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+    private void setHandlerExecutions(Class<?> controllerClass, Object controllerInstance) {
+        String controllerPath = controllerClass.getAnnotation(Controller.class).value();
+        List<Method> methods = getRequestMappingMethods(controllerClass);
+        methods.forEach(method -> setHandlerExecutionsPerMethod(controllerInstance, method, controllerPath));
     }
 
     private void setHandlerExecutionsPerMethod(Object controllerInstance, Method method, String controllerPath) {
