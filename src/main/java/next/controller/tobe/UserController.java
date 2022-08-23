@@ -1,4 +1,4 @@
-package next.controller;
+package next.controller.tobe;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
@@ -7,6 +7,7 @@ import core.db.DataBase;
 import core.mvc.ModelAndView;
 import core.mvc.view.ForwardView;
 import core.mvc.view.RedirectView;
+import next.controller.UserSessionUtils;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,5 +107,15 @@ public class UserController {
         logger.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return new ModelAndView(new RedirectView("redirect:/"));
+    }
+
+    @RequestMapping(value = "/form")
+    public ModelAndView form(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(new ForwardView("/user/form.jsp"));
+    }
+
+    @RequestMapping(value = "loginForm")
+    public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(new ForwardView("/user/login.jsp"));
     }
 }
