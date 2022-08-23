@@ -3,11 +3,11 @@ package core.mvc.tobe;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HandlerAdapterImpl {
+public class HandlerAdapterStorage {
 
     private final List<HandlerAdapter> handlerAdapters = new ArrayList<>();
 
-    public HandlerAdapterImpl() {
+    public HandlerAdapterStorage() {
     }
 
     public void initHandlerAdapters() {

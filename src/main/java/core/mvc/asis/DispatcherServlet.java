@@ -3,7 +3,7 @@ package core.mvc.asis;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerAdapter;
-import core.mvc.tobe.HandlerAdapterImpl;
+import core.mvc.tobe.HandlerAdapterStorage;
 import core.mvc.tobe.HandlerMapping;
 import core.mvc.view.View;
 import exception.NotFoundException;
@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private RequestMapping requestMapping;
-    private HandlerAdapterImpl handlerAdapters;
+    private HandlerAdapterStorage handlerAdapters;
 
     private AnnotationHandlerMapping AnnotationHandlerMapping;
     private final List<HandlerMapping> mappings = new ArrayList<>();
@@ -33,7 +34,7 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() {
         requestMapping = new RequestMapping();
-        handlerAdapters = new HandlerAdapterImpl();
+        handlerAdapters = new HandlerAdapterStorage();
         requestMapping.initMapping();
         handlerAdapters.initHandlerAdapters();
 
@@ -44,7 +45,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) {
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         Object handler = getHandler(request);
         if (handler == null) {
             throw new NotFoundException(HttpStatus.NOT_FOUND);
@@ -55,7 +56,8 @@ public class DispatcherServlet extends HttpServlet {
             View view = modelAndView.getView();
             view.render(modelAndView.getModel(), request, response);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error("Exception: {}", e.getMessage());
+            throw new ServletException(e.getMessage());
         }
     }
 
