@@ -79,8 +79,13 @@ public class MyController {
 - HandlerMapping 인터페이스
   - LegacyRequestMapping 구현체
     - path 에 대한 Controller 구현체들을 mapping
+    - mapping 된 Controller 를 반환한다.
   - AnnotationHandlerMapping 구현체
     - Reflections 라이브러리 이용하여 @Controller 의 @RequestMapping path & request method 를 mapping 하도록 구현한다.
+    - mapping 된 HandlerExecution 을 반환한다.
+- ControllerScanner
+  - @Controller 애노테이션이 설정되어 있는 모든 클래스를 찾는다.
+  - 찾은 클래스와 그 인스턴스를 가지는 `Map<Class<?>, Object>` 를 반환하는 메서드를 구현한다.
 - HandlerExecution
   - handler(request 에 해당하는 controller)의 method 를 실행시킨다.
 - HandlerKey
@@ -91,4 +96,11 @@ public class MyController {
     - page 에 대한 render 처리를 진행한다. (RequestDispatcher 활용)
 - ModelAndView
   - 화면에 보여줄 view (path) 와 데이터 (model)을 관리한다.
+- HandlerAdapter 인터페이스
+  - Legacy Controller 와 Annotation 기반 Controller 의 handler 를 처리 하기 위한 어댑터 인터페이스 (처리할 Controller or HandlerExecution 을 찾는 지원 메서드 & handler 를 실행할 메서드)
+  - 레거시 MVC 와 애노테이션 기반 MVC 의 Controller 를 통합하여 관리한다.
+  - ControllerHandlerAdapter 구현체
+    - Legacy Controller 에 대한 지원 메서드를 구현한다.
+  - HandlerExecutionHandlerAdapter 구현체
+    - Annotation 기반 Controller 에 대한 지원 메서드를 구현한다.
 >Legacy 네이밍으로 시작하는 클래스들은 애노테이션 기반 MVC 패턴이 적용 된 후 삭제한다.

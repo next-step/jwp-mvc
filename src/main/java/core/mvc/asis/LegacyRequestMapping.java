@@ -1,7 +1,15 @@
 package core.mvc.asis;
 
+import core.mvc.DispatcherServlet;
 import core.mvc.HandlerMapping;
-import next.controller.*;
+import next.controller.LegacyCreateUserController;
+import next.controller.LegacyHomeController;
+import next.controller.LegacyListUserController;
+import next.controller.LegacyLoginController;
+import next.controller.LegacyLogoutController;
+import next.controller.LegacyProfileController;
+import next.controller.LegacyUpdateFormUserController;
+import next.controller.LegacyUpdateUserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +21,7 @@ public class LegacyRequestMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private Map<String, Controller> mappings = new HashMap<>();
 
-    void initMapping() {
+    public void initMapping() {
         mappings.put("/", new LegacyHomeController());
         mappings.put("/users/form", new LegacyForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new LegacyForwardController("/user/login.jsp"));

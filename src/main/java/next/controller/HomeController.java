@@ -3,8 +3,8 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.ResourceView;
-import core.mvc.ModelAndView;
+import core.mvc.view.ResourceView;
+import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
