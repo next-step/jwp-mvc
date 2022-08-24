@@ -114,7 +114,7 @@ public class UserController {
         return new ModelAndView(new ForwardView("/user/form.jsp"));
     }
 
-    @RequestMapping(value = "loginForm")
+    @RequestMapping(value = "/loginForm")
     public ModelAndView loginForm(HttpServletRequest request, HttpServletResponse response) {
         return new ModelAndView(new ForwardView("/user/login.jsp"));
     }
