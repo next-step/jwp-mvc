@@ -2,8 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerAdapter;
-import core.mvc.tobe.HandlerAdapterStorage;
+import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMapping;
 import core.mvc.view.View;
 import exception.NotFoundException;
@@ -26,7 +25,6 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
     private RequestMapping requestMapping;
-    private HandlerAdapterStorage handlerAdapters;
 
     private AnnotationHandlerMapping AnnotationHandlerMapping;
     private final List<HandlerMapping> mappings = new ArrayList<>();
@@ -34,12 +32,11 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() {
         requestMapping = new RequestMapping();
-        handlerAdapters = new HandlerAdapterStorage();
         requestMapping.initMapping();
-        handlerAdapters.initHandlerAdapters();
 
         AnnotationHandlerMapping = new AnnotationHandlerMapping();
         AnnotationHandlerMapping.initialize();
+
         mappings.add(requestMapping);
         mappings.add(AnnotationHandlerMapping);
     }
@@ -50,15 +47,22 @@ public class DispatcherServlet extends HttpServlet {
         if (handler == null) {
             throw new NotFoundException(HttpStatus.NOT_FOUND);
         }
-        HandlerAdapter adapter = handlerAdapters.getHandlerAdapter(handler);
+
         try {
-            ModelAndView modelAndView = adapter.handle(request, response, handler);
+            ModelAndView modelAndView = execute(request, response, handler);
             View view = modelAndView.getView();
             view.render(modelAndView.getModel(), request, response);
         } catch (Exception e) {
             logger.error("Exception: {}", e.getMessage());
             throw new ServletException(e.getMessage());
         }
+    }
+
+    private ModelAndView execute(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if (handler instanceof Controller) {
+            return ((Controller) handler).execute(request, response);
+        }
+        return ((HandlerExecution) handler).handle(request, response);
     }
 
     private Object getHandler(HttpServletRequest request) {
