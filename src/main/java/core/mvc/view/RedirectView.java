@@ -14,16 +14,12 @@ public class RedirectView implements View {
     private final String redirectPath;
 
     public RedirectView(String redirectPath) {
-        Assert.notNull(redirectPath, "redirectPath가 null이어선 안됩니다.");
+        Assert.hasText(redirectPath, "redirectPath가 null이어선 안됩니다.");
         this.redirectPath = redirectPath;
     }
 
     @Override
-    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        render(response);
-    }
-
-    private void render(HttpServletResponse response) throws IOException {
+    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendRedirect(redirectPath.substring(DEFAULT_REDIRECT_PREFIX.length()));
     }
 }
