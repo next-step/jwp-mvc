@@ -7,10 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-public class HandlerExecution {
+public class HandlerExecution implements HandlerAdapter {
 
-    private final Object bean;
-    private final Method method;
+    private Object bean;
+    private Method method;
+
+    public HandlerExecution() {
+    }
 
     public HandlerExecution(Object bean, Method method) {
         Assert.notNull(bean, "Bean이 null이어선 안됩니다.");
@@ -19,7 +22,17 @@ public class HandlerExecution {
         this.method = method;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public boolean support(Object handler) {
+        return (handler instanceof HandlerExecution);
+    }
+
+    @Override
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        return ((HandlerExecution) handler).execute(request, response);
+    }
+
+    public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return (ModelAndView) method.invoke(bean, request, response);
     }
 }

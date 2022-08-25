@@ -1,9 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.*;
 import core.mvc.view.View;
 import exception.NotFoundException;
 import org.slf4j.Logger;
@@ -24,6 +22,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
+    private HandlerAdapterStorage handlerAdapterStorage;
     private RequestMapping requestMapping;
 
     private AnnotationHandlerMapping AnnotationHandlerMapping;
@@ -31,11 +30,14 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
+        handlerAdapterStorage = new HandlerAdapterStorage();
+        handlerAdapterStorage.init();
+
         requestMapping = new RequestMapping();
         requestMapping.initMapping();
 
         AnnotationHandlerMapping = new AnnotationHandlerMapping();
-        AnnotationHandlerMapping.initialize();
+        AnnotationHandlerMapping.initMapping();
 
         mappings.add(requestMapping);
         mappings.add(AnnotationHandlerMapping);
@@ -47,22 +49,25 @@ public class DispatcherServlet extends HttpServlet {
         if (handler == null) {
             throw new NotFoundException(HttpStatus.NOT_FOUND);
         }
+        HandlerAdapter adapter = handlerAdapterStorage.getHandlerAdapter(handler);
+        handleAdapter(request, response, handler, adapter);
+    }
 
+    private void handleAdapter(HttpServletRequest request, HttpServletResponse response,
+                               Object handler, HandlerAdapter adapter) throws ServletException {
         try {
-            ModelAndView modelAndView = execute(request, response, handler);
-            View view = modelAndView.getView();
-            view.render(modelAndView.getModel(), request, response);
+            handle(request, response, handler, adapter);
         } catch (Exception e) {
             logger.error("Exception: {}", e.getMessage());
             throw new ServletException(e.getMessage());
         }
     }
 
-    private ModelAndView execute(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (handler instanceof Controller) {
-            return ((Controller) handler).execute(request, response);
-        }
-        return ((HandlerExecution) handler).handle(request, response);
+    private void handle(HttpServletRequest request, HttpServletResponse response,
+                        Object handler, HandlerAdapter adapter) throws Exception {
+        ModelAndView modelAndView = adapter.handle(request, response, handler);
+        View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), request, response);
     }
 
     private Object getHandler(HttpServletRequest request) {
