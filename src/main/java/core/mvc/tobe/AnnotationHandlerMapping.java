@@ -4,9 +4,11 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import exception.NotFoundException;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -27,7 +29,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     @Override
     public void initMapping() {
         ControllerScanner controllerScanner = new ControllerScanner(basePackage);
-        initHandlerExecution(controllerScanner.getControllers());
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+        if (controllers.isEmpty()) {
+            throw new NotFoundException(HttpStatus.NOT_FOUND);
+        }
+        initHandlerExecution(controllers);
     }
 
     private void initHandlerExecution(Map<Class<?>, Object> controllers) {
@@ -48,14 +54,15 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private void addHandlerExecution(Object controllerInstance, String path, Method method) {
-        HandlerKey handlerKey = createHandlerKey(path, method);
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        HandlerKey handlerKey = createHandlerKey(requestMapping, path);
         logger.debug("Add RequestMapping. URI: {}, requestMethod: {}", handlerKey, method);
         handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
     }
 
-    private HandlerKey createHandlerKey(String path, Method method) {
-        String uriPath = method.getAnnotation(RequestMapping.class).value();
-        RequestMethod requestMethod = method.getAnnotation(RequestMapping.class).method();
+    private HandlerKey createHandlerKey(RequestMapping requestMapping, String path) {
+        String uriPath = requestMapping.value();
+        RequestMethod requestMethod = requestMapping.method();
         return new HandlerKey(path + uriPath, requestMethod);
     }
 

@@ -31,11 +31,11 @@ public class ControllerScanner {
 
     private Map<Class<?>, Object> instantiateControllers(Set<Class<?>> controllerClasses)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Map<Class<?>, Object> controllers = new HashMap<>();
+        Map<Class<?>, Object> controllerInstances = new HashMap<>();
         for (Class<?> controllerClass : controllerClasses) {
             Object instance = controllerClass.getConstructor().newInstance();
-            controllers.put(controllerClass, instance);
+            controllerInstances.put(controllerClass, instance);
         }
-        return controllers;
+        return controllerInstances;
     }
 }
