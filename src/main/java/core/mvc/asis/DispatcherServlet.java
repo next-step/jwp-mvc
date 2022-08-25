@@ -1,5 +1,9 @@
 package core.mvc.asis;
 
+import com.google.common.collect.Lists;
+import core.mvc.HandlerMapping;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -17,12 +23,17 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private List<HandlerMapping> mappings = Lists.newArrayList();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        LegacyHandlerMapping lhm = new LegacyHandlerMapping();
+        lhm.initMapping();
+        AnnotationHandlerMapping ahm = new AnnotationHandlerMapping("next.controller");
+        ahm.initialize();
+
+        mappings.add(lhm);
+        mappings.add(ahm);
     }
 
     @Override
