@@ -4,10 +4,10 @@ import core.annotation.web.RequestMethod;
 import core.configuration.ApplicationContext;
 import core.mvc.HandlerMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerKey;
 import core.web.view.ModelAndView;
-import core.web.view.ViewRenderer;
+import next.support.resolver.ArgumentResolver;
+import next.support.resolver.HandlerSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,15 +47,12 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Object handler = this.findHandler(req.getMethod(), requestUri);
+        HandlerKey handlerKey = new HandlerKey(requestUri, RequestMethod.getRequestMethod(req.getMethod()));
+        Object handler = this.findHandler(handlerKey);
+        HandlerSpec handlerSpec = new HandlerSpec(handler, handlerKey, req, resp);
         try {
-            if (handler instanceof Controller) {
-                String viewName = ((Controller) handler).execute(req, resp);
-                ViewRenderer.getInstance().render(viewName, req, resp);
-                return;
-            }
-
-            ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+            // ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+            ModelAndView modelAndView = ArgumentResolver.getInstance().invokeHandler(handlerSpec);
             modelAndView.render(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
@@ -63,10 +60,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Object findHandler(String methodType, String url) throws ServletException {
-        RequestMethod requestMethod = RequestMethod.getRequestMethod(methodType);
-        HandlerKey handlerKey = new HandlerKey(url, requestMethod);
-
+    private Object findHandler(HandlerKey handlerKey) throws ServletException {
         return handlerMappings.stream()
                 .map(handlerMapping -> handlerMapping.getHandler(handlerKey))
                 .filter(Objects::nonNull)

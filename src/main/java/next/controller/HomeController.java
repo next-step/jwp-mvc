@@ -6,13 +6,10 @@ import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.web.view.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Controller
 public class HomeController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView index(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView index() {
         ModelAndView modelAndView = ModelAndView.getJspModelAndView("home.jsp");
         modelAndView.addObject("users", DataBase.findAll());
         return modelAndView;
