@@ -17,7 +17,7 @@ public class LegacyForwardController implements Controller {
     }
 
     @Override
-    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        return new ModelAndView(new ResourceView(forwardUrl));
+    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        return forwardUrl;
     }
 }
