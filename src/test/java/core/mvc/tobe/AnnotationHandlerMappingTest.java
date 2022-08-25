@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import core.db.DataBase;
 import next.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -13,11 +14,12 @@ public class AnnotationHandlerMappingTest {
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
         handlerMapping.initialize();
     }
 
+    @DisplayName("회원가입")
     @Test
     public void create_find() throws Exception {
         User user = new User("pobi", "password", "포비", "pobi@nextstep.camp");
