@@ -59,3 +59,19 @@
   * 점진적 리팩토링 도입
     * 기존 MVC와 새로운 MVC가 공존.
     * 모든 Controller가 새로운 MVC로 전환되면 기존 레거시 MVC 삭제.
+
+## 3단계 - @MVC 구현(힌트)
+
+### 요구사항 - ControllerScanner 클래스 추가
+
+* **ControllerScanner**
+  * reflections 사용해서 `@Controller`어노테이션 설정된 클래스를 **찾는다**.
+  * 찾은 각 클래스에 대한 **인스턴스 생성**을 담당한다.
+
+* **AnnotationHandlerMapping**
+  * 어노테이션 기반 매핑을 담당.
+  * @Controller 클래스의 메서드 중 `@RequestMapping` 어노테이션 설정된 모든 메서드를 **찾는다**
+  * 찾은 메서드를 바탕으로 `Map<HandlerKey, HandlerExecution>`에 값을 저장.
+    * `HandlerKey` : `@RequestMapping` 어노테이션이 갖고 있는 URL과 HTTP 메서드를 저장.
+    * `HandlerExecution` : 자바 리플랙션에서 메서드를 실행하기 위해 필요한 정보 저장.
+      * 실행할 메서드가 존재하는 클래스의 인스턴스 정보, 실행할 메서드 정보 저장.
