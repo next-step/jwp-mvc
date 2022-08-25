@@ -3,12 +3,11 @@ package core.di.factory.example;
 import core.annotation.Inject;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
-import core.mvc.ModelAndView;
+import core.web.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller
 public class QnaController {
     private MyQnaService qnaService;
 

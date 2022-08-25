@@ -1,18 +1,29 @@
-package core.mvc;
+package core.web.view;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
     private View view;
-    private Map<String, Object> model = new HashMap<String, Object>();
+    private final Map<String, Object> model = new HashMap<>();
 
     public ModelAndView() {
     }
 
     public ModelAndView(View view) {
         this.view = view;
+    }
+
+    public static ModelAndView getJspModelAndView(String viewName) {
+        return new ModelAndView(new JspView(viewName));
+    }
+
+    public static ModelAndView redirectHome() {
+
+        return new ModelAndView(new JspView("redirect:/"));
     }
 
     public ModelAndView addObject(String attributeName, Object attributeValue) {
@@ -30,5 +41,9 @@ public class ModelAndView {
 
     public View getView() {
         return view;
+    }
+
+    public void render(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        this.view.render(model, request, response);
     }
 }
