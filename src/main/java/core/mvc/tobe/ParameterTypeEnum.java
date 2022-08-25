@@ -7,7 +7,8 @@ public enum ParameterTypeEnum {
     INT_PRIMITIVE(int.class, "int"),
     LONG_PRIMITIVE(long.class, "long"),
     INTEGER(Integer.class, "java.lang.Integer"),
-    LONG(Long.class, "java.lang.Long");
+    LONG(Long.class, "java.lang.Long"),
+    OBJECT(Object.class, "java.lang.Object");
 
     private final String className;
 
@@ -15,17 +16,22 @@ public enum ParameterTypeEnum {
         this.className = className;
     }
 
-    public static Object casting(String value, Class<?> clazz) {
+    public static Object casting(Object value, Class<?> clazz) {
+        if (type(clazz) == OBJECT) {
+            return value;
+        }
+
+        String stringValue = String.valueOf(value);
         switch (type(clazz)) {
-            case INT_PRIMITIVE: return Integer.parseInt(value);
-            case LONG_PRIMITIVE: return Long.parseLong(value);
-            case INTEGER: return Integer.valueOf(value);
-            case LONG: return Long.valueOf(value);
-            default: return value;
+            case INT_PRIMITIVE: return Integer.parseInt(stringValue);
+            case LONG_PRIMITIVE: return Long.parseLong(stringValue);
+            case INTEGER: return Integer.valueOf(stringValue);
+            case LONG: return Long.valueOf(stringValue);
+            default: return stringValue;
         }
     }
 
     public static ParameterTypeEnum type(Class<?> clazz) {
-        return Arrays.stream(values()).filter(type -> type.className.equals(clazz.getName())).findFirst().orElse(STRING);
+        return Arrays.stream(values()).filter(type -> type.className.equals(clazz.getName())).findFirst().orElse(OBJECT);
     }
 }

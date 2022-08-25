@@ -1,17 +1,20 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMapping;
+import core.mvc.tobe.argumentResolver.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RequestParameters {
+
+    private static final List<HandlerMethodArgumentResolver> resolvers = Arrays.asList(new HttpServletRequestArgumentResolver(),
+            new HttpServletResponseArgumentResolver(), new TestUserArgumentResolver(), new StringArgumentResolver(),
+            new IntegerArgumentResolver(), new LongArgumentResolver());
 
     private final String[] parameterNames;
     private Class<?>[] parameterTypes;
@@ -34,32 +37,10 @@ public class RequestParameters {
             String parameterName = parameterNames[i];
             Class<?> parameterType = parameterTypes[i];
 
-            String parameter = request.getParameter(parameterName);
-            if (parameter != null) {
-                parameterList.add(ParameterTypeEnum.casting(parameter, parameterType));
-                continue;
-            }
-
-            String pathVariable = pathVariables.keySet().stream().filter(key -> key.equals(parameterName))
-                    .map(pathVariables::get).findFirst().orElse(null);
-            if (pathVariable != null) {
-                parameterList.add(ParameterTypeEnum.casting(pathVariable, parameterType));
-                continue;
-            }
-
-            Object attribute = request.getAttribute(parameterName);
-            if (attribute != null) {
-                parameterList.add(attribute);
-                continue;
-            }
-
-            if (parameterType.getSimpleName().equals("HttpServletRequest")) {
-                parameterList.add(request);
-                continue;
-            }
-
-            if (parameterType.getSimpleName().equals("HttpServletResponse")) {
-                parameterList.add(response);
+            for (HandlerMethodArgumentResolver resolver : resolvers) {
+                if (resolver.supportsParameter(parameterType)) {
+                    add(resolver.resolveArgument(parameterType, arguments(request, response, parameterName)), parameterType);
+                }
             }
         }
         return parameterList;
@@ -69,5 +50,19 @@ public class RequestParameters {
         RequestMapping requestMappingAnnotation = method.getAnnotation(RequestMapping.class);
         UriPathPattern uriPathPattern = new UriPathPattern(requestMappingAnnotation.value());
         return uriPathPattern.matchAndExtract(request.getRequestURI());
+    }
+
+    private List<Object> arguments(HttpServletRequest request, HttpServletResponse response, String parameterName) {
+        List<Object> arguments = new ArrayList<>();
+        arguments.add(request.getParameter(parameterName));
+        arguments.add(pathVariables.keySet().stream().filter(key -> key.equals(parameterName)).map(pathVariables::get).findFirst().orElse(null));
+        arguments.add(request.getAttribute(parameterName));
+        arguments.add(request);
+        arguments.add(response);
+        return arguments;
+    }
+
+    private void add(Object object, Class<?> parameterType) {
+        parameterList.add(ParameterTypeEnum.casting(object, parameterType));
     }
 }
