@@ -23,13 +23,12 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private LegacyHandlerMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
     private HandlerMappings mappings = new HandlerMappings();
 
     @Override
     public void init() throws ServletException {
-        rm = new LegacyHandlerMapping();
+        LegacyHandlerMapping rm = new LegacyHandlerMapping();
         rm.initMapping();
 
         annotationHandlerMapping = new AnnotationHandlerMapping();
