@@ -35,7 +35,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         getRequestMappingMethod(clazz)
             .forEach(method -> {
                     handlerExecutions.put(
-                        createHanlderKey(method, clazz),
+                        createHandlerKey(method, clazz),
                         new HandlerExecution(controllers.get(method.getDeclaringClass()), method));
             });
     }
@@ -44,12 +44,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
     }
 
-    private static HandlerKey createHanlderKey(Method method, Class<?> clazz) {
+    private static HandlerKey createHandlerKey(Method method, Class<?> clazz) {
         Controller controller = clazz.getAnnotation(Controller.class);
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         return new HandlerKey(controller.value() + requestMapping.value(), requestMapping.method());
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
