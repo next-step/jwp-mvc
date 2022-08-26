@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.handlerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class HandlerAdapterStorage {
     }
 
     public void init() {
-        handlerAdapters.add(new HandlerExecution());
+        handlerAdapters.add(new RequestMappingHandlerAdapter());
         handlerAdapters.add(new SimpleControllerHandlerAdapter());
     }
 
