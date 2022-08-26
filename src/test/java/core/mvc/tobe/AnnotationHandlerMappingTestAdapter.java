@@ -10,13 +10,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import core.db.DataBase;
 import next.model.User;
 
-public class AnnotationHandlerMappingTest {
+public class AnnotationHandlerMappingTestAdapter {
     private AnnotationHandlerMapping handlerMapping;
 
     @BeforeEach
     public void setup() {
-        this.handlerMapping = new ControllerScanner("core.mvc.tobe")
-            .getAnnotationHandlerMapping();
+        this.handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
+        this.handlerMapping.initialize();
     }
 
     @Test
@@ -29,7 +29,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
         var execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        ((HandlerExecution)execution).handle(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
     }
@@ -42,6 +42,6 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
         var execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        ((HandlerExecution)execution).handle(request, response);
     }
 }

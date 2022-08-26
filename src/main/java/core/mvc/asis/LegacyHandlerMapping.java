@@ -3,14 +3,11 @@ package core.mvc.asis;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import core.mvc.tobe.Handler;
 import core.mvc.tobe.HandlerMapping;
 import next.controller.CreateUserController;
 import next.controller.HomeController;
@@ -52,25 +49,9 @@ public class LegacyHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public Handler getHandler(HttpServletRequest request) {
+    public Object getHandler(HttpServletRequest request) {
         var uri = request.getRequestURI();
 
-        return new LegacyHandler(mappings.get(uri));
-    }
-
-    private static class LegacyHandler implements Handler {
-        private final Controller controller;
-
-        private LegacyHandler(Controller controller) {
-            this.controller = controller;
-        }
-
-        @Override
-        public void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-            var execute = controller.execute(request, response);
-            var requestDispatcher = request.getRequestDispatcher(execute);
-
-            requestDispatcher.forward(request, response);
-        }
+        return mappings.get(uri);
     }
 }
