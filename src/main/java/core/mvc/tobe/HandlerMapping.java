@@ -4,5 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface HandlerMapping {
 
+    void initMapping();
     Object getHandler(HttpServletRequest request);
 }

@@ -16,7 +16,7 @@ public class AnnotationHandlerMappingTest {
     @BeforeEach
     public void setup() throws Exception {
         handlerMapping = new AnnotationHandlerMapping("core.mvc.tobe");
-        handlerMapping.initialize();
+        handlerMapping.initMapping();
     }
 
     @DisplayName("회원가입")
@@ -30,7 +30,7 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        execution.execute(request, response);
 
         assertThat(request.getAttribute("user")).isEqualTo(user);
     }
@@ -43,6 +43,6 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        execution.handle(request, response);
+        execution.execute(request, response);
     }
 }
