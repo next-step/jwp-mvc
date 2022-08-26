@@ -1,53 +1,46 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMapping;
+import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-@WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
-public class DispatcherServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+public class LegacyHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    private Map<String, Controller> mappings = new HashMap<>();
 
-    private RequestMapping rm;
+    void initMapping() {
+        mappings.put("/", new HomeController());
+        mappings.put("/users/form", new ForwardController("/user/form.jsp"));
+        mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
+        mappings.put("/users", new ListUserController());
+        mappings.put("/users/login", new LoginController());
+        mappings.put("/users/profile", new ProfileController());
+        mappings.put("/users/logout", new LogoutController());
+        mappings.put("/users/create", new CreateUserController());
+        mappings.put("/users/updateForm", new UpdateFormUserController());
+        mappings.put("/users/update", new UpdateUserController());
 
-    @Override
-    public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        logger.info("Initialized Request Mapping!");
+        mappings.keySet().forEach(path -> {
+            logger.info("Path : {}, Controller : {}", path, mappings.get(path).getClass());
+        });
+    }
+
+    public Controller findController(String url) {
+        return mappings.get(url);
+    }
+
+    void put(String url, Controller controller) {
+        mappings.put(url, controller);
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
-
-        Controller controller = rm.findController(requestUri);
-        try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
-        } catch (Throwable e) {
-            logger.error("Exception : {}", e);
-            throw new ServletException(e.getMessage());
-        }
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+    public Object getHandler(HttpServletRequest request) {
+        return findController(request.getRequestURI());
     }
 }
