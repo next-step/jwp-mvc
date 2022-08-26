@@ -1,21 +1,20 @@
 package core.mvc.tobe;
 
+import java.util.Set;
+
 import org.reflections.Reflections;
 
 import core.annotation.web.Controller;
 
 public class ControllerScanner {
 
-    private final AnnotationHandlerMapping annotationHandlerMapping;
+    private final Reflections reflections;
 
     public ControllerScanner(Object... basePackage) {
-        var reflections = new Reflections(basePackage);
-        var targetClasses = reflections.getTypesAnnotatedWith(Controller.class);
-
-        this.annotationHandlerMapping = new AnnotationHandlerMapping(targetClasses);
+        this.reflections = new Reflections(basePackage);
     }
 
-    public AnnotationHandlerMapping getAnnotationHandlerMapping() {
-        return annotationHandlerMapping;
+    public Set<Class<?>> findControllers() {
+        return reflections.getTypesAnnotatedWith(Controller.class);
     }
 }
