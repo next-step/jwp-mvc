@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/my-controller/users", method = RequestMethod.GET)
     public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
         String userId = request.getParameter("userId");
         logger.debug("Find UserId : {}", userId);
@@ -25,7 +25,7 @@ public class MyController {
         return null;
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/my-controller/users", method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(
                 request.getParameter("userId"),

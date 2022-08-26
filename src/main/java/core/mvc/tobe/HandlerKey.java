@@ -11,6 +11,11 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
+    public boolean matchedHandler(String requestURI) {
+        UriPathPattern uriPathPattern = new UriPathPattern(url);
+        return uriPathPattern.matched(requestURI);
+    }
+
     @Override
     public String toString() {
         return "HandlerKey [url=" + url + ", requestMethod=" + requestMethod + "]";
