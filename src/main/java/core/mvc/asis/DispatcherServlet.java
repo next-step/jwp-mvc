@@ -51,7 +51,6 @@ public class DispatcherServlet extends HttpServlet {
         Object handler = this.findHandler(handlerKey);
         HandlerSpec handlerSpec = new HandlerSpec(handler, handlerKey, req, resp);
         try {
-            // ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
             ModelAndView modelAndView = ArgumentResolver.getInstance().invokeHandler(handlerSpec);
             modelAndView.render(req, resp);
         } catch (Throwable e) {
