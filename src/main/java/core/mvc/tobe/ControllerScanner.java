@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class ControllerScanner {
     private static final Logger logger = LoggerFactory.getLogger(ControllerScanner.class);
 
-    private Reflections reflections;
+    private final Reflections reflections;
 
     public ControllerScanner(Object... basePackages) {
         this.reflections = new Reflections(basePackages);
@@ -30,7 +30,7 @@ public class ControllerScanner {
             return clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             logger.error("Exception : {}", e.getMessage(), e);
-            return null;
+            throw new IllegalStateException("컨트롤러 등록 실패");
         }
     }
 
