@@ -5,6 +5,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.configuration.ApplicationContext;
 import core.mvc.HandlerMapping;
+import next.support.resolver.PathAnalyzer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +29,21 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public Object getHandler(HandlerKey handlerKey) {
-        return handlerExecutions.get(handlerKey);
+        String requestUri = handlerKey.getUri();
+        Object handler = handlerExecutions.get(handlerKey);
+        if (Objects.nonNull(handler)) {
+            return handler;
+        }
+
+        return handlerExecutions.entrySet().stream()
+                .filter(entry -> {
+                    String handlerUri = entry.getKey().getUri();
+                    RequestMethod requestMethod = entry.getKey().getRequestMethod();
+                    return (PathAnalyzer.isSamePattern(handlerUri, requestUri)) && (handlerKey.getRequestMethod().equals(requestMethod));
+                })
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElse(null);
     }
 
     private void setHandlerExecutions(Object controller) {

@@ -19,9 +19,6 @@ public class ArgumentResolver {
 
     private final static ArgumentResolver argumentResolver = new ArgumentResolver();
     private final static Integer HANDLER_ARGUMENT_ANNOTATION_COUNT_LIMIT = 1;
-    private final static String URL_PATH_SEPARATOR = "/";
-    private final static String PATH_VARIABLE_BRACKET_OPEN = "{";
-    private final static String PATH_VARIABLE_BRACKET_CLOSE = "}";
 
     private ArgumentResolver() {
 
@@ -73,7 +70,7 @@ public class ArgumentResolver {
 
         if (parameterAnnotation.annotationType().equals(PathVariable.class)) {
             String requestUri = httpServletRequest.getRequestURI();
-            String handlerUri = handlerSpec.getHandlerKey().getUrl();
+            String handlerUri = handlerSpec.getOriginHandlerUri();
             return this.getPathVariable(requestUri, handlerUri, parameterName);
         }
 
@@ -114,11 +111,7 @@ public class ArgumentResolver {
     }
 
     private String getPathVariable(String requestUri, String handlerUri, String targetParameter) {
-        List<String> seperatedUrl = Arrays.stream(handlerUri.split(URL_PATH_SEPARATOR))
-                .collect(Collectors.toList());
-        int index = seperatedUrl.indexOf(PATH_VARIABLE_BRACKET_OPEN + targetParameter + PATH_VARIABLE_BRACKET_CLOSE);
-
-        return requestUri.split(URL_PATH_SEPARATOR)[index];
+        return PathAnalyzer.getVariables(handlerUri, requestUri, targetParameter);
     }
 
 }
