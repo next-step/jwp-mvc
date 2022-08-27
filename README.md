@@ -7,3 +7,17 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+### 구현 기능 명세
+* 클래스 정보 출력
+  * Question 클래스의 모든 필드 정보 출력
+  * Question 클래스의 생성자 정보 출력
+  * Question 클래스의 모든 메소드 정보 출력
+* test로 시작하는 메소드 실행
+  * Junit3Test 클래스에서 test로 시작하는 메소드만 실행
+* @Test 애노테이션 메소드 실행
+  * @MyTest 애노테이션 설정 메소드만 실행
+* private field에 값 할당
+* 인자를 가진 생성자의 인스턴스 생성
+* Component Scan
+  * @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력.
