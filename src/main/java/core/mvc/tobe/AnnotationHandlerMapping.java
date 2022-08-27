@@ -20,6 +20,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
+    private static final AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping();
+
+    public static AnnotationHandlerMapping getInstance() {
+        return annotationHandlerMapping;
+    }
+
     @Override
     public void init() {
         Map<String, Object> controllers = ApplicationContext.getInstance().getBeans();
@@ -42,6 +48,17 @@ public class AnnotationHandlerMapping implements HandlerMapping {
                     return (PathAnalyzer.isSamePattern(handlerUri, requestUri)) && (handlerKey.getRequestMethod().equals(requestMethod));
                 })
                 .map(Map.Entry::getValue)
+                .findAny()
+                .orElse(null);
+    }
+
+    public String getHandlerOriginUri(String requestUri) {
+        return handlerExecutions.keySet().stream()
+                .filter(handlerExecution -> {
+                    String handlerUri = handlerExecution.getUri();
+                    return PathAnalyzer.isSamePattern(handlerUri, requestUri);
+                })
+                .map(HandlerKey::getUri)
                 .findAny()
                 .orElse(null);
     }

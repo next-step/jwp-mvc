@@ -3,6 +3,7 @@ package next.support.resolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestBody;
+import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.web.view.ModelAndView;
 import next.support.mapper.ObjectMapperFactory;
@@ -70,7 +71,7 @@ public class ArgumentResolver {
 
         if (parameterAnnotation.annotationType().equals(PathVariable.class)) {
             String requestUri = httpServletRequest.getRequestURI();
-            String handlerUri = handlerSpec.getOriginHandlerUri();
+            String handlerUri = AnnotationHandlerMapping.getInstance().getHandlerOriginUri(requestUri);
             return this.getPathVariable(requestUri, handlerUri, parameterName);
         }
 

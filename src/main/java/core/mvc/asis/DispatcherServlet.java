@@ -2,7 +2,6 @@ package core.mvc.asis;
 
 import core.annotation.web.RequestMethod;
 import core.configuration.ApplicationContext;
-import core.mvc.HandlerMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerKey;
 import core.web.view.ModelAndView;
@@ -16,30 +15,18 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private final List<HandlerMapping> handlerMappings = new ArrayList<>();
-    private RequestMapping requestMapping;
-    private AnnotationHandlerMapping annotationHandlerMapping;
-
 
     @Override
     public void init() throws ServletException {
         ApplicationContext.getInstance().init();
-        requestMapping = new RequestMapping();
-        requestMapping.init();
-
-        annotationHandlerMapping = new AnnotationHandlerMapping();
-        annotationHandlerMapping.init();
-
-        handlerMappings.add(requestMapping);
-        handlerMappings.add(annotationHandlerMapping);
+        AnnotationHandlerMapping.getInstance().init();
     }
 
     @Override
@@ -60,11 +47,12 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object findHandler(HandlerKey handlerKey) throws ServletException {
-        return handlerMappings.stream()
-                .map(handlerMapping -> handlerMapping.getHandler(handlerKey))
-                .filter(Objects::nonNull)
-                .findAny()
-                .orElseThrow(ServletException::new);
+        Object handler = AnnotationHandlerMapping.getInstance().getHandler(handlerKey);
+        if (Objects.isNull(handler)) {
+            throw new ServletException();
+        }
+
+        return handler;
     }
 
 }
