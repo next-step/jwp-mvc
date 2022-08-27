@@ -16,15 +16,6 @@ public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
-    @SuppressWarnings("rawtypes")
-    public void constructor() throws Exception {
-        Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
-        Arrays.stream(constructors).forEach(constructor
-                -> printConstructorParameterInfo(constructor.getParameterTypes()));
-    }
-
-    @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
@@ -51,6 +42,22 @@ public class ReflectionTest {
 
         assertThat(student.getName()).isEqualTo(testName);
         assertThat(student.getAge()).isEqualTo(ageValue);
+    }
+
+    @Test
+    @SuppressWarnings("rawtypes")
+    public void constructor() throws Exception {
+        Class<Question> clazz = Question.class;
+        String writer = "writer";
+        String title = "title";
+        String contents = "contents";
+
+        Constructor<Question> constructor = clazz.getConstructor(String.class, String.class, String.class);
+        Question question = constructor.newInstance(writer, title, contents);
+
+        assertThat(question.getWriter()).isEqualTo(writer);
+        assertThat(question.getTitle()).isEqualTo(title);
+        assertThat(question.getContents()).isEqualTo(contents);
     }
 
     private void printAllFieldInfos(Class<Question> clazz) {
