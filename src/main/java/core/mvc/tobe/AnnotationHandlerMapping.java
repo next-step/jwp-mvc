@@ -5,6 +5,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.configuration.ApplicationContext;
 import core.mvc.HandlerMapping;
+import next.support.resolver.PathAnalyzer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +20,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
+    private static final AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping();
+
+    public static AnnotationHandlerMapping getInstance() {
+        return annotationHandlerMapping;
+    }
+
     @Override
     public void init() {
         Map<String, Object> controllers = ApplicationContext.getInstance().getBeans();
@@ -28,7 +35,32 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public Object getHandler(HandlerKey handlerKey) {
-        return handlerExecutions.get(handlerKey);
+        String requestUri = handlerKey.getUri();
+        Object handler = handlerExecutions.get(handlerKey);
+        if (Objects.nonNull(handler)) {
+            return handler;
+        }
+
+        return handlerExecutions.entrySet().stream()
+                .filter(entry -> {
+                    String handlerUri = entry.getKey().getUri();
+                    RequestMethod requestMethod = entry.getKey().getRequestMethod();
+                    return (PathAnalyzer.isSamePattern(handlerUri, requestUri)) && (handlerKey.getRequestMethod().equals(requestMethod));
+                })
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElse(null);
+    }
+
+    public String getHandlerOriginUri(String requestUri) {
+        return handlerExecutions.keySet().stream()
+                .filter(handlerExecution -> {
+                    String handlerUri = handlerExecution.getUri();
+                    return PathAnalyzer.isSamePattern(handlerUri, requestUri);
+                })
+                .map(HandlerKey::getUri)
+                .findAny()
+                .orElse(null);
     }
 
     private void setHandlerExecutions(Object controller) {

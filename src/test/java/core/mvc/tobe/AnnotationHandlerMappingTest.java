@@ -5,6 +5,8 @@ import core.configuration.ApplicationContext;
 import core.db.DataBase;
 import core.web.view.ModelAndView;
 import next.model.User;
+import next.support.resolver.ArgumentResolver;
+import next.support.resolver.HandlerSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -33,8 +35,9 @@ public class AnnotationHandlerMappingTest {
         HandlerKey handlerKey = new HandlerKey("/users", RequestMethod.GET);
         request.setParameter("userId", user.getUserId());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = (HandlerExecution) annotationHandlerMapping.getHandler(handlerKey);
-        ModelAndView modelAndView = execution.handle(request, response);
+        HandlerExecution handler = (HandlerExecution) annotationHandlerMapping.getHandler(handlerKey);
+        HandlerSpec handlerSpec = new HandlerSpec(handler, handlerKey, request, response);
+        ModelAndView modelAndView = ArgumentResolver.getInstance().invokeHandler(handlerSpec);
 
         assertThat(modelAndView.getModel().get("user")).isEqualTo(user);
     }
@@ -47,7 +50,8 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("name", user.getName());
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        HandlerExecution execution = (HandlerExecution) annotationHandlerMapping.getHandler(handlerKey);
-        execution.handle(request, response);
+        HandlerExecution handler = (HandlerExecution) annotationHandlerMapping.getHandler(handlerKey);
+        HandlerSpec handlerSpec = new HandlerSpec(handler, handlerKey, request, response);
+        ModelAndView modelAndView = ArgumentResolver.getInstance().invokeHandler(handlerSpec);
     }
 }

@@ -2,7 +2,6 @@ package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
 import core.mvc.tobe.HandlerKey;
-import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,7 @@ public class RequestMapping implements HandlerMapping {
 
     @Override
     public Object getHandler(HandlerKey handlerKey) {
-        String url = handlerKey.getUrl();
+        String url = handlerKey.getUri();
         return this.findController(url);
     }
 
