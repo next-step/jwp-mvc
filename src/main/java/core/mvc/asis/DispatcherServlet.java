@@ -4,11 +4,8 @@ import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
 import core.mvc.tobe.HandlerMappings;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +23,12 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
     private HandlerMappings mappings = new HandlerMappings();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
+        LegacyHandlerMapping rm = new LegacyHandlerMapping();
         rm.initMapping();
 
         annotationHandlerMapping = new AnnotationHandlerMapping();

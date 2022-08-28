@@ -32,3 +32,17 @@
 ## 🚀 2단계 - @MVC 구현
 1. [X] 요구사항 1 - 애노테이션 기반 MVC 프레임워크
 2. [X] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+
+
+## 🚀 3단계 - @MVC 구현(힌트)
+
+### 요구사항 1 힌트
+- [x] ControllerScanner 클래스 추가
+- [x] AnnotationHandlerMapping 클래스 추가 - ***기존에 있어 수정작업 진행***
+- [x] 요청에 대한 Controller 반환 - ***기존에 있어 수정작업 진행***
+
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+- [x] HandlerMapping 추가 - ***기존에 있어 수정작업 진행***
+  - [x] RequestMapping -> LegacyHandlerMapping으로 클래스 이름 변경
+- [x] HandlerMapping 초기화 - ***기존에 있어 수정작업 진행***
+- [x] Controller 실행 - ***기존에 있어 수정작업 진행***

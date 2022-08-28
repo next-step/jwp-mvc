@@ -4,13 +4,11 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-import org.reflections.Reflections;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,55 +24,33 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        try {
-            initializeHandlerExecution(reflections);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("AnnotationHandlerMapping initiallize Exception!! : {}", e.getMessage());
-        }
+        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+
+        controllers.keySet()
+            .forEach(clazz -> addHandlerMapping(clazz, controllers));
     }
 
-    private void initializeHandlerExecution(Reflections reflections)
-        throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
-        for (Class<?> controllerClass : controllerClasses) {
-            Controller controllerAnnotation = controllerClass.getAnnotation(Controller.class);
-            String controllerLevelPath = controllerAnnotation.value();
-
-            requestMethodScan(controllerLevelPath, controllerClass);
-        }
+    private void addHandlerMapping(Class<?> clazz, Map<Class<?>, Object> controllers) {
+        getRequestMappingMethod(clazz)
+            .forEach(method -> {
+                    handlerExecutions.put(
+                        createHandlerKey(method, clazz),
+                        new HandlerExecution(controllers.get(method.getDeclaringClass()), method));
+            });
     }
 
-    private void requestMethodScan(String controllerLevelPath, Class<?> controllerClass)
-        throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
-        Method[] methods = controllerClass.getDeclaredMethods();
-        for (Method method : methods) {
-            addHendlerExecution(controllerInstance, controllerLevelPath, method);
-        }
+    private static Set<Method> getRequestMappingMethod(Class<?> clazz) {
+        return ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
     }
 
-    private void addHendlerExecution(Object controllerInstance, String controllerLevelPath, Method method) {
-        if(isExistAnnotaionPresent(method)) {
-            RequestMapping requestMapping = getRequestMapping(method);
-            addHandlerExecution(controllerInstance, controllerLevelPath, method, requestMapping);
-        }
+    private static HandlerKey createHandlerKey(Method method, Class<?> clazz) {
+        Controller controller = clazz.getAnnotation(Controller.class);
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        return new HandlerKey(controller.value() + requestMapping.value(), requestMapping.method());
     }
 
-    private boolean isExistAnnotaionPresent(Method method) {
-        return method.isAnnotationPresent(RequestMapping.class);
-    }
-
-    private RequestMapping getRequestMapping(Method method) {
-        return method.getAnnotation(RequestMapping.class);
-    }
-
-    private void addHandlerExecution(Object controllerInstance, String controllerLevelPath, Method method, RequestMapping requestMapping) {
-        HandlerKey handlerKey = new HandlerKey(controllerLevelPath + requestMapping.value(), requestMapping.method());
-        handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
-    }
-
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
