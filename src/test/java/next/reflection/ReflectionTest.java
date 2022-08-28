@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,13 +28,23 @@ public class ReflectionTest {
     @SuppressWarnings("rawtypes")
     public void constructor() throws Exception {
         Class<Question> clazz = Question.class;
-        Constructor[] constructors = clazz.getConstructors();
+        Constructor[] constructors = clazz.getDeclaredConstructors();
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
+            int length = parameterTypes.length;
+            logger.debug("paramer length : {}", length);
             for (Class paramType : parameterTypes) {
                 logger.debug("param type : {}", paramType);
+
             }
+
+            Question newQuestion;
+            if (length == 3) {
+                newQuestion = (Question) constructor.newInstance("pobi", "test", "test contents");
+            } else {
+                newQuestion = (Question) constructor.newInstance(0L, "pobi", "test", "test contents", new Date(), 2);
+            }
+            logger.debug("newInstance : {}", newQuestion);
         }
     }
 
