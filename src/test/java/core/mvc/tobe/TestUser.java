@@ -31,4 +31,24 @@ public class TestUser {
                 ", age=" + age +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TestUser testUser = (TestUser) o;
+
+        if (age != testUser.age) return false;
+        if (!userId.equals(testUser.userId)) return false;
+        return password.equals(testUser.password);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userId.hashCode();
+        result = 31 * result + password.hashCode();
+        result = 31 * result + age;
+        return result;
+    }
 }

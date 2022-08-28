@@ -1,5 +1,6 @@
 package core.mvc.tobe;
 
+import core.mvc.tobe.resolver.ArgumentResolverMapping;
 import core.mvc.view.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) controllerMethod.invoke(controllerInstance, request, response);
+        Object[] arguments = ArgumentResolverMapping.resolve(controllerMethod, request, response);
+        return (ModelAndView) controllerMethod.invoke(controllerInstance, arguments);
     }
 }

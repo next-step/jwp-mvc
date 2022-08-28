@@ -3,16 +3,15 @@ package next.controller;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.db.DataBase;
-import core.mvc.view.ResourceView;
 import core.mvc.view.ModelAndView;
+import core.mvc.view.ResourceView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class HomeController {
     @RequestMapping("/")
-    public ModelAndView homePage(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView homePage(HttpServletRequest req) {
         req.setAttribute("users", DataBase.findAll());
         return new ModelAndView(new ResourceView("home.jsp"));
     }
