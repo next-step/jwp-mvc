@@ -74,6 +74,40 @@ public class MyController {
 - 즉, 레거시 MVC 프레임워크와 새롭게 구현한 애노테이션 MVC 프레임워크가 공존해야 한다.
 - 레거시 MVC 프레임워크가 새로운 애노테이션 MVC 프레임워크로 전환이 완료된 후, 기존의 레거시 MVC 프레임워크를 삭제한다.
 
+# 기능 요구사항 (Controller 메소드 인자 매핑)
+현재 Controller 메소드의 인자가 모두 `HttpServletRequest req, HttpServletResponse resp` 이므로, 매번 req 에서 값을 가져와서 형 변환을 해야 하는 불편함이 있다.
+Controller 메소드의 인자 타입에 따라 HttpServletRequest 에서 값을 꺼내와서 자동으로 형 변환을 한 후 매핑 하는 작업을 하도록 구현한다.
+또, URL 을 통해서 동적으로 값을 전달 하도록 한다.
+```java
+public class TestUserController {
+    private static final Logger logger = LoggerFactory.getLogger(TestUsersController.class);
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_string(String userId, String password) {
+        logger.debug("userId: {}, password: {}", userId, password);
+        return null;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_int_long(long id, int age) {
+        logger.debug("id: {}, age: {}", id, age);
+        return null;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ModelAndView create_javabean(TestUser testUser) {
+        logger.debug("testUser: {}", testUser);
+        return null;
+    }
+
+
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    public ModelAndView show_pathvariable(@PathVariable long id) {
+        logger.debug("userId: {}", id);
+        return null;
+    }
+}
+```
 
 ## 기능 목록
 - HandlerMapping 인터페이스
@@ -103,4 +137,32 @@ public class MyController {
     - Legacy Controller 에 대한 지원 메서드를 구현한다.
   - HandlerExecutionHandlerAdapter 구현체
     - Annotation 기반 Controller 에 대한 지원 메서드를 구현한다.
+- MethodParameter 객체
+  - 특정 메서드의 파라미터의 책임을 가진다.
+  - 해당 파라미터의 이름, 파라미터 타입, 애노테이션 존재 여부, primitive, wrapper, model type 여부를 지원한다.
+- HandlerMethodArgumentResolver 인터페이스
+  - Controller 의 파라미터(argument)의 타입을 찾아서 HttpServletRequest 의 값을 매핑해주는 메서드를 지원한다.
+  - supportsParameter 메서드를 통해 특정 파라미터의 Resolver 를 지원하는지 확인한다. 
+  - resolveArgument 메서드를 통해 특정 파라미터의 값을 추출하여 반환한다.
+  - HttpRequestArgumentResolver 구현체
+    - 컨트롤러의 파라미터 타입이 HttpServletRequest 일 경우, 그대로 그 값을 반환한다.
+  - HttpResponseArgumentResolver 구현체
+    - 컨트롤러의 파라미터 타입이 HttpServletResponse 일 경우, 그대로 그 값을 반환한다. 
+  - ModelArgumentResolver 구현체
+    - Model (객체 without HttpServletRequest, HttpServletResponse) 타입의 파라미터를 지원한다.
+    - 해당 객체의 생성자(전체 필드 갯수 매핑)를 찾아서 해당 필드의 이름과 그 값을 찾아서 인스턴스화 한 값을 반환한다.
+  - PathVariableArgumentResolver 구현체
+    - @PathVariable 애노테이션이 붙은 파라미터를 지원한다.
+    - 메서드의 RequestMapping value 값에 contain 된 value 를 찾아서 반환한다.
+    - PathVariable Option -> value 혹은 name 값을 우선으로 매핑하고, value, name 이 없을 경우, 파라미터 이름으로 매핑한다.
+  - RequestParamArgumentResolver 구현체
+    - @RequestParam 애노테이션이 붙은 파라미터를 지원한다.
+    - RequestParam Option -> value 혹은 name 값을 우선으로 매핑하고, value, name 이 없을 경우, 파라미터 이름으로 매핑한다.
+  - SimpleTypeArgumentResolver 구현체
+    - primitive or wrapper type 에 대한 파라미터를 지원한다.
+    - 파라미터 타입을 통해 값을 매핑하고 그 값을 반환한다.
+- TypeConverter 객체
+  - primitive type, wrapper type 에 대해서 input(String) 값을 해당 type 에 맞게 converting 해준다.
+- ArgumentResolverMapping 객체
+  - 파라미터 resolving 을 지원하는 객체를 매핑해준다.
 >Legacy 네이밍으로 시작하는 클래스들은 애노테이션 기반 MVC 패턴이 적용 된 후 삭제한다.
