@@ -59,8 +59,8 @@ public class DispatcherServlet extends HttpServlet {
                 .filter(adapter -> adapter.supports(handler))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("핸들러 처리를 지원하는 어댑터가 존재하지 않습니다."));
-        ModelAndView handle = handlerAdapter.handle(request, response, handler);
-        handle.render(request, response);
+        ModelAndView modelAndView = handlerAdapter.handle(request, response, handler);
+        modelAndView.render(request, response);
     }
 
     private Object getHandler(HttpServletRequest request) throws NotFoundException {

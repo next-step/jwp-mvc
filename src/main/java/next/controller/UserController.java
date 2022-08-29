@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
@@ -19,8 +18,7 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping("/create")
-    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"), req.getParameter("email"));
+    public ModelAndView createUser(User user) {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
@@ -28,7 +26,7 @@ public class UserController {
     }
 
     @RequestMapping
-    public ModelAndView showUsers(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView showUsers(HttpServletRequest req) {
         if (!UserSessionUtils.isLogined(req.getSession())) {
             return new ModelAndView(new ResourceView("redirect:/users/loginForm"));
         }
@@ -38,9 +36,7 @@ public class UserController {
     }
 
     @RequestMapping("/login")
-    public ModelAndView userLogin(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
+    public ModelAndView userLogin(HttpServletRequest req, String userId, String password) {
         User user = DataBase.findUserById(userId);
         if (isLoginFail(password, user)) {
             req.setAttribute("loginFailed", true);
@@ -56,23 +52,21 @@ public class UserController {
     }
 
     @RequestMapping("/logout")
-    public ModelAndView userLogout(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView userLogout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return new ModelAndView(new ResourceView("redirect:/"));
     }
 
     @RequestMapping("/profile")
-    public ModelAndView showUserProfile(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView showUserProfile(HttpServletRequest request, String userId) {
         User user = Optional.ofNullable(DataBase.findUserById(userId)).orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다."));
         request.setAttribute("user", user);
         return new ModelAndView(new ResourceView("/user/profile.jsp"));
     }
 
     @RequestMapping("/updateForm")
-    public ModelAndView showUserUpdateForm(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView showUserUpdateForm(HttpServletRequest request, String userId) {
         User user = DataBase.findUserById(userId);
         validateSameUser(request, user);
         request.setAttribute("user", user);
@@ -80,12 +74,10 @@ public class UserController {
     }
 
     @RequestMapping("/update")
-    public ModelAndView userUpdate(HttpServletRequest request, HttpServletResponse response) {
-        User user = DataBase.findUserById(request.getParameter("userId"));
+    public ModelAndView userUpdate(HttpServletRequest request, String userId, User updateUser) {
+        User user = DataBase.findUserById(userId);
         validateSameUser(request, user);
 
-        User updateUser = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"),
-                request.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
         return new ModelAndView(new ResourceView("redirect:/"));
