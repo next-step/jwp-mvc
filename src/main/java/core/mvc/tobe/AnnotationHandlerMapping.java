@@ -1,64 +1,68 @@
 package core.mvc.tobe;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.reflections.Reflections;
-
 import com.google.common.collect.Maps;
 
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
-public class AnnotationHandlerMapping {
-    private Object[] basePackage;
+public class AnnotationHandlerMapping implements HandlerMapping {
+
+    private final ControllerScanner controllerScanner;
 
     private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
 
-    public AnnotationHandlerMapping(Object... basePackage) {
-        this.basePackage = basePackage;
+    public AnnotationHandlerMapping(Object... packages) {
+        this.controllerScanner = new ControllerScanner(packages);
     }
 
     public void initialize() {
-        var reflections = new Reflections(basePackage);
-        var targetClasses = reflections.getTypesAnnotatedWith(Controller.class);
+        var controllers = controllerScanner.findControllers();
 
-        for (Class<?> targetClass : targetClasses) {
-            var targetObject = createTarget(targetClass);
-
-            var methods = Arrays.stream(targetClass.getMethods())
-                .filter(it -> it.getDeclaredAnnotation(RequestMapping.class) != null)
-                .collect(Collectors.toList());
-
-            var handlers = methods.stream()
-                .map(it -> Map.entry(createKey(it), new HandlerExecution(targetObject, it)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-            handlerExecutions.putAll(handlers);
-        }
+        this.handlerExecutions = controllers.stream()
+            .flatMap(this::toHandlerExecutions)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
     }
 
-    private HandlerKey createKey(Method it) {
-        var declaredAnnotation = it.getDeclaredAnnotation(RequestMapping.class);
+    private Stream<Map.Entry<HandlerKey, HandlerExecution>> toHandlerExecutions(Class<?> clazz) {
+        var object = createTarget(clazz);
+        var methods = findTargetMethods(clazz);
 
-        return new HandlerKey(declaredAnnotation.value(), declaredAnnotation.method());
+        return methods.stream()
+            .map(method -> Map.entry(createKey(method), new HandlerExecution(object, method)));
+    }
+
+    private List<Method> findTargetMethods(Class<?> targetClass) {
+        return Arrays.stream(targetClass.getMethods())
+            .filter(it -> it.isAnnotationPresent(RequestMapping.class))
+            .collect(Collectors.toList());
     }
 
     private Object createTarget(Class<?> targetClass) {
         try {
-            return targetClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            return targetClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new IllegalArgumentException("해당 클래스를 생성할 수 없습니다. " + targetClass.getName(), e);
         }
     }
 
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    private HandlerKey createKey(Method method) {
+        var declaredAnnotation = method.getDeclaredAnnotation(RequestMapping.class);
+
+        return new HandlerKey(declaredAnnotation.value(), declaredAnnotation.method());
+    }
+
+    @Override
+    public Object getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));

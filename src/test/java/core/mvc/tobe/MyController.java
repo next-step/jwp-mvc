@@ -25,6 +25,7 @@ public class MyController {
         return null;
     }
 
+
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
         User user = new User(
