@@ -1,5 +1,6 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -23,6 +25,7 @@ public class DispatcherServlet extends HttpServlet {
 
     private LegacyRequestMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
+    private List<HandlerMapping> handlerMappingList;
 
     @Override
     public void init() throws ServletException {
@@ -30,29 +33,36 @@ public class DispatcherServlet extends HttpServlet {
         rm.initMapping();
         annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
+        handlerMappingList = List.of(rm, annotationHandlerMapping);
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
         try {
-            Controller controller = rm.findController(requestUri);
-            if (controller != null) {
-                String viewName = controller.execute(req, resp);
-                move(viewName, req, resp);
-            } else {
-                HandlerExecution handler = annotationHandlerMapping.getHandler(req);
-                if (handler != null) {
-                    throw new ServletException("요청을 찾을 수 없습니다.");
-                }
-                ModelAndView modelAndView = handler.handle(req, resp);
-                move(modelAndView, req, resp);
-            }
+            Object handler = getHandler(req);
+            handle(handler, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
+        }
+    }
+
+    private Object getHandler(HttpServletRequest req) throws ServletException {
+        return handlerMappingList.stream()
+                .map(handlerMapping -> handlerMapping.getHandler(req))
+                .findFirst()
+                .orElseThrow(() -> new ServletException("요청을 찾을 수 없습니다."));
+    }
+
+    private void handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        if (handler instanceof Controller) {
+            String viewName = ((Controller) handler).execute(req, resp);
+            move(viewName, req, resp);
+        } else if (handler instanceof HandlerExecution) {
+            ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+            move(modelAndView, req, resp);
         }
     }
 
