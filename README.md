@@ -36,3 +36,6 @@
    - 힌트2 - AnnotationHandlerMapping 클래스 추가
    - 힌트3 - 요청에 대한 Controller 반환
 2. [X] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+
+## 🚀 4단계 - Controller 메소드 인자 매핑
+1. [X] 요구사항 1 - Controller 메소드 인자 매핑 구현하기

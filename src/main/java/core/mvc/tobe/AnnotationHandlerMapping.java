@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.resolver.*;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +12,23 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Arrays.asList;
+
 public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
+
+    private static final List<ArgumentResolver> argumentResolvers = asList(
+            new HttpRequestArgumentResolver(),
+            new HttpResponseArgumentResolver(),
+            new RequestParamArgumentResolver(),
+            new PathVariableArgumentResolver(),
+            new RequestBodyArgumentResolver(),
+            new SimpleArgumentResolver()
+    );
 
     private Object[] basePackage;
 
@@ -49,7 +62,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     private void addHandlerExecution(Object controllerInstance, String controllerLevelPath, Method method) {
         RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        handlerExecutions.put(createHandlerKey(controllerLevelPath, requestMapping), new HandlerExecution(controllerInstance, method));
+        handlerExecutions.put(createHandlerKey(controllerLevelPath, requestMapping), new HandlerExecution(argumentResolvers, controllerInstance, method));
     }
 
     private HandlerKey createHandlerKey(String controllerLevelPath, RequestMapping rm) {
@@ -61,6 +74,13 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+
+        HandlerKey findHandlerKey = handlerExecutions.keySet()
+                .stream()
+                .filter(handlerKey -> handlerKey.isSameHandlerKey(new HandlerKey(requestUri, rm)))
+                .findFirst()
+                .orElse(null);
+
+        return handlerExecutions.get(findHandlerKey);
     }
 }
