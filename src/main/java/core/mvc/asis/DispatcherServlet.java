@@ -2,7 +2,10 @@ package core.mvc.asis;
 
 import com.google.common.collect.Lists;
 import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,12 +44,23 @@ public class DispatcherServlet extends HttpServlet {
             Controller controller = (Controller) lhm.getHandler(req);
             if (controller != null) {
                 move(controller.execute(req, resp), req, resp);
+            } else {
+                HandlerExecution he = ahm.getHandler(req);
+                if (he == null) {
+                    throw new ServletException("유효하지 않은 요청입니다.");
+                }
+                render(req, resp, he.handle(req, resp));
             }
         } catch (Throwable e) {
             throw new ServletException(e.getMessage());
         }
     }
 
+    private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView mav)
+            throws Exception {
+        View view = mav.getView();
+        view.render(mav.getModel(), req, resp);
+    }
 
     private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
