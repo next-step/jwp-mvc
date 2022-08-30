@@ -5,6 +5,8 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 public class HandlerKey {
+
+    private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
     private String url;
     private RequestMethod requestMethod;
 
@@ -51,7 +53,6 @@ public class HandlerKey {
             return false;
         }
 
-        PathPatternParser parser = new PathPatternParser();
-        return parser.parse(url).matches(PathContainer.parsePath(handlerKey.url));
+        return PATH_PATTERN_PARSER.parse(url).matches(PathContainer.parsePath(handlerKey.url));
     }
 }
