@@ -35,7 +35,27 @@ public class PathVariableArgumentResolver implements ArgumentResolver {
                 .matchAndExtract(PathContainer.parsePath(request.getRequestURI()))
                 .getUriVariables();
 
-        return uriVariables.get(pathVariableValue);
+        return returnValue(uriVariables.get(pathVariableValue), requestParameter.getClassType());
+    }
+
+    private Object returnValue(String value, Class<?> classType) {
+        if (classType.equals(int.class)) {
+            return Integer.parseInt(value);
+        }
+
+        if (classType.equals(long.class)) {
+            return Long.parseLong(value);
+        }
+
+        if (classType.equals(double.class)) {
+            return Double.parseDouble(value);
+        }
+
+        if (classType.equals(float.class)) {
+            return Float.parseFloat(value);
+        }
+
+        return value;
     }
 
     private String getControllerRequestUrl(Method method) {
