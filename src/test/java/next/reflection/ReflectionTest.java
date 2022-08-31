@@ -1,12 +1,20 @@
 package next.reflection;
 
+import core.annotation.Component;
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Set;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -50,5 +58,36 @@ public class ReflectionTest {
 
         logger.debug("name => " + student.getName());
         logger.debug("age => " + student.getAge());
+    }
+
+    @Test
+    @DisplayName("요구사항5")
+    public void instanceInit() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+
+        Question question = (Question)declaredConstructors[0].newInstance("kim", "nextstep", "nextstep is good");
+
+        logger.debug("writer => " + question.getWriter());
+        logger.debug("title => " + question.getTitle());
+        logger.debug("contents => " + question.getContents());
+    }
+
+    @Test
+    @DisplayName("요구사항6")
+    public void showAnnotations() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+
+        Set<Class<?>> classByComponentAnnotation = reflections.getTypesAnnotatedWith(Controller.class);
+        classByComponentAnnotation.stream()
+                .forEach(System.out::println);
+
+        Set<Class<?>> classByServiceAnnotation = reflections.getTypesAnnotatedWith(Service.class);
+        classByServiceAnnotation.stream()
+                .forEach(System.out::println);
+
+        Set<Class<?>> classByRepositoryAnnotation = reflections.getTypesAnnotatedWith(Repository.class);
+        classByRepositoryAnnotation.stream()
+                .forEach(System.out::println);
     }
 }
