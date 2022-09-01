@@ -75,3 +75,73 @@
     * `HandlerKey` : `@RequestMapping` 어노테이션이 갖고 있는 URL과 HTTP 메서드를 저장.
     * `HandlerExecution` : 자바 리플랙션에서 메서드를 실행하기 위해 필요한 정보 저장.
       * 실행할 메서드가 존재하는 클래스의 인스턴스 정보, 실행할 메서드 정보 저장.
+
+## 4단계 - Controller 메서드 인자 매핑
+
+### 요구사항
+
+* Controller 메서드의 인자 타입에 따라 `HttpServletRequest` 에서 값을 꺼내와 자동으로 **형 변환**을 한 후 매핑 작업 자동화
+  * long, int, String
+* URL을 통한 동적 값 전달
+  * Spring 프레임워크의 `HandlerMethodArgumentResolver`
+
+## Domain
+
+### 1. MethodParameter
+
+- MethodParameter를 캡슐화 시켜주는 객체
+- 메서드에 `@RequestMapping` 어노테이션 존재 여부 판단
+- 메서드 인자에
+  - `@ModelAttribute`, `@PathVariable`, `@RequestParam` 존재 여부 판단
+- 메서드와 메서드 인자 관련 정보 제공.
+
+### 2. SimpleTypeConverter
+
+HttpServletRequest 값을 형변환 시키는 객체
+Integer, Long, String 형으로의 변환만을 지원.
+
+String → 메서드 인자의 타입으로 변환
+
+### 3. HandlerMethodArgumentResolverComposite
+
+HandlerMethodArgumentResolver들을 저장.
+저장되어있는 resolver들을 사용해서 MethodParameter를 resovle(해석)
+해석한 MethodParameter를 캐싱해놓는다.
+
+### 4. HandlerMethodArgumentResolver
+
+어노테이션 기반 컨트롤러는 다양한 파라미터 사용이 가능.
+
+- `HttpServletRequest`, `Model`, `@RequestParam`, `@ModelAttribute`, `@RequestBody`, `HttpEntity`
+
+RequestMappingHandlerAdapter가 ArgumentResolver를 호출해서 핸들러가 필요로 하는 다양한 객체를 생성한다.
+
+- `supportsParameter()`
+  - 해당 파라미터 지원 여부를 확인
+- `resolveArgument`
+  - 해당 파라미터를 지원하면 실제 객체를 생성.
+  - 생성된 객체를 컨트롤러로 반환
+
+### 4.1 ModelAttributeMethodArgumentResolver
+
+- `@ModelAttribute` 어노테이션이 붙은 메서드 인자를 찾아서 값을 추출
+- 인자로 주어진 객체 생성
+- String, int, Integer와 같은 단순 타입은 지원하지 않는다.
+  - `@RequestParam` 이 지원
+
+### 4.2 RequestParamMethodArgumentResolver
+
+- `@RequestParam` 어노테이션이 붙은 메서드 인자를 찾아서 값을 추출.
+- String, int, Integer 등의 단순 타입이면 `@RequestParam` 어노테이션 생략 가능
+  - required = true (기본값) 이면 어노테이션 필수
+  - required = false 이면 어노테이션 생략 가능
+
+### 4.3 PathVariableMethodArgumentResolver
+
+- `@PathVariable` 어노테이션이 붙은 메서드 인자를 찾아서 추출.
+  - `@RequestMapping` 어노테이션이 붙은 메서드에서 사용 가능.
+-
+
+### 4.4 ServletRequestParamMethodArgumentResolver
+
+- 서블릿 관련 요청 메서드의 인자를 추출.
