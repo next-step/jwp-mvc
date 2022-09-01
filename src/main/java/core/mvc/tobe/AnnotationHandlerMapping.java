@@ -46,10 +46,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 	}
 
 	private HandlerExecution getHandlerExecution(String requestUri, RequestMethod requestMethod) {
-		final HandlerExecution handlerExecution = handlerExecutions.get(new HandlerKey(requestUri, requestMethod));
-		if (handlerExecution != null) {
-			return handlerExecution;
+		return handlerExecutions.entrySet()
+				.stream()
+				.filter(entry -> isMatched(entry, requestUri, requestMethod) || isMatched(entry, requestUri, RequestMethod.ALL))
+				.findFirst()
+				.map(Map.Entry::getValue)
+				.orElse(null);
+	}
+
+	private boolean isMatched(Map.Entry<HandlerKey, HandlerExecution> entry, String requestUri, RequestMethod requestMethod) {
+		final HandlerKey handlerKey = entry.getKey();
+		if (!handlerKey.isSameMethod(requestMethod)) {
+			return false;
 		}
-		return handlerExecutions.get(new HandlerKey(requestUri, RequestMethod.ALL));
+		return handlerKey.isMatchedUri(requestUri);
 	}
 }
