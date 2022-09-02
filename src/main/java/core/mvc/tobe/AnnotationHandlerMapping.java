@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.exception.NotMatchHandlerKeyException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
@@ -52,8 +53,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        HandlerKey key = new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod().toUpperCase()));
+
+        return handlerExecutions.entrySet().stream()
+            .filter(it -> it.getKey().isMatch(key))
+            .map(it -> it.getValue())
+            .findAny()
+            .orElseThrow(() -> new NotMatchHandlerKeyException(request.getRequestURI()));
     }
 }

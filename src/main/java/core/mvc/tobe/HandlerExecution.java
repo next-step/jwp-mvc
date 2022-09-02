@@ -17,6 +17,7 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(declaredObject, request, response);
+        ArgumentScanner argumentScanner = new ArgumentScanner(method, request, response);
+        return (ModelAndView) method.invoke(declaredObject, argumentScanner.getArguments());
     }
 }
