@@ -33,16 +33,20 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         if (controllers.isEmpty()) {
             throw new NotFoundException(HttpStatus.NOT_FOUND);
         }
-        initHandlerExecution(controllers);
+        handlerExecutions.putAll(initHandlerExecution(controllers));
     }
 
-    private void initHandlerExecution(Map<Class<?>, Object> controllers) {
+    private Map<HandlerKey, HandlerExecution> initHandlerExecution(Map<Class<?>, Object> controllers) {
+        Map<HandlerKey, HandlerExecution> tmp = Maps.newHashMap();
         Set<Method> methods = getMethods(controllers);
         for (Method method : methods) {
             Class<?> declaringClass = method.getDeclaringClass();
             Controller annotation = declaringClass.getAnnotation(Controller.class);
-            addHandlerExecution(controllers.get(declaringClass), annotation.value(), method);
+            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+            HandlerKey handlerKey = createHandlerKey(requestMapping, annotation.value());
+            tmp.put(handlerKey, new HandlerExecution(controllers.get(declaringClass), method));
         }
+        return tmp;
     }
 
     private Set<Method> getMethods(Map<Class<?>, Object> controllers) {
@@ -53,23 +57,34 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         return methods;
     }
 
-    private void addHandlerExecution(Object controllerInstance, String path, Method method) {
-        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        HandlerKey handlerKey = createHandlerKey(requestMapping, path);
-        logger.debug("Add RequestMapping. URI: {}, requestMethod: {}", handlerKey, method);
-        handlerExecutions.put(handlerKey, new HandlerExecution(controllerInstance, method));
-    }
-
     private HandlerKey createHandlerKey(RequestMapping requestMapping, String path) {
         String uriPath = requestMapping.value();
         RequestMethod requestMethod = requestMapping.method();
         return new HandlerKey(path + uriPath, requestMethod);
     }
 
-    @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    private HandlerKey createHandlerKey(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestURI, requestMethod));
+        return new HandlerKey(requestURI, requestMethod);
+    }
+
+    @Override
+    public HandlerExecution getHandler(HttpServletRequest request) {
+        HandlerKey handlerKey = createHandlerKey(request);
+        return handlerExecutions.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().matches(handlerKey))
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("지원하지 않는 요청입니다. %s", request)));
+    }
+
+    @Override
+    public boolean isSupported(HttpServletRequest request) {
+        HandlerKey handlerKey = createHandlerKey(request);
+        return handlerExecutions.keySet()
+                .stream()
+                .anyMatch(key -> key.matches(handlerKey));
     }
 }

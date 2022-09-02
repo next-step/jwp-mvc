@@ -2,6 +2,9 @@ package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.tobe.*;
+import core.mvc.tobe.handlerAdapter.HandlerAdapter;
+import core.mvc.tobe.handlerAdapter.HandlerAdapterStorage;
+
 import core.mvc.view.View;
 import exception.NotFoundException;
 import org.slf4j.Logger;
@@ -15,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -24,7 +26,6 @@ public class DispatcherServlet extends HttpServlet {
 
     private HandlerAdapterStorage handlerAdapterStorage;
     private RequestMapping requestMapping;
-    
     private AnnotationHandlerMapping AnnotationHandlerMapping;
     private final List<HandlerMapping> mappings = new ArrayList<>();
 
@@ -72,8 +73,8 @@ public class DispatcherServlet extends HttpServlet {
 
     private Object getHandler(HttpServletRequest request) {
         return mappings.stream()
+                .filter(handlerMapping -> handlerMapping.isSupported(request))
                 .map(handlerMapping -> handlerMapping.getHandler(request))
-                .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 URL 주소입니다."));
     }

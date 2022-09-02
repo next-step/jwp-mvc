@@ -1,5 +1,7 @@
 package core.mvc.tobe;
 
+import java.util.Objects;
+
 public class TestUser {
     private String userId;
     private String password;
@@ -30,5 +32,18 @@ public class TestUser {
                 ", password='" + password + '\'' +
                 ", age=" + age +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TestUser testUser = (TestUser) o;
+        return getAge() == testUser.getAge() && Objects.equals(getUserId(), testUser.getUserId()) && Objects.equals(getPassword(), testUser.getPassword());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUserId(), getPassword(), getAge());
     }
 }
