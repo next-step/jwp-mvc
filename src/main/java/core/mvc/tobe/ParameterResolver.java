@@ -37,6 +37,14 @@ public class ParameterResolver {
         this.pathVariables = getPathVariables();
     }
 
+    public Object[] resolve() {
+        final Object[] parameterValues = new Object[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            parameterValues[i] = getParameterValue(parameterTypes[i], i);
+        }
+        return parameterValues;
+    }
+
     private Map<String, String> getPathVariables() {
         final String requestURI = request.getRequestURI();
         final PathPattern parse = parse(method.getDeclaredAnnotation(RequestMapping.class).value());
@@ -45,14 +53,6 @@ public class ParameterResolver {
             return new HashMap<>();
         }
         return pathMatchInfo.getUriVariables();
-    }
-
-    public Object[] resolve() {
-        final Object[] parameterValues = new Object[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            parameterValues[i] = getParameterValue(parameterTypes[i], i);
-        }
-        return parameterValues;
     }
 
     private Object getParameterValue(Class<?> parameterType, int index) {
