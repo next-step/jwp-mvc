@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class LogoutController {
     @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
-    public ModelAndView llogout(HttpServletRequest request) {
+    public ModelAndView logout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return ModelAndView.fromJspView("redirect:/");

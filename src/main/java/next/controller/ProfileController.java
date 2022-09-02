@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class ProfileController {
     @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView profille(String userId, HttpServletRequest request) {
+    public ModelAndView profile(String userId, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
