@@ -31,10 +31,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
         for (Class<?> clazz : controllers.keySet()) {
             methods.addAll(ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class)));
-            for (Method method : methods) {
-                RequestMapping rm = method.getAnnotation(RequestMapping.class);
-                handlerExecutions.put(new HandlerKey(rm.value(), rm.method()), new HandlerExecution(controllers.get(method.getDeclaringClass()), method));
-            }
+            putHandler(methods, controllers);
         }
     }
 
@@ -42,5 +39,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
         return handlerExecutions.get(new HandlerKey(requestUri, rm));
+    }
+
+    public void putHandler(Set<Method> methods, Map<Class<?>, Object> controllers) {
+        for (Method method : methods) {
+            RequestMapping rm = method.getAnnotation(RequestMapping.class);
+            handlerExecutions.put(new HandlerKey(rm.value(), rm.method()), new HandlerExecution(controllers.get(method.getDeclaringClass()), method));
+        }
     }
 }
