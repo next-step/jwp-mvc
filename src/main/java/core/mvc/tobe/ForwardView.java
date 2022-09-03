@@ -2,7 +2,6 @@ package core.mvc.tobe;
 
 import core.mvc.View;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
