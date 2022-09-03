@@ -1,5 +1,10 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -17,12 +25,14 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private RequestMapping requestMapping;
+    private final HandlerMapping handlerMapping = new AnnotationHandlerMapping();
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        requestMapping = new RequestMapping();
+        requestMapping.initMapping();
+        handlerMapping.initialize();
     }
 
     @Override
@@ -30,7 +40,22 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        HandlerExecution handler = handlerMapping.getHandler(req);
+        if (!Objects.isNull(handler)) {
+            try {
+                ModelAndView modelAndView = handler.handle(req, resp);
+                View view = modelAndView.getView();
+                view.render(modelAndView.getModel(), req, resp);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+        Controller controller = requestMapping.findController(requestUri);
+        if (Objects.isNull(controller)) {
+            return;
+        }
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
