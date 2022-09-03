@@ -8,15 +8,12 @@ import core.mvc.ModelAndView;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String userId = request.getParameter("userId");
-        String password = request.getParameter("password");
+    public ModelAndView login(String userId, String password, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             request.setAttribute("loginFailed", true);

@@ -8,13 +8,11 @@ import core.mvc.ModelAndView;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class UpdateUserFormController {
     @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
-    public ModelAndView form(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String userId = request.getParameter("userId");
+    public ModelAndView form(String userId, HttpServletRequest request) {
         User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");

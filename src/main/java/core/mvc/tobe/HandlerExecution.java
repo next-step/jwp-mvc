@@ -18,8 +18,11 @@ public class HandlerExecution {
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        final ParameterResolver parameterResolver = new ParameterResolver(request, response, method);
+        final Object[] parameterValues = parameterResolver.resolve();
+
         try {
-            return (ModelAndView) method.invoke(declaredObject, request, response);
+            return (ModelAndView) method.invoke(declaredObject, parameterValues);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ServletException(e.getMessage(), e);
         }

@@ -4,6 +4,7 @@ import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 
 import java.lang.reflect.Method;
+import java.util.regex.Pattern;
 
 public class HandlerKey {
     private final String url;
@@ -50,5 +51,14 @@ public class HandlerKey {
         } else if (!url.equals(other.url))
             return false;
         return true;
+    }
+
+    public boolean isSameMethod(RequestMethod requestMethod) {
+        return this.requestMethod == requestMethod;
+    }
+
+    public boolean isMatchedUri(String requestUri) {
+        final Pattern pattern = Pattern.compile(url.replaceAll("\\{[^/]+}", "[^/]+"));
+        return pattern.matcher(requestUri).matches();
     }
 }
