@@ -1,7 +1,9 @@
 package core.mvc.tobe;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,22 +35,26 @@ public class HandlerExecution {
         var parameterNames = ParameterSupport.nameDiscoverer()
             .getParameterNames(method);
         var parameters = method.getParameters();
-        var values = new Object[parameterNames.length];
 
-        for (int i = 0; i < parameterNames.length; i++) {
-            var parameterName = parameterNames[i];
-            var parameter = parameters[i];
 
-            var resolver = argumentResolvers.stream()
-                .filter(it -> it.supportsParameter(parameter))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않은 파라미터 타입입니다" + parameter.getName()));
+        var values = IntStream.range(0, parameterNames.length)
+            .mapToObj(idx -> {
+                var parameterName = parameterNames[idx];
+                var parameter = parameters[idx];
 
-            var value = resolver.resolve(parameterName, parameter, request, method);
-            values[i] = value;
-        }
+                var resolver = findResolver(parameter);
+                return resolver.resolve(parameterName, parameter, request, method);
+            })
+            .toArray(Object[]::new);
 
         return (ModelAndView)method.invoke(targetObject, values);
+    }
+
+    private HandlerMethodArgumentResolver findResolver(Parameter parameter) {
+        return argumentResolvers.stream()
+            .filter(it -> it.supportsParameter(parameter))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("지원하지 않은 파라미터 타입입니다" + parameter.getName()));
     }
 }
 
