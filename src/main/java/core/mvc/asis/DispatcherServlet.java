@@ -25,8 +25,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private LegacyHandlerMapping lhm;
-    private AnnotationHandlerMapping ahm;
+    private List<HandlerMapping> mappings = Lists.newArrayList();
 
     @Override
     public void init() throws ServletException {
@@ -34,42 +33,33 @@ public class DispatcherServlet extends HttpServlet {
         lhm.initMapping();
         AnnotationHandlerMapping ahm = new AnnotationHandlerMapping("next.controller");
         ahm.initialize();
+
+        mappings.add(lhm);
+        mappings.add(ahm);
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        Object handler = getHandler(req);
         try {
-            Controller controller = (Controller) lhm.getHandler(req);
-            if (controller != null) {
-                move(controller.execute(req, resp), req, resp);
-            } else {
-                HandlerExecution he = ahm.getHandler(req);
-                if (he == null) {
-                    throw new ServletException("유효하지 않은 요청입니다.");
-                }
-                render(req, resp, he.handle(req, resp));
+            if (handler instanceof Controller) {
+                ModelAndView mav = ((Controller)handler).execute(req, resp);
+            } else if (handler instanceof HandlerExecution) {
+                ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
             }
         } catch (Throwable e) {
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void render(HttpServletRequest req, HttpServletResponse resp, ModelAndView mav)
-            throws Exception {
-        View view = mav.getView();
-        view.render(mav.getModel(), req, resp);
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private Object getHandler(HttpServletRequest req) {
+        for (HandlerMapping handlerMapping : mappings) {
+            Object handler = handlerMapping.getHandler(req);
+            if (handler != null) {
+                return handler;
+            }
         }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        return null;
     }
+
 }
