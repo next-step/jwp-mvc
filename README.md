@@ -40,6 +40,15 @@
   - [ ] AnnotationHandlerMapping에 클라이언트 요청정보(HttpServletRequest)를 전달하면 요청에 해당하는 HandlerExecution을 반환하는 메소드를 구현한다.
     - HandlerExecution의 getHandler(HttpServletRequest req) 메소드를 구현한다. 
 
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+- 힌트 1 - HandlerMapping
+- 힌트 2 - HandlerMapping 초기화
+  - DispatcherServlet의 초기화(init() 메소드) 과정에서LegacyHandlerMapping, AnnotationHandlerMapping 모두 초기화한다. 
+  - 초기화한 2개의 HandlerMapping을 List로 관리한다.
+- 힌트 3 - Controller 실행
+  - DispatcherServlet의 service() 메소드에서는 앞에서 초기화한 2개의 HandlerMapping에서 요청 URL에 해당하는 Controller를 찾아 메소드를 실행한다.
+
+
 ## 진행 방법
 * 프레임워크 구현에 대한 요구사항을 파악한다.
 * 요구사항에 대한 구현을 완료한 후 자신의 github 아이디에 해당하는 브랜치에 Pull Request(이하 PR)를 통해 코드 리뷰 요청을 한다.
