@@ -1,6 +1,10 @@
 package core.mvc.tobe;
 
-import core.mvc.ModelAndView;
+import static org.assertj.core.api.Assertions.*;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +12,8 @@ import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import core.mvc.ModelAndView;
+import core.mvc.tobe.resolver.TestUserController;
 
 public class HandlerMethodArgumentResolverTest {
     private static final Logger logger = LoggerFactory.getLogger(HandlerMethodArgumentResolverTest.class);

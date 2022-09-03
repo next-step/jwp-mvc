@@ -2,7 +2,6 @@ package core.mvc.asis;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,28 +14,21 @@ import org.slf4j.LoggerFactory;
 
 import core.mvc.tobe.AnnotationHandlerAdapter;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerAdapter;
-import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.HandlerAdapters;
+import core.mvc.tobe.HandlerMappings;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private List<HandlerMapping> handlerMappings;
-    private final List<HandlerAdapter> adapters = List.of(new LegacyHandlerAdapterAdapter(),
-        new AnnotationHandlerAdapter());
+    private HandlerMappings handlerMappings;
+    private HandlerAdapters adapters;
 
     @Override
     public void init() throws ServletException {
-        var legacyHandlerMapping = new LegacyHandlerMapping();
-        legacyHandlerMapping.initMapping();
-
-        var annotationHandlerMapping = new AnnotationHandlerMapping();
-        annotationHandlerMapping.initialize();
-
-        this.handlerMappings = List.of(legacyHandlerMapping, annotationHandlerMapping);
+        this.handlerMappings = new HandlerMappings(List.of(new LegacyHandlerMapping(), new AnnotationHandlerMapping()));
+        this.adapters = new HandlerAdapters(List.of(new LegacyHandlerAdapterAdapter(), new AnnotationHandlerAdapter()));
     }
 
     @Override
@@ -45,16 +37,8 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         try {
-            var handler = handlerMappings.stream()
-                .map(it -> it.getHandler(req))
-                .filter(Objects::nonNull)
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 URL 입니디. url" + requestUri));
-
-            var handlerAdapter = adapters.stream()
-                .filter(it -> it.supports(handler))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 핸들러입니다. url" + requestUri));
+            var handler = handlerMappings.getHandler(req);
+            var handlerAdapter = adapters.findAdapter(handler, requestUri);
 
             var modelAndView = handlerAdapter.handle(req, resp, handler);
             modelAndView.render(req, resp);
