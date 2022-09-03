@@ -1,10 +1,12 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,24 +25,17 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        Set<Class<?>> preInitiatedControllers = reflections.getTypesAnnotatedWith(Controller.class);
+        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
+        Map<Class<?>, Object> controllers = controllerScanner.getControllers();
+        Set<Method> methods = Sets.newHashSet();
 
-        for (Class<?> clazz : preInitiatedControllers) {
-            try {
-                Object controller = clazz.getDeclaredConstructor().newInstance();
-                Method[] methods = clazz.getDeclaredMethods();
-                for (Method method : methods) {
-                    if (method.isAnnotationPresent(RequestMapping.class)) {
-                        RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-                        handlerExecutions.put(new HandlerKey(mapping.value(), mapping.method()), new HandlerExecution(controller, method));
-                    }
-                }
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
+        for (Class<?> clazz : controllers.keySet()) {
+            methods.addAll(ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class)));
+            for (Method method : methods) {
+                RequestMapping rm = method.getAnnotation(RequestMapping.class);
+                handlerExecutions.put(new HandlerKey(rm.value(), rm.method()), new HandlerExecution(controllers.get(method.getDeclaringClass()), method));
             }
         }
-
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
