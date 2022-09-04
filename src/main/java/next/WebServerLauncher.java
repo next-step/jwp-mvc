@@ -21,7 +21,7 @@ public class WebServerLauncher {
         if(webPort == null || webPort.isEmpty()) {
             webPort = "8080";
         }
-        tomcat.setPort(Integer.valueOf(webPort));
+        tomcat.setPort(Integer.parseInt(webPort));
 
         StandardContext ctx = (StandardContext) tomcat.addWebapp("/", new File(webappDirLocation).getAbsolutePath());
         File additionWebInfClasses = new File("build/classes/java/main");
