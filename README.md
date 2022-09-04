@@ -26,6 +26,29 @@
 ### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
 - [ ] 이전의 컨트롤러를 애노테이션 기반으로 바꿔서 공존 할 수 있도록 구현한다.
 
+## @MVC 구현 리펙토링
+### 요구사항 1 - 힌트
+- 힌트 1 - ControllerScanner 클래스 추가
+  - [ ] @Controller 애노테이션이 설정되어 있는 모든 클래스를 찾는다.
+  - [ ] 찾은 클래스에 대한 인스턴스를 생성해 Map<Class<?>, Object>에 추가한다.
+- 힌트 2 - AnnotationHandlerMapping 클래스 추가
+  - [ ] ControllerScanner를 통해 찾은 @Controller 클래스의 메소드 중 RequestMapping 애노테이션이 설정되어 있는 모든 메소드를 찾는다.
+  - [ ] 찾은 메소드를 Map<HandlerKey, HandlerExecution>에 각 요청 URL과 URL과연결되는 메소드 정보를 추가한다.
+    - HandlerKey는 RequestMapping 애노테이션이 가지고있는 URL과 HTTP 메소드 정보를 가진다.
+    - HandlerExecution은 자바 Reflection을 실행하기 위한 정보를 가진다.
+- 힌트 3 - 요청에 대한 Controller 반환
+  - [ ] AnnotationHandlerMapping에 클라이언트 요청정보(HttpServletRequest)를 전달하면 요청에 해당하는 HandlerExecution을 반환하는 메소드를 구현한다.
+    - HandlerExecution의 getHandler(HttpServletRequest req) 메소드를 구현한다. 
+
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+- 힌트 1 - HandlerMapping
+- 힌트 2 - HandlerMapping 초기화
+  - DispatcherServlet의 초기화(init() 메소드) 과정에서LegacyHandlerMapping, AnnotationHandlerMapping 모두 초기화한다. 
+  - 초기화한 2개의 HandlerMapping을 List로 관리한다.
+- 힌트 3 - Controller 실행
+  - DispatcherServlet의 service() 메소드에서는 앞에서 초기화한 2개의 HandlerMapping에서 요청 URL에 해당하는 Controller를 찾아 메소드를 실행한다.
+
+
 ## 진행 방법
 * 프레임워크 구현에 대한 요구사항을 파악한다.
 * 요구사항에 대한 구현을 완료한 후 자신의 github 아이디에 해당하는 브랜치에 Pull Request(이하 PR)를 통해 코드 리뷰 요청을 한다.
