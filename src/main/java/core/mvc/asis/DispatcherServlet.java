@@ -43,7 +43,13 @@ public class DispatcherServlet extends HttpServlet {
         Object handler = getHandler(req);
         try {
             if (handler instanceof Controller) {
-                ModelAndView mav = ((Controller)handler).execute(req, resp);
+                String  viewName = ((Controller)handler).execute(req, resp);
+                if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
+                    resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+                    return;
+                }
+                RequestDispatcher rd = req.getRequestDispatcher(viewName);
+                rd.forward(req, resp);
             } else if (handler instanceof HandlerExecution) {
                 ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
             }
