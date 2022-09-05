@@ -1,11 +1,12 @@
 package core.mvc.tobe;
 
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ControllerScannerTest {
     private static final Logger logger = LoggerFactory.getLogger(ControllerScannerTest.class);
@@ -14,10 +15,11 @@ public class ControllerScannerTest {
 
     @Test
     public void getControllers() throws Exception {
+        //given
         scanner = new ControllerScanner("core.mvc");
+        //when
         Map<Class<?>, Object> controllers = scanner.getControllers();
-        for (Class<?> controller : controllers.keySet()){
-            logger.debug("controller : {}", controller);
-        }
+        //then
+        assertThat(controllers.get(MyController.class).getClass().getName()).isEqualTo(MyController.class.getName());
     }
 }
