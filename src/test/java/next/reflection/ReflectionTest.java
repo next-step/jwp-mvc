@@ -9,6 +9,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +18,7 @@ public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
+    @DisplayName("요구사항 1")
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
@@ -39,6 +42,7 @@ public class ReflectionTest {
     }
 
     @Test
+    @DisplayName("요구사항 4")
     public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
         Class<Student> clazz = Student.class;
         logger.debug(clazz.getName());
@@ -56,5 +60,18 @@ public class ReflectionTest {
         logger.debug("student : {}", actual);
         assertThat(actual.getName()).isEqualTo("재영");
         assertThat(actual.getAge()).isEqualTo(35);
+    }
+
+    @Test
+    @DisplayName("요구사항 5")
+    public void initializeInstance() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Class<Question> clazz = Question.class;
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+
+        Question question1 = (Question) constructors[0].newInstance("joel", "test", "clean code");
+        Question question2 = (Question) constructors[1].newInstance(1L, "joel", "test", "clean code", new Date(), 1);
+
+        assertThat(question1).isEqualTo(new Question("joel", "test", "clean code"));
+        assertThat(question2).isEqualTo(new Question(1L, "joel", "test", "clean code", new Date(), 1));
     }
 }
