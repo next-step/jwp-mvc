@@ -49,6 +49,19 @@
   - DispatcherServlet의 service() 메소드에서는 앞에서 초기화한 2개의 HandlerMapping에서 요청 URL에 해당하는 Controller를 찾아 메소드를 실행한다.
 
 
+## Controller 메소드 인자 매핑
+### 요구사항 1 - Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 꺼내와 자동으로 형 변환
+- 힌트 1 - HttpServletRequest에 값 전달하기
+  - Spring에서 제공하는 MockHttpServletRequest을 활용
+- 힌트 2 - 메소드의 인자 이름 구하기
+  - 인자 이름은 Spring에서 제공하는 ParameterNameDiscoverer을 활용
+- 힌트 3 - primitive type을 비교
+  - primitive type을 비교할 경우 int.class, long.class로 비교할 수 있다.
+
+### 요구사항 2 - URL을 통해서도 동적으로 값을 전달
+- 힌트 - PathVariable 구현을 위해 URL 매칭과 값 추출
+  - Spring의 PathPattern을 활용해 쉽게 구현할 수 있다.
+
 ## 진행 방법
 * 프레임워크 구현에 대한 요구사항을 파악한다.
 * 요구사항에 대한 구현을 완료한 후 자신의 github 아이디에 해당하는 브랜치에 Pull Request(이하 PR)를 통해 코드 리뷰 요청을 한다.
