@@ -14,13 +14,13 @@ public class Junit3TestRunner {
         Method[] methods = clazz.getDeclaredMethods();
 
         for (Method method : methods) {
-            runWithTestMethod(method);
+            runWithTestMethod(method, clazz);
         }
     }
 
-    private void runWithTestMethod(Method method) throws InvocationTargetException, IllegalAccessException {
+    private void runWithTestMethod(Method method, Class<Junit3Test> clazz) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         if (method.getName().startsWith("test")) {
-            method.invoke(new Junit3Test());
+            method.invoke(clazz.newInstance());
         }
     }
 }
