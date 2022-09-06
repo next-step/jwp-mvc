@@ -1,15 +1,23 @@
 package next.reflection;
 
+import com.google.common.collect.Sets;
+import core.annotation.Repository;
+import core.annotation.Service;
+import core.annotation.web.Controller;
+import core.di.factory.BeanFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,5 +81,18 @@ public class ReflectionTest {
 
         assertThat(question1).isEqualTo(new Question("joel", "test", "clean code"));
         assertThat(question2).isEqualTo(new Question(1L, "joel", "test", "clean code", new Date(), 1));
+    }
+
+    @Test
+    @DisplayName("요구사항 6")
+    void componentScan() {
+        Reflections reflections = new Reflections("core.di.factory.example");
+        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
+        Set<Class<?>> services = reflections.getTypesAnnotatedWith(Service.class);
+        Set<Class<?>> repositories = reflections.getTypesAnnotatedWith(Repository.class);
+
+        controllers.forEach(controller -> assertThat(controller.getName().endsWith("Controller")).isTrue());
+        services.forEach(service -> assertThat(service.getName().endsWith("Service")).isTrue());
+        repositories.forEach(repository -> assertThat(repository.getName().endsWith("Repository")).isTrue());
     }
 }
