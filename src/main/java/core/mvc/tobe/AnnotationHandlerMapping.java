@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
@@ -30,18 +32,25 @@ public class AnnotationHandlerMapping {
         Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
 
         controllerClasses.stream()
-                .forEach(clazz -> putHandlerExecution(clazz));
+                .forEach(clazz -> {
+                    Set<Method> methods = getRequestMethod(clazz);
+                    putHandlerExecution(clazz, methods);
+                });
     }
 
-    private void putHandlerExecution(Class<?> clazz) {
+    private Set<Method> getRequestMethod(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                .collect(Collectors.toSet());
+    }
+
+    private void putHandlerExecution(Class<?> clazz, Set<Method> methods) {
         try {
             Object object = clazz.getDeclaredConstructor().newInstance();
-            Arrays.stream(clazz.getDeclaredMethods())
-                    .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                    .forEach(method -> {
-                        RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
-                        handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(object, method));
-                    });
+            methods.forEach(method -> {
+                RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+                handlerExecutions.put(new HandlerKey(requestMapping.value(), requestMapping.method()), new HandlerExecution(object, method));
+            });
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             logger.error(e.getMessage());
         }
