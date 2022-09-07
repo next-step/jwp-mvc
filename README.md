@@ -8,7 +8,7 @@
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
 
-## 요구사항
+### 1단계 요구사항
 - [x] 요구사항 1 - 클래스 정보 출력
   - src/test/java > next.reflection > ReflectionTest의 showClass() 메소드를 구현해 Question 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
 - [x] 요구사항 2 - test로 시작하는 메소드 실행
@@ -25,3 +25,11 @@
 - [x] 요구사항 6 - component scan
   - src/test/java 폴더의 core.di.factory.example 패키지를 보면 DI 테스트를 위한 샘플 코드가 있다.
     core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+### 2단계 요구사항
+- [ ] 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+  - 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아니라 메소드를 추가하는 방식이면 좋겠다.
+  - 요청 URL을 매핑할 때 HTTP 메소드(GET, POST, PUT, DELETE 등)도 매핑에 활용할 수 있으면 좋겠다. @RequestMapping()에 method 설정이 되어 있지 않으면 모든 HTTP method를 지원해야 한다.
+- [ ] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+  - 지금까지 사용한 MVC 프레임워크와 새롭게 구현한 애노테이션 기반 MVC 프레임워크가 공존해야 한다.
+    기존의 모든 Controller가 새로운 MVC 프레임워크로 전환이 완료된 후 기존의 레거시 MVC 프레임워크를 삭제할 수 있다.
