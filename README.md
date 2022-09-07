@@ -27,7 +27,7 @@
     core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
 
 ### 2단계 요구사항
-- [ ] 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+- [x] 요구사항 1 - 애노테이션 기반 MVC 프레임워크
   - 새로운 기능이 추가될 때마다 매번 컨트롤러를 추가하는 것이 아니라 메소드를 추가하는 방식이면 좋겠다.
   - 요청 URL을 매핑할 때 HTTP 메소드(GET, POST, PUT, DELETE 등)도 매핑에 활용할 수 있으면 좋겠다. @RequestMapping()에 method 설정이 되어 있지 않으면 모든 HTTP method를 지원해야 한다.
 - [ ] 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
