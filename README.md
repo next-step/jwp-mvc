@@ -19,3 +19,6 @@
 
 ### 요구사항 3 - @Test 애노테이션 메소드 실행
 * [v] Junit4Test 클래스에서 @MyTest 애노테이션으로 설정되어 있는 메소드만 Java Reflection 활용해서 실행하도록 구현한다.
+
+### 요구사항 4 - private field에 값 할당
+* [v] Java Reflection 활용해서 Student 클래스의 name,age 필드에 값을 할당하고 getter 메소드를 통해 값을 확인한다.
