@@ -7,3 +7,9 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+
+## step1. 자바 reflection
+
+### 요구사항 1 - 클래스 정보 출력
+* [v] 클래스의 모든 필드, 생성자, 메소드에 대한 정보를 출력한다.
