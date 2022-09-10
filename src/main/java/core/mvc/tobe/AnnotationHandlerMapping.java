@@ -1,7 +1,6 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import java.lang.reflect.Method;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,19 +24,16 @@ public class AnnotationHandlerMapping {
     }
 
     public void initialize() {
-        Set<Class<?>> controllers = findControllers();
+        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
 
-        Set<Method> methods = findMethods(controllers);
+        Set<Class<?>> controllers = controllerScanner.getControllers();
+
+        Set<Method> methods = getRequestMappingMethods(controllers);
 
         addHandlerExecutions(methods);
     }
 
-    private Set<Class<?>> findControllers() {
-        Reflections reflections = new Reflections(basePackage);
-        return reflections.getTypesAnnotatedWith(Controller.class);
-    }
-
-    private Set<Method> findMethods(Set<Class<?>> controllers) {
+    private Set<Method> getRequestMappingMethods(Set<Class<?>> controllers) {
         return controllers.stream()
                 .map(Class::getDeclaredMethods)
                 .flatMap(Arrays::stream)
