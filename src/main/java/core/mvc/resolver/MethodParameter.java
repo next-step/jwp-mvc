@@ -2,6 +2,7 @@ package core.mvc.resolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public class MethodParameter {
     private final Method method;
@@ -9,11 +10,11 @@ public class MethodParameter {
     private final String parameterName;
     private final Annotation[] annotations;
 
-    public MethodParameter(Method method, Class<?> parameterType, String parameterName, Annotation[] annotations) {
+    public MethodParameter(Method method, Parameter methodParameter, String parameterName) {
         this.method = method;
-        this.parameterType = parameterType;
+        this.parameterType = methodParameter.getType();
+        this.annotations = methodParameter.getAnnotations();
         this.parameterName = parameterName;
-        this.annotations = annotations;
     }
 
     public Method getMethod() {
