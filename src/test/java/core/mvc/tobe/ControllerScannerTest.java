@@ -15,7 +15,7 @@ class ControllerScannerTest {
     void getController() {
         ControllerScanner controllerScanner = new ControllerScanner("core.mvc.tobe");
 
-        Map<Class<?>, Object> controllerList = controllerScanner.getControllerList();
+        Map<Class<?>, Object> controllerList = controllerScanner.getControllerMap();
         Set<Class<?>> controllerClassList = controllerList.keySet();
 
         assertThat(controllerClassList.size()).isEqualTo(1);

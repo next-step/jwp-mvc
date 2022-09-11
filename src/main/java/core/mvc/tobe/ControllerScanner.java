@@ -20,7 +20,7 @@ public class ControllerScanner {
         reflections = new Reflections(basePackages);
     }
 
-    public Map<Class<?>, Object> getControllerList() {
+    public Map<Class<?>, Object> getControllerMap() {
         Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
         Map<Class<?>, Object> instantiateControllerMap = new HashMap<>();
         try {
