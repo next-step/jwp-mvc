@@ -20,7 +20,7 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/")
     public ModelAndView home(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("home");
         request.setAttribute("users", DataBase.findAll());

@@ -26,18 +26,18 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         HandlerExecution handler = handlerMapping.getHandler(req);
-        if (!Objects.isNull(handler)) {
+        if (Objects.nonNull(handler)) {
             try {
                 ModelAndView modelAndView = handler.handle(req, resp);
                 View view = modelAndView.getView();
                 view.render(modelAndView.getModel(), req, resp);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("잘못 된 요청입니다 : " + e);
             }
         }
     }

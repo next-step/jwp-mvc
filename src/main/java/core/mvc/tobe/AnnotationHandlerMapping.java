@@ -36,7 +36,8 @@ public class AnnotationHandlerMapping implements HandlerMapping {
             try {
                 Object controller = annotatedController.getDeclaredConstructor().newInstance();
                 Arrays.stream(annotatedController.getDeclaredMethods())
-                        .forEach(method -> addHandlerExecutionIsAnnotationPresent(controller, method));
+                        .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                        .forEach(method -> addHandlerExecution(controller, method));
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
                 logger.error("Annotation Controller Find Error : {}", e.toString());
             }
@@ -45,15 +46,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        return handlerExecutions.get(new HandlerKey(request.getRequestURI(),
-                RequestMethod.requestMethod(request.getMethod())));
+        RequestMethod requestMethod = RequestMethod.requestMethod(request.getMethod());
+        return handlerExecutions.get(new HandlerKey(request.getRequestURI(), requestMethod));
     }
 
-    private void addHandlerExecutionIsAnnotationPresent(Object controller, Method method) {
-        if (method.isAnnotationPresent(RequestMapping.class)) {
-            RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-            handlerExecutions.put(new HandlerKey(mapping.value(), mapping.method()), new HandlerExecution(controller, method));
+    private void addHandlerExecution(Object controller, Method method) {
+        RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+        if (mapping.method().equals(RequestMethod.ALL)) {
+            Arrays.stream(RequestMethod.values())
+                    .forEach(value -> handlerExecutions.put(new HandlerKey(mapping.value(), value), new HandlerExecution(controller, method)));
+            return;
         }
+
+        handlerExecutions.put(new HandlerKey(mapping.value(), mapping.method()), new HandlerExecution(controller, method));
     }
 }
 
