@@ -4,7 +4,8 @@ import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
 import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerAdapter;
+import core.mvc.tobe.HandlerExecutionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,8 @@ public class DispatcherServlet extends HttpServlet {
 
     private LegacyRequestMapping rm;
     private AnnotationHandlerMapping annotationHandlerMapping;
-    private List<HandlerMapping> handlerMappingList;
+    private List<HandlerMapping> handlerMappings;
+    private List<HandlerAdapter> handlerAdapters;
 
     @Override
     public void init() throws ServletException {
@@ -33,7 +35,8 @@ public class DispatcherServlet extends HttpServlet {
         rm.initMapping();
         annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
         annotationHandlerMapping.initialize();
-        handlerMappingList = List.of(rm, annotationHandlerMapping);
+        handlerMappings = List.of(rm, annotationHandlerMapping);
+        handlerAdapters = List.of(new ControllerHandlerAdapter(), new HandlerExecutionAdapter());
     }
 
     @Override
@@ -53,7 +56,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object getHandler(HttpServletRequest req) {
-        for (HandlerMapping handlerMapping : handlerMappingList) {
+        for (HandlerMapping handlerMapping : handlerMappings) {
             Object handler = handlerMapping.getHandler(req);
             if (handler != null) {
                 return handler;
@@ -63,29 +66,22 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (handler instanceof Controller) {
-            String viewName = ((Controller) handler).execute(req, resp);
-            move(viewName, req, resp);
-        } else if (handler instanceof HandlerExecution) {
-            ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
-            move(modelAndView, req, resp);
+        for (HandlerAdapter handlerAdapter : handlerAdapters) {
+            execute(handler, req, resp, handlerAdapter);
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private void execute(Object handler, HttpServletRequest req, HttpServletResponse resp, HandlerAdapter handlerAdapter) throws Exception {
+        if (handlerAdapter.supports(handler)) {
+            ModelAndView modelAndView = handlerAdapter.handle(req, resp, handler);
+            render(modelAndView, req, resp);
         }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
     }
 
-    private void move(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp)
+    private void render(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp)
             throws Exception {
         View view = modelAndView.getView();
         view.render(modelAndView.getModel(), req, resp);
     }
+
 }
