@@ -57,11 +57,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         String url = annotation.value();
         RequestMethod requestMethod = annotation.method();
 
-        if (requestMethod != null) {
+        if (requestMethod != RequestMethod.ALL) {
             return Set.of(new HandlerKey(url, requestMethod));
         }
 
-        return Arrays.stream(RequestMethod.values())
+        return Arrays.stream(RequestMethod.all())
                 .map(it -> new HandlerKey(url, it))
                 .collect(Collectors.toSet());
     }
