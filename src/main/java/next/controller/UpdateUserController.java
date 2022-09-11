@@ -1,5 +1,6 @@
 package next.controller;
 
+import core.annotation.web.RequestMapping;
 import core.db.DataBase;
 import core.mvc.asis.Controller;
 import next.model.User;
@@ -9,10 +10,12 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@core.annotation.web.Controller
 public class UpdateUserController implements Controller {
     private static final Logger log = LoggerFactory.getLogger(UpdateUserController.class);
 
     @Override
+    @RequestMapping
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
