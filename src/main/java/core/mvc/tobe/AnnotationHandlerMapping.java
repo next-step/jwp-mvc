@@ -1,19 +1,15 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
 
@@ -29,19 +25,11 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public void initialize() {
-        Reflections reflections = new Reflections(basePackage);
-        Set<Class<?>> annotatedControllers = reflections.getTypesAnnotatedWith(Controller.class);
-
-        for (Class<?> annotatedController : annotatedControllers) {
-            try {
-                Object controller = annotatedController.getDeclaredConstructor().newInstance();
-                Arrays.stream(annotatedController.getDeclaredMethods())
-                        .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                        .forEach(method -> addHandlerExecution(controller, method));
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                logger.error("Annotation Controller Find Error : {}", e.toString());
-            }
-        }
+        ControllerScanner controllerScanner = new ControllerScanner(basePackage);
+        controllerScanner.controllers()
+                .forEach((key, value) -> Arrays.stream(key.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
+                .forEach(method -> addHandlerExecution(value, method)));
     }
 
     @Override
@@ -53,12 +41,19 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void addHandlerExecution(Object controller, Method method) {
         RequestMapping mapping = method.getAnnotation(RequestMapping.class);
         if (mapping.method().equals(RequestMethod.ALL)) {
-            Arrays.stream(RequestMethod.values())
-                    .forEach(value -> handlerExecutions.put(new HandlerKey(mapping.value(), value), new HandlerExecution(controller, method)));
+            addAllMethodHandlerExecutions(controller, method, mapping);
             return;
         }
 
         handlerExecutions.put(new HandlerKey(mapping.value(), mapping.method()), new HandlerExecution(controller, method));
+    }
+
+    private void addAllMethodHandlerExecutions(Object controller, Method method, RequestMapping mapping) {
+        Arrays.stream(RequestMethod.values())
+                .forEach(value -> handlerExecutions.put(
+                        new HandlerKey(mapping.value(), value),
+                        new HandlerExecution(controller, method))
+                );
     }
 }
 

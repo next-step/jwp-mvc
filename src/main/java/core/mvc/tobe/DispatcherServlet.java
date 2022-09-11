@@ -10,15 +10,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Objects;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
+    public static final String SCAN_PACKAGE = "next.controller";
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-    private final HandlerMapping handlerMapping = new AnnotationHandlerMapping();
+    private final HandlerMapping handlerMapping = new AnnotationHandlerMapping(SCAN_PACKAGE);
 
     @Override
     public void init() throws ServletException {
