@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public class Junit3TestRunner {
-    private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(Junit3TestRunner.class);
 
     @Test
     public void run() throws Exception {
