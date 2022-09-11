@@ -32,4 +32,8 @@ public class ControllerScanner {
 
         return controllerClassByInstance;
     }
+
+    Set<Class<?>> getControllerTypes() {
+        return reflections.getTypesAnnotatedWith(Controller.class);
+    }
 }

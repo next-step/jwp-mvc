@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +28,7 @@ class BeanFactoryTest {
 
     @BeforeEach
     @SuppressWarnings("unchecked")
-    void setup() {
+    void setup() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         reflections = new Reflections("core.di.factory.example");
         // Controoler, service, Repository 어노테이션이 설정되어있는 모든 클래스
         Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
