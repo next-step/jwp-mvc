@@ -42,6 +42,9 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             Object handler = getHandler(req);
+            if (handler == null) {
+                throw new ServletException(String.format("%s의 handler 를 찾을 수 없습니다.", req.getRequestURI()));
+            }
             handle(handler, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
@@ -49,11 +52,14 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Object getHandler(HttpServletRequest req) throws ServletException {
-        return handlerMappingList.stream()
-                .map(handlerMapping -> handlerMapping.getHandler(req))
-                .findFirst()
-                .orElseThrow(() -> new ServletException("요청을 찾을 수 없습니다."));
+    private Object getHandler(HttpServletRequest req) {
+        for (HandlerMapping handlerMapping : handlerMappingList) {
+            Object handler = handlerMapping.getHandler(req);
+            if (handler != null) {
+                return handler;
+            }
+        }
+        return null;
     }
 
     private void handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
