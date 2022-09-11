@@ -28,3 +28,11 @@
   * RequestMapping 기반의 요청 처리
   * method 정보가 없을 경우 method All 허용
 * 기존 프레임 워크를 애노테이션 기반으로 변경
+
+#### Step 3
+* 클래스 다이어 그램에 맞는 구조로 변경
+  * ControllerScanner 클래스 추가
+    * reflections 라이브러리를 활용해 @Controller 애노테이션이 설정되어 있는 모든 클래스를 찾고, 인스턴스 생성을 담당하는 클래스를 추가.
+  * AnnotationHandlerMapping 클래스 추가 (Step2 에서 완료)
+  * 해당하는 HandlerExecution을 반환하는 메소드 구현 (Step2 에서 완료)
+* 레거시 MVC와 애노테이션 기반 MVC 통합 (Step2 에서 완료)
