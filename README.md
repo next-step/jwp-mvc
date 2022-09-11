@@ -7,3 +7,13 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+## 요구사항
+### STEP 1
+- [X] Java Reflection 실습
+  - [X] 요구사항 1 - 클래스 정보 출력
+  - [X] 요구사항 2 - test로 시작하는 메소드 실행
+  - [X] 요구사항 3 - @Test 애노테이션 메소드 실행
+  - [X] 요구사항 4 - private field에 값 할당
+  - [X] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
+  - [X] 요구사항 6 - component scan
