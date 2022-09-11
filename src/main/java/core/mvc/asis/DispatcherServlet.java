@@ -1,14 +1,10 @@
 package core.mvc.asis;
 
-import com.google.common.collect.Lists;
 import core.mvc.ModelAndView;
-import core.mvc.tobe.AnnotationHandlerMapping;
-import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
-import java.io.IOException;
+import core.mvc.tobe.*;
+import core.mvc.view.View;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
+import java.util.Objects;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,63 +18,71 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private List<HandlerMapping> mappings = Lists.newArrayList();
+    private List<HandlerMapping> handlerMappings;
+    private List<HandlerAdapter> handlerAdapters;
+    private final ViewResolver viewResolver = new ViewResolver();
 
     @Override
     public void init() {
+        initHandlerMappings();
+
+        initHandlerAdapters();
+    }
+
+    private void initHandlerMappings() {
         RequestMapping rm = new RequestMapping();
         rm.initMapping();
         AnnotationHandlerMapping am = new AnnotationHandlerMapping();
         am.initialize();
 
-        mappings.add(rm);
-        mappings.add(am);
+        handlerMappings = List.of(rm, am);
+    }
+
+    private void initHandlerAdapters() {
+        ControllerHandlerAdapter controllerAdapter = new ControllerHandlerAdapter();
+        HandlerExecutionHandlerAdapter handlerExecutionAdapter = new HandlerExecutionHandlerAdapter();
+
+        handlerAdapters = List.of(controllerAdapter, handlerExecutionAdapter);
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
-
         Object handler = getHandler(req);
 
-        if (handler instanceof Controller) {
-            try {
-                String viewName = ((Controller) handler).execute(req, resp);
-                move(viewName, req, resp);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        } else if (handler instanceof HandlerExecution) {
-            try {
-                ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        } else {
-            throw new RuntimeException("존재하지 않음.");
-        }
-    }
+        HandlerAdapter handlerAdapter = getHandlerAdapter(handler);
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
+        try {
+            ModelAndView modelAndView = handlerAdapter.handle(req, resp, handler);
 
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+            render(modelAndView, req, resp);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private Object getHandler(HttpServletRequest req) {
-        for (HandlerMapping handlerMapping : mappings) {
-            Object handler = handlerMapping.getHandler(req);
+        return handlerMappings.stream()
+                .map(it -> it.getHandler(req))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("요청을 처리할 핸들러가 존재하지 않습니다.."));
+    }
 
-            if (handler != null) {
-                return handler;
-            }
+    private HandlerAdapter getHandlerAdapter(Object handler) {
+        return handlerAdapters.stream()
+                .filter(it -> it.supports(handler))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("핸들러 어댑터가 존재하지 않습니다."));
+    }
+
+    private void render(ModelAndView modelAndView, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (modelAndView.hasView()) {
+            View view = modelAndView.getView();
+            view.render(modelAndView.getModel(), request, response);
+            return;
         }
-        return null;
+
+        View view = viewResolver.resolve(modelAndView.getViewName());
+        view.render(modelAndView.getModel(), request, response);
     }
 }
