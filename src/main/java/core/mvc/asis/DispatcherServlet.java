@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -43,7 +42,7 @@ public class DispatcherServlet extends HttpServlet {
         Object handler = getHandler(req);
         try {
             if (handler instanceof Controller) {
-                String  viewName = ((Controller)handler).execute(req, resp);
+                String viewName = ((Controller) handler).execute(req, resp);
                 if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
                     resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
                     return;
@@ -52,6 +51,8 @@ public class DispatcherServlet extends HttpServlet {
                 rd.forward(req, resp);
             } else if (handler instanceof HandlerExecution) {
                 ModelAndView mav = ((HandlerExecution) handler).handle(req, resp);
+                View view = mav.getView();
+                view.render(mav.getModel(), req, resp);
             }
         } catch (Throwable e) {
             throw new ServletException(e.getMessage());
