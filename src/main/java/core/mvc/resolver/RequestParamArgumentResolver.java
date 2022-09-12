@@ -21,23 +21,24 @@ public class RequestParamArgumentResolver implements ArgumentResolver{
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
         String value = requestParamAnnotation.value();
+        String paramValue = request.getParameter(value);
         Class<?> parameterType = methodParameter.getParameterType();
 
         if (parameterType.equals(int.class)) {
-            return Integer.parseInt(value);
+            return Integer.parseInt(paramValue);
         }
 
         if (parameterType.equals(long.class)) {
-            return Long.parseLong(value);
+            return Long.parseLong(paramValue);
         }
 
         if (parameterType.equals(double.class)) {
-            return Double.parseDouble(value);
+            return Double.parseDouble(paramValue);
         }
 
         if (parameterType.equals(float.class)) {
-            return Float.parseFloat(value);
+            return Float.parseFloat(paramValue);
         }
-        return parameterType;
+        return paramValue;
     }
 }
