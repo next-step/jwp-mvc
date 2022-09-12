@@ -6,9 +6,12 @@ import core.annotation.Service;
 import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
+import next.reflection.ReflectionTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -16,6 +19,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BeanFactoryTest {
+    private static final Logger logger = LoggerFactory.getLogger(BeanFactoryTest.class);
+
     private Reflections reflections;
     private BeanFactory beanFactory;
 
@@ -24,6 +29,8 @@ public class BeanFactoryTest {
     public void setup() {
         reflections = new Reflections("core.di.factory.example");
         Set<Class<?>> preInstanticateClazz = getTypesAnnotatedWith(Controller.class, Service.class, Repository.class);
+        logger.debug("annotated class: {}", preInstanticateClazz);
+
         beanFactory = new BeanFactory(preInstanticateClazz);
         beanFactory.initialize();
     }
