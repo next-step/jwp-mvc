@@ -1,5 +1,11 @@
 package core.mvc.asis;
 
+import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerAdapter;
+import core.mvc.tobe.HandlerExecutionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -17,37 +24,64 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private LegacyRequestMapping rm;
+    private AnnotationHandlerMapping annotationHandlerMapping;
+    private List<HandlerMapping> handlerMappings;
+    private List<HandlerAdapter> handlerAdapters;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
+        rm = new LegacyRequestMapping();
         rm.initMapping();
+        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        annotationHandlerMapping.initialize();
+        handlerMappings = List.of(rm, annotationHandlerMapping);
+        handlerAdapters = List.of(new ControllerHandlerAdapter(), new HandlerExecutionAdapter());
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
-        logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
+        logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        Controller controller = rm.findController(requestUri);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            Object handler = getHandler(req);
+            if (handler == null) {
+                throw new ServletException(String.format("%s의 handler 를 찾을 수 없습니다.", req.getRequestURI()));
+            }
+            handle(handler, req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
     }
 
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
+    private Object getHandler(HttpServletRequest req) {
+        for (HandlerMapping handlerMapping : handlerMappings) {
+            Object handler = handlerMapping.getHandler(req);
+            if (handler != null) {
+                return handler;
+            }
         }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
+        return null;
     }
+
+    private void handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        for (HandlerAdapter handlerAdapter : handlerAdapters) {
+            execute(handler, req, resp, handlerAdapter);
+        }
+    }
+
+    private void execute(Object handler, HttpServletRequest req, HttpServletResponse resp, HandlerAdapter handlerAdapter) throws Exception {
+        if (handlerAdapter.supports(handler)) {
+            ModelAndView modelAndView = handlerAdapter.handle(req, resp, handler);
+            render(modelAndView, req, resp);
+        }
+    }
+
+    private void render(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp)
+            throws Exception {
+        View view = modelAndView.getView();
+        view.render(modelAndView.getModel(), req, resp);
+    }
+
 }
