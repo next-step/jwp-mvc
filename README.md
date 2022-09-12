@@ -13,3 +13,8 @@
 ### 요구사항 1
 - @Controller 애노테이션이 설정되어있는 클래스 찾기
 - @RequestMapping 설정에 따라 요청 URL과 메소드를 연결하도록 구현
+
+### 요구사항 2
+- RequestMapping, AnnotationHandlerMapping의 공통 부분인 HandlerMapping 인터페이스 추가
+- DispatcherServlet에서 HandlerMapping 초기화
+- DispatcherServlet에서 메소드 실행부분 구현 
