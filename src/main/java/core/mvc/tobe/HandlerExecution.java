@@ -34,9 +34,8 @@ public class HandlerExecution {
             String parameterName = parameterNames[i];
             MethodParameter methodParameter = new MethodParameter(method, parameter, parameterName);
             parameters[i] = getParameter(methodParameter, request, response);
-
         }
-        return (ModelAndView) method.invoke(controller, request, response);
+        return (ModelAndView) method.invoke(controller, parameters);
     }
 
     private Object getParameter(MethodParameter requestParameter, HttpServletRequest request, HttpServletResponse response) {
