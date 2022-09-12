@@ -20,6 +20,6 @@ public class ControllerScannerTest {
         //when
         Map<Class<?>, Object> controllers = scanner.getControllers();
         //then
-        assertThat(controllers.get(MyController.class).getClass().getName()).isEqualTo(MyController.class.getName());
+        assertThat(controllers.get(MyController.class)).isInstanceOf(MyController.class);
     }
 }
