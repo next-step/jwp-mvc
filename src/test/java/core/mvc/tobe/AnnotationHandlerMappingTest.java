@@ -34,7 +34,7 @@ public class AnnotationHandlerMappingTest {
     }
 
     private void createUser(User user) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/users/create");
         request.setParameter("userId", user.getUserId());
         request.setParameter("password", user.getPassword());
         request.setParameter("name", user.getName());

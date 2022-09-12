@@ -16,7 +16,7 @@ public class CreateUserController implements Controller {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @Override
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
                 req.getParameter("email"));
