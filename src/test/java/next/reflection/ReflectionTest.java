@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,6 +40,13 @@ public class ReflectionTest {
             logger.debug("paramer length : {}", parameterTypes.length);
             for (Class paramType : parameterTypes) {
                 logger.debug("param type : {}", paramType);
+            }
+            if (parameterTypes.length == 3) {
+                constructor.newInstance("writer", "title", "contents");
+            }
+
+            if (parameterTypes.length == 5) {
+                constructor.newInstance(1, "writer", "title", "contents", new Date(), 0);
             }
         }
     }
