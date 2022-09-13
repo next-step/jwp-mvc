@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private Object[] basePackage;
@@ -27,24 +27,25 @@ public class AnnotationHandlerMapping {
         this.basePackage = basePackage;
     }
 
+    @Override
     public void initialize() {
         Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> controllerClasses = reflections.getTypesAnnotatedWith(Controller.class);
 
         controllerClasses.stream()
                 .forEach(clazz -> {
-                    Set<Method> methods = getRequestMethod(clazz);
-                    putHandlerExecution(clazz, methods);
+                    Set<Method> methods = getRequestMethods(clazz);
+                    addHandlerExecution(clazz, methods);
                 });
     }
 
-    private Set<Method> getRequestMethod(Class<?> clazz) {
+    private Set<Method> getRequestMethods(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(RequestMapping.class))
                 .collect(Collectors.toSet());
     }
 
-    private void putHandlerExecution(Class<?> clazz, Set<Method> methods) {
+    private void addHandlerExecution(Class<?> clazz, Set<Method> methods) {
         try {
             Object object = clazz.getDeclaredConstructor().newInstance();
             methods.forEach(method -> {
@@ -56,6 +57,7 @@ public class AnnotationHandlerMapping {
         }
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
