@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
 
@@ -39,5 +41,28 @@ public class ReflectionTest {
                 logger.debug("param type : {}", paramType);
             }
         }
+    }
+
+    @Test
+    public void privateFieldAccess() {
+        Class<Student> clazz = Student.class;
+        final Student student = new Student();
+        logger.debug(clazz.getName());
+        Arrays.stream(clazz.getDeclaredFields())
+                .forEach(i -> {
+                    i.setAccessible(true);
+                    try {
+                        if (i.getName().equals("name")) {
+                            i.set(student, "재성");
+                        }
+                        if (i.getName().equals("age")) {
+                            i.set(student, 20);
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
+        assertThat(student.getAge()).isEqualTo(20);
+        assertThat(student.getName()).isEqualTo("재성");
     }
 }
