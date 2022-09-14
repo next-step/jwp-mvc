@@ -1,7 +1,10 @@
-package core.mvc.tobe;
+package core.mvc.asis;
 
 import core.mvc.ModelAndView;
 import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +19,7 @@ import java.util.Objects;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-    private final HandlerMapping handlerMapping = new AnnotationHandlerMapping();
+    private final HandlerMapping handlerMapping = new AnnotationHandlerMapping("next.controller");
 
     @Override
     public void init() {

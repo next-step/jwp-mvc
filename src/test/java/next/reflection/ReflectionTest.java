@@ -26,9 +26,18 @@ public class ReflectionTest {
     public void showClass() {
         Class<Question> clazz = Question.class;
         logger.debug(clazz.getName());
-        logger.debug("Fields: {}", Arrays.stream(clazz.getDeclaredFields()).map(field -> String.valueOf(field)).collect(Collectors.joining(", ")));
-        logger.debug("Constructors : {}", Arrays.stream(clazz.getDeclaredConstructors()).map(constructor -> String.valueOf(constructor)).collect(Collectors.joining(", ")));
-        logger.debug("Methods : {}", Arrays.stream(clazz.getDeclaredMethods()).map(method -> String.valueOf(method)).collect(Collectors.joining(", ")));
+        logger.debug("Fields: {}",
+                Arrays.stream(clazz.getDeclaredFields())
+                        .map(field -> String.valueOf(field))
+                        .collect(Collectors.joining(", ")));
+        logger.debug("Constructors : {}",
+                Arrays.stream(clazz.getDeclaredConstructors())
+                        .map(constructor -> String.valueOf(constructor))
+                        .collect(Collectors.joining(", ")));
+        logger.debug("Methods : {}",
+                Arrays.stream(clazz.getDeclaredMethods())
+                        .map(method -> String.valueOf(method))
+                        .collect(Collectors.joining(", ")));
     }
 
     @Test

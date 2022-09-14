@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +12,9 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
@@ -40,9 +40,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     private Set<Method> getRequestMethods(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(RequestMapping.class))
-                .collect(Collectors.toSet());
+        return ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
     }
 
     private void addHandlerExecution(Class<?> clazz, Set<Method> methods) {
@@ -59,8 +57,12 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
-        return handlerExecutions.get(
-                new HandlerKey(request.getRequestURI(), RequestMethod.getRequestMethod(request.getMethod()))
-        );
+        HandlerExecution handlerExecution = handlerExecutions.get(
+                new HandlerKey(request.getRequestURI(), RequestMethod.valueOf(request.getMethod().toUpperCase())));
+
+        if (Objects.isNull(handlerExecution)) {
+            return handlerExecutions.get(new HandlerKey(request.getRequestURI(), RequestMethod.NONE));
+        }
+        return handlerExecution;
     }
 }
