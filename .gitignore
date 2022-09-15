@@ -9,7 +9,6 @@ build/
 ### build ###
 /target/
 /tomcat.8080/
-/tomcat.8888/
 
 ### STS ###
 .apt_generated
