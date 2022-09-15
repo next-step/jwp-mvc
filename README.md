@@ -17,3 +17,8 @@
   - [X] 요구사항 4 - private field에 값 할당
   - [X] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
   - [X] 요구사항 6 - component scan
+### STEP 2
+- [X] 요구사항1 - 애노테이션 기반 MVC 프레임워크
+  - [X] ControllerScanner 이용해서 `@Controller`된 클래스 찾기
+  - [X] `@RequestMapping` 와 AnnotationHandlerMapping 정의하여 애노테이션 기반으로 핸들러 관리하기
+- [X] 요구사항2 - 레거시 MVC와 애노테이션 기반 MVC 통합
