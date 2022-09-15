@@ -28,3 +28,11 @@
 
 ### 요구사항 6 - component scan
 * [v] core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+
+## step2. @MVC 구현
+
+### 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+* [x] 컨트롤러를 추가하는 방식이 아니라 메소드를 추가하는 방식으로 구현한다
+* [x] 요청 URL을 매핑할 때, HTTP 메소드도 매핑한다.
+* [x] @RequestMapping()에 method 설정이 되어 있지 않으면 모든 HTTP method를 지원해야 한다.
