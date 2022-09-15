@@ -19,7 +19,7 @@ public class LegacyHandlerMapping implements HandlerMapping {
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
         mappings.put("/users", new ListUserController());
-        mappings.put("/users/login", new LoginController());
+        //mappings.put("/users/login", new LoginController());
         mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
         //mappings.put("/users/create", new CreateUserController());

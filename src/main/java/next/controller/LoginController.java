@@ -1,6 +1,7 @@
 package next.controller;
 
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.asis.Controller;
 import next.model.User;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpSession;
 public class LoginController implements Controller {
 
     @Override
-    @RequestMapping
+    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");
