@@ -55,12 +55,12 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Object findHandler(HttpServletRequest req) {
+    private Object findHandler(HttpServletRequest req) throws NoSuchMethodException {
         return handlerMappings.stream()
-                .filter(handlerMapping -> Objects.nonNull(handlerMapping.getHandler(req)))
+                .filter(hm -> Objects.nonNull(hm.getHandler(req)))
                 .findFirst()
-                .map(handlerMapping -> handlerMapping.getHandler(req))
-                .orElseThrow(NoSuchMethodError::new);
+                .map(hm-> hm.getHandler(req))
+                .orElseThrow(NoSuchMethodException::new);
     }
 
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {

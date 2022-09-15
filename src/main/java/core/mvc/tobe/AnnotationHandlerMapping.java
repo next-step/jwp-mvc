@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.di.factory.BeanFactory;
@@ -30,19 +31,22 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         final Set<Class<?>> controllerTypes = controllerScanner.getControllers().keySet();
         this.beanFactory = new BeanFactory(controllerTypes);
         beanFactory.initialize();
+
         controllerTypes.forEach(controllerType -> getRequestMappingMethods(controllerType));
+        log.error("✅ AnnotaionHandlerMapping initialized : {}", handlerExecutions);
     }
 
-    private HandlerKey createHandlerKey(RequestMapping requestMapping) {
-        return new HandlerKey(requestMapping.value(), requestMapping.method());
+    private HandlerKey createHandlerKey(Controller controller, RequestMapping requestMapping) {
+        return new HandlerKey(controller.value() + requestMapping.value(), requestMapping.method());
     }
 
     private void getRequestMappingMethods(Class<?> controllerType) {
+        final Controller controller = controllerType.getAnnotation(Controller.class);
         final Set<Method> methods = ReflectionUtils.getAllMethods(controllerType, ReflectionUtils.withAnnotation(RequestMapping.class));
         methods.forEach(
                 method -> {
                     final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-                    final HandlerKey handlerKey = createHandlerKey(requestMapping);
+                    final HandlerKey handlerKey = createHandlerKey(controller, requestMapping);
                     handlerExecutions.put(handlerKey, new HandlerExecution(method, beanFactory.getBean(controllerType)));
                 }
         );
