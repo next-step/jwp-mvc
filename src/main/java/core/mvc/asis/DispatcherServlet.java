@@ -1,7 +1,6 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerMapping;
-import core.mvc.JspView;
+import core.mvc.HandlerMappings;
 import core.mvc.ModelAndView;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
@@ -14,10 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -25,16 +21,11 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String HANDLER_MAPPING_PACKAGE = "next.controller";
 
-    private LegacyHandlerMapping legacyHandlerMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
-    private List<HandlerMapping> handlerMappings = new ArrayList<>();
+    private final HandlerMappings handlerMappings = new HandlerMappings();
 
     @Override
     public void init() throws ServletException {
-        legacyHandlerMapping = new LegacyHandlerMapping();
-        legacyHandlerMapping.initMapping();
-        handlerMappings.add(legacyHandlerMapping);
-
         annotationHandlerMapping = new AnnotationHandlerMapping(HANDLER_MAPPING_PACKAGE);
         annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
@@ -44,9 +35,8 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), req.getRequestURI());
 
-        Controller controller = legacyHandlerMapping.getHandler(req);
         try {
-            final Object handler = findHandler(req);
+            final Object handler = handlerMappings.findHandler(req);
             final ModelAndView modelAndView = handle(handler, req, resp);
             modelAndView.renderView(req, resp);
         } catch (Throwable e) {
@@ -55,22 +45,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private Object findHandler(HttpServletRequest req) throws NoSuchMethodException {
-        return handlerMappings.stream()
-                .filter(hm -> Objects.nonNull(hm.getHandler(req)))
-                .findFirst()
-                .map(hm-> hm.getHandler(req))
-                .orElseThrow(NoSuchMethodException::new);
-    }
-
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if (handler instanceof Controller) {
-            final String veiwName = ((Controller) handler).execute(req, resp);
-            return new ModelAndView(new JspView(veiwName));
-        }
-        if (handler instanceof HandlerExecution) {
-            return ((HandlerExecution) handler).handle(req, resp);
-        }
-        throw new NoSuchElementException("Resource doesn't exists.");
+        return ((HandlerExecution) handler).handle(req, resp);
     }
 }
