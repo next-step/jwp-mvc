@@ -17,12 +17,12 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
-    private RequestMapping rm;
+    private LegacyRequestMapping legacyRequestMapping;
 
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        legacyRequestMapping = new LegacyRequestMapping();
+        legacyRequestMapping.initMapping();
     }
 
     @Override
@@ -30,7 +30,7 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
+        Controller controller = legacyRequestMapping.findController(requestUri);
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);
