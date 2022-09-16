@@ -21,7 +21,7 @@ public class LegacyRequestMapping implements HandlerMapping {
         mappings.put("/users/login", new LoginController());
         mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
-        mappings.put("/users/create", new CreateUserController());
+//        mappings.put("/users/create", new CreateUserController());
         mappings.put("/users/updateForm", new UpdateFormUserController());
         mappings.put("/users/update", new UpdateUserController());
 
