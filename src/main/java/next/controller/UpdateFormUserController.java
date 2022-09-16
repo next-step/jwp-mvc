@@ -1,15 +1,16 @@
 package next.controller;
 
+import core.annotation.web.RequestMapping;
 import core.db.DataBase;
 import core.mvc.asis.Controller;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+@core.annotation.web.Controller
+public class UpdateFormUserController {
 
-public class UpdateFormUserController implements Controller {
-
-    @Override
+    @RequestMapping(value = "/users/updateForm")
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
