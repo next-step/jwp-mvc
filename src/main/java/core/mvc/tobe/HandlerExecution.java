@@ -15,10 +15,10 @@ public class HandlerExecution {
         this.method = method;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public  Object handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Class<?> declaringClass = method.getDeclaringClass();
         Constructor<?> constructor = declaringClass.getConstructor();
         Object newInstance = constructor.newInstance();
-        return (ModelAndView) method.invoke(newInstance, request, response);
+        return method.invoke(newInstance, request, response);
     }
 }
