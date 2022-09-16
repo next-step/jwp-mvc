@@ -33,7 +33,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         beanFactory.initialize();
 
         controllerTypes.forEach(controllerType -> getRequestMappingMethods(controllerType));
-        log.error("✅ AnnotaionHandlerMapping initialized : {}", handlerExecutions);
+        log.debug("✅ AnnotaionHandlerMapping initialized : {}", handlerExecutions);
     }
 
     private HandlerKey createHandlerKey(Controller controller, RequestMapping requestMapping) {

@@ -6,6 +6,7 @@ import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.JspView;
 import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ public class UserController {
     @RequestMapping
     public ModelAndView getUsers(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (!UserSessionUtils.isLogined(req.getSession())) {
-            return new ModelAndView(new JspView("redirect:/users/loginForm"));
+            return new ModelAndView(new RedirectView("/users/loginForm"));
         }
 
         req.setAttribute("users", DataBase.findAll());
@@ -35,7 +36,7 @@ public class UserController {
         log.debug("User : {}", user);
 
         DataBase.addUser(user);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/profile")
@@ -71,7 +72,7 @@ public class UserController {
                 req.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -86,7 +87,7 @@ public class UserController {
         if (user.matchPassword(password)) {
             HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return new ModelAndView(new JspView("redirect:/"));
+            return new ModelAndView(new RedirectView("/"));
         } else {
             req.setAttribute("loginFailed", true);
             return new ModelAndView(new JspView("/user/login.jsp"));
@@ -97,7 +98,7 @@ public class UserController {
     public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return new ModelAndView(new JspView("redirect:/"));
+        return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/form")

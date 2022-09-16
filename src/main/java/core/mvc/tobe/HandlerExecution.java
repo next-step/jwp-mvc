@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
-    private static final Logger log = LoggerFactory.getLogger(HandlerExecution.class);
-
     private final Method method;
     private final Object declaredObject;
 

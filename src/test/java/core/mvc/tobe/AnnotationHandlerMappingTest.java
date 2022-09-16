@@ -41,7 +41,6 @@ public class AnnotationHandlerMappingTest {
         request.setParameter("email", user.getEmail());
         MockHttpServletResponse response = new MockHttpServletResponse();
         HandlerExecution execution = handlerMapping.getHandler(request);
-        System.out.println(execution);
         execution.handle(request, response);
     }
 }
