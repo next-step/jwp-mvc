@@ -19,6 +19,6 @@ class ControllerScannerTest {
 
         final Set<Class> expected = Set.of(MyController.class);
         assertEquals(expected, controllers.keySet());
-        controllers.keySet().forEach(Assertions::assertNotNull);
+        controllers.values().forEach(Assertions::assertNotNull);
     }
 }
