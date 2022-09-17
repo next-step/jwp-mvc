@@ -1,4 +1,4 @@
-package next.controller;
+package next.controller.legacy;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
@@ -7,17 +7,16 @@ import core.mvc.ForwardView;
 import core.mvc.ModelAndView;
 import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
+import next.controller.UserSessionUtils;
 import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@core.annotation.web.Controller
 public class LoginController implements Controller {
 
     @Override
-    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
     public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");

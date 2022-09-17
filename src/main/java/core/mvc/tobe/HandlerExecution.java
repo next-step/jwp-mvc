@@ -16,16 +16,7 @@ public class HandlerExecution {
         this.method = method;
     }
 
-//    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//        return null;
-//    }
-
-    // TODO ModelAndView 반환하기.
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//        Object obj = method.invoke(controller, request, response);
-
-//        return (String) obj;
-
         return (ModelAndView) method.invoke(controller, request, response);
     }
 }
