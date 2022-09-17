@@ -24,23 +24,18 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final String BASE_PACKAGE = "next.controller";
-    private LegacyRequestMapping legacyRequestMapping;
-    private AnnotationHandlerMapping annotationHandlerMapping;
-
     private List<HandlerMapping> mappings = Lists.newArrayList();
 
     @Override
     public void init() throws ServletException {
         LegacyRequestMapping legacyRequestMapping = new LegacyRequestMapping();
         legacyRequestMapping.initMapping();
-        this.legacyRequestMapping = legacyRequestMapping;
 
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
-        this.annotationHandlerMapping = annotationHandlerMapping;
 
-        mappings.add(this.legacyRequestMapping);
-        mappings.add(this.annotationHandlerMapping);
+        mappings.add(legacyRequestMapping);
+        mappings.add(annotationHandlerMapping);
     }
 
     @Override
