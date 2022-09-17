@@ -1,11 +1,10 @@
 package core.mvc.asis;
 
-import com.google.common.collect.Lists;
 import core.mvc.ModelAndView;
 import core.mvc.exception.NotFoundException;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
@@ -24,8 +22,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private static final String BASE_PACKAGE = "next.controller";
-    private List<HandlerMapping> mappings = Lists.newArrayList();
-
+    private HandlerMappings mappings;
     @Override
     public void init() throws ServletException {
         LegacyRequestMapping legacyRequestMapping = new LegacyRequestMapping();
@@ -34,8 +31,10 @@ public class DispatcherServlet extends HttpServlet {
         AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
         annotationHandlerMapping.initialize();
 
-        mappings.add(legacyRequestMapping);
-        mappings.add(annotationHandlerMapping);
+        mappings = new HandlerMappings(
+                legacyRequestMapping,
+                annotationHandlerMapping
+        );
     }
 
     @Override
@@ -93,7 +92,8 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private Object getHandler(HttpServletRequest request) {
-        return mappings.stream()
+        return mappings.getMappings()
+                .stream()
                 .filter(it -> it.hasHandler(request))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException(request))
