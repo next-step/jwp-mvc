@@ -1,13 +1,10 @@
 package core.mvc.tobe;
 
-import core.annotation.web.Controller;
 import core.mvc.ModelAndView;
-import core.mvc.View;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 public class HandlerExecution {
 
@@ -23,10 +20,12 @@ public class HandlerExecution {
 //        return null;
 //    }
 
-    public String handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Class<Controller> clazz = (Class<Controller>) controller.getClass();
-        Object obj = method.invoke(clazz.newInstance(), request, response);
+    // TODO ModelAndView 반환하기.
+    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        Object obj = method.invoke(controller, request, response);
 
-        return (String) obj;
+//        return (String) obj;
+
+        return (ModelAndView) method.invoke(controller, request, response);
     }
 }

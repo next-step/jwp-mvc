@@ -3,6 +3,8 @@ package next.controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
 import next.model.User;
 import org.slf4j.Logger;
@@ -17,7 +19,7 @@ public class UpdateUserController implements Controller {
 
     @Override
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         User user = DataBase.findUserById(req.getParameter("userId"));
         if (!UserSessionUtils.isSameUser(req.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
@@ -27,6 +29,7 @@ public class UpdateUserController implements Controller {
                 req.getParameter("email"));
         log.debug("Update User : {}", updateUser);
         user.update(updateUser);
-        return "redirect:/";
+
+        return new ModelAndView(new RedirectView("redirect:/"));
     }
 }

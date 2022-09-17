@@ -2,6 +2,8 @@ package next.controller;
 
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.ModelAndView;
+import core.mvc.RedirectView;
 import core.mvc.asis.Controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,9 +15,9 @@ public class LogoutController implements Controller {
 
     @Override
     @RequestMapping(value = "/users/logout", method = RequestMethod.POST)
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public ModelAndView execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return "redirect:/";
+        return new ModelAndView(new RedirectView("redirect:/"));
     }
 }
