@@ -29,4 +29,14 @@ public class LoginController {
             return "/user/login.jsp";
         }
     }
+
+    @RequestMapping(value = "/users/loginForm")
+    public String loginForm(HttpServletRequest req, HttpServletResponse resp) {
+        return "/user/login.jsp";
+    }
+
+    @RequestMapping(value = "/users/form")
+    public String getform(HttpServletRequest req, HttpServletResponse resp) {
+        return "/user/form.jsp";
+    }
 }
