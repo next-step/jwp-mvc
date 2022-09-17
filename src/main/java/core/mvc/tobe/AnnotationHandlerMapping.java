@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,10 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     public void initialize() {
         Reflections reflections = new Reflections(basePackage);
         Set<Class<?>> annotatedClass = reflections.getTypesAnnotatedWith(Controller.class);
-        getRequestMappingMethods(annotatedClass);
+        setHandlerExecutions(annotatedClass);
     }
 
-    private void getRequestMappingMethods(Set<Class<?>> annotatedClass) {
+    private void setHandlerExecutions(Set<Class<?>> annotatedClass) {
         List<Method> methodList = annotatedClass
                 .stream()
                 .flatMap(aClass -> Arrays.stream(aClass.getMethods()))
