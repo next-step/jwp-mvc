@@ -29,26 +29,28 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
+        try {
+            ModelAndView modelAndView = handle(req, resp);
+            modelAndView.getView().render(modelAndView.getModel(), req, resp);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private ModelAndView handle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Object handler = Optional.ofNullable(requestMapping.getHandler(req))
                 .orElseGet(() -> annotationHandlerMapping.getHandler(req));
 
-        try {
-            if (handler instanceof Controller) {
-                String viewName = ((Controller) handler).execute(req, resp);
-                if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-                    resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-                }
-                req.getRequestDispatcher(viewName).forward(req, resp);
-            } else if (handler instanceof HandlerExecution) {
-                ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
-                modelAndView.getView().render(modelAndView.getModel(), req, resp);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        if (handler instanceof Controller) {
+            return ((Controller) handler).execute(req, resp);
+        } else if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution) handler).handle(req, resp);
+        } else {
+            throw new ServletException("request not supported");
         }
     }
 }
