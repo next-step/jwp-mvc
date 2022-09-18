@@ -1,10 +1,8 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
-import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
-import core.mvc.tobe.HandlerMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,17 +11,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
+import java.util.Optional;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private final HandlerMapping handlerMapping = new AnnotationHandlerMapping("next.controller");
+    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+
+    private final RequestMapping requestMapping = new RequestMapping();
+    private final AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
 
     @Override
     public void init() {
-        handlerMapping.initialize();
+        requestMapping.initMapping();
+        annotationHandlerMapping.initialize();
     }
 
     @Override
@@ -31,18 +33,20 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        HandlerExecution handlerExecution = handlerMapping.getHandler(req);
+        Object handler = Optional.ofNullable(requestMapping.getHandler(req))
+                .orElseGet(() -> annotationHandlerMapping.getHandler(req));
 
-        if (Objects.nonNull(handlerExecution)) {
-            renderingByView(handlerExecution, req, resp);
-        }
-    }
-
-    private void renderingByView(HandlerExecution handlerExecution, HttpServletRequest req, HttpServletResponse resp) {
         try {
-            ModelAndView modelAndView = handlerExecution.handle(req, resp);
-            View view = modelAndView.getView();
-            view.render(modelAndView.getModel(), req, resp);
+            if (handler instanceof Controller) {
+                String viewName = ((Controller) handler).execute(req, resp);
+                if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
+                    resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
+                }
+                req.getRequestDispatcher(viewName).forward(req, resp);
+            } else if (handler instanceof HandlerExecution) {
+                ModelAndView modelAndView = ((HandlerExecution) handler).handle(req, resp);
+                modelAndView.getView().render(modelAndView.getModel(), req, resp);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

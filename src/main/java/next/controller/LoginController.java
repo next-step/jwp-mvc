@@ -15,9 +15,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@Controller(path = "/users")
-public class UserLoginController {
-    private static final Logger logger = LoggerFactory.getLogger(UserLoginController.class);
+@Controller("/users")
+public class LoginController {
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    @RequestMapping("/form")
+    public ModelAndView usersForm(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("Request Path : {}", request.getRequestURI());
+
+        return new ModelAndView(new ForwardView("/user/form.jsp"));
+    }
+
+    @RequestMapping("/loginForm")
+    public ModelAndView usersLoginForm(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("Request Path : {}", request.getRequestURI());
+
+        return new ModelAndView(new ForwardView("/user/login.jsp"));
+    }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
@@ -30,9 +44,7 @@ public class UserLoginController {
         if (user == null || !user.matchPassword(password)) {
             return loginFail(request);
         }
-
         return loginSuccess(request, user);
-
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
