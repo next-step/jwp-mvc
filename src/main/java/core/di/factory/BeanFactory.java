@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class BeanFactory {
     private static final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
@@ -55,5 +57,11 @@ public class BeanFactory {
         }
 
         return createInstance(typeClass);
+    }
+
+    public <T> List<T> getBeansFilter(Predicate<Object> predicate) {
+        return beans.values().stream().filter(predicate)
+                .map(bean -> (T)bean)
+                .collect(Collectors.toList());
     }
 }
