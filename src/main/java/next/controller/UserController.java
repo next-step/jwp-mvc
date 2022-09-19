@@ -13,73 +13,24 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-@Controller
+@Controller("/users")
 public class UserController {
-
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView forwardHome(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        request.setAttribute("users", DataBase.findAll());
-        return new ModelAndView(new ForwardView("home.jsp"));
-    }
-
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @RequestMapping
     public ModelAndView users(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Request Path : {}", request.getRequestURI());
 
         if (!UserSessionUtils.isLogined(request.getSession())) {
-            return new ModelAndView(new RedirectView("/users/loginForm"));
+            return new ModelAndView(new RedirectView("/loginForm"));
         }
 
         request.setAttribute("users", DataBase.findAll());
         return new ModelAndView(new ForwardView("/user/list.jsp"));
     }
 
-    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        String userId = request.getParameter("userId");
-        String password = request.getParameter("password");
-        User user = DataBase.findUserById(userId);
-
-        if (user == null || !user.matchPassword(password)) {
-            return loginFail(request);
-        }
-
-        return loginSuccess(request, user);
-
-    }
-
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView userProfile(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        String userId = request.getParameter("userId");
-        User user = DataBase.findUserById(userId);
-
-        if (user == null) {
-            throw new NullPointerException("사용자를 찾을 수 없습니다.");
-        }
-
-        request.setAttribute("user", user);
-        return new ModelAndView(new ForwardView("/user/profile.jsp"));
-    }
-
-    @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
-    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        request.getSession().removeAttribute(UserSessionUtils.USER_SESSION_KEY);
-        return new ModelAndView(new RedirectView("/"));
-    }
-
-    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Request Path : {}", request.getRequestURI());
 
@@ -90,7 +41,7 @@ public class UserController {
         return new ModelAndView(new RedirectView("/"));
     }
 
-    @RequestMapping(value = "/users/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public ModelAndView updateUser(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Request Path : {}", request.getRequestURI());
 
@@ -105,36 +56,7 @@ public class UserController {
         return new ModelAndView(new RedirectView("/"));
     }
 
-    private ModelAndView loginSuccess(HttpServletRequest request, User user) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        HttpSession session = request.getSession();
-        session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-        return new ModelAndView(new RedirectView("/"));
-    }
-
-    private ModelAndView loginFail(HttpServletRequest request) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        request.setAttribute("loginFailed", true);
-        return new ModelAndView(new ForwardView("/user/login.jsp"));
-    }
-
-    @RequestMapping(value = "/users/form", method = RequestMethod.GET)
-    public ModelAndView usersForm(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        return new ModelAndView(new ForwardView("/user/form.jsp"));
-    }
-
-    @RequestMapping(value = "/users/loginForm", method = RequestMethod.GET)
-    public ModelAndView usersLoginForm(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Request Path : {}", request.getRequestURI());
-
-        return new ModelAndView(new ForwardView("/user/login.jsp"));
-    }
-
-    @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
+    @RequestMapping(value = "/updateForm")
     public ModelAndView userUpdateForm(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Request Path : {}", request.getRequestURI());
 
@@ -146,5 +68,20 @@ public class UserController {
 
         request.setAttribute("user", user);
         return new ModelAndView(new ForwardView("/user/updateForm.jsp"));
+    }
+
+    @RequestMapping(value = "/profile", method = RequestMethod.GET)
+    public ModelAndView userProfile(HttpServletRequest request, HttpServletResponse response) {
+        logger.debug("Request Path : {}", request.getRequestURI());
+
+        String userId = request.getParameter("userId");
+        User user = DataBase.findUserById(userId);
+
+        if (user == null) {
+            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+        }
+
+        request.setAttribute("user", user);
+        return new ModelAndView(new ForwardView("/user/profile.jsp"));
     }
 }
