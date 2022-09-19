@@ -1,5 +1,10 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.exception.NotFoundException;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
+import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +21,20 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
-
-    private RequestMapping rm;
-
+    private static final String BASE_PACKAGE = "next.controller";
+    private HandlerMappings mappings;
     @Override
     public void init() throws ServletException {
-        rm = new RequestMapping();
-        rm.initMapping();
+        LegacyRequestMapping legacyRequestMapping = new LegacyRequestMapping();
+        legacyRequestMapping.initMapping();
+
+        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        annotationHandlerMapping.initialize();
+
+        mappings = new HandlerMappings(
+                legacyRequestMapping,
+                annotationHandlerMapping
+        );
     }
 
     @Override
@@ -30,10 +42,8 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = rm.findController(requestUri);
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            handle(req, resp);
         } catch (Throwable e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
@@ -49,5 +59,44 @@ public class DispatcherServlet extends HttpServlet {
 
         RequestDispatcher rd = req.getRequestDispatcher(viewName);
         rd.forward(req, resp);
+    }
+
+    private void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Object handler = getHandler(request);
+        if (handler instanceof Controller) {
+            render(
+                    ((Controller) handler).execute(request, response),
+                    request,
+                    response
+            );
+        }
+        if (handler instanceof HandlerExecution) {
+            render(
+                    ((HandlerExecution) handler).handle(request, response),
+                    request,
+                    response
+            );
+        }
+    }
+
+    private void render(Object view, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (view instanceof String) {
+            String viewName = (String) view;
+            move(viewName, request, response);
+        }
+        if (view instanceof ModelAndView) {
+            ModelAndView modelAndView = (ModelAndView) view;
+            modelAndView.getView()
+                    .render(modelAndView.getModel(), request, response);
+        }
+    }
+
+    private Object getHandler(HttpServletRequest request) {
+        return mappings.getMappings()
+                .stream()
+                .filter(it -> it.hasHandler(request))
+                .findAny()
+                .orElseThrow(() -> new NotFoundException(request))
+                .getHandler(request);
     }
 }

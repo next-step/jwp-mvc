@@ -28,3 +28,15 @@
 
 ### 요구사항 6 - component scan
 * [v] core.di.factory.example 패키지에서 @Controller, @Service, @Repository 애노테이션이 설정되어 있는 모든 클래스를 찾아 출력한다.
+
+
+## step2. @MVC 구현
+
+### 요구사항 1 - 애노테이션 기반 MVC 프레임워크
+* [x] 컨트롤러를 추가하는 방식이 아니라 메소드를 추가하는 방식으로 구현한다
+* [x] 요청 URL을 매핑할 때, HTTP 메소드도 매핑한다.
+* [x] @RequestMapping()에 method 설정이 되어 있지 않으면 모든 HTTP method를 지원해야 한다.
+
+### 요구사항 2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+* [x] 지금까지 사용한 MVC 프레임워크와 새롭게 구현한 애노테이션 기반 MVC 프레임워크가 공존하게 리팩토링한다.
+* [x] 새로운 MVC 프레임워크로 전환이 완료된 후 기존의 레거시 MVC 프레임워크를 삭제한다.
