@@ -48,19 +48,20 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     private void putHandlerExecutions(Method method) {
         final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
         final String requestUrl = requestMapping.value();
-        RequestMethod[] requestMethods = new RequestMethod[0];
-        if (requestMapping.method().length > 0) {
-            requestMethods = requestMapping.method();
-        }
-        if (requestMapping.method().length == 0) {
-            requestMethods = RequestMethod.values();
-        }
+        RequestMethod[] requestMethods = getRequestMethods(requestMapping);
         for (RequestMethod requestMethod : requestMethods) {
             HandlerKey handlerKey = new HandlerKey(requestUrl, requestMethod);
             HandlerExecution handlerExecution = new HandlerExecution(method);
             handlerExecutions.put(handlerKey, handlerExecution);
             logger.info("RequestMapping URL : {}, method : {}", handlerKey, method);
         }
+    }
+
+    private RequestMethod[] getRequestMethods(RequestMapping requestMapping) {
+        if (requestMapping.method().length > 0) {
+            return requestMapping.method();
+        }
+        return RequestMethod.values();
     }
 
     @Override
