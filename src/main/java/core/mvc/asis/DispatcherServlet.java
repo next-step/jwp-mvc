@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.HandlerMapping;
 import core.mvc.ModelAndView;
+import core.mvc.View;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.web.exception.NotFoundHandlerException;
@@ -22,7 +23,6 @@ import java.util.List;
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private List<HandlerMapping> mappingList = new ArrayList<>();
 
@@ -43,31 +43,21 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Object handler = getHandler(req);
-        String viewName;
         try {
             if (handler instanceof Controller) {
-                viewName = ((Controller) handler).execute(req, resp);
-                move(viewName, req, resp);
+                ModelAndView mv = ((Controller) handler).execute(req, resp);
+                View view = mv.getView();
+                view.render(mv.getModel(), req, resp);
             } else if (handler instanceof HandlerExecution) {
-                viewName = ((HandlerExecution) handler).handle(req, resp);
-                move(viewName, req, resp);
+                ModelAndView mv = ((HandlerExecution) handler).handle(req, resp);
+                View view = mv.getView();
+                view.render(mv.getModel(), req, resp);
             } else {
                 throw new NotFoundHandlerException("handler 를 찾을 수 없습니다");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void move(String viewName, HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        if (viewName.startsWith(DEFAULT_REDIRECT_PREFIX)) {
-            resp.sendRedirect(viewName.substring(DEFAULT_REDIRECT_PREFIX.length()));
-            return;
-        }
-
-        RequestDispatcher rd = req.getRequestDispatcher(viewName);
-        rd.forward(req, resp);
     }
 
     private Object getHandler(HttpServletRequest request) {
