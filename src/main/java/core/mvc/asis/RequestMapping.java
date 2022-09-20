@@ -28,12 +28,7 @@ public class RequestMapping implements HandlerMapping {
     }
 
     @Override
-    public void initialize() {
-        
-    }
-
-    @Override
     public Object getHandler(HttpServletRequest request) {
-        return null;
+        return findController(request.getRequestURI());
     }
 }
