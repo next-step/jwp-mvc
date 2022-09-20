@@ -28,8 +28,8 @@ public class ControllerScanner {
             return instantiateControllers(annotatedClass);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             logger.error("Exception : {}", e.getMessage());
+            return controllers;
         }
-        return null;
     }
 
     private Map<Class<?>, Object> instantiateControllers(Set<Class<?>> annotatedClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
