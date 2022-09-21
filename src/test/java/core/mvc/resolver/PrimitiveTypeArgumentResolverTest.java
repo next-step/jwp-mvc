@@ -41,7 +41,7 @@ class PrimitiveTypeArgumentResolverTest {
         methodParameters.forEach(methodParameter -> assertEquals(true, resolver.supportsParameter(methodParameter)));
     }
 
-    @DisplayName("PrimitiveTypeArgumentResolver는 String 타입을 resolve하여 반환한다.")
+    @DisplayName("PrimitiveTypeArgumentResolver는 String 타입을 resolve한다.")
     @Test
     void resolveArgumentWithString() throws NoSuchMethodException {
         MockHttpServletRequest request = new MockHttpServletRequest();

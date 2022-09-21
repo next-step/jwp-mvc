@@ -4,11 +4,11 @@ import org.junit.jupiter.api.BeforeAll;
 
 class HandlerMethodArgumentResolverMapperTest {
 
-    private static HandlerMethodArgumentResolverMapper mapper;
+    private static HandlerMethodArgumentResolverMapping mapper;
 
     @BeforeAll
     static void setUp() {
-        mapper = new HandlerMethodArgumentResolverMapper();
+        mapper = new HandlerMethodArgumentResolverMapping();
         mapper.initialize();
     }
 }

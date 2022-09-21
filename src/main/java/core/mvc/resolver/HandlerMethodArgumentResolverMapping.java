@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class HandlerMethodArgumentResolverMapper {
+public class HandlerMethodArgumentResolverMapping {
 
     private final String RESOLVER_COMPONENT_SCAN_BASE = "core.mvc.resolver";
     private final List<HandlerMethodArgumentResolver> argumentResolvers = new ArrayList<>();

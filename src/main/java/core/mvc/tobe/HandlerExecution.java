@@ -17,7 +17,7 @@ public class HandlerExecution {
         this.declaredObject = declaredObject;
     }
 
-    public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(declaredObject, request, response);
+    public ModelAndView handle(Object... values) throws Exception {
+        return (ModelAndView) method.invoke(declaredObject, values);
     }
 }

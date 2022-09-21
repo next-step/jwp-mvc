@@ -24,7 +24,7 @@ class HttpServletRequestArgumentResolverTest {
                 .forEach(methodParameter -> assertEquals(true, resolver.supportsParameter(methodParameter)));
     }
 
-    @DisplayName("HttpServletRequestArgumentResolver는 httpServletRequest 타입을 resolve하여 반환한다.")
+    @DisplayName("HttpServletRequestArgumentResolver는 httpServletRequest 타입을 resolve한다.")
     @Test
     void resolveArgument() throws NoSuchMethodException {
         MockHttpServletRequest request = new MockHttpServletRequest();
