@@ -38,7 +38,7 @@ public class HandlerMethodArgumentResolverMapper {
         Object[] values = new Object[parametersNum];
 
         for (int i = 0; i < parametersNum; i++) {
-            MethodParameter methodParameter = new MethodParameter(method, parameters[i]);
+            MethodParameter methodParameter = new MethodParameter(method, parameters[i], parameterNames[i]);
             values[i] = getArgumentResolver(methodParameter).resolveArgument(methodParameter, httpServletRequest);
         }
 
