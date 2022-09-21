@@ -31,6 +31,8 @@ public class HandlerMethodArgumentResolverMapping {
                 });
     }
 
+    public
+
     public Object[] resolve(Method method, HttpServletRequest httpServletRequest) {
         Parameter[] parameters = method.getParameters();
         String[] parameterNames = nameDiscoverer.getParameterNames(method);
