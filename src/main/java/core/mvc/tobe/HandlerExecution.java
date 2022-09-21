@@ -20,4 +20,8 @@ public class HandlerExecution {
     public ModelAndView handle(Object... values) throws Exception {
         return (ModelAndView) method.invoke(declaredObject, values);
     }
+
+    public Method getMethod() {
+        return method;
+    }
 }

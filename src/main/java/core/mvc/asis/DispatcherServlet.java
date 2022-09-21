@@ -52,7 +52,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        Object[] values = argumentResolverMapping.resolve((Method) handler, req);
+        Object[] values = argumentResolverMapping.resolve(((HandlerExecution) handler).getMethod(), req);
         return ((HandlerExecution) handler).handle(values);
     }
 }
