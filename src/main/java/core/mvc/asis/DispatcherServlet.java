@@ -1,5 +1,8 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +19,18 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
+    public static final String BASE_PACKAGE = "next.controller";
 
     private RequestMapping rm;
+    private AnnotationHandlerMapping handlerMapping;
 
     @Override
     public void init() throws ServletException {
         rm = new RequestMapping();
         rm.initMapping();
+
+        handlerMapping = new AnnotationHandlerMapping(BASE_PACKAGE);
+        handlerMapping.initialize();
     }
 
     @Override
@@ -31,10 +39,30 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Controller controller = rm.findController(requestUri);
+        String viewName = null;
+        if (controller == null) {
+            viewName = findReflectionsAnnotation(req, resp);
+        }
+        if (controller != null) {
+            viewName = executeController(req, resp, controller);
+        }
+        move(viewName, req, resp);
+    }
+
+    private String executeController(HttpServletRequest req, HttpServletResponse resp, Controller controller) throws ServletException {
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            return controller.execute(req, resp);
         } catch (Throwable e) {
+            logger.error("Exception : {}", e);
+            throw new ServletException(e.getMessage());
+        }
+    }
+
+    private String findReflectionsAnnotation(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        HandlerExecution execution = handlerMapping.getHandler(req);
+        try {
+            return execution.handle(req, resp);
+        } catch (Exception e) {
             logger.error("Exception : {}", e);
             throw new ServletException(e.getMessage());
         }
