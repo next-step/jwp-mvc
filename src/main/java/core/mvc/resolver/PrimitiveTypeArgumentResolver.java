@@ -1,7 +1,10 @@
 package core.mvc.resolver;
 
+import core.annotation.Component;
+
 import javax.servlet.http.HttpServletRequest;
 
+@Component
 public class PrimitiveTypeArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override

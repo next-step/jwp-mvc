@@ -1,5 +1,6 @@
 package core.mvc.resolver;
 
+import core.annotation.Component;
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import org.springframework.http.server.PathContainer;
@@ -8,6 +9,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+@Component
 public class PathVariableArgumentResolver implements HandlerMethodArgumentResolver {
 
     private static final PathPatternParser pathPatternParser = PathPatternParser.defaultInstance;
