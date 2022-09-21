@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 public class TestUserController {
     private static final Logger logger = LoggerFactory.getLogger(TestUserController.class);
@@ -51,6 +52,13 @@ public class TestUserController {
     public ModelAndView httpServletRequest(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("request", request);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ModelAndView session(HttpSession session) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("session", session);
         return modelAndView;
     }
 }

@@ -19,12 +19,8 @@ class ModelArgumentResolverTest {
     @DisplayName("ModelAttributeArgumentResolver는 JavaBean 타입을 지원한다.")
     @Test
     void supportParameter() throws NoSuchMethodException {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("userId", "1");
-        request.addParameter("password", "1234");
-        request.addParameter("age", "20");
-
         Method method = getMethod("create_javabean");
+
         generateMethodParameters(method)
                 .forEach(methodParameter -> assertTrue(resolver.supportsParameter(methodParameter)));
     }

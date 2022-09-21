@@ -17,10 +17,8 @@ class PathVariableArgumentResolverTest {
     @DisplayName("PathVariableArgumentResolver는 PathVariable 타입을 지원한다.")
     @Test
     void supportParameter() throws NoSuchMethodException {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("id", "1");
-
         Method method = getMethod("show_pathvariable");
+
         generateMethodParameters(method)
                 .forEach(methodParameter -> assertTrue(resolver.supportsParameter(methodParameter)));
     }

@@ -18,10 +18,6 @@ class PrimitiveTypeArgumentResolverTest {
     @DisplayName("PrimitiveTypeArgumentResolver는 String 타입을 지원한다.")
     @Test
     void supportParameterWithString() throws NoSuchMethodException {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("userId", "jiwon");
-        request.addParameter("password", "1234");
-
         Method method = getMethod("create_string");
         List<MethodParameter> methodParameters = generateMethodParameters(method);
 
@@ -31,10 +27,6 @@ class PrimitiveTypeArgumentResolverTest {
     @DisplayName("PrimitiveTypeArgumentResolver는 int, long 타입을 지원한다.")
     @Test
     void supportParameterWithIntAndLong() throws NoSuchMethodException {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addParameter("id", "1");
-        request.addParameter("age", "20");
-
         Method method = getMethod("create_int_long");
         List<MethodParameter> methodParameters = generateMethodParameters(method);
 
