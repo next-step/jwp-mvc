@@ -17,8 +17,18 @@
   - [X] 요구사항 4 - private field에 값 할당
   - [X] 요구사항 5 - 인자를 가진 생성자의 인스턴스 생성
   - [X] 요구사항 6 - component scan
-### STEP 2
+### STEP 2 + STEP 3
 - [X] 요구사항1 - 애노테이션 기반 MVC 프레임워크
   - [X] ControllerScanner 이용해서 `@Controller`된 클래스 찾기
   - [X] `@RequestMapping` 와 AnnotationHandlerMapping 정의하여 애노테이션 기반으로 핸들러 관리하기
 - [X] 요구사항2 - 레거시 MVC와 애노테이션 기반 MVC 통합
+### STEP 4
+- [X] Controller 메소드의 인자 타입에 따라 HttpServletRequest에서 값을 꺼내와 자동으로 형 변환을 한 후 매핑해주는 기능 구현 (HandlerMethodArgumentResolver)
+  - [X] HandlerMethodArgumentResolver 구현
+  - [X] HttpServletRequestArgumentResolver 구현
+  - [X] PrimitiveTypeArgumentResolver 구현
+  - [X] PathVariableArgumentResolver 구현
+  - [X] ModelAttributeArgumentResolver 구현
+  - [X] SessionArgumentResolver 구현
+  - [X] ServletDispatcher에 ArugmentHandler 등록 
+  - [X] 모든 Controller Argument를 리팩토링
