@@ -1,5 +1,6 @@
 package core.mvc.resolver;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Objects;
@@ -32,15 +33,8 @@ public class MethodParameter {
         return parameter.getType();
     }
 
-    public boolean isPrimitive() {
-        if (parameter.getType().equals(int.class) || parameter.getType().equals(long.class) ||
-                parameter.getType().equals(double.class) || parameter.getType().equals(float.class) ||
-                parameter.getType().equals(boolean.class) || parameter.getType().equals(byte.class) ||
-                parameter.getType().equals(short.class) || parameter.getType().equals(char.class) ||
-                parameter.getType().equals(String.class)) {
-            return true;
-        }
-        return false;
+    public boolean hasAnnotation(Class<? extends Annotation> annotation) {
+        return parameter.isAnnotationPresent(annotation);
     }
 
     @Override
