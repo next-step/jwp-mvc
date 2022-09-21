@@ -1,8 +1,10 @@
 package next.reflection;
 
+import core.annotation.web.Controller;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.context.TestPropertySource;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -13,6 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+
+    @Test
+    public void showAnnotationClass() {
+        Class<Controller> clazz = Controller.class;
+        logger.debug("fields: {}", clazz.getDeclaredMethods());
+    }
 
     @Test
     public void showClass() {
