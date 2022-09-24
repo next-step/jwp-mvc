@@ -21,14 +21,14 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView home(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView home(HttpServletRequest request) {
         logger.debug("home");
         request.setAttribute("users", DataBase.findAll());
         return new ModelAndView(new ForwardView("home.jsp"));
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView users(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView users(HttpServletRequest request) {
         logger.debug("users");
         if (!UserSessionUtils.isLogined(request.getSession())) {
             return new ModelAndView(new RedirectView("/users/loginForm"));
@@ -39,10 +39,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView login(String userId, String password, HttpServletRequest request) {
         logger.debug("login");
-        String userId = request.getParameter("userId");
-        String password = request.getParameter("password");
         User user = DataBase.findUserById(userId);
 
         if (user == null || !user.matchPassword(password)) {
@@ -54,9 +52,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView userProfile(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView userProfile(String userId, HttpServletRequest request) {
         logger.debug("userProfile");
-        String userId = request.getParameter("userId");
         User user = DataBase.findUserById(userId);
 
         if (user == null) {
@@ -68,29 +65,26 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
-    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView logout(HttpServletRequest request) {
         request.getSession().removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView createUser(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(request.getParameter("userId"), request.getParameter("password"),
-                request.getParameter("name"), request.getParameter("email"));
-
+    public ModelAndView createUser(String userId, String password, String name, String email) {
+        User user = new User(userId, password, name, email);
         DataBase.addUser(user);
         return new ModelAndView(new RedirectView("/"));
     }
 
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)
-    public ModelAndView updateUser(HttpServletRequest request, HttpServletResponse response) {
-        User user = DataBase.findUserById(request.getParameter("userId"));
+    public ModelAndView updateUser(String userId, String password, String name, String email, HttpServletRequest request) {
+        User user = DataBase.findUserById(userId);
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
         }
 
-        User updateUser = new User(request.getParameter("userId"), request.getParameter("password"),
-                request.getParameter("name"), request.getParameter("email"));
+        User updateUser = new User(userId, password, name, email);
         user.update(updateUser);
         return new ModelAndView(new RedirectView("/"));
     }
@@ -105,5 +99,4 @@ public class UserController {
         request.setAttribute("loginFailed", true);
         return new ModelAndView(new ForwardView("/user/login.jsp"));
     }
-
 }
