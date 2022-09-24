@@ -6,6 +6,7 @@ import core.annotation.web.RequestMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -33,9 +34,21 @@ public class AnnotationHandlerMapping implements HandlerMapping {
     }
 
     @Override
-    public HandlerExecution getHandler(HttpServletRequest request) {
+    public HandlerExecution getHandler(HttpServletRequest request) throws ServletException {
         RequestMethod requestMethod = RequestMethod.requestMethod(request.getMethod());
-        return handlerExecutions.get(new HandlerKey(request.getRequestURI(), requestMethod));
+        String requestURI = request.getRequestURI();
+
+        return handlerExecutions.entrySet()
+                .stream()
+                .filter(entry -> isMatched(entry, requestURI, requestMethod) || isMatched(entry, requestURI, RequestMethod.ALL))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElseThrow(() -> new ServletException("요청을 처리할 수 없습니다."));
+    }
+
+    private boolean isMatched(Map.Entry<HandlerKey, HandlerExecution> entry, String requestUri, RequestMethod requestMethod) {
+        final HandlerKey handlerKey = entry.getKey();
+        return handlerKey.isSameMethod(requestMethod) && handlerKey.isMatchedUri(requestUri);
     }
 
     private void addHandlerExecution(Object controller, Method method) {
