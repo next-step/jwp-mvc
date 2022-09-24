@@ -36,3 +36,7 @@
   * AnnotationHandlerMapping 클래스 추가 (Step2 에서 완료)
   * 해당하는 HandlerExecution을 반환하는 메소드 구현 (Step2 에서 완료)
 * 레거시 MVC와 애노테이션 기반 MVC 통합 (Step2 에서 완료)
+
+#### Step4
+* Controller 메소드의 인자 타입에 따라 자동 형변환 후 매핑
+* URL을 통해서 동적으로 값 전달
