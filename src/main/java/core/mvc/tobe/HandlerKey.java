@@ -13,11 +13,14 @@ public class HandlerKey {
         this.requestMethod = requestMethod;
     }
 
-    public boolean isSameMethod(RequestMethod requestMethod) {
+    public boolean isMatched(RequestMethod requestMethod, String requestUri) {
+        return (isSameMethod(requestMethod) || isSameMethod(RequestMethod.ALL)) && isMatchedUri(requestUri);
+    }
+    private boolean isSameMethod(RequestMethod requestMethod) {
         return this.requestMethod == requestMethod;
     }
 
-    public boolean isMatchedUri(String requestUri) {
+    private boolean isMatchedUri(String requestUri) {
         Pattern pattern = Pattern.compile(url.replaceAll("\\{[^/]+}", "[^/]+"));
         return pattern.matcher(requestUri).matches();
     }

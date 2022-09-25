@@ -3,6 +3,7 @@ package core.mvc.tobe;
 import com.google.common.collect.Maps;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.tobe.exception.HandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,15 +41,10 @@ public class AnnotationHandlerMapping implements HandlerMapping {
 
         return handlerExecutions.entrySet()
                 .stream()
-                .filter(entry -> isMatched(entry, requestURI, requestMethod) || isMatched(entry, requestURI, RequestMethod.ALL))
+                .filter(entry -> entry.getKey().isMatched(requestMethod, requestURI))
                 .findFirst()
                 .map(Map.Entry::getValue)
-                .orElseThrow(() -> new ServletException("요청을 처리할 수 없습니다."));
-    }
-
-    private boolean isMatched(Map.Entry<HandlerKey, HandlerExecution> entry, String requestUri, RequestMethod requestMethod) {
-        final HandlerKey handlerKey = entry.getKey();
-        return handlerKey.isSameMethod(requestMethod) && handlerKey.isMatchedUri(requestUri);
+                .orElseThrow(() -> new HandlerException("요청을 처리할 수 없습니다."));
     }
 
     private void addHandlerExecution(Object controller, Method method) {

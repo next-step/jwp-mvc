@@ -1,4 +1,4 @@
-package core.mvc.tobe;
+package core.mvc.tobe.resolver;
 
 import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
@@ -9,53 +9,49 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class PathVariableArgumentResolver implements ArgumentResolver {
 
-    private final HttpServletRequest request;
-    private final Class<?>[] parameterTypes;
-    private final Map<String, String> pathVariables;
-    private final Method method;
-    private final Annotation[][] parameterAnnotations;
-    private final String[] parameterNames;
+    private static final PathVariableArgumentResolver parameterArgumentResolver = new PathVariableArgumentResolver();
 
+    private PathVariableArgumentResolver() {}
 
-    public PathVariableArgumentResolver(HttpServletRequest request, Method method) {
-        this.request = request;
-        this.method = method;
-        this.parameterTypes = method.getParameterTypes();
-        this.pathVariables = getPathVariables();
-        this.parameterAnnotations = method.getParameterAnnotations();
-        this.parameterNames = ((ParameterNameDiscoverer) new LocalVariableTableParameterNameDiscoverer())
-                .getParameterNames(method);
+    public static PathVariableArgumentResolver getInstance() {
+        return parameterArgumentResolver;
     }
 
     @Override
-    public Object[] resolve() {
-        return IntStream.range(0, parameterTypes.length)
-                .filter(this::isPathVariableContains)
-                .mapToObj(this::getPathVariableValue)
-                .toArray();
+    public Object[] resolve(HttpServletRequest request, HttpServletResponse response, Method method) {
+        List<String> list = new ArrayList<>();
+        String[] parameterNames = ((ParameterNameDiscoverer) new LocalVariableTableParameterNameDiscoverer()).getParameterNames(method);
+
+        for (int i = 0; i < method.getParameterTypes().length; i++) {
+            Annotation[] annotationArray = method.getParameterAnnotations()[i];
+            if (isPathVariableContains(annotationArray)) {
+                String pathVariableValue = getPathVariableValue(request, method, Objects.requireNonNull(parameterNames)[i]);
+                list.add(pathVariableValue);
+            }
+        }
+        return list.toArray();
     }
 
-    private boolean isPathVariableContains(int index) {
-        return Arrays.stream(parameterAnnotations[index])
+    private boolean isPathVariableContains(Annotation[] annotationArray) {
+        return Arrays.stream(annotationArray)
                 .map(Annotation::annotationType)
                 .anyMatch(type -> Objects.equals(type, PathVariable.class));
     }
 
-    private String getPathVariableValue(int index) {
-        String parameterName = parameterNames[index];
-        String pathVariableValue = pathVariables.get(parameterName);
+    private String getPathVariableValue(HttpServletRequest request, Method method, String parameterName) {
+        String pathVariableValue = pathVariables(request, method).get(parameterName);
         Objects.requireNonNull(pathVariableValue, parameterName + "경로가 존재하지 않습니다.");
         return pathVariableValue;
     }
 
-    private Map<String, String> getPathVariables() {
+    private Map<String, String> pathVariables(HttpServletRequest request, Method method) {
         PathPattern pathPattern = pathPattern(method.getDeclaredAnnotation(RequestMapping.class).value());
         PathPattern.PathMatchInfo pathMatchInfo = pathPattern.matchAndExtract(toPathContainer(request.getRequestURI()));
         if (pathMatchInfo == null) {
