@@ -1,13 +1,7 @@
 package core.mvc.tobe.resolver;
 
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.ParameterNameDiscoverer;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class ParameterArgumentResolver implements ArgumentResolver {
 
@@ -20,19 +14,16 @@ public class ParameterArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object[] resolve(HttpServletRequest request, HttpServletResponse response, Method method) {
-        String[] parameterNames = ((ParameterNameDiscoverer) new LocalVariableTableParameterNameDiscoverer()).getParameterNames(method);
-        return Arrays.stream(Objects.requireNonNull(parameterNames), 0, method.getParameterTypes().length)
-                .filter(parameterName -> isParameterContains(request, parameterName))
-                .map(parameterName -> parameterValue(request, parameterName))
-                .toArray();
+    public Object resolve(HttpServletRequest request, HttpServletResponse response, ArgumentModel argumentModel) {
+        String parameter = request.getParameter(argumentModel.parameterName());
+        if (parameter != null) {
+            return parameter;
+        }
+        return request;
     }
 
-    private boolean isParameterContains(HttpServletRequest request, String parameterName) {
-        return request.getParameter(parameterName) != null;
-    }
-
-    private String parameterValue(HttpServletRequest request, String parameterName) {
-        return request.getParameter(parameterName);
+    @Override
+    public boolean isSupport(ArgumentModel argumentModel) {
+        return argumentModel.type().equals(HttpServletRequest.class);
     }
 }

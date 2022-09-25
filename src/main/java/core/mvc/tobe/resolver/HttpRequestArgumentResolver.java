@@ -2,8 +2,6 @@ package core.mvc.tobe.resolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class HttpRequestArgumentResolver implements ArgumentResolver {
 
@@ -16,10 +14,13 @@ public class HttpRequestArgumentResolver implements ArgumentResolver {
     }
 
     @Override
-    public Object[] resolve(HttpServletRequest request, HttpServletResponse response, Method method) {
-        return Arrays.stream(method.getParameterTypes())
-                .filter(parameterType -> parameterType.equals(HttpServletRequest.class))
-                .map(parameterType -> request).toArray();
+    public Object resolve(HttpServletRequest request, HttpServletResponse response, ArgumentModel argumentModel) {
+        return request;
+    }
+
+    @Override
+    public boolean isSupport(ArgumentModel argumentModel) {
+        return argumentModel.type().equals(HttpServletRequest.class);
     }
 
 }

@@ -1,11 +1,14 @@
 package core.mvc.tobe;
 
+import core.mvc.tobe.resolver.ArgumentModel;
 import core.mvc.tobe.resolver.ArgumentResolver;
 import core.mvc.tobe.resolver.PathVariableArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -20,6 +23,7 @@ public class PathVariableTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private Method method;
+    private static final ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     @BeforeEach
     void setup() {
@@ -33,13 +37,16 @@ public class PathVariableTest {
     @ValueSource(strings = {"user, user2"})
     void getPathvariable(String userId) {
         // given
-         final ArgumentResolver argumentResolver = PathVariableArgumentResolver.getInstance();
+        final ArgumentResolver argumentResolver = PathVariableArgumentResolver.getInstance();
         request.setRequestURI("/users/" + userId);
+        ArgumentModel argumentModel = new ArgumentModel(method, method.getParameterTypes()[0], method.getParameterAnnotations()[0],
+                Objects.requireNonNull(parameterNameDiscoverer.getParameterNames(method))[0]);
+
         // when
-        final Object[] arguments = argumentResolver.resolve(request, response, method);
+        final Object argument = argumentResolver.resolve(request, response, argumentModel);
 
         // then
-        assertThat(arguments[0]).isEqualTo(userId);
+        assertThat(argument).isEqualTo(userId);
     }
 
     private Method pathvariableMethod() {
