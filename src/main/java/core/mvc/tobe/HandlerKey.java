@@ -2,6 +2,8 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
 
+import java.util.regex.Pattern;
+
 public class HandlerKey {
     private String url;
     private RequestMethod requestMethod;
@@ -9,6 +11,18 @@ public class HandlerKey {
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
         this.requestMethod = requestMethod;
+    }
+
+    public boolean isMatched(RequestMethod requestMethod, String requestUri) {
+        return (isSameMethod(requestMethod) || isSameMethod(RequestMethod.ALL)) && isMatchedUri(requestUri);
+    }
+    private boolean isSameMethod(RequestMethod requestMethod) {
+        return this.requestMethod == requestMethod;
+    }
+
+    private boolean isMatchedUri(String requestUri) {
+        Pattern pattern = Pattern.compile(url.replaceAll("\\{[^/]+}", "[^/]+"));
+        return pattern.matcher(requestUri).matches();
     }
 
     @Override

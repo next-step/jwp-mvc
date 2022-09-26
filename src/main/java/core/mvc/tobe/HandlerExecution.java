@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.resolver.ArgumentResolverScanner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,12 +11,13 @@ public class HandlerExecution {
 
     final private Object controller;
     final private Method method;
+
     public HandlerExecution(Object controller, Method method) {
         this.controller = controller;
         this.method = method;
     }
-
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(controller, request, response);
+        ArgumentResolverScanner argumentResolverScanner = new ArgumentResolverScanner(request, response, method);
+        return (ModelAndView) method.invoke(controller, argumentResolverScanner.arguments());
     }
 }

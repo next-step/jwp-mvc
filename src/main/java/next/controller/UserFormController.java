@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class UserFormController {
@@ -20,17 +19,17 @@ public class UserFormController {
 
 
     @RequestMapping(value = "/users/form", method = RequestMethod.GET)
-    public ModelAndView usersForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView usersForm() {
         return new ModelAndView(new ForwardView("/user/form.jsp"));
     }
 
     @RequestMapping(value = "/users/loginForm", method = RequestMethod.GET)
-    public ModelAndView usersLoginForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView usersLoginForm() {
         return new ModelAndView(new ForwardView("/user/login.jsp"));
     }
 
     @RequestMapping(value = "/users/updateForm", method = RequestMethod.GET)
-    public ModelAndView userUpdateForm(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView userUpdateForm(HttpServletRequest request) {
         User user = DataBase.findUserById(request.getParameter("userId"));
 
         if (!UserSessionUtils.isSameUser(request.getSession(), user)) {
