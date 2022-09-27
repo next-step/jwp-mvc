@@ -1,44 +1,76 @@
 package core.mvc.tobe;
 
+import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
+import org.apache.commons.lang3.ArrayUtils;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ControllerScanner {
-    private final Reflections reflections;
-    private final Map<Class, Object> controllers = new HashMap<>();
+    private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
+    private final Map<Class, Object> controllers = Maps.newHashMap();
+    private Map<HandlerKey, HandlerExecution> result = Maps.newHashMap();
 
-    ControllerScanner(String... basePackage) {
-        this.reflections = new Reflections(
-                basePackage,
+
+    public ControllerScanner(Object... basePackage) {
+        Set<Class<?>> controllerClazz = new Reflections(basePackage,
                 new MethodAnnotationsScanner(),
                 new TypeAnnotationsScanner(),
-                new SubTypesScanner()
-        );
+                new SubTypesScanner()).getTypesAnnotatedWith(Controller.class);
+
+        controllerClazz.forEach(clazz -> this.controllers.put(clazz, newInstance(clazz)));
+
         initialize();
     }
 
-    List<Object> getControllers() {
-        return new ArrayList<>(this.controllers.values());
-    }
-
     private void initialize() {
-        Set<Class<?>> controllers = reflections.getTypesAnnotatedWith(Controller.class);
-        controllers.stream().map(clazz -> newInstance(clazz));
-        for (Class clazz : controllers) {
-            this.controllers.put(clazz, newInstance(clazz));
-        }
+        this.controllers.values().forEach(clazz -> {
+            Set<Method> methods = ReflectionUtils.getAllMethods(clazz.getClass(), ReflectionUtils.withAnnotation(RequestMapping.class));
+            methods.forEach(method -> addHandlerExecution(clazz, method));
+        });
     }
 
-    private Object newInstance(Class clazz) {
+    private void addHandlerExecution(Object object, Method method) {
+        RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+        List<HandlerKey> handlerKeys = getHandlerKeys(requestMapping, object);
+        handlerKeys.forEach(handlerKey -> result.put(handlerKey, new HandlerExecution(object, method)));
+    }
+
+    private List<HandlerKey> getHandlerKeys(RequestMapping requestMapping, Object object) {
+        Controller controller = object.getClass().getDeclaredAnnotation(Controller.class);
+        RequestMethod[] requestMethods = requestMapping.method();
+
+        if (ArrayUtils.isEmpty(requestMethods)) {
+            requestMethods = RequestMethod.values();
+        }
+
+        return Arrays.stream(requestMethods)
+                .map(requestMethod -> new HandlerKey(controller.value() + requestMapping.value(), requestMethod))
+                .collect(Collectors.toList());
+    }
+
+    private Object newInstance(Class<?> clazz) {
         try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return clazz.getDeclaredConstructor(EMPTY_CLASS_ARRAY).newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    public Map<? extends HandlerKey, ? extends HandlerExecution> getHandlerExecutions() {
+        return this.result;
     }
 }
