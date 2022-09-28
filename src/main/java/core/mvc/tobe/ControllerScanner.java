@@ -15,6 +15,7 @@ public class ControllerScanner {
         Reflections reflections = new Reflections("next.controller");
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(Controller.class);
         for (Class<?> clazz : classes) {
+            // TODO
             Object instance = clazz.newInstance();
             mapByClass.put(clazz, instance);
         }
