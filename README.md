@@ -18,3 +18,14 @@
 - RequestMapping, AnnotationHandlerMapping의 공통 부분인 HandlerMapping 인터페이스 추가
 - DispatcherServlet에서 HandlerMapping 초기화
 - DispatcherServlet에서 메소드 실행부분 구현 
+
+### 요구사항 3
+
+### 요구사항 4
+- MethodArgumentResolver 인터페이스 구현
+- 메소드의 파라미터 한개를 추상화한 MethodParameter 클래스 구현
+- MethodArgumentResolver 구현체 구현 및 등록
+    - UserDefinedTypeArgumentResolver (사용자 정의 클래스 파라미터 전용) (o)
+    - PrimitiveTypeArgumentResolver 
+    - PathVariableArgumentResolver
+    - HttpServletArgumentResolver 
