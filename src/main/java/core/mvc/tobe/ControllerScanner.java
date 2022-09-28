@@ -4,12 +4,10 @@ import com.google.common.collect.Maps;
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
+import core.mvc.resolver.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,20 +17,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
+
 public class ControllerScanner {
+    private static final List<ArgumentResolver> argumentResolvers = asList(
+            new HttpRequestArgumentResolver(),
+            new HttpResponseArgumentResolver(),
+            new RequestParamArgumentResolver(),
+            new PathVariableArgumentResolver(),
+            new RequestBodyArgumentResolver(),
+            new SimpleTypeArgumentResolver()
+    );
+
     private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
     private final Map<Class, Object> controllers = Maps.newHashMap();
     private Map<HandlerKey, HandlerExecution> result = Maps.newHashMap();
 
 
     public ControllerScanner(Object... basePackage) {
-        Set<Class<?>> controllerClazz = new Reflections(basePackage,
-                new MethodAnnotationsScanner(),
-                new TypeAnnotationsScanner(),
-                new SubTypesScanner()).getTypesAnnotatedWith(Controller.class);
-
+        Set<Class<?>> controllerClazz = new Reflections(basePackage).getTypesAnnotatedWith(Controller.class);
         controllerClazz.forEach(clazz -> this.controllers.put(clazz, newInstance(clazz)));
-
         initialize();
     }
 
@@ -46,7 +50,7 @@ public class ControllerScanner {
     private void addHandlerExecution(Object object, Method method) {
         RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
         List<HandlerKey> handlerKeys = getHandlerKeys(requestMapping, object);
-        handlerKeys.forEach(handlerKey -> result.put(handlerKey, new HandlerExecution(object, method)));
+        handlerKeys.forEach(handlerKey -> result.put(handlerKey, new HandlerExecution(argumentResolvers, object, method)));
     }
 
     private List<HandlerKey> getHandlerKeys(RequestMapping requestMapping, Object object) {
