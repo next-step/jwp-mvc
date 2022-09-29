@@ -47,10 +47,12 @@ public class DispatcherServlet extends HttpServlet {
 
         if (handler instanceof Controller) {
             return ((Controller) handler).execute(req, resp);
-        } else if (handler instanceof HandlerExecution) {
-            return ((HandlerExecution) handler).handle(req, resp);
-        } else {
-            throw new ServletException("request not supported");
         }
+
+        if (handler instanceof HandlerExecution) {
+            return ((HandlerExecution) handler).handle(req, resp);
+        }
+
+        throw new ServletException("request not supported");
     }
 }
