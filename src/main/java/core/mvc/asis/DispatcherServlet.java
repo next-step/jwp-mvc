@@ -2,6 +2,7 @@ package core.mvc.asis;
 
 import core.mvc.HandlerMappings;
 import core.mvc.ModelAndView;
+import core.mvc.resolver.HandlerMethodArgumentResolverMapping;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
@@ -21,6 +23,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String HANDLER_MAPPING_PACKAGE = "next.controller";
 
+    private HandlerMethodArgumentResolverMapping argumentResolverMapping;
     private AnnotationHandlerMapping annotationHandlerMapping;
     private final HandlerMappings handlerMappings = new HandlerMappings();
 
@@ -29,6 +32,9 @@ public class DispatcherServlet extends HttpServlet {
         annotationHandlerMapping = new AnnotationHandlerMapping(HANDLER_MAPPING_PACKAGE);
         annotationHandlerMapping.initialize();
         handlerMappings.add(annotationHandlerMapping);
+
+        argumentResolverMapping = new HandlerMethodArgumentResolverMapping();
+        argumentResolverMapping.initialize();
     }
 
     @Override
@@ -46,6 +52,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private ModelAndView handle(Object handler, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        return ((HandlerExecution) handler).handle(req, resp);
+        Object[] values = argumentResolverMapping.resolve(((HandlerExecution) handler).getMethod(), req);
+        return ((HandlerExecution) handler).handle(values);
     }
 }
