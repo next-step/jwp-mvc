@@ -1,6 +1,7 @@
 package core.mvc.resolver;
 
 import core.mvc.tobe.MethodParameter;
+import org.apache.commons.lang3.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +16,7 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
     public boolean supportsParameter(MethodParameter methodParameter) {
         Class<?> parameterType = methodParameter.getParameterType();
 
-        return (isSingleConstructor(parameterType) && isAllPrimitiveTypeInConstructorParameters(parameterType));
+        return (isSingleConstructor(parameterType) && isAllSimpleTypeInConstructorParameters(parameterType));
     }
 
     private boolean isSingleConstructor(Class<?> methodParameter) {
@@ -23,7 +24,10 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
         return (declaredConstructors.length == 1);
     }
 
-    private boolean isAllPrimitiveTypeInConstructorParameters(Class<?> methodParameter) {
+    /*
+        Simple 타입은 Wrapper 또는 Primitive Type 인 경우를 의미한다.
+     */
+    private boolean isAllSimpleTypeInConstructorParameters(Class<?> methodParameter) {
         Constructor<?>[] declaredConstructors = methodParameter.getDeclaredConstructors();
 
         Constructor<?> declaredConstructor = declaredConstructors[0];
@@ -34,10 +38,7 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
     }
 
     private boolean isSimpleType(Class<?> parameterType) {
-        return parameterType.isPrimitive() ||
-                Number.class.isAssignableFrom(parameterType) ||
-                String.class.isAssignableFrom(parameterType) ||
-                Boolean.class.isAssignableFrom(parameterType);
+        return ClassUtils.isPrimitiveOrWrapper(parameterType);
     }
 
     @Override
