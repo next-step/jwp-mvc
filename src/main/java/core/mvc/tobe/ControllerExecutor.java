@@ -1,13 +1,27 @@
 package core.mvc.tobe;
 
 import java.lang.reflect.Method;
-
-import core.mvc.ModelAndView;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import core.mvc.ModelAndView;
+import next.controller.UserSessionUtils;
+
 public class ControllerExecutor implements Controller {
+    private static final List<HandlerMethodArgumentResolver> RESOLVER_LIST = new ArrayList<>();
+
+    static {
+        RESOLVER_LIST.add(new HttpServletRequestMethodArgumentResolver());
+        RESOLVER_LIST.add(new PrimitiveMethodArgumentResolver());
+        RESOLVER_LIST.add(new WrapperMethodArgumentResolver());
+        RESOLVER_LIST.add(new UserMethodArgumentResolver());
+        RESOLVER_LIST.add(new PathVariableMethodArgumentResolver());
+    }
+
     private final Object declaredObject;
     private final Method method;
 
@@ -18,6 +32,36 @@ public class ControllerExecutor implements Controller {
 
     @Override
     public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return (ModelAndView) method.invoke(declaredObject, request, response);
+        Object[] parameters = resolveParameters(this.method, request);
+
+        ModelAndView mav = (ModelAndView) method.invoke(declaredObject, parameters);
+
+        mav.getModel().forEach((key, value) -> {
+            request.getSession().setAttribute(key, value);
+
+            if (key.equals(UserSessionUtils.USER_DELETE_KEY) && (boolean) value) {
+                request.getSession().removeAttribute(UserSessionUtils.USER_SESSION_KEY);
+            }
+        });
+
+        return mav;
+    }
+
+    private Object[] resolveParameters(Method method, HttpServletRequest request) {
+        Parameter[] parameters = method.getParameters();
+        final int length = parameters.length;
+        Object[] values = new Object[length];
+
+        for (int i = 0; i < length; i++) {
+            MethodParameter methodParameter = new MethodParameter(method, i, parameters[i].getAnnotations());
+
+            values[i] = RESOLVER_LIST.stream()
+                    .filter(r -> r.supportsParameter(methodParameter))
+                    .findFirst()
+                    .orElse(new DefaultMethodArgumentResolver())
+                    .resolveArgument(methodParameter, request);
+        }
+
+        return values;
     }
 }

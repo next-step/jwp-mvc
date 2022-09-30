@@ -1,45 +1,50 @@
 package core.mvc.tobe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
 import core.mvc.ModelAndView;
 import next.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class MyController {
     private static final Logger logger = LoggerFactory.getLogger(MyController.class);
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ModelAndView findUserId(HttpServletRequest request, HttpServletResponse response) {
-        String userId = request.getParameter("userId");
+    public ModelAndView findUserId(String userId) {
         logger.debug("Find UserId : {}", userId);
         User user = DataBase.findUserById(userId);
-        request.setAttribute("user", user);
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        return modelAndView.addObject("user", user);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(
-                request.getParameter("userId"),
-                request.getParameter("password"),
-                request.getParameter("name"),
-                request.getParameter("email"));
+    public ModelAndView save(String userId, String password, String name, String email) {
+        User user = new User(userId, password, name, email);
         logger.debug("User : {}", user);
         DataBase.addUser(user);
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        return modelAndView.addObject("user", user);
     }
 
     @RequestMapping(value = "/testAllMethods")
-    public ModelAndView testAllMethod(HttpServletRequest request, HttpServletResponse response) {
-        request.setAttribute("test", "ok");
-        return null;
+    public ModelAndView testAllMethod() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("status", "ok");
+        return modelAndView;
+    }
+
+    public void primitiveMethodArgumentResolverTest(String strType, int intType, long longType, double doubleType) {
+    }
+
+    public void wrapperMethodArgumentResolverTest(String strType, Integer intType, Long longType, Double doubleType) {
+    }
+
+    @RequestMapping("/test/{id}/{name}")
+    public void pathVariableMethodArgumentResolverTest(long id, String name) {
     }
 }
