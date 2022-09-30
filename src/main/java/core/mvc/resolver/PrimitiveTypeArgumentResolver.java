@@ -3,6 +3,7 @@ package core.mvc.resolver;
 import core.mvc.tobe.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver{
 
@@ -14,7 +15,7 @@ public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver{
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, HttpServletRequest request) {
+    public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
         Class<?> parameterType = parameter.getParameterType();
         String parameterName = parameter.getParameterName();
         String object = request.getParameter(parameterName);

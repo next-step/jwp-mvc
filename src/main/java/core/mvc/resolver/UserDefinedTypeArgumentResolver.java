@@ -3,6 +3,7 @@ package core.mvc.resolver;
 import core.mvc.tobe.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
@@ -40,7 +41,7 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParam, HttpServletRequest request) {
+    public Object resolveArgument(MethodParameter methodParam, HttpServletRequest request, HttpServletResponse response) {
         Parameter parameter = methodParam.getParameter();
         Class<?> type = parameter.getType();
         Field[] declaredFields = type.getDeclaredFields();

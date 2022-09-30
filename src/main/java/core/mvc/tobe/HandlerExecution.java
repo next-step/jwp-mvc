@@ -38,7 +38,7 @@ public class HandlerExecution {
         for (int i = 0; i < parameterObjs.length; ++i) {
             MethodParameter methodParameter = new MethodParameter(method, parameterNames[i], parameters[i]);
 
-            parameterObjs[i] = getParameterObject(request, methodParameter);
+            parameterObjs[i] = getParameterObject(request, response, methodParameter);
 
             if(parameterObjs[i] != null) {
                 return (ModelAndView) method.invoke(controller, parameterObjs);
@@ -48,10 +48,10 @@ public class HandlerExecution {
         return (ModelAndView) method.invoke(controller, request, response);
     }
 
-    private Object getParameterObject(HttpServletRequest request, MethodParameter methodParameter) {
+    private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
         for (MethodArgumentResolver methodArgumentResolver : list) {
             if(methodArgumentResolver.supportsParameter(methodParameter)) {
-                return methodArgumentResolver.resolveArgument(methodParameter, request);
+                return methodArgumentResolver.resolveArgument(methodParameter, request, response);
             }
         }
 
