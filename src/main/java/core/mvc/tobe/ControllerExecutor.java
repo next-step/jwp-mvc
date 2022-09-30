@@ -18,6 +18,7 @@ public class ControllerExecutor implements Controller {
         RESOLVER_LIST.add(new HttpServletRequestMethodArgumentResolver());
         RESOLVER_LIST.add(new PrimitiveMethodArgumentResolver());
         RESOLVER_LIST.add(new WrapperMethodArgumentResolver());
+        RESOLVER_LIST.add(new UserMethodArgumentResolver());
         RESOLVER_LIST.add(new PathVariableMethodArgumentResolver());
     }
 
