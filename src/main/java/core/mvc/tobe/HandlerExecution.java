@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
 import core.mvc.resolver.MethodArgumentResolver;
+import core.mvc.resolver.PrimitiveTypeArgumentResolver;
 import core.mvc.resolver.UserDefinedTypeArgumentResolver;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -25,6 +26,7 @@ public class HandlerExecution {
         this.method = method;
 
         list.add(new UserDefinedTypeArgumentResolver());
+        list.add(new PrimitiveTypeArgumentResolver());
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {

@@ -77,21 +77,9 @@ public class UserController {
         return new ModelAndView(new RedirectView("redirect:/"));
     }
 
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp)  {
-        String userId = req.getParameter("userId");
-        User user = DataBase.findUserById(userId);
-        if (user == null) {
-            throw new NullPointerException("사용자를 찾을 수 없습니다.");
-        }
-
-        ModelAndView mv = new ModelAndView(new ForwardView("/user/profile.jsp"));
-        mv.addObject("user", user);
-        return mv;
-    }
-
 //    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-//    public ModelAndView profile(String userId)  {
+//    public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp)  {
+//        String userId = req.getParameter("userId");
 //        User user = DataBase.findUserById(userId);
 //        if (user == null) {
 //            throw new NullPointerException("사용자를 찾을 수 없습니다.");
@@ -101,6 +89,18 @@ public class UserController {
 //        mv.addObject("user", user);
 //        return mv;
 //    }
+
+    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
+    public ModelAndView profile(String userId)  {
+        User user = DataBase.findUserById(userId);
+        if (user == null) {
+            throw new NullPointerException("사용자를 찾을 수 없습니다.");
+        }
+
+        ModelAndView mv = new ModelAndView(new ForwardView("/user/profile.jsp"));
+        mv.addObject("user", user);
+        return mv;
+    }
 
 
     @RequestMapping(value = "/users/updateForm", method = RequestMethod.POST)

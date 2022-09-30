@@ -1,12 +1,10 @@
 package core.mvc.resolver;
 
 import core.mvc.tobe.MethodParameter;
-import next.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
@@ -47,12 +45,20 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
         Class<?> type = parameter.getType();
         Field[] declaredFields = type.getDeclaredFields();
 
+        return getObject(request, type, declaredFields);
+    }
+
+    private Object getObject(HttpServletRequest request, Class<?> type, Field[] declaredFields) {
         Object[] objects = new Object[declaredFields.length];
         int i = 0;
         for (Field field : declaredFields) {
             objects[i++] = request.getParameter(field.getName());
         }
 
+        return getObjectByConstructor(type, objects);
+    }
+
+    private Object getObjectByConstructor(Class<?> type, Object[] objects) {
         Object o = null;
         try {
             Constructor<?>[] declaredConstructors = type.getDeclaredConstructors();
@@ -61,7 +67,6 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return o;
     }
 }
