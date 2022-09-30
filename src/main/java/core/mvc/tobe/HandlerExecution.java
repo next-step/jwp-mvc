@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
+import core.mvc.resolver.HttpServletArgumentResolver;
 import core.mvc.resolver.MethodArgumentResolver;
 import core.mvc.resolver.PrimitiveTypeArgumentResolver;
 import core.mvc.resolver.UserDefinedTypeArgumentResolver;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HandlerExecution {
@@ -19,14 +19,15 @@ public class HandlerExecution {
     private Object controller;
     private Method method;
 
-    private List<MethodArgumentResolver> list = new ArrayList<>();
+    private static List<MethodArgumentResolver> list = List.of(
+            new UserDefinedTypeArgumentResolver(),
+            new PrimitiveTypeArgumentResolver(),
+            new HttpServletArgumentResolver()
+    );
 
     public HandlerExecution(Object controller, Method method) {
         this.controller = controller;
         this.method = method;
-
-        list.add(new UserDefinedTypeArgumentResolver());
-        list.add(new PrimitiveTypeArgumentResolver());
     }
 
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -45,7 +46,7 @@ public class HandlerExecution {
             }
         }
 
-        return (ModelAndView) method.invoke(controller, request, response);
+        return (ModelAndView) method.invoke(controller);
     }
 
     private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {

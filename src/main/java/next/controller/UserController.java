@@ -10,7 +10,6 @@ import core.mvc.RedirectView;
 import next.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,22 +19,12 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-//    @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-//    public ModelAndView createUser(HttpServletRequest req, HttpServletResponse resp) {
-//        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-//                req.getParameter("email"));
-//        log.debug("User : {}", user);
-//        DataBase.addUser(user);
-//        return new ModelAndView(new RedirectView("redirect:/"));
-//    }
-
     @RequestMapping(value = "/users/create", method = RequestMethod.POST)
-    public ModelAndView createUser2(User user) {
+    public ModelAndView createUser(User user) {
         log.debug("User : {}", user);
         DataBase.addUser(user);
         return new ModelAndView(new RedirectView("redirect:/"));
     }
-
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ModelAndView users(HttpServletRequest req, HttpServletResponse resp)  {
@@ -70,25 +59,14 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/users/logout", method = RequestMethod.POST)
+    @RequestMapping(value = "/users/logout", method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest req, HttpServletResponse resp) {
         HttpSession session = req.getSession();
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return new ModelAndView(new RedirectView("redirect:/"));
     }
 
-//    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-//    public ModelAndView profile(HttpServletRequest req, HttpServletResponse resp)  {
-//        String userId = req.getParameter("userId");
-//        User user = DataBase.findUserById(userId);
-//        if (user == null) {
-//            throw new NullPointerException("사용자를 찾을 수 없습니다.");
-//        }
-//
-//        ModelAndView mv = new ModelAndView(new ForwardView("/user/profile.jsp"));
-//        mv.addObject("user", user);
-//        return mv;
-//    }
+
 
     @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
     public ModelAndView profile(String userId)  {
@@ -131,12 +109,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/form", method = RequestMethod.GET)
-    public ModelAndView form(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView form() {
         return new ModelAndView(new ForwardView("/user/form.jsp"));
     }
 
     @RequestMapping(value = "/users/loginForm", method = RequestMethod.GET)
-    public ModelAndView loginForm(HttpServletRequest req, HttpServletResponse resp) {
+    public ModelAndView loginForm() {
         return new ModelAndView(new ForwardView("/user/login.jsp"));
     }
 }
