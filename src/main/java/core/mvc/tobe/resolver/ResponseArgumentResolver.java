@@ -1,7 +1,6 @@
 package core.mvc.tobe.resolver;
 
-import core.mvc.tobe.resolver.ArgumentResolver;
-import org.springframework.core.MethodParameter;
+import core.mvc.tobe.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +9,7 @@ public class ResponseArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(HttpServletResponse.class);
+        return parameter.getType().equals(HttpServletResponse.class);
     }
 
     @Override

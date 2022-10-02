@@ -1,23 +1,24 @@
 package core.mvc.tobe.resolver;
 
+import core.mvc.tobe.MethodParameter;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class SimplePropertyArgumentResolver extends AbstractArgumentResolver {
+public class SimplePropertyArgumentResolver implements ArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        return BeanUtils.isSimpleProperty(methodParameter.getParameterType());
+        return BeanUtils.isSimpleProperty(methodParameter.getType());
     }
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, HttpServletRequest request, HttpServletResponse response) {
-        String argumentName = getArgumentName(methodParameter.getMethod(), methodParameter.getParameterIndex());
+        String argumentName = methodParameter.getParameterName();
         Object parameter = request.getParameter(argumentName);
 
-        return TypeConverter.cast(methodParameter.getParameterType(), parameter);
+        return TypeConverter.cast(methodParameter.getType(), parameter);
     }
+
 }
