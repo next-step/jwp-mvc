@@ -1,11 +1,9 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
-import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
-import org.reflections.ReflectionUtils;
-import org.reflections.Reflections;
+import core.mvc.tobe.resolver.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +15,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
+
 public class AnnotationHandlerMapping implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationHandlerMapping.class);
 
     private final Object[] basePackage;
 
     private final Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+
+    private static final List<ArgumentResolver> resolvers = asList(
+            new RequestArgumentResolver(),
+            new ResponseArgumentResolver(),
+            new PathVariableArgumentResolver(),
+            new SimplePropertyArgumentResolver(),
+            new RequestParamArgumentResolver()
+    );
+
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
@@ -53,7 +62,7 @@ public class AnnotationHandlerMapping implements HandlerMapping {
         RequestMethod[] requestMethods = getRequestMethods(requestMapping);
         for (RequestMethod requestMethod : requestMethods) {
             HandlerKey handlerKey = new HandlerKey(requestUrl, requestMethod);
-            HandlerExecution handlerExecution = new HandlerExecution(method);
+            HandlerExecution handlerExecution = new HandlerExecution(method, resolvers);
             handlerExecutions.put(handlerKey, handlerExecution);
             logger.info("RequestMapping URL : {}, method : {}", handlerKey, method);
         }

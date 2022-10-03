@@ -2,6 +2,7 @@ package next.controller;
 
 import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestParam;
 import core.db.DataBase;
 import next.model.User;
 
@@ -12,9 +13,7 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class LoginController {
     @RequestMapping(value = "/users/login")
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        String userId = req.getParameter("userId");
-        String password = req.getParameter("password");
+    public String execute(@RequestParam String userId, @RequestParam String password, HttpServletRequest req) throws Exception {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             req.setAttribute("loginFailed", true);
