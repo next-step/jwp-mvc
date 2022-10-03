@@ -1,10 +1,7 @@
 package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
-import core.mvc.resolver.HttpServletArgumentResolver;
-import core.mvc.resolver.MethodArgumentResolver;
-import core.mvc.resolver.PrimitiveTypeArgumentResolver;
-import core.mvc.resolver.UserDefinedTypeArgumentResolver;
+import core.mvc.resolver.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -22,7 +19,8 @@ public class HandlerExecution {
     private static List<MethodArgumentResolver> list = List.of(
             new UserDefinedTypeArgumentResolver(),
             new PrimitiveTypeArgumentResolver(),
-            new HttpServletArgumentResolver()
+            new HttpServletArgumentResolver(),
+            new PathVariableArgumentResolver()
     );
 
     public HandlerExecution(Object controller, Method method) {
@@ -52,6 +50,7 @@ public class HandlerExecution {
     private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
         for (MethodArgumentResolver methodArgumentResolver : list) {
             if(methodArgumentResolver.supportsParameter(methodParameter)) {
+                System.out.println("methodArgumentResolver -> {} " + methodArgumentResolver);
                 return methodArgumentResolver.resolveArgument(methodParameter, request, response);
             }
         }

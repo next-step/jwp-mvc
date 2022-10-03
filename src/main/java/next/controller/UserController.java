@@ -1,6 +1,7 @@
 package next.controller;
 
 import core.annotation.web.Controller;
+import core.annotation.web.PathVariable;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.db.DataBase;
@@ -66,10 +67,8 @@ public class UserController {
         return new ModelAndView(new RedirectView("redirect:/"));
     }
 
-
-
-    @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
-    public ModelAndView profile(String userId)  {
+    @RequestMapping(value = "/users/profile/{userId}", method = RequestMethod.GET)
+    public ModelAndView profile(@PathVariable String userId)  {
         User user = DataBase.findUserById(userId);
         if (user == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
@@ -79,8 +78,7 @@ public class UserController {
         mv.addObject("user", user);
         return mv;
     }
-
-
+    
     @RequestMapping(value = "/users/updateForm", method = RequestMethod.POST)
     public ModelAndView updateForm(HttpServletRequest req, HttpServletResponse resp)  {
         String userId = req.getParameter("userId");

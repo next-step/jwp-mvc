@@ -1,8 +1,11 @@
 package core.mvc.tobe;
 
+import core.annotation.web.PathVariable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 
 public class MethodParameter {
 
@@ -34,5 +37,11 @@ public class MethodParameter {
         this.method = method;
         this.parameterName = parameterName;
         this.parameter = parameter;
+    }
+
+    public boolean hasAnnotationInParameter(Class<?> clazz) {
+        Annotation[] annotations = getAnnotations();
+        return Arrays.stream(annotations)
+                .anyMatch(annotation -> annotation.annotationType() == clazz);
     }
 }

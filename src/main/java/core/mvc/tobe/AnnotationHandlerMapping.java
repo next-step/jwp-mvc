@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
 import core.annotation.web.RequestMapping;
 import core.annotation.web.RequestMethod;
 import core.mvc.HandlerMapping;
@@ -37,8 +38,7 @@ public class AnnotationHandlerMapping implements HandlerMapping  {
         Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(RequestMapping.class));
 
         for(Method method : methods) {
-            RequestMapping rm = method.getAnnotation(RequestMapping.class);
-            HandlerKey handlerKey = createHandlerKey(rm);
+            HandlerKey handlerKey = createHandlerKey(method);
 
             Object controller = controllerClass.get(clazz);
             HandlerExecution handlerExecution = new HandlerExecution(controller, method);
@@ -46,14 +46,29 @@ public class AnnotationHandlerMapping implements HandlerMapping  {
         }
     }
 
-    private HandlerKey createHandlerKey(RequestMapping rm) {
-        return new HandlerKey(rm.value(), rm.method());
+    private HandlerKey createHandlerKey(Method method) {
+        Class<?> declaringClass = method.getDeclaringClass();
+        Controller controllerAnnotation = declaringClass.getAnnotation(Controller.class);
+        String controllerPath = controllerAnnotation.value();
+
+        RequestMapping rm = method.getAnnotation(RequestMapping.class);
+
+        return new HandlerKey(controllerPath + rm.value(), rm.method());
     }
 
     @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+
+        HandlerKey handlerKey = null;
+        for(HandlerKey key : handlerExecutions.keySet()) {
+            if (key.isSameHandlerKey(new HandlerKey(requestUri, rm))) {
+                handlerKey = key;
+                break;
+            }
+        }
+
+        return handlerExecutions.get(handlerKey);
     }
 }

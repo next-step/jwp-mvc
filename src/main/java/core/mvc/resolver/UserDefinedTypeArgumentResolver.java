@@ -34,11 +34,11 @@ public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
         Class<?>[] parameterTypes = declaredConstructor.getParameterTypes();
 
         return Arrays.stream(parameterTypes)
-                .allMatch(type -> isSimpleType(type));
+                .allMatch(type -> isSimpleAndStringType(type));
     }
 
-    private boolean isSimpleType(Class<?> parameterType) {
-        return ClassUtils.isPrimitiveOrWrapper(parameterType);
+    private boolean isSimpleAndStringType(Class<?> parameterType) {
+        return ClassUtils.isPrimitiveOrWrapper(parameterType) || parameterType.equals(String.class);
     }
 
     @Override

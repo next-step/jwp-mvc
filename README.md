@@ -26,6 +26,6 @@
 - 메소드의 파라미터 한개를 추상화한 MethodParameter 클래스 구현
 - MethodArgumentResolver 구현체 구현 및 등록
     - UserDefinedTypeArgumentResolver (사용자 정의 클래스 파라미터 전용) (o)
-    - PrimitiveTypeArgumentResolver 
-    - PathVariableArgumentResolver
-    - HttpServletArgumentResolver 
+    - PrimitiveTypeArgumentResolver (o)
+    - HttpServletArgumentResolver (o)
+    - PathVariableArgumentResolver 
