@@ -11,7 +11,6 @@ import org.springframework.web.util.pattern.PathPatternParser;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
-import java.util.Objects;
 
 public class PathVariableArgumentResolver implements MethodArgumentResolver {
     private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
@@ -30,15 +29,18 @@ public class PathVariableArgumentResolver implements MethodArgumentResolver {
 //            return getValueWithMatchingType(methodParameter.getParameterType(), null);
 //        }
 
-        return null;
-    }
+        Map<String, String> uriVariables = pathMatchInfo.getUriVariables();
+        String pathValue = parameter.getParameter().getAnnotation(PathVariable.class).value();
 
+        String object = "";
+        if(pathValue.isEmpty()) {
+            object = uriVariables.get(parameter.getParameterName());
+        }
+        else {
+            object = uriVariables.get(pathValue);
+        }
 
-
-    private PathPattern parse(String path) {
-        PathPatternParser pp = new PathPatternParser();
-        pp.setMatchOptionalTrailingSeparator(true);
-        return pp.parse(path);
+        return PrimitiveConverter.convert(parameter.getParameterType(), object);
     }
 
     private static PathPattern.PathMatchInfo getPathMatchInfo(RequestMapping requestMapping, final String requestURI) {

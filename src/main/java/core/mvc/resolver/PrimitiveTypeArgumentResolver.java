@@ -1,6 +1,5 @@
 package core.mvc.resolver;
 
-import core.annotation.web.PathVariable;
 import core.mvc.tobe.MethodParameter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,15 +28,16 @@ public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver{
         String parameterName = parameter.getParameterName();
         String object = request.getParameter(parameterName);
 
-        if(parameterType.equals(int.class))
-            return Integer.parseInt(object);
-        else if(parameterType.equals(double.class))
-            return Double.parseDouble(object);
-        else if(parameterType.equals(long.class))
-            return Long.parseLong(object);
-        else if(parameterType.equals(float.class))
-            return Float.parseFloat(object);
-
-        return object;
+        return PrimitiveConverter.convert(parameterType, object);
+//        if(parameterType.equals(int.class))
+//            return Integer.parseInt(object);
+//        else if(parameterType.equals(double.class))
+//            return Double.parseDouble(object);
+//        else if(parameterType.equals(long.class))
+//            return Long.parseLong(object);
+//        else if(parameterType.equals(float.class))
+//            return Float.parseFloat(object);
+//
+//        return object;
     }
 }
