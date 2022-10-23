@@ -10,7 +10,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
-public class UserDefinedTypeArgumentResolver implements MethodArgumentResolver {
+/**
+ *  @RequestBody 도 처리가능(단, RequestBody에 Primitive Type이 들어오면 PrimitiveTypeArgumentResolver 에서 처리함)
+  */
+public class UserObjectTypeArgumentResolver implements MethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
