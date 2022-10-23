@@ -28,4 +28,5 @@
     - UserDefinedTypeArgumentResolver (사용자 정의 클래스 파라미터 전용) (o)
     - PrimitiveTypeArgumentResolver (o)
     - HttpServletArgumentResolver (o)
-    - PathVariableArgumentResolver 
+    - PathVariableArgumentResolver (o)
+    - HttpSessionResolver (o)
