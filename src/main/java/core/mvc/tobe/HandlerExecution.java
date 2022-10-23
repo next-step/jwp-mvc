@@ -20,7 +20,8 @@ public class HandlerExecution {
             new UserDefinedTypeArgumentResolver(),
             new PrimitiveTypeArgumentResolver(),
             new HttpServletArgumentResolver(),
-            new PathVariableArgumentResolver()
+            new PathVariableArgumentResolver(),
+            new HttpSessionResolver()
     );
 
     public HandlerExecution(Object controller, Method method) {
@@ -34,17 +35,17 @@ public class HandlerExecution {
         Parameter[] parameters = method.getParameters();
 
         Object[] parameterObjs = new Object[parameterNames.length];
-        for (int i = 0; i < parameterObjs.length; ++i) {
-            MethodParameter methodParameter = new MethodParameter(method, parameterNames[i], parameters[i]);
 
-            parameterObjs[i] = getParameterObject(request, response, methodParameter);
-
-            if(parameterObjs[i] != null) {
-                return (ModelAndView) method.invoke(controller, parameterObjs);
-            }
+        if(parameterObjs.length == 0) {
+            return (ModelAndView) method.invoke(controller);
         }
 
-        return (ModelAndView) method.invoke(controller);
+        for (int i = 0; i < parameterObjs.length; ++i) {
+            MethodParameter methodParameter = new MethodParameter(method, parameterNames[i], parameters[i]);
+            parameterObjs[i] = getParameterObject(request, response, methodParameter);
+        }
+
+        return (ModelAndView) method.invoke(controller, parameterObjs);
     }
 
     private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
