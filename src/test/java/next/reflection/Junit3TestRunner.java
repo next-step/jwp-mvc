@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -19,14 +18,6 @@ public class Junit3TestRunner {
 
         Arrays.stream(methods)
                 .filter(method -> method.getName().startsWith("test"))
-                .forEach(it -> executeMethod(defaultConstructor, it));
-    }
-
-    private void executeMethod(Constructor<?> defaultConstructor, Method it) {
-        try {
-            it.invoke(defaultConstructor.newInstance());
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new RuntimeException(e);
-        }
+                .forEach(it -> ReflectionUtils.executeMethod(defaultConstructor, it));
     }
 }
