@@ -1,43 +1,57 @@
 package core.mvc.resolver;
 
+import core.annotation.web.PathVariable;
 import core.mvc.tobe.MethodParameter;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
-public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver{
+/**
+ * @RequestParam 또는 일반 Primitive Type 변수도 처리할 수 있는 Resolver
+ */
+public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         Class<?> parameterType = parameter.getParameterType();
 
         /**
-         * 예를 들어 PathVariable 어노테이션이 있으면 PathVariableArgumentResolver 가 호출되어야한다.
-         * 그렇기 때문에 매개변수에 어노테이션이 없는 것들만 true 가 되야함.
+         * PathVariable 어노테이션이 있으면 PathVariableArgumentResolver 가 호출되어야한다.
          */
-        if(parameter.getAnnotations().length > 0)
+        if (parameter.getAnnotations().equals(PathVariable.class))
             return false;
 
         return (parameterType.isPrimitive() || parameterType.equals(String.class));
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
+    public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Class<?> parameterType = parameter.getParameterType();
         String parameterName = parameter.getParameterName();
         String object = request.getParameter(parameterName);
 
-        return PrimitiveConverter.convert(parameterType, object);
-//        if(parameterType.equals(int.class))
-//            return Integer.parseInt(object);
-//        else if(parameterType.equals(double.class))
-//            return Double.parseDouble(object);
-//        else if(parameterType.equals(long.class))
-//            return Long.parseLong(object);
-//        else if(parameterType.equals(float.class))
-//            return Float.parseFloat(object);
-//
-//        return object;
+        /**
+         * RequestParam은 url 끝에 query String을 통해 데이터를 요청한다.
+         */
+        if (!StringUtils.hasText(object)) {
+            if (isQueryString(request, parameterType, parameterName, object))
+                return PrimitiveConverter.convert(parameterType, object);
+        }
+
+        return PrimitiveConverter.convert(parameterType,object);
+    }
+
+    private boolean isQueryString(HttpServletRequest request, Class<?> parameterType, String parameterName, String object) throws IOException {
+        String readLine = request.getReader().readLine();
+        for (String param : readLine.split("&")) {
+            String[] pair = param.split("=");
+            if (pair[0].equals(parameterName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

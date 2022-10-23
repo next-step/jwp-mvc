@@ -7,6 +7,7 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
@@ -17,7 +18,7 @@ public class HandlerExecution {
     private Method method;
 
     private static List<MethodArgumentResolver> list = List.of(
-            new UserDefinedTypeArgumentResolver(),
+            new UserObjectTypeArgumentResolver(),
             new PrimitiveTypeArgumentResolver(),
             new HttpServletArgumentResolver(),
             new PathVariableArgumentResolver(),
@@ -48,7 +49,7 @@ public class HandlerExecution {
         return (ModelAndView) method.invoke(controller, parameterObjs);
     }
 
-    private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) {
+    private Object getParameterObject(HttpServletRequest request, HttpServletResponse response, MethodParameter methodParameter) throws IOException {
         for (MethodArgumentResolver methodArgumentResolver : list) {
             if(methodArgumentResolver.supportsParameter(methodParameter)) {
                 System.out.println("methodArgumentResolver -> {} " + methodArgumentResolver);
