@@ -63,4 +63,17 @@ public class ReflectionTest {
                 () -> assertThat(student.getAge()).isEqualTo(29)
         );
     }
+
+    @Test
+    @DisplayName("리플렉션을 사용해 Question Class 의 인스턴스를 생성한다.")
+    void newInstance() throws Exception {
+        Class<Question> clazz = Question.class;
+        Object[] args = new String[]{"HanGyeol", "Question Instance 생성", "Reflection 학습"};
+
+        Constructor<?> firstConstructor = clazz.getConstructors()[0];
+
+        Object instance = firstConstructor.newInstance(args);
+
+        assertThat(instance).isEqualTo(new Question("HanGyeol", "Question Instance 생성", "Reflection 학습"));
+    }
 }
