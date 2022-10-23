@@ -53,17 +53,14 @@ public class ReflectionTest {
         Field nameField = clazz.getDeclaredField("name");
         Field ageField = clazz.getDeclaredField("age");
 
-        setPrivateField(student, nameField, "재성");
-        setPrivateField(student, ageField, 29);
+        ReflectionUtils<Student> reflectionUtils = new ReflectionUtils<>();
+
+        reflectionUtils.setPrivateField(student, nameField, "재성");
+        reflectionUtils.setPrivateField(student, ageField, 29);
 
         assertAll(
                 () -> assertThat(student.getName()).isEqualTo("재성"),
                 () -> assertThat(student.getAge()).isEqualTo(29)
         );
-    }
-
-    private void setPrivateField(Student student, Field field, Object value) throws IllegalAccessException {
-        field.setAccessible(true);
-        field.set(student, value);
     }
 }
