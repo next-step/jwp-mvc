@@ -7,8 +7,13 @@ import core.annotation.web.Controller;
 import core.di.factory.example.MyQnaService;
 import core.di.factory.example.QnaController;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -16,6 +21,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BeanFactoryTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(BeanFactoryTest.class);
     private Reflections reflections;
     private BeanFactory beanFactory;
 
@@ -47,5 +54,19 @@ public class BeanFactoryTest {
             beans.addAll(reflections.getTypesAnnotatedWith(annotation));
         }
         return beans;
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {Controller.class, Service.class, Repository.class})
+    @DisplayName("core.di.factory.example 패키지에서 @Controller, @Service, @Repository 가 설정된 클래스를 찾는다.")
+    void findAnnotation(Class<? extends Annotation> targetAnnotations) {
+        Set<Class<?>> classes = reflections.getTypesAnnotatedWith(targetAnnotations);
+
+        classes.forEach(it -> {
+            String[] annotationPackageNames = targetAnnotations.getName().split("\\.");
+            String annotationClassName = annotationPackageNames[annotationPackageNames.length - 1];
+
+            logger.debug("{} Annotated Class: ({})", annotationClassName, it);
+        });
     }
 }
