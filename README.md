@@ -25,8 +25,15 @@
 - MethodArgumentResolver 인터페이스 구현
 - 메소드의 파라미터 한개를 추상화한 MethodParameter 클래스 구현
 - MethodArgumentResolver 구현체 구현 및 등록
-    - UserObjectTypeArgumentResolver (o) (@RequestBody 대응)
-    - PrimitiveTypeArgumentResolver (o) (@RequestParam, @RequestBody Primitive Type 대응)
-    - HttpServletArgumentResolver (o) (HttpRequest, HttpRequest 대응)
-    - PathVariableArgumentResolver (o) (@PathVariable 대응)
-    - HttpSessionResolver (o) 
+    - UserObjectTypeArgumentResolver 
+      - ex) User user
+    - PrimitiveTypeArgumentResolver
+      - ex) @RequestParam int userId 또는 int userId
+    - HttpServletArgumentResolver
+      - ex) HttpServletRequest, HttpServletResponse
+    - PathVariableArgumentResolver 
+      - ex) @PathVariable int userId
+    - HttpSessionResolver
+      - ex) HttpSession session
+    - ResponseBodyArgumentResolver
+      - ex) @RequestBody User user
