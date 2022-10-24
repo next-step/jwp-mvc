@@ -2,6 +2,7 @@ package core.mvc.tobe;
 
 import core.mvc.ModelAndView;
 import core.mvc.resolver.*;
+import core.web.exception.NotFoundResolverException;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -58,7 +59,6 @@ public class HandlerExecution {
             }
         }
 
-        // TODO
-        return null;
+        throw new NotFoundResolverException("실행 할 수 있는 Method Resolver 가 없습니다.");
     }
 }
