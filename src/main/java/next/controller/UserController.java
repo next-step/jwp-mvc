@@ -97,7 +97,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/update", method = RequestMethod.POST)
-    public ModelAndView update(User user, HttpSession session)  {
+    public ModelAndView update(@RequestBody User user, HttpSession session)  {
         User findUser = DataBase.findUserById(user.getUserId());
         if (!UserSessionUtils.isSameUser(session, findUser)) {
             throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");

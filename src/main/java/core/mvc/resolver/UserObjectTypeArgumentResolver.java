@@ -2,6 +2,7 @@ package core.mvc.resolver;
 
 import core.mvc.tobe.MethodParameter;
 import org.apache.commons.lang3.ClassUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +12,7 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
 /**
- *  @RequestBody 도 처리가능(단, RequestBody에 Primitive Type이 들어오면 PrimitiveTypeArgumentResolver 에서 처리함)
+ *  @ModelAttribute 기능 처리 가능 (어노테이션을 체크하진않는다)
   */
 public class UserObjectTypeArgumentResolver implements MethodArgumentResolver {
 
@@ -19,7 +20,15 @@ public class UserObjectTypeArgumentResolver implements MethodArgumentResolver {
     public boolean supportsParameter(MethodParameter methodParameter) {
         Class<?> parameterType = methodParameter.getParameterType();
 
+        if(isRequestBodyAnnotation(methodParameter))
+            return false;
+
         return (isSingleConstructor(parameterType) && isAllSimpleTypeInConstructorParameters(parameterType));
+    }
+
+    private boolean isRequestBodyAnnotation(MethodParameter methodParameter) {
+        return Arrays.stream(methodParameter.getAnnotations())
+                .anyMatch(annotation -> annotation.annotationType().equals(RequestBody.class));
     }
 
     private boolean isSingleConstructor(Class<?> methodParameter) {
