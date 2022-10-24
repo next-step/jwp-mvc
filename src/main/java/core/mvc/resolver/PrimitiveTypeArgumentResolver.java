@@ -38,10 +38,10 @@ public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver {
          */
         if (!StringUtils.hasText(object)) {
             if (isQueryString(request, parameterType, parameterName, object))
-                return PrimitiveConverter.convert(parameterType, object);
+                return ResolverUtility.convertPrimitiveType(parameterType, object);
         }
 
-        return PrimitiveConverter.convert(parameterType,object);
+        return ResolverUtility.convertPrimitiveType(parameterType,object);
     }
 
     private boolean isQueryString(HttpServletRequest request, Class<?> parameterType, String parameterName, String object) throws IOException {

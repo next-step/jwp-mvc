@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.Arrays;
 
 /**
@@ -23,17 +21,17 @@ public class UserObjectTypeArgumentResolver implements MethodArgumentResolver {
         if(isRequestBodyAnnotation(methodParameter))
             return false;
 
-        return (isSingleConstructor(parameterType) && isAllSimpleTypeInConstructorParameters(parameterType));
+        return (isExistConstructor(parameterType) && isAllSimpleTypeInConstructorParameters(parameterType));
+    }
+
+    private boolean isExistConstructor(Class<?> methodParameter) {
+        Constructor<?>[] declaredConstructors = methodParameter.getDeclaredConstructors();
+        return (declaredConstructors.length >= 1);
     }
 
     private boolean isRequestBodyAnnotation(MethodParameter methodParameter) {
         return Arrays.stream(methodParameter.getAnnotations())
                 .anyMatch(annotation -> annotation.annotationType().equals(RequestBody.class));
-    }
-
-    private boolean isSingleConstructor(Class<?> methodParameter) {
-        Constructor<?>[] declaredConstructors = methodParameter.getDeclaredConstructors();
-        return (declaredConstructors.length == 1);
     }
 
     /*
@@ -59,28 +57,6 @@ public class UserObjectTypeArgumentResolver implements MethodArgumentResolver {
         Class<?> type = parameter.getType();
         Field[] declaredFields = type.getDeclaredFields();
 
-        return getObject(request, type, declaredFields);
-    }
-
-    private Object getObject(HttpServletRequest request, Class<?> type, Field[] declaredFields) {
-        Object[] objects = new Object[declaredFields.length];
-        int i = 0;
-        for (Field field : declaredFields) {
-            objects[i++] = request.getParameter(field.getName());
-        }
-
-        return getObjectByConstructor(type, objects);
-    }
-
-    private Object getObjectByConstructor(Class<?> type, Object[] objects) {
-        Object o = null;
-        try {
-            Constructor<?>[] declaredConstructors = type.getDeclaredConstructors();
-            Constructor<?> declaredConstructor = declaredConstructors[0];
-            o = declaredConstructor.newInstance(objects);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return o;
+        return ResolverUtility.getObject(request, type, declaredFields);
     }
 }

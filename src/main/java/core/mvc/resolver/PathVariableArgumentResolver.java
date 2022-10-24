@@ -40,7 +40,7 @@ public class PathVariableArgumentResolver implements MethodArgumentResolver {
             object = uriVariables.get(pathValue);
         }
 
-        return PrimitiveConverter.convert(parameter.getParameterType(), object);
+        return ResolverUtility.convertPrimitiveType(parameter.getParameterType(), object);
     }
 
     private static PathPattern.PathMatchInfo getPathMatchInfo(RequestMapping requestMapping, final String requestURI) {
