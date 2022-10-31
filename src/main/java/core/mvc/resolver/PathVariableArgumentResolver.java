@@ -25,10 +25,6 @@ public class PathVariableArgumentResolver implements MethodArgumentResolver {
         RequestMapping rm = parameter.getMethod().getAnnotation(RequestMapping.class);
         PathPattern.PathMatchInfo pathMatchInfo = getPathMatchInfo(rm, request.getRequestURI());
 
-//        if (Objects.isNull(pathMatchInfo)) {
-//            return getValueWithMatchingType(methodParameter.getParameterType(), null);
-//        }
-
         Map<String, String> uriVariables = pathMatchInfo.getUriVariables();
         String pathValue = parameter.getParameter().getAnnotation(PathVariable.class).value();
 

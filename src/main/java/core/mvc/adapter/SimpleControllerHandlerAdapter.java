@@ -7,7 +7,7 @@ import core.mvc.asis.Controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class SimpleControllerHandlerAdapter implements HandlerAdapter{
+public class SimpleControllerHandlerAdapter implements HandlerAdapter {
 
     @Override
     public boolean support(Object handler) {

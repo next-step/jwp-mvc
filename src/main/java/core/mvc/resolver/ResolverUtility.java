@@ -10,13 +10,13 @@ public class ResolverUtility {
 
     public static Object convertPrimitiveType(Class<?> parameterType, String object) {
 
-        if(parameterType.equals(int.class))
+        if (parameterType.equals(int.class))
             return Integer.parseInt(object);
-        else if(parameterType.equals(double.class))
+        else if (parameterType.equals(double.class))
             return Double.parseDouble(object);
-        else if(parameterType.equals(long.class))
+        else if (parameterType.equals(long.class))
             return Long.parseLong(object);
-        else if(parameterType.equals(float.class))
+        else if (parameterType.equals(float.class))
             return Float.parseFloat(object);
 
         return object;
