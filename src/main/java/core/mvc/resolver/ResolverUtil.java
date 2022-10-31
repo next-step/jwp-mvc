@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.TypeVariable;
 import java.util.stream.IntStream;
 
-public class ResolverUtility {
+public class ResolverUtil {
 
     public static Object convertPrimitiveType(Class<?> parameterType, String object) {
 

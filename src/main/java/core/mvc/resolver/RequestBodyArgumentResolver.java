@@ -61,6 +61,6 @@ public class RequestBodyArgumentResolver implements MethodArgumentResolver {
         Class<?> type = parameter.getType();
         Field[] declaredFields = type.getDeclaredFields();
 
-        return ResolverUtility.getObject(request, type, declaredFields);
+        return ResolverUtil.getObject(request, type, declaredFields);
     }
 }

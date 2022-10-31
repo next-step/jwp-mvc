@@ -1,6 +1,7 @@
 package core.mvc.tobe;
 
 import core.annotation.web.PathVariable;
+import core.annotation.web.RequestMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -43,5 +44,13 @@ public class MethodParameter {
         Annotation[] annotations = getAnnotations();
         return Arrays.stream(annotations)
                 .anyMatch(annotation -> annotation.annotationType() == clazz);
+    }
+
+    public String getPathVariableValue() {
+        return parameter.getAnnotation(PathVariable.class).value();
+    }
+
+    public String getRequestMappingValue() {
+        return method.getAnnotation(RequestMapping.class).value();
     }
 }

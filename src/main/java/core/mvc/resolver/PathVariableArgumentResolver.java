@@ -1,19 +1,16 @@
 package core.mvc.resolver;
 
 import core.annotation.web.PathVariable;
-import core.annotation.web.RequestMapping;
 import core.mvc.tobe.MethodParameter;
-import org.springframework.http.server.PathContainer;
-import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+
+import static core.mvc.resolver.PathPatternUtil.getUriVariable;
 
 public class PathVariableArgumentResolver implements MethodArgumentResolver {
-    private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -22,26 +19,22 @@ public class PathVariableArgumentResolver implements MethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, HttpServletRequest request, HttpServletResponse response) {
-        RequestMapping rm = parameter.getMethod().getAnnotation(RequestMapping.class);
-        PathPattern.PathMatchInfo pathMatchInfo = getPathMatchInfo(rm, request.getRequestURI());
+        String object = getObject(parameter, request);
 
-        Map<String, String> uriVariables = pathMatchInfo.getUriVariables();
-        String pathValue = parameter.getParameter().getAnnotation(PathVariable.class).value();
-
-        String object = "";
-        if(pathValue.isEmpty()) {
-            object = uriVariables.get(parameter.getParameterName());
-        }
-        else {
-            object = uriVariables.get(pathValue);
-        }
-
-        return ResolverUtility.convertPrimitiveType(parameter.getParameterType(), object);
+        return ResolverUtil.convertPrimitiveType(parameter.getParameterType(), object);
     }
 
-    private static PathPattern.PathMatchInfo getPathMatchInfo(RequestMapping requestMapping, final String requestURI) {
-        PathPattern pathPattern = PATH_PATTERN_PARSER.parse(requestMapping.value());
-        return pathPattern.matchAndExtract(PathContainer.parsePath(requestURI));
+    private String getObject(MethodParameter parameter, HttpServletRequest request) {
+        String pattern = parameter.getRequestMappingValue();
+        String requestURI = request.getRequestURI();
+        String key = getKey(parameter);
+
+        return getUriVariable(pattern, requestURI, key);
     }
 
+    private String getKey(MethodParameter parameter) {
+        String pathValue = parameter.getPathVariableValue();
+
+        return pathValue.isEmpty() ? parameter.getParameterName() : pathValue;
+    }
 }
