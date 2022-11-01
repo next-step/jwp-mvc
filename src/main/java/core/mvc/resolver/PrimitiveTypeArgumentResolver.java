@@ -37,15 +37,20 @@ public class PrimitiveTypeArgumentResolver implements MethodArgumentResolver {
          * RequestParam은 url 끝에 query String을 통해 데이터를 요청한다.
          */
         if (!StringUtils.hasText(object)) {
-            if (isQueryString(request, parameterType, parameterName, object))
+            if (isQueryString(request, parameterName))
                 return ResolverUtil.convertPrimitiveType(parameterType, object);
         }
 
         return ResolverUtil.convertPrimitiveType(parameterType,object);
     }
 
-    private boolean isQueryString(HttpServletRequest request, Class<?> parameterType, String parameterName, String object) throws IOException {
+    private boolean isQueryString(HttpServletRequest request,String parameterName) throws IOException {
         String readLine = request.getReader().readLine();
+
+        if(readLine == null) {
+            return false;
+        }
+
         for (String param : readLine.split("&")) {
             String[] pair = param.split("=");
             if (pair[0].equals(parameterName)) {

@@ -22,19 +22,13 @@ public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private List<HandlerMapping> mappingList = new ArrayList<>();
-
+    private HandlerMappingRegistry handlerMappingRegistry = new HandlerMappingRegistry();
     private List<HandlerAdapter> adapterList = new ArrayList<>();
 
     @Override
     public void init() {
-        LegacyHandlerMapping legacyHandlerMapping = new LegacyHandlerMapping();
-        legacyHandlerMapping.initMapping();
-        mappingList.add(legacyHandlerMapping);
-
-        AnnotationHandlerMapping annotationHandlerMapping = new AnnotationHandlerMapping();
-        annotationHandlerMapping.initialize();
-        mappingList.add(annotationHandlerMapping);
+        handlerMappingRegistry.add(new LegacyHandlerMapping());
+        handlerMappingRegistry.add(new AnnotationHandlerMapping());
 
         adapterList.add(new SimpleControllerHandlerAdapter());
         adapterList.add(new AnnotationHandlerAdapter());
@@ -45,7 +39,7 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Object handler = getHandler(req);
+        Object handler = handlerMappingRegistry.getHandler(req);
         HandlerAdapter adapter = adapterList.stream()
                 .filter(ad -> ad.support(handler))
                 .findFirst()
@@ -58,16 +52,5 @@ public class DispatcherServlet extends HttpServlet {
         } catch (Throwable e) {
             throw new ServletException(e.getMessage());
         }
-    }
-
-    private Object getHandler(HttpServletRequest request) {
-        for (HandlerMapping mapping : mappingList) {
-            Object handler = mapping.getHandler(request);
-            if (handler != null) {
-                return handler;
-            }
-        }
-
-        return null;
     }
 }
