@@ -23,8 +23,7 @@ public class HandlerExecution {
             new PrimitiveTypeArgumentResolver(),
             new HttpServletArgumentResolver(),
             new PathVariableArgumentResolver(),
-            new HttpSessionResolver(),
-            new RequestBodyArgumentResolver()
+            new HttpSessionResolver()
     );
 
     public HandlerExecution(Object controller, Method method) {
