@@ -60,19 +60,7 @@ public class UserController {
         session.removeAttribute(UserSessionUtils.USER_SESSION_KEY);
         return new ModelAndView(new RedirectView("redirect:/"));
     }
-
-//    @RequestMapping(value = "/users/profile/{userId}", method = RequestMethod.GET)
-//    public ModelAndView profile(@PathVariable String userId)  {
-//        User user = DataBase.findUserById(userId);
-//        if (user == null) {
-//            throw new NullPointerException("사용자를 찾을 수 없습니다.");
-//        }
-//
-//        ModelAndView mv = new ModelAndView(new ForwardView("/user/profile.jsp"));
-//        mv.addObject("user", user);
-//        return mv;
-//    }
-
+    
     @RequestMapping(value = "/users/profile", method = RequestMethod.GET)
     public ModelAndView profile(User user)  {
         User findUser = DataBase.findUserById(user.getUserId());

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class ControllerScanner {
-
     private Map<Class<?>, Object> mapByClass = new HashMap<>();
 
     public ControllerScanner() throws InstantiationException, IllegalAccessException, InvocationTargetException {
