@@ -15,9 +15,7 @@ public class SimpleControllerHandlerAdapter implements HandlerAdapter {
     }
 
     @Override
-    public void handle(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ModelAndView mv = ((Controller) handler).execute(request, response);
-        View view = mv.getView();
-        view.render(mv.getModel(), request, response);
+    public ModelAndView handle(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        return ((Controller) handler).execute(request, response);
     }
 }

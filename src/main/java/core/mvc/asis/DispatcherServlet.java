@@ -1,11 +1,12 @@
 package core.mvc.asis;
 
-import core.mvc.HandlerMapping;
+import core.mvc.ModelAndView;
+import core.mvc.View;
 import core.mvc.adapter.AnnotationHandlerAdapter;
 import core.mvc.adapter.HandlerAdapter;
+import core.mvc.adapter.HandlerAdapterRegistry;
 import core.mvc.adapter.SimpleControllerHandlerAdapter;
 import core.mvc.tobe.AnnotationHandlerMapping;
-import core.web.exception.NotFoundHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,24 +15,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 @WebServlet(name = "dispatcher", urlPatterns = "/", loadOnStartup = 1)
 public class DispatcherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-
     private HandlerMappingRegistry handlerMappingRegistry = new HandlerMappingRegistry();
-    private List<HandlerAdapter> adapterList = new ArrayList<>();
+    private HandlerAdapterRegistry handlerAdapterRegistry = new HandlerAdapterRegistry();
 
     @Override
     public void init() {
         handlerMappingRegistry.add(new LegacyHandlerMapping());
         handlerMappingRegistry.add(new AnnotationHandlerMapping());
 
-        adapterList.add(new SimpleControllerHandlerAdapter());
-        adapterList.add(new AnnotationHandlerAdapter());
+        handlerAdapterRegistry.add(new SimpleControllerHandlerAdapter());
+        handlerAdapterRegistry.add(new AnnotationHandlerAdapter());
     }
 
     @Override
@@ -40,15 +38,13 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         Object handler = handlerMappingRegistry.getHandler(req);
-        HandlerAdapter adapter = adapterList.stream()
-                .filter(ad -> ad.support(handler))
-                .findFirst()
-                .orElseThrow(() -> {
-                    throw new NotFoundHandlerException("handler 를 찾을 수 없습니다");
-                });
+
+        HandlerAdapter adapter = handlerAdapterRegistry.getAdapter(handler);
 
         try {
-            adapter.handle(handler, req, resp);
+            ModelAndView mv = adapter.handle(handler, req, resp);
+            View view = mv.getView();
+            view.render(mv.getModel(), req, resp);
         } catch (Throwable e) {
             throw new ServletException(e.getMessage());
         }
