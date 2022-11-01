@@ -15,13 +15,9 @@ public class AnnotationHandlerAdapter implements HandlerAdapter {
     }
 
     @Override
-    public void handle(Object handler, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            ModelAndView mv = ((HandlerExecution) handler).handle(request, response);
-            View view = mv.getView();
-            view.render(mv.getModel(), request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void handle(Object handler, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ModelAndView mv = ((HandlerExecution) handler).handle(request, response);
+        View view = mv.getView();
+        view.render(mv.getModel(), request, response);
     }
 }

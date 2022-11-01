@@ -9,6 +9,7 @@ import core.web.exception.NotFoundHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
@@ -51,7 +52,12 @@ public class DispatcherServlet extends HttpServlet {
                 .orElseThrow(() -> {
                     throw new NotFoundHandlerException("handler 를 찾을 수 없습니다");
                 });
-        adapter.handle(handler, req, resp);
+
+        try {
+            adapter.handle(handler, req, resp);
+        } catch (Throwable e) {
+            throw new ServletException(e.getMessage());
+        }
     }
 
     private Object getHandler(HttpServletRequest request) {
