@@ -1,6 +1,8 @@
 package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 public class HandlerKey {
     private String url;
@@ -42,5 +44,14 @@ public class HandlerKey {
         } else if (!url.equals(other.url))
             return false;
         return true;
+    }
+
+    public boolean isSameHandlerKey(HandlerKey handlerKey) {
+        if (!requestMethod.equals(handlerKey.requestMethod)) {
+            return false;
+        }
+
+        PathPatternParser pathPatternParser = new PathPatternParser();
+        return pathPatternParser.parse(url).matches(PathContainer.parsePath(handlerKey.url));
     }
 }

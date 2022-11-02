@@ -13,8 +13,8 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HandlerMethodArgumentResolverTest {
-    private static final Logger logger = LoggerFactory.getLogger(HandlerMethodArgumentResolverTest.class);
+public class MethodArgumentResolverTest {
+    private static final Logger logger = LoggerFactory.getLogger(MethodArgumentResolverTest.class);
 
     private ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
