@@ -30,7 +30,7 @@ public class DispatcherServlet extends HttpServlet {
         String requestUri = req.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
-        Controller controller = requestMappingLegacy.findController(requestUri);
+        ControllerLegacy controller = requestMappingLegacy.findController(requestUri);
         try {
             String viewName = controller.execute(req, resp);
             move(viewName, req, resp);

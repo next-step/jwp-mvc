@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class RequestMappingLegacy {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private Map<String, Controller> mappings = new HashMap<>();
+    private Map<String, ControllerLegacy> mappings = new HashMap<>();
 
     void initMapping() {
         mappings.put("/", new HomeController());
@@ -29,11 +29,11 @@ public class RequestMappingLegacy {
         });
     }
 
-    public Controller findController(String url) {
+    public ControllerLegacy findController(String url) {
         return mappings.get(url);
     }
 
-    void put(String url, Controller controller) {
-        mappings.put(url, controller);
+    void put(String url, ControllerLegacy controllerLegacy) {
+        mappings.put(url, controllerLegacy);
     }
 }
