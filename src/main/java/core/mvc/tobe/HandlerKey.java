@@ -2,9 +2,14 @@ package core.mvc.tobe;
 
 import core.annotation.web.RequestMethod;
 
+/**
+ * 요청 정보
+ * 요청 URI, Http Method 를 갖는다.
+ * RequestMappingInfo 의 역할로 활용한다.
+ */
 public class HandlerKey {
-    private String url;
-    private RequestMethod requestMethod;
+    private final String url;
+    private final RequestMethod requestMethod;
 
     public HandlerKey(String url, RequestMethod requestMethod) {
         this.url = url;
@@ -37,10 +42,7 @@ public class HandlerKey {
         if (requestMethod != other.requestMethod)
             return false;
         if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+            return other.url == null;
+        } else return url.equals(other.url);
     }
 }

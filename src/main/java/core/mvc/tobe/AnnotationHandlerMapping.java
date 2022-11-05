@@ -1,27 +1,30 @@
 package core.mvc.tobe;
 
-import com.google.common.collect.Maps;
+import core.annotation.web.Controller;
 import core.annotation.web.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 public class AnnotationHandlerMapping {
-    private Object[] basePackage;
 
-    private Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+    private Object[] basePackage;
+    private final MappingRegistry mappingRegistry = new MappingRegistry();
 
     public AnnotationHandlerMapping(Object... basePackage) {
         this.basePackage = basePackage;
     }
 
     public void initialize() {
+        ComponentScanner componentScanner = ComponentScanner.of(basePackage);
+        Map<Class<?>, Object> scannedClasses = componentScanner.doScan(Controller.class);
 
+        mappingRegistry.register(scannedClasses);
     }
 
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
-        return handlerExecutions.get(new HandlerKey(requestUri, rm));
+        return mappingRegistry.getHandlerExecution(new HandlerKey(requestUri, rm));
     }
 }
