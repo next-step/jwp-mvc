@@ -34,7 +34,7 @@ class CreateUserControllerTest {
     @Test
     @DisplayName("Annotation Mapping 으로 /form API 요청을 처리한다.")
     void forward_form() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/form");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/form");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         HandlerExecution execution = handlerMapping.getHandler(request);
@@ -48,7 +48,7 @@ class CreateUserControllerTest {
     @Test
     @DisplayName("DispatcherServlet 으로 /form API 요청을 처리한다.")
     void forward_form_by_dispatcher() throws ServletException, IOException {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/form");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/users/form");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         dispatcherServlet.service(request, response);
