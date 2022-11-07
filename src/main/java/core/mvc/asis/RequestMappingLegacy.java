@@ -12,7 +12,6 @@ public class RequestMappingLegacy {
     private final Map<String, ControllerLegacy> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/users", new ListUserController());
         mappings.put("/users/login", new LoginController());
         mappings.put("/users/profile", new ProfileController());
         mappings.put("/users/logout", new LogoutController());
