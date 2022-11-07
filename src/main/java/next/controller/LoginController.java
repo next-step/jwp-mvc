@@ -1,6 +1,11 @@
 package next.controller;
 
+import core.annotation.web.Controller;
+import core.annotation.web.RequestMapping;
+import core.annotation.web.RequestMethod;
 import core.db.DataBase;
+import core.mvc.ForwardView;
+import core.mvc.ModelAndView;
 import core.mvc.asis.ControllerLegacy;
 import next.model.User;
 
@@ -8,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+@Controller(path = "/users")
 public class LoginController implements ControllerLegacy {
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -26,5 +32,10 @@ public class LoginController implements ControllerLegacy {
             req.setAttribute("loginFailed", true);
             return "/user/login.jsp";
         }
+    }
+
+    @RequestMapping(value = "/loginForm", method = RequestMethod.GET)
+    public ModelAndView forwardLoginForm(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView(new ForwardView("/user/login.jsp"));
     }
 }
