@@ -13,6 +13,8 @@ import java.util.Map;
  */
 public class MappingRegistry {
 
+    private static final int FIRST_METHOD = 0;
+
     private final Map<HandlerKey, HandlerExecution> registry = new HashMap<>();
 
     public void register(Map<Class<?>, Object> classMap) {
@@ -33,7 +35,7 @@ public class MappingRegistry {
                 RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
 
                 String requestUri = basePath + requestMapping.value();
-                RequestMethod requestMethod = requestMapping.method();
+                RequestMethod requestMethod = RequestMethod.from(requestMapping.method()[FIRST_METHOD]);
 
                 HandlerKey handlerKey = new HandlerKey(requestUri, requestMethod);
 
