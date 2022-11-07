@@ -1,7 +1,7 @@
 package next.controller;
 
 import core.mvc.view.ModelAndView;
-import core.mvc.asis.DispatcherServlet;
+import core.mvc.tobe.DispatcherServlet;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import org.junit.jupiter.api.BeforeEach;
