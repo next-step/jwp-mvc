@@ -1,5 +1,9 @@
 package core.mvc.asis;
 
+import core.mvc.ModelAndView;
+import core.mvc.View;
+import core.mvc.tobe.AnnotationHandlerMapping;
+import core.mvc.tobe.HandlerExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +22,15 @@ public class DispatcherServlet extends HttpServlet {
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
 
     private RequestMappingLegacy requestMappingLegacy;
+    private AnnotationHandlerMapping annotationHandlerMapping;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         requestMappingLegacy = new RequestMappingLegacy();
         requestMappingLegacy.initMapping();
+
+        annotationHandlerMapping = new AnnotationHandlerMapping("next.controller");
+        annotationHandlerMapping.initialize();
     }
 
     @Override
@@ -31,11 +39,20 @@ public class DispatcherServlet extends HttpServlet {
         logger.debug("Method : {}, Request URI : {}", req.getMethod(), requestUri);
 
         ControllerLegacy controller = requestMappingLegacy.findController(requestUri);
+
         try {
-            String viewName = controller.execute(req, resp);
-            move(viewName, req, resp);
+            if (controller != null) {
+                String viewName = controller.execute(req, resp);
+                move(viewName, req, resp);
+            } else {
+                HandlerExecution handlerExecution = annotationHandlerMapping.getHandler(req);
+                ModelAndView modelAndView = handlerExecution.handle(req, resp);
+
+                View view = modelAndView.getView();
+                view.render(modelAndView.getModel(), req, resp);
+            }
         } catch (Throwable e) {
-            logger.error("Exception : {}", e);
+            logger.error("Exception: {}", e.getMessage());
             throw new ServletException(e.getMessage());
         }
     }

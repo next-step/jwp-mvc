@@ -9,10 +9,9 @@ import java.util.Map;
 
 public class RequestMappingLegacy {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
-    private Map<String, ControllerLegacy> mappings = new HashMap<>();
+    private final Map<String, ControllerLegacy> mappings = new HashMap<>();
 
     void initMapping() {
-        mappings.put("/", new HomeController());
         mappings.put("/users/form", new ForwardController("/user/form.jsp"));
         mappings.put("/users/loginForm", new ForwardController("/user/login.jsp"));
         mappings.put("/users", new ListUserController());
