@@ -1,7 +1,7 @@
 package next.controller;
 
 import core.db.DataBase;
-import core.mvc.tobe.DispatcherServlet;
+import core.mvc.asis.DispatcherServlet;
 import core.mvc.tobe.AnnotationHandlerMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.view.ForwardView;
