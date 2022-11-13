@@ -8,11 +8,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class HandlerExecution {
-    Object classInstance;
-    Method method;
+    private final Object classInstance;
+    private final Method method;
 
-    public HandlerExecution(Object classInstance,
-                            Method method) {
+    public HandlerExecution(Object classInstance, Method method) {
         this.classInstance = classInstance;
         this.method = method;
     }

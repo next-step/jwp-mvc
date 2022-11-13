@@ -58,10 +58,4 @@ public class BeanFactory {
 
         return createInstance(typeClass);
     }
-
-    public <T> List<T> getBeansFilter(Predicate<Object> predicate) {
-        return beans.values().stream().filter(predicate)
-                .map(bean -> (T)bean)
-                .collect(Collectors.toList());
-    }
 }

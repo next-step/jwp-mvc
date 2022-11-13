@@ -22,8 +22,6 @@ public class RequestParamArgumentResolver implements ArgumentResolver {
                                   String parameterName) {
         RequestParam requestParam = methodParameter.getParameterAnnotation(RequestParam.class);
 
-
-
         String key = StringUtils.isNotBlank(requestParam.name()) ? requestParam.name() : parameterName;
         String result = request.getParameter(key);
 
@@ -31,6 +29,6 @@ public class RequestParamArgumentResolver implements ArgumentResolver {
             throw new IllegalArgumentException();
         }
 
-        return result;
+        return cast(methodParameter.getParameterType(), result);
     }
 }

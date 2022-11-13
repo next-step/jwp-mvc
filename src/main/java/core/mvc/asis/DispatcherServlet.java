@@ -22,7 +22,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private final HandlerMappings handlerMappings = new HandlerMappings();
-    private final ArgumentResolverMapping argumentResolverMapping = new ArgumentResolverMapping();
+    private final ArgumentResolverMapping argumentResolverMapping = new ArgumentResolverMapping("next.controller");
 
 
     @Override
