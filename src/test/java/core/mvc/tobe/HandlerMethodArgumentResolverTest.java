@@ -10,6 +10,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,5 +47,23 @@ public class HandlerMethodArgumentResolverTest {
                 .filter(method -> method.getName().equals(name))
                 .findFirst()
                 .get();
+    }
+
+    @Test
+    void getParamsName() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        Class clazz = TestUserController.class;
+        List<Method> methods = Arrays.asList(clazz.getDeclaredMethods());
+
+        for (Method method : methods) {
+            String[] parameterNames = nameDiscoverer.getParameterNames(method);
+            Object[] values = new Object[parameterNames.length];
+            for (int i = 0; i < parameterNames.length; i++) {
+                String parameterName = parameterNames[i];
+                logger.debug("parameter : {}", parameterName);
+                values[i] = request.getParameter(parameterName);
+            }
+        }
     }
 }

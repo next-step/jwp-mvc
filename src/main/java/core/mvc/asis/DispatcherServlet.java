@@ -1,6 +1,7 @@
 package core.mvc.asis;
 
 import core.mvc.ModelAndView;
+import core.mvc.tobe.ArgumentResolverMapping;
 import core.mvc.tobe.HandlerExecution;
 import core.mvc.tobe.HandlerMappings;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private static final String DEFAULT_REDIRECT_PREFIX = "redirect:";
     private final HandlerMappings handlerMappings = new HandlerMappings();
+    private final ArgumentResolverMapping argumentResolverMapping = new ArgumentResolverMapping("next.controller");
 
 
     @Override
@@ -35,7 +37,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request,
-                           HttpServletResponse response) throws ServletException, IOException {
+                           HttpServletResponse response) throws ServletException {
         String requestUri = request.getRequestURI();
         logger.debug("Method : {}, Request URI : {}", request.getMethod(), requestUri);
 
@@ -43,7 +45,8 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             if (handler instanceof HandlerExecution) {
-                ModelAndView modelAndView = ((HandlerExecution) handler).handle(request, response);
+                Object[] args = argumentResolverMapping.resolve(((HandlerExecution) handler).getMethod(), request, response);
+                ModelAndView modelAndView = ((HandlerExecution) handler).handle(args);
                 modelAndView.render(request, response);
             }
 

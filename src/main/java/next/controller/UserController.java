@@ -11,29 +11,23 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller("/users")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ModelAndView create(HttpServletRequest request, HttpServletResponse response) {
-        User user = new User(
-                request.getParameter("userId"),
-                request.getParameter("password"),
-                request.getParameter("name"),
-                request.getParameter("email")
-        );
-
+    public ModelAndView create(User user, HttpServletResponse response) {
         logger.debug("User : {}", user);
         DataBase.addUser(user);
         return new ModelAndView("redirect:/");
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView list(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView list(HttpSession session, HttpServletRequest request) {
 
-        if (!UserSessionUtils.isLogined(request.getSession())) {
+        if (!UserSessionUtils.isLogined(session)) {
             return new ModelAndView("redirect:/users/loginForm");
         }
 
