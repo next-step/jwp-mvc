@@ -1,13 +1,15 @@
 package core.mvc.asis;
 
+import core.mvc.tobe.HandlerMapping;
 import next.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestMappingLegacy {
+public class RequestMappingLegacy implements HandlerMapping {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
     private final Map<String, ControllerLegacy> mappings = new HashMap<>();
 
@@ -25,8 +27,10 @@ public class RequestMappingLegacy {
         });
     }
 
-    public ControllerLegacy findController(String url) {
-        return mappings.get(url);
+    @Override
+    public ControllerLegacy getHandler(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return mappings.get(uri);
     }
 
     void put(String url, ControllerLegacy controllerLegacy) {

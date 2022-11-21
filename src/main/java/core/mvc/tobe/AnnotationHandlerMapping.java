@@ -6,7 +6,7 @@ import core.annotation.web.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-public class AnnotationHandlerMapping {
+public class AnnotationHandlerMapping implements HandlerMapping {
 
     private Object[] basePackage;
     private final MappingRegistry mappingRegistry = new MappingRegistry();
@@ -22,6 +22,7 @@ public class AnnotationHandlerMapping {
         mappingRegistry.register(scannedClasses);
     }
 
+    @Override
     public HandlerExecution getHandler(HttpServletRequest request) {
         String requestUri = request.getRequestURI();
         RequestMethod rm = RequestMethod.valueOf(request.getMethod().toUpperCase());
